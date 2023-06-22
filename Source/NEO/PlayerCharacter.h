@@ -175,7 +175,7 @@ private:
 
 	int ComboIndex;					// 何段目のコンボか
 
-	TArray<FName> ComboCntNames;	// 何段目のコンボの名前(First,Second,Third・・・)
+	TArray<FName> ComboCntNames;	// コンボの段数(First,Second,Third・・・)
 
 	UPROPERTY(EditAnywhere, Category = Damage)
 	float DamageAmount;				// ダメージ量

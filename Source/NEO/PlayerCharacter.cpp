@@ -151,24 +151,24 @@ void APlayerCharacter::SetupDefoultMappingContext()
 void APlayerCharacter::SetupAnimationAsset()
 {
 	// アニメーションアセットを検索して格納
-	ConstructorHelpers::FObjectFinder<UAnimMontage> ComboMontage(TEXT("/Game/Player/Animation/Montage/Combo/sword/SwordCombo"));
-	ConstructorHelpers::FObjectFinder<UAnimMontage> ComboMontage2(TEXT("/Game/Player/Animation/Montage/Combo/sword/SwordCombo2"));
-	ConstructorHelpers::FObjectFinder<UAnimMontage> UltMontage(TEXT("/Game/Player/Animation/Montage/hissatu"));
+	//ConstructorHelpers::FObjectFinder<UAnimMontage> ComboMontage(TEXT("/Game/Player/Animation/Montage/Combo/sword/SwordCombo"));
+	//ConstructorHelpers::FObjectFinder<UAnimMontage> ComboMontage2(TEXT("/Game/Player/Animation/Montage/Combo/sword/SwordCombo2"));
+	//ConstructorHelpers::FObjectFinder<UAnimMontage> UltMontage(TEXT("/Game/Player/Animation/Montage/hissatu"));
 
-	if (ComboMontage.Succeeded())
-	{
-		ComboAnimMontages.Add(ComboMontage.Object);
-	}
+	//if (ComboMontage.Succeeded())
+	//{
+	//	ComboAnimMontages.Add(ComboMontage.Object);
+	//}
 
-	if (ComboMontage2.Succeeded())
-	{
-		ComboAnimMontages.Add(ComboMontage2.Object);
-	}
+	//if (ComboMontage2.Succeeded())
+	//{
+	//	ComboAnimMontages.Add(ComboMontage2.Object);
+	//}
 
-	if (UltMontage.Succeeded())
-	{
-		UltAnimMontage = UltMontage.Object;
-	}
+	//if (UltMontage.Succeeded())
+	//{
+	//	UltAnimMontage = UltMontage.Object;
+	//}
 
 	// コンボの名前格納
 	ComboCntNames = { "First", "Second", "Third" };
