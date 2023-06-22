@@ -6,11 +6,11 @@
 
 ABossAIController::ABossAIController(const class FObjectInitializer& ObjectInitializer)
 {
-	BehaviorComp = ObjectInitializer.CreateDefaultSubobject<UBehaviorTreeComponent>(this, TEXT("BT_Boss"));
-	BlackboardComp = ObjectInitializer.CreateDefaultSubobject<UBlackboardComponent>(this, TEXT("BB_Boss"));
+	BehaviorComp = ObjectInitializer.CreateDefaultSubobject<UBehaviorTreeComponent>(this, TEXT("BT_BossAI"));
+	BlackboardComp = ObjectInitializer.CreateDefaultSubobject<UBlackboardComponent>(this, TEXT("BB_BossAI"));
 
 	// 作成したビヘイビアツリーを設定
-	//ConstructorHelpers::FObjectFinder<UBehaviorTree> BTFinder(TEXT("/Game/AI/BT_Enemy.BT_Enemy"));
+	//ConstructorHelpers::FObjectFinder<UBehaviorTree> BTFinder(TEXT("/Game/0113/BOSS/BT_BossAI.BT_BossAI"));
 	//BehaviorTree = BTFinder.Object;
 
 	PlayerKeyName = "Player";
