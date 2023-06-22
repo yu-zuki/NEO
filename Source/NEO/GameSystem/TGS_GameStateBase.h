@@ -1,0 +1,188 @@
+﻿// 更新日：2023/6/5		更新者：董		更新内容：ゲームの状態を管理するクラスを作成
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "GameFramework/GameStateBase.h"
+#include "InputCharacter.h"
+
+#include "TGS_GameStateBase.generated.h"
+
+UENUM(BlueprintType)
+enum class EGameState : uint8
+{
+	EGame_None UMETA(DisplayName = "Game_None"),					// ゲームスタート前
+
+	EGame_Title UMETA(DisplayName = "Game_Title"),					// タイトル画面
+	EGame_Playing UMETA(DisplayName = "Game_Playing"),				// ゲーム中	
+	EGame_InBattleArea UMETA(DisplayName = "EGame_InBattleArea"),	// バトルエリア
+	EGame_Over UMETA(DisplayName = "Game_Over"),					// ゲームオーバー
+
+	EGame_ReSpawnPlayer UMETA(DisplayName = "Game_ReSpawnPlayer"),	// プレイヤーの復活
+	EGame_Menu UMETA(DisplayName = "Game_Menu"),					// メニュー画面	
+	EGame_Pause UMETA(DisplayName = "Game_Pause"),					// ポーズ画面
+
+	EGame_Unknown UMETA(DisplayName = "Game_Unknown")
+};
+
+UENUM(BlueprintType)
+enum class ENextLevel : uint8
+{
+	ENextLevel_None UMETA(DisplayName = "NextLevel_None"),					// None
+	ENextLevel_Title UMETA(DisplayName = "NextLevel_Title"),				// タイトル画面
+	ENextLevel_Playing UMETA(DisplayName = "NextLevel_Playing"),			// ゲーム中
+	ENextLevel_Over UMETA(DisplayName = "NextLevel_Over"),					// ゲームオーバー
+
+};
+
+UENUM(BlueprintType)
+enum class EChangeLevel : uint8
+{
+	EChangeLevel_None UMETA(DisplayName = "ChangeLevel_None"),					// None
+	EChangeLevel_Title UMETA(DisplayName = "ChangeLevel_Title"),				// タイトル画面
+	EChangeLevel_Playing UMETA(DisplayName = "ChangeLevel_Playing"),			// ゲーム中
+	EChangeLevel_Over UMETA(DisplayName = "ChangeLevel_Over"),					// ゲームオーバー
+
+};
+/**
+ *
+ */
+UCLASS()
+class NEO_API ATGS_GameStateBase : public AGameStateBase
+{
+	GENERATED_BODY()
+
+protected:
+	ACharacter* PlayerCharacter;					// プレイヤーのキャラクター
+
+	TArray<class AActor*> Enemies;					// 敵の配列
+	EGameState ECurrentState;						// 現在のゲームの状態
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALevelName")
+		FName GameTitleLevelName = FName(TEXT("GameTitle"));	// ゲームタイトルのレベル名
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALevelName")
+		FName GamePlayLevelName = FName(TEXT("GamePlay"));		// ゲームプレイのレベル名
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALevelName")
+		FName GameOverLevelName = FName(TEXT("GameOver"));		// ゲームオーバーのレベル名
+
+public:
+	FDateTime GameStartTime;						// ゲームの開始時間
+	FDateTime GameEndTime;							// ゲームの終了時間
+
+	bool bIsGameOver;								// 外部からゲームオーバーを設定　するためのフラグ
+
+
+public:
+	ATGS_GameStateBase();
+
+	//-------------------------------------------------------------------------------------------------------
+
+	void InitGameState();							// ゲームの状態を初期化
+	void UpdateGameState(float DeltaTime);			// ゲームの状態を更新
+
+	void AddEnemy(class AActor* Enemy);
+	void RemoveEnemy(class AActor* Enemy);
+	TArray<class AActor*> GetEnemies() const;
+	void ClearEnemies();							// 敵の配列をクリア
+
+	void SetCurrentState(EGameState NewState) { ECurrentState = NewState; }
+	inline const EGameState& GetCurrentState() const { return ECurrentState; }		// 最適化ために　return const reference
+
+	//CurrentStateの初期化
+	void InitCurrentState();
+
+
+	bool IsGameOver();								// ゲームオーバーかどうかを判定
+
+	//-------------------------------------------------------------------------------------------------------
+protected:
+	//ゲームタイトルの処理
+	void OnGameTitle();
+	//ゲームプレイ中の処理
+	void OnGamePlaying(float DeltaTime);
+	//ゲームオーバーの処理
+	void OnGameOver();
+	//プレイヤーの復活処理
+	void OnReSpawnPlayer();
+	//メニュー画面の処理
+	void OnGameMenu();
+	//ポーズ画面の処理
+	void OnGamePause();
+	//バトルエリアの処理
+	void OnInBattleArea();
+
+	//-------------------------------------------------------------------------------------------------------
+		//バトルエリアに入る
+	void EnterBattleArea();
+	//バトルエリアから出る
+	void ExitBattleArea();
+
+	//バトルエリアの壁Actors
+	TArray<class AActor*> BattleAreaWalls;
+	//バトルエリアの壁Actorsのタグ
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Area")
+		FName AreaWallsTag;
+
+	//バトルエリアの初期化処理
+	void InitBattleArea();
+
+public:
+	//バトルエリアのフラグ
+	bool bIsOnBattleArea;
+
+	//バトルエリアのカメラ
+	AActor* BattleAreaCamera;
+
+	AActor* GetBattleAreaCamera();
+//---------------------------------------------------------------------------------------------------------------------
+protected:
+	//ゲームインスタンスの取得
+	class UTGS_GameInstance* GetGameInstance();
+
+
+	inline void ChangeLevel(FName NextLevelName);
+
+public:
+	void ChangeNextLevel(ENextLevel NextLevel);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Level")
+		EChangeLevel EchangeLevel;						// レベルの変更
+
+	//EChangeLevel GetChangeLevel();
+
+
+protected:
+	//----------------------------------------------------------------------------
+		//現在のサブアクション
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "GameInput")
+		ESubAction CurrentSubAction;
+
+public:
+	ESubAction UseSubAction();
+	void SetSubAction(ESubAction _subAction);
+	inline const ESubAction& GetCurrentSubAction() const { return CurrentSubAction; }
+
+	//-----------------------------------UI--------------------------------------------
+public:
+
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI")
+		TSubclassOf<class UUserWidget> Widget_GameMenuClass;			// ゲームメニューのUI
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI")
+		TSubclassOf<class UUserWidget> Widget_PlayerStatusClass;		// プレイヤーのステータスのUI
+
+protected:
+
+	//機能テスト用アクター
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Test")
+		class AJumpModuleActor* JumpModuleActor;
+
+	//重力加速度的跳跃实现所需要的变量
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Jump")
+		float fJumpHeight;					//跳跃高度
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Jump")
+		float fGravityAcceleration;			//重力加速度
+};

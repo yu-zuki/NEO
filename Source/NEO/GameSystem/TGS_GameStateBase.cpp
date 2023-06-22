@@ -1,0 +1,427 @@
+// 更新日：2023/6/5		更新者：董		更新内容：ゲームの状態を管理するクラスを作成
+
+#include "TGS_GameStateBase.h"
+#include "TGS_GameMode.h"
+#include "TGS_GameInstance.h"
+#include "Kismet/GameplayStatics.h"
+#include "Blueprint/UserWidget.h"
+
+//test
+#include "JumpModuleActor.h"
+
+ATGS_GameStateBase::ATGS_GameStateBase()
+	:ECurrentState(EGameState::EGame_None), EchangeLevel(EChangeLevel::EChangeLevel_None)
+{
+
+}
+
+//ゲームの状態を初期化する
+void ATGS_GameStateBase::InitGameState()
+{
+	PlayerCharacter = Cast<ACharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+
+	//バトルエリアの初期化
+	InitBattleArea();
+
+	//ゲームの状態を初期化する
+	InitCurrentState();
+}
+
+void ATGS_GameStateBase::UpdateGameState(float DeltaTime)
+{
+
+	switch (ECurrentState)
+	{
+	case EGameState::EGame_None:
+		break;
+	case EGameState::EGame_Title:
+		OnGameTitle();
+		break;
+	case EGameState::EGame_Playing:
+		OnGamePlaying(DeltaTime);
+		break;
+	case EGameState::EGame_InBattleArea:
+		OnInBattleArea();
+		break;
+	case EGameState::EGame_Over:
+		OnGameOver();
+		break;
+	case EGameState::EGame_ReSpawnPlayer:
+		OnReSpawnPlayer();
+		break;
+	case EGameState::EGame_Menu:
+		OnGameMenu();
+		break;
+	case EGameState::EGame_Pause:
+		OnGamePause();
+		break;
+	case EGameState::EGame_Unknown:
+		break;
+	default:
+		break;
+	}
+
+	// EChangeLevel = EchangeLevel::EChangeLevel_None;
+}
+
+void ATGS_GameStateBase::AddEnemy(AActor* Enemy)
+{
+	Enemies.Add(Enemy);
+}
+
+void ATGS_GameStateBase::RemoveEnemy(AActor* Enemy)
+{
+	if (Enemy == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("RemoveEnemy is not Found"));
+		return;
+	}
+	Enemy->Destroy();
+
+	Enemies.Remove(Enemy);
+}
+
+TArray<class AActor*> ATGS_GameStateBase::GetEnemies() const
+{
+	return Enemies;
+}
+
+void ATGS_GameStateBase::ClearEnemies()
+{
+	//性能が良くない場合は、下記のFor文を使う
+	for (auto Enemy : Enemies)
+	{
+		RemoveEnemy(Enemy);
+	}
+
+	//for (int i = 0; i < Enemies.Num(); i++)
+	//{
+	//	RemoveEnemy(Enemies[i]);
+	//}
+}
+
+void ATGS_GameStateBase::InitCurrentState()
+{
+	//CurrentState = EGameState::EGame_None;
+	ECurrentState = GetGameInstance()->LoadGameStateData();		//インスタンスからゲームの状態を読み込む
+
+	if (ECurrentState == EGameState::EGame_Playing)
+	{
+		if (Widget_GameMenuClass && Widget_PlayerStatusClass) {
+			UUserWidget* Widget_GameMenu = CreateWidget<UUserWidget>(GetWorld(), Widget_GameMenuClass, "GameMenu");
+			UUserWidget* Widget_PlayerStatus = CreateWidget<UUserWidget>(GetWorld(), Widget_PlayerStatusClass, "PlayerStatus");
+
+			if (Widget_PlayerStatus) {
+				Widget_PlayerStatus->AddToViewport();		//プレイヤーのステータスを表示する
+			}
+			else {
+				UE_LOG(LogTemp, Warning, TEXT("Widget_PlayerStatus is not found"));
+			}
+		}
+		else {
+			UE_LOG(LogTemp, Warning, TEXT("Widget_GameMenuClass or Widget_PlayerStatusClass is not found"));
+		}
+
+	}
+}
+
+bool ATGS_GameStateBase::IsGameOver()
+{
+	// 例：　/*if (player.hp < 0) { return true }*/
+
+	return bIsGameOver;
+}
+
+void ATGS_GameStateBase::OnGameTitle()
+{
+	if (EchangeLevel == EChangeLevel::EChangeLevel_Playing)			//レベルを変更できるかどうか
+	{
+		SetCurrentState(EGameState::EGame_Playing);					//意味ないかも
+		GetGameInstance()->SaveGameStateData(ECurrentState);		//インスタンスにゲームの状態を保存
+
+		ChangeNextLevel(ENextLevel::ENextLevel_Playing);			//レベルを変更
+	}
+
+	//Enterキーを押したら、ゲームを開始する
+	if (UseSubAction() == ESubAction::ESubAction_Enter) {
+		EchangeLevel = EChangeLevel::EChangeLevel_Playing;
+	}
+}
+
+
+void ATGS_GameStateBase::OnGamePlaying(float DeltaTime)
+{
+	//switch(UseSubAction())
+	//{ 
+	//case ESubAction::ESubAction_Enter:
+	//	//Debug用
+	//	if (true)
+	//	{
+	//		/*JumpModuleActor =Cast<AJumpModuleActor>( UGameplayStatics::GetActorOfClass(GetWorld(), AJumpModuleActor::StaticClass()) ) ;
+
+	//		if (JumpModuleActor)		{
+	//		JumpModuleActor->StartJumpByGravity(fJumpHeight, fGravityAcceleration);
+	//		}*/
+
+	//		//バトルエリアに入る
+	//		EnterBattleArea(nullptr);
+	//		SetCurrentState(EGameState::EGame_InBattleArea);
+	//	}
+	//	break;
+	//}	
+
+	//Debug用
+	if (bIsOnBattleArea)	{
+		EnterBattleArea();
+		SetCurrentState(EGameState::EGame_InBattleArea);
+
+		return;
+	}
+
+
+	if (IsGameOver() || EchangeLevel == EChangeLevel::EChangeLevel_Over) {
+		SetCurrentState(EGameState::EGame_Over);
+		GameEndTime = FDateTime::Now();
+
+		GetGameInstance()->SaveGameStateData(ECurrentState);		//インスタンスにゲームの状態を保存
+		ChangeNextLevel(ENextLevel::ENextLevel_Over);
+	}
+	else if (false) {
+		SetCurrentState(EGameState::EGame_Pause);
+	}
+	else if (false) {
+		SetCurrentState(EGameState::EGame_Menu);
+	}
+
+	//Enterキーが押されたら、ゲームをGameOverにする
+	if (UseSubAction() == ESubAction::ESubAction_Enter) {
+		EchangeLevel = EChangeLevel::EChangeLevel_Over;
+	}
+}
+
+void ATGS_GameStateBase::OnGameOver()
+{
+	if (false) {
+		SetCurrentState(EGameState::EGame_ReSpawnPlayer);
+	}
+	else if (EchangeLevel == EChangeLevel::EChangeLevel_Title) {
+		SetCurrentState(EGameState::EGame_Title);
+
+		GetGameInstance()->SaveGameStateData(ECurrentState);		//インスタンスにゲームの状態を保存
+		ChangeNextLevel(ENextLevel::ENextLevel_Title);
+	}
+
+	//Enterキーが押されたら、タイトルに戻る
+	if (UseSubAction() == ESubAction::ESubAction_Enter) {
+		EchangeLevel = EChangeLevel::EChangeLevel_Title;
+	}
+}
+
+void ATGS_GameStateBase::OnReSpawnPlayer()
+{
+	ATGS_GameMode* GameMode = Cast<ATGS_GameMode>(GetWorld()->GetAuthGameMode());
+	if (GameMode) {
+		GameMode->RespawnPlayer();
+	}
+}
+
+void ATGS_GameStateBase::OnGameMenu()
+{
+	if (EchangeLevel == EChangeLevel::EChangeLevel_Playing) {
+		SetCurrentState(EGameState::EGame_Playing);
+	}
+	else if (true) {
+		SetCurrentState(EGameState::EGame_Title);
+
+		GetGameInstance()->SaveGameStateData(ECurrentState);		//インスタンスにゲームの状態を保存
+		ChangeNextLevel(ENextLevel::ENextLevel_Title);
+	}
+
+	//Menu画面を追加
+}
+
+void ATGS_GameStateBase::OnGamePause()
+{
+	if (true) {
+		SetCurrentState(EGameState::EGame_Playing);
+	}
+}
+
+void ATGS_GameStateBase::OnInBattleArea()
+{
+	//Debug用 BattleAreaから出る
+	if (UseSubAction() == ESubAction::ESubAction_Enter) {
+		bIsOnBattleArea = false;
+	}
+
+	if (bIsOnBattleArea != true) {
+		//バトルエリアから出る
+		ExitBattleArea();
+		SetCurrentState(EGameState::EGame_Playing);
+	}
+}
+
+void ATGS_GameStateBase::EnterBattleArea()
+{
+	//バトルエリアを有効化
+	for (auto Wall : BattleAreaWalls)	{
+		if (Wall)		{
+			Wall->SetActorEnableCollision(true);
+			Wall->SetActorHiddenInGame(false);
+		}
+		else {
+			UE_LOG(LogTemp, Warning, TEXT("Wall is not found"));
+		}
+	}
+
+	//プレイヤーのカメラを固定カメラに変更
+	if (GetBattleAreaCamera()) {
+		APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+		if (PlayerController) {
+			PlayerController->SetViewTargetWithBlend(GetBattleAreaCamera(), 0.5f);
+		}
+		else {
+			UE_LOG(LogTemp, Warning, TEXT("PlayerController is not found"));
+		}
+	}
+}
+
+void ATGS_GameStateBase::ExitBattleArea()
+{
+	//バトルエリアを無効化
+	for (auto Wall : BattleAreaWalls)
+	{
+		if (Wall) {
+			Wall->SetActorEnableCollision(false);
+			Wall->SetActorHiddenInGame(true);
+		}
+		else {
+			UE_LOG(LogTemp, Warning, TEXT("Wall is not found"));
+		}
+	}
+
+	//固定カメラをプレイヤーのカメラに変更
+	if (PlayerCharacter) {
+		APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+		if (PlayerController) {
+			PlayerController->SetViewTargetWithBlend(PlayerCharacter, 0.5f);
+		}
+		else {
+			UE_LOG(LogTemp, Warning, TEXT("PlayerController is not found"));
+		}
+	}
+}
+
+void ATGS_GameStateBase::InitBattleArea()
+{
+	if (AreaWallsTag.IsValid())
+	{
+		//バトルエリアの壁を取得
+		UGameplayStatics::GetAllActorsWithTag(GetWorld(), AreaWallsTag, BattleAreaWalls);
+
+		//バトルエリアの壁がない場合はエラーを出す
+		if (BattleAreaWalls.Num() == 0 ) {
+			UE_LOG(LogTemp, Error, TEXT("AreaWallsTag is not Found"));
+			return;
+		}
+
+		//バトルエリアを無効化
+		ExitBattleArea();
+	}
+	else {
+		UE_LOG(LogTemp, Error, TEXT("AreaWallsTag is not Found"));
+	}
+}
+
+AActor* ATGS_GameStateBase::GetBattleAreaCamera()
+{
+	if (BattleAreaCamera)	{
+		return BattleAreaCamera;
+	}
+	else	{
+		UE_LOG(LogTemp, Error, TEXT("BattleAreaCamera is not Found"));
+		return nullptr;
+	}
+}
+
+UTGS_GameInstance* ATGS_GameStateBase::GetGameInstance()
+{
+	UTGS_GameInstance* GameInstance = Cast<UTGS_GameInstance>(GetWorld()->GetGameInstance());
+	if (GameInstance) {
+		return GameInstance;
+	}
+	else {
+		UE_LOG(LogTemp, Error, TEXT("GameInstance is not Found"));
+	}
+	return nullptr;
+}
+
+/**
+* 指定されたNextLevelパラメータに基づいてレベルを変更します。
+* @param NextLevel 次に変更するレベルを決定する列挙値。
+*/
+void ATGS_GameStateBase::ChangeNextLevel(ENextLevel NextLevel)
+{
+	switch (NextLevel)
+	{
+	case ENextLevel::ENextLevel_None:
+		break;
+	case ENextLevel::ENextLevel_Title:
+		ChangeLevel(GameTitleLevelName);
+		break;
+	case ENextLevel::ENextLevel_Playing:
+		ChangeLevel(GamePlayLevelName);
+		break;
+	case ENextLevel::ENextLevel_Over:
+		ChangeLevel(GameOverLevelName);
+		break;
+	}
+}
+
+void ATGS_GameStateBase::ChangeLevel(FName NextLevelName)
+{
+	//次のレベルに移動する
+	if (NextLevelName != NAME_None) {
+		UGameplayStatics::OpenLevel(GetWorld(), NextLevelName);
+	}
+}
+
+/**
+* 指定されたNextLevelパラメータに基づいてレベルを変更します。
+* @param NextLevel 次に変更するレベルを決定する列挙値。
+*/
+//EChangeLevel ATGS_GameStateBase::GetChangeLevel()
+//{
+//	EChangeLevel Temp = EchangeLevel;
+//	EchangeLevel = EChangeLevel::EChangeLevel_None;
+//
+//	return Temp;
+//}
+
+
+void ATGS_GameStateBase::SetSubAction(ESubAction _subAction)
+{
+	CurrentSubAction = _subAction;
+}
+
+/**
+ * @brief サブアクションを使用するための関数
+ *
+ * @details 現在設定されているサブアクションを返し、
+ *          現在のサブアクションをリセットする。
+ *
+ * @return ESubAction 現在設定されているサブアクション
+ */
+ESubAction ATGS_GameStateBase::UseSubAction()
+{
+
+	ESubAction tmp_SubAction = CurrentSubAction;
+	CurrentSubAction = ESubAction::ESubAction_None;
+
+	if (tmp_SubAction != ESubAction::ESubAction_None) {
+		UE_LOG(LogTemp, Warning, TEXT("SubAction is %d"), (int)tmp_SubAction);
+	}
+
+	return tmp_SubAction;
+}
+
