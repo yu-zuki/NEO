@@ -25,8 +25,11 @@ public:
 public:
 	void SetPlayerKey(APawn* player);
 
+	void SetToPlayerDistance(float* distance);
+
 	UFUNCTION()
 		ABossBase* GetPlayerKey();
+
 
 	UPROPERTY()
 		UBehaviorTreeComponent* BehaviorComp;
@@ -35,7 +38,10 @@ public:
 		UBlackboardComponent* BlackboardComp;
 
 	UPROPERTY(EditDefaultsOnly, Category = AI)
-		FName PlayerKeyName;
+		FName PlayerKeyName;	
+	
+	UPROPERTY(EditDefaultsOnly, Category = AI)
+		FName DistanceKeyName;
 
 protected:
 	// AIControllerÇÃPawnèäéù

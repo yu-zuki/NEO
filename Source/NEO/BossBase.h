@@ -4,8 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "GameFramework/Actor.h"
 #include "Kismet/GameplayStatics.h"
 #include "PlayerCharacter.h"
+#include "BossAIController.h"
 #include "BossBase.generated.h"
 
 UCLASS()
@@ -32,7 +34,17 @@ public:
 	UPROPERTY(EditAnywhere)
 	USceneComponent* DefaultSceneRoot;
 
-	//PlayerInput
+	//Playerの値を代入するための関数
 	void PlayerInput();
+
+	//PlayerとのDistanceをとる
+	void GetPlayerDistance();
+
+	//AIコントローラーの値を保存
+	ABossAIController* AIController;
+
+public:
+	UPROPERTY(EditAnywhere)
+	float PlayerDistance;
 
 };

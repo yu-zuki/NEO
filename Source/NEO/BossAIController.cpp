@@ -14,6 +14,7 @@ ABossAIController::ABossAIController(const class FObjectInitializer& ObjectIniti
 	BehaviorTree = BTFinder.Object;
 
 	PlayerKeyName = "Player";
+	DistanceKeyName = "Distance";
 }
 
 void ABossAIController::BeginPlay()
@@ -44,9 +45,22 @@ void ABossAIController::SetPlayerKey(APawn* player)
 	BlackboardComp->SetValueAsObject(PlayerKeyName, player);
 }
 
+void ABossAIController::SetToPlayerDistance(float* distance)
+{
+	ensure(BlackboardComp);
+
+	// ブラックボードで作成したDistanceというキーにプレイヤーとの距離情報を入れる
+	BlackboardComp->SetValueAsFloat(PlayerKeyName, *distance);
+
+	UKismetSystemLibrary::PrintString(this, FString::SanitizeFloat(*distance), true, true, FColor::Blue, 2.f);
+
+}
+
+
 ABossBase* ABossAIController::GetPlayerKey()
 {
 	ensure(BlackboardComp);
 
 	return Cast<ABossBase>(BlackboardComp->GetValueAsObject(PlayerKeyName));
 }
+
