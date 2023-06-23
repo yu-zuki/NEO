@@ -2,6 +2,10 @@
 
 
 #include "BossBase.h"
+#include "BossAIController.h"
+#include "Kismet/KismetSystemLibrary.h"
+#include "Kismet/GameplayStatics.h"
+#include "PlayerCharacter.h"
 
 
 // Sets default values
@@ -9,11 +13,6 @@ ABossBase::ABossBase()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
-	//SceneComponentÇRootComponentÇ…ê›íËÇ∑ÇÈ
-	DefaultSceneRoot = CreateDefaultSubobject<USceneComponent>(TEXT("SceneComponent"));
-	RootComponent = DefaultSceneRoot;
-
 }
 
 // Called when the game starts or when spawned
@@ -21,6 +20,7 @@ void ABossBase::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	PlayerInput();
 }
 
 // Called every frame
@@ -36,3 +36,16 @@ void ABossBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 }
 
+void ABossBase::PlayerInput()
+{
+	ABossAIController* AIController = Cast<ABossAIController>(GetController());
+	//ÉvÉåÉCÉÑÅ[
+	APlayerCharacter* player = Cast<APlayerCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(),0));
+
+	if (AIController && player)
+	{
+		AIController->SetPlayerKey(player);
+	}
+	
+	UKismetSystemLibrary::PrintString(this, UKismetSystemLibrary::GetDisplayName(player), true, true, FColor::Blue, 2.f);
+}

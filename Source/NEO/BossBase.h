@@ -32,10 +32,7 @@ public:
 	UPROPERTY(EditAnywhere)
 	USceneComponent* DefaultSceneRoot;
 
-	FString Skeletal_Path = TEXT("SkeletalMesh'/Game/Enemy/BOSS/Boss_Mesh.BossMesh'");
-
-
-
-	
+	//PlayerInput
+	void PlayerInput();
 
 };
