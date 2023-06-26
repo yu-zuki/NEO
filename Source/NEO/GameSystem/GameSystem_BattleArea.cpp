@@ -29,6 +29,8 @@ AGameSystem_BattleArea::AGameSystem_BattleArea()
 	//StaticMesh インスタンス
 	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
 	StaticMeshComponent->SetupAttachment(RootComponent);
+	StaticMeshComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	StaticMeshComponent->SetCollisionResponseToAllChannels(ECR_Overlap);
 
 	//Meshの生成
 	LeftMesh = CreateDefaultSubobject<UProceduralMeshComponent>(TEXT("LeftProceduralMesh"));
@@ -43,10 +45,14 @@ void AGameSystem_BattleArea::BeginPlay()
 {
 	Super::BeginPlay();
 
+	auto Transform = GetActorTransform();
+
 	// RootのTransformを初期化
 	GetRootComponent()->SetRelativeTransform(FTransform::Identity);
 
 	CreateBattleArea();
+
+	GetRootComponent()->SetRelativeTransform(Transform);
 
 	StaticMeshComponent->OnComponentBeginOverlap.AddDynamic(this, &AGameSystem_BattleArea::BeginOverlap);
 }
