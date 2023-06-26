@@ -1,5 +1,5 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
+// 更新日：2023/6/24	更新者：董		更新内容：バトルエリア機能が必要な変数を作成
+// 更新日：2023/6/26	更新者：董		更新内容：バトルエリア機能がが完成
 #pragma once
 
 #include "CoreMinimal.h"
@@ -43,6 +43,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BattleArea")
 		float MaxCameraDistance = 1000.0f;
 
+	//カメラの近平面と遠平面の距離
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BattleArea")
 		float NearPlane = 10.0f;
 
@@ -54,6 +55,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BattleAreaDebug")
 	    float thickness = 1.0f;
 
+	//バトルエリアのメッシュ
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BattleArea")
 		class UProceduralMeshComponent* LeftMesh;
 

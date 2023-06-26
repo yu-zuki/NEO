@@ -1,4 +1,5 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
+﻿// 更新日：2023/6/24	更新者：董		更新内容：バトルエリア機能が必要な変数を作成
+// 更新日：2023/6/26	更新者：董		更新内容：バトルエリア機能がが完成
 
 #include "GameSystem_BattleArea.h"
 #include "Components/SceneComponent.h"
@@ -62,6 +63,7 @@ void AGameSystem_BattleArea::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 }
+
 
 void AGameSystem_BattleArea::CreateBattleArea()
 {
@@ -132,16 +134,21 @@ SFrustumVertices AGameSystem_BattleArea::GetFrustumVertices(FMinimalViewInfo Cam
 	return FrustumVertices;
 }
 
+/**
+ * @brief ビューフラスタムを使って2つのメッシュを作成し、それぞれ左辺と右辺に配置する
+ *
+ * @param FrustumVertices 視錐台の頂点。メッシュ作成に使用される
+ */
 void AGameSystem_BattleArea::CreateAreaMesh(SFrustumVertices FrustumVertices)
 {
-	//頂点追加
+	//　左側の平面の頂点を追加
 	TArray<FVector> Vertices;
 	Vertices.Add(FrustumVertices.BottomLeftNear);
 	Vertices.Add(FrustumVertices.TopLeftNear);
 	Vertices.Add(FrustumVertices.TopLeftFar);
 	Vertices.Add(FrustumVertices.BottomLeftFar);
 
-	// 定义三角形
+	//　Verticesの配列を作成
 	TArray<int32> Triangles;
 	Triangles.Add(0);
 	Triangles.Add(1);
@@ -150,29 +157,29 @@ void AGameSystem_BattleArea::CreateAreaMesh(SFrustumVertices FrustumVertices)
 	Triangles.Add(3);
 	Triangles.Add(0);
 
-	// 创建网格
+	// メッシュの作成
 	LeftMesh->CreateMeshSection_LinearColor(0, Vertices, Triangles, TArray<FVector>(), TArray<FVector2D>(), TArray<FLinearColor>(), TArray<FProcMeshTangent>(), true);
 
-	// 禁用渲染
+	//　レンダーしない
 	LeftMesh->SetVisibility(false);
 
-	// 启用碰撞
+	//　衝突を無効に
 	LeftMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
-	//添加右侧顶点
+	//　右側の平面の頂点を追加
 	Vertices.Reset();
 	Vertices.Add(FrustumVertices.BottomRightNear);
 	Vertices.Add(FrustumVertices.TopRightNear);
 	Vertices.Add(FrustumVertices.TopRightFar);
 	Vertices.Add(FrustumVertices.BottomRightFar);
 
-	//创建右侧网格
+	//
 	RightMesh->CreateMeshSection_LinearColor(0, Vertices, Triangles, TArray<FVector>(), TArray<FVector2D>(), TArray<FLinearColor>(), TArray<FProcMeshTangent>(), true);
 	
-	// 禁用渲染
+	// 
 	RightMesh->SetVisibility(false);
 
-	// 启用碰撞
+	// 
 	RightMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
