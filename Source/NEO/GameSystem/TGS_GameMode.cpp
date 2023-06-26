@@ -7,6 +7,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputCharacter.h"
+#include "ProceduralMeshComponent.h"
 
 
 ATGS_GameMode::ATGS_GameMode()
@@ -101,8 +102,13 @@ void ATGS_GameMode::SetSubAction(ESubAction _eSubAction)
 	GetGameState()->SetSubAction(_eSubAction);
 }
 
-void ATGS_GameMode::SetIsOnBattleArea(bool bIsOnArea,AActor* Camera)
+void ATGS_GameMode::SetIsOnBattleArea(bool bIsOnArea,AActor* Camera, class UProceduralMeshComponent* LeftMesh, class UProceduralMeshComponent* RightMesh)
 {
+	GetGameState()->BattleAreaMeshs.Reset();
+
+	GetGameState()->BattleAreaMeshs.Add(LeftMesh);
+	GetGameState()->BattleAreaMeshs.Add(RightMesh);
+
 	GetGameState()->bIsOnBattleArea = bIsOnArea; 
 	GetGameState()->BattleAreaCamera = Camera;
 }

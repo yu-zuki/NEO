@@ -6,6 +6,8 @@
 #include "Kismet/GameplayStatics.h"
 #include "Blueprint/UserWidget.h"
 
+#include "ProceduralMeshComponent.h"
+
 //test
 #include "JumpModuleActor.h"
 
@@ -121,7 +123,6 @@ void ATGS_GameStateBase::InitCurrentState()
 		else {
 			UE_LOG(LogTemp, Warning, TEXT("Widget_GameMenuClass or Widget_PlayerStatusClass is not found"));
 		}
-
 	}
 }
 
@@ -151,30 +152,10 @@ void ATGS_GameStateBase::OnGameTitle()
 
 void ATGS_GameStateBase::OnGamePlaying(float DeltaTime)
 {
-	//switch(UseSubAction())
-	//{ 
-	//case ESubAction::ESubAction_Enter:
-	//	//Debug用
-	//	if (true)
-	//	{
-	//		/*JumpModuleActor =Cast<AJumpModuleActor>( UGameplayStatics::GetActorOfClass(GetWorld(), AJumpModuleActor::StaticClass()) ) ;
-
-	//		if (JumpModuleActor)		{
-	//		JumpModuleActor->StartJumpByGravity(fJumpHeight, fGravityAcceleration);
-	//		}*/
-
-	//		//バトルエリアに入る
-	//		EnterBattleArea(nullptr);
-	//		SetCurrentState(EGameState::EGame_InBattleArea);
-	//	}
-	//	break;
-	//}	
-
 	//Debug用
 	if (bIsOnBattleArea)	{
 		EnterBattleArea();
 		SetCurrentState(EGameState::EGame_InBattleArea);
-
 		return;
 	}
 
@@ -264,13 +245,12 @@ void ATGS_GameStateBase::OnInBattleArea()
 void ATGS_GameStateBase::EnterBattleArea()
 {
 	//バトルエリアを有効化
-	for (auto Wall : BattleAreaWalls)	{
-		if (Wall)		{
-			Wall->SetActorEnableCollision(true);
-			Wall->SetActorHiddenInGame(false);
+	for (auto Mesh : BattleAreaMeshs)	{
+		if (Mesh)		{
+			Mesh->SetCollisionEnabled(ECollisionEnabled::QueryOnly);;
 		}
 		else {
-			UE_LOG(LogTemp, Warning, TEXT("Wall is not found"));
+			UE_LOG(LogTemp, Warning, TEXT("MeshWall is not found"));
 		}
 	}
 
@@ -289,14 +269,12 @@ void ATGS_GameStateBase::EnterBattleArea()
 void ATGS_GameStateBase::ExitBattleArea()
 {
 	//バトルエリアを無効化
-	for (auto Wall : BattleAreaWalls)
-	{
-		if (Wall) {
-			Wall->SetActorEnableCollision(false);
-			Wall->SetActorHiddenInGame(true);
+	for (auto Mesh : BattleAreaMeshs) {
+		if (Mesh) {
+			Mesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		}
 		else {
-			UE_LOG(LogTemp, Warning, TEXT("Wall is not found"));
+			UE_LOG(LogTemp, Warning, TEXT("MeshWall is not found"));
 		}
 	}
 
@@ -314,23 +292,8 @@ void ATGS_GameStateBase::ExitBattleArea()
 
 void ATGS_GameStateBase::InitBattleArea()
 {
-	if (AreaWallsTag.IsValid())
-	{
-		//バトルエリアの壁を取得
-		UGameplayStatics::GetAllActorsWithTag(GetWorld(), AreaWallsTag, BattleAreaWalls);
-
-		//バトルエリアの壁がない場合はエラーを出す
-		if (BattleAreaWalls.Num() == 0 ) {
-			UE_LOG(LogTemp, Error, TEXT("AreaWallsTag is not Found"));
-			return;
-		}
-
-		//バトルエリアを無効化
-		ExitBattleArea();
-	}
-	else {
-		UE_LOG(LogTemp, Error, TEXT("AreaWallsTag is not Found"));
-	}
+	//バトルエリアを無効化
+	ExitBattleArea();
 }
 
 AActor* ATGS_GameStateBase::GetBattleAreaCamera()

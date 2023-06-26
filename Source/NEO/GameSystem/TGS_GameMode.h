@@ -55,7 +55,8 @@ public:
 	void SetSubAction(ESubAction _eSubAction);
 
 	UFUNCTION(BlueprintCallable, Category = "Area")
-		void SetIsOnBattleArea(bool bIsOnArea, AActor* Camera);
+		void SetIsOnBattleArea(bool bIsOnArea, AActor* Camera,class UProceduralMeshComponent* LeftMesh, class UProceduralMeshComponent* RightMesh);
+	
 	UFUNCTION(BlueprintCallable, Category = "Area")
 		bool GetIsOnBattleArea();
 

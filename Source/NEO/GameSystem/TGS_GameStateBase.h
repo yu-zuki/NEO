@@ -135,6 +135,8 @@ public:
 	//バトルエリアのカメラ
 	AActor* BattleAreaCamera;
 
+	TArray<class UProceduralMeshComponent*> BattleAreaMeshs;
+
 	AActor* GetBattleAreaCamera();
 //---------------------------------------------------------------------------------------------------------------------
 protected:
