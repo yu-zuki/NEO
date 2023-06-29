@@ -40,7 +40,27 @@ public:
 	UPROPERTY()
 	FVector ForwardDirection;
 
-	//移動速度
+	//通常の移動速度
 	UPROPERTY(EditAnywhere)
 		float OdaSpeed;
+
+	//急な速度
+	UPROPERTY(EditAnywhere)
+		float FastOdaSpeed;
+
+	//前方移動変更カウンター
+	UPROPERTY()
+		int FlontTimer;
+	
+	//行動変更時間設定
+	UPROPERTY(EditAnywhere)
+		int ChangeFlontTimer;
+
+	//前方移動
+	UFUNCTION()
+		void FlontMove(float Speed);
+
+	//後方移動
+	UFUNCTION()
+		void BackMove(float Speed);
 };
