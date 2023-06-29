@@ -50,10 +50,14 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BattleArea")
 		float FarPlane = 500.0f;
 
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "BattleArea")
+		FName EnterActorTag = "Player";
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BattleAreaDebug")
 		float lifeTime = 100.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BattleAreaDebug")
 	    float thickness = 1.0f;
+
 
 	//バトルエリアのメッシュ
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BattleArea")

@@ -104,8 +104,29 @@ void ATGS_GameStateBase::ClearEnemies()
 
 void ATGS_GameStateBase::InitCurrentState()
 {
-	//CurrentState = EGameState::EGame_None;
-	ECurrentState = GetGameInstance()->LoadGameStateData();		//インスタンスからゲームの状態を読み込む
+	//今のレベルの名前を取得
+	FString CurrentLevelName = GetWorld()->GetMapName();
+	//レベル名の先頭にある"/Game/"を削除
+	CurrentLevelName.RemoveFromStart(GetWorld()->StreamingLevelsPrefix);
+
+	if ((FName)CurrentLevelName == GameTitleLevelName)
+	{
+		ECurrentState = EGameState::EGame_Title;
+	}
+	else if ((FName)CurrentLevelName == GamePlayLevelName)
+	{
+		ECurrentState = EGameState::EGame_Playing;
+	}
+	else if ((FName)CurrentLevelName == GameOverLevelName)
+	{
+		ECurrentState = EGameState::EGame_Over;
+	}
+
+	//インスタンスからゲームの状態を読み込む
+	if (ECurrentState != GetGameInstance()->LoadGameStateData()) {
+		GetGameInstance()->SaveGameStateData(ECurrentState);
+		UE_LOG(LogTemp, Warning, TEXT("Not starting from GameTitle"));
+	}		
 
 	if (ECurrentState == EGameState::EGame_Playing)
 	{
