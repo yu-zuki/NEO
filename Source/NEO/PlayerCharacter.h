@@ -106,22 +106,11 @@ public:
 	// ボタンの設定
 	void SetupDefoultMappingContext();
 
-	// カメラの設定
-	void SetupCamera();
-
 	// アニメーションの設定
 	void SetupAnimationAsset();
 
 	// 刀のメッシュと当たり判定の設定
 	void SetupSword();
-
-	/** Camera boom positioning the camera behind the character */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-		class USpringArmComponent* CameraBoom;
-
-	/** Follow camera */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-		class UCameraComponent* Follow_Camera;
 
 	// 剣のメッシュ
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Mesh, meta = (AllowPrivateAccess = "true"))
@@ -141,7 +130,7 @@ public:
 
 private:
 
-	bool IsControl;				// 入力可能かどうか
+	bool IsControl;					// 入力可能かどうか
 
 	bool IsRunning;					// ダッシュ中のフラグ
 

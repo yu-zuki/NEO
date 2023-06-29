@@ -19,6 +19,11 @@ class NEO_API ACharacterCamera : public AActor
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 		class UCameraComponent* Follow_Camera;
 
+	// プレイヤーの情報
+	APawn* PlayerInfo;
+
+	// 初期位置
+	FVector StartPos;
 	
 public:	
 	// Sets default values for this actor's properties

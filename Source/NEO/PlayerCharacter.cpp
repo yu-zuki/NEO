@@ -47,9 +47,6 @@ APlayerCharacter::APlayerCharacter()
 	// 武器のセットアップ
 	SetupSword();
 
-	// カメラのセットアップ
-	SetupCamera();
-
 	// ボタン設定
 	SetupDefoultMappingContext();	
 }
@@ -150,32 +147,6 @@ void APlayerCharacter::SetupDefoultMappingContext()
 	//}
 
 }
-
-// カメラのセットアップ
-void APlayerCharacter::SetupCamera()
-{
-	// Don't rotate when the controller rotates. Let that just affect the camera.
-	bUseControllerRotationPitch = false;
-	bUseControllerRotationYaw = false;
-	bUseControllerRotationRoll = false;
-
-	// Create a camera boom (pulls in towards the player if there is a collision)
-	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
-	CameraBoom->SetupAttachment(RootComponent);
-	CameraBoom->TargetArmLength = 500.0f; // The camera follows at this distance behind the character	
-	CameraBoom->bUsePawnControlRotation = true; // Rotate the arm based on the controller
-	CameraBoom->bInheritPitch = false;
-	CameraBoom->SetRelativeLocation(FVector(0.f, 0.f, 100.f));
-	CameraBoom->SetRelativeRotation(FRotator(-5.f, 0.f, 0.f));
-	CameraBoom->bDoCollisionTest = false;
-
-	// Create a follow camera
-	Follow_Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
-	Follow_Camera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
-	Follow_Camera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
-}
-
-
 
 // アニメーションの設定
 void APlayerCharacter::SetupAnimationAsset()
