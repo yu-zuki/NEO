@@ -17,24 +17,6 @@ class NEO_API APlayerCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
-	// 属性
-	enum Attribute_State
-	{
-		State_Fire = 0,
-		State_Ice,
-		State_Wind
-	};
-
-private:
-
-	// コンボ
-	enum Attack_State
-	{
-		State_Combo1 = 0,
-		State_Combo2,
-		State_Ult
-	};
-
 	// プレイヤー
 	enum Player_State
 	{
@@ -57,18 +39,11 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 		UInputAction* RunAction;
 
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-		UInputAction* SwitchAction;
-
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 		UInputAction* ComboAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 		UInputAction* ComboAction2;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-		UInputAction* UltAction;
 
 
 public:
@@ -93,28 +68,31 @@ protected:
 	bool IsPlayerGrounded()const;
 
 	// 攻撃
-	void Attack();
+	void Attack(int ComboNum = 0);
 
 	// 一つ目のコンボ
 	void Combo1();
 
-	// 2つ目のコンボ
+	// 二つ目のコンボ
 	void Combo2();
 
-	// コンボリセット
-	void ResetCombo();
+	// コンボ継続
+	UFUNCTION(BlueprintCallable)
+		void ContinuationCombo();
 
-	// 必殺技
-	void UltimateAttack();
+	// コンボリセット
+	UFUNCTION(BlueprintCallable)
+		void ResetCombo();
+
+	// ダメージを与える処理
+	UFUNCTION(BlueprintCallable)
+		void SetSwordCollision();
 
 	// ダメージを受ける処理
 	void TakedDamage();
 
-	// 属性切り替え
-	void SwitchAttribute();
-
 	// アニメーション再生
-	void PlayAnimation();
+	void PlayAnimation(UAnimMontage* ToPlayAnimMontage,FName StartSectionName = "None");
 
 public:	
 	// Called every frame
@@ -126,23 +104,34 @@ public:
 	// ボタンの設定
 	void SetupDefoultMappingContext();
 
+	// カメラの設定
+	void SetupCamera();
+
 	// アニメーションの設定
 	void SetupAnimationAsset();
 
-	UFUNCTION(BlueprintCallable)
-		int GetAttribute()const { return AttrState; }
+	// 刀のメッシュと当たり判定の設定
+	void SetupSword();
 
+	/** Camera boom positioning the camera behind the character */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+		class USpringArmComponent* CameraBoom;
+
+	/** Follow camera */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+		class UCameraComponent* Follow_Camera;
 
 	// 剣のメッシュ
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Mesh, meta = (AllowPrivateAccess = "true"))
 		class USkeletalMeshComponent* SwordMesh;
 
+	//剣の当たり判定
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Collision, meta = (AllowPrivateAccess = "true"))
+		class UCapsuleComponent* SwordCollision;
+
 	// アニメーション保管用
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Animation)
 		TArray<UAnimMontage*> ComboAnimMontages;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Animation)
-		UAnimMontage* UltAnimMontage;
 
 	// キャラクターの動き
 	UCharacterMovementComponent* CharacterMovementComp;
@@ -150,14 +139,14 @@ public:
 
 private:
 
-	bool IsControl;					// 入力可能かどうか
+	bool IsControl;				// 入力可能かどうか
 
 	bool IsRunning;					// ダッシュ中のフラグ
 
 	float frames;					// フレーム		
 
 	UPROPERTY(EditAnywhere)
-		float height = 150;			// ジャンプの高さ
+		float height;				// ジャンプの高さ
 
 	const float radPerFrame = 3.14f / 30.f;
 
@@ -165,11 +154,7 @@ private:
 
 	Player_State PlayerState;		// プレイヤーのステート
 
-	Attribute_State AttrState;		// 属性のステート
-
 	bool IsAttacking;				// 攻撃中のフラグ
-
-	Attack_State AttackState;		// 攻撃のステート
 
 	bool CanCombo;					// コンボ継続できるか
 
@@ -179,4 +164,6 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = Damage)
 	float DamageAmount;				// ダメージ量
+
+	float HP;
 };
