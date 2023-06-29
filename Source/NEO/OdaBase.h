@@ -4,19 +4,18 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
-#include "GameFramework/Actor.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
-#include "PlayerCharacter.h"
-#include "BossBase.generated.h"
+#include "OdaBase.generated.h"
 
 UCLASS()
-class NEO_API ABossBase : public ACharacter
+class NEO_API AOdaBase : public ACharacter
 {
 	GENERATED_BODY()
 
 public:
 	// Sets default values for this character's properties
-	ABossBase();
+	AOdaBase();
 
 protected:
 	// Called when the game starts or when spawned
@@ -29,15 +28,19 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	//Sceneコンポーネント
+	//ボスキャラクター
+	UPROPERTY()
+	AOdaBase* OdaNobunaga;
+
+	//キャラクタームーブメント
+	UPROPERTY()
+		UCharacterMovementComponent* NobunagaMovement;
+	
+	//前方向をとる
+	UPROPERTY()
+	FVector ForwardDirection;
+
+	//移動速度
 	UPROPERTY(EditAnywhere)
-	USceneComponent* DefaultSceneRoot;
-
-	//Playerの値を代入するための関数
-	void PlayerInput();
-
-public:
-	UPROPERTY(EditAnywhere)
-	float PlayerDistance;
-
+		float OdaSpeed;
 };

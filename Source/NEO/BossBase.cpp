@@ -2,9 +2,8 @@
 
 
 #include "BossBase.h"
-#include "Kismet/KismetSystemLibrary.h"
-#include "Kismet/GameplayStatics.h"
-#include "PlayerCharacter.h"
+#include "BossAIController.h"
+
 
 
 // Sets default values
@@ -28,7 +27,6 @@ void ABossBase::BeginPlay()
 void ABossBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	GetPlayerDistance();
 }
 
 // Called to bind functionality to input
@@ -40,12 +38,13 @@ void ABossBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 void ABossBase::PlayerInput()
 {
+
 	ABossAIController* AIController = Cast<ABossAIController>(GetController());
 
 	//ÉvÉåÉCÉÑÅ[
 	APlayerCharacter* player = Cast<APlayerCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(),0));
 
-	if (AIController && player)
+	if (AIController != NULL)
 	{
 		AIController->SetPlayerKey(player);
 	}
@@ -54,9 +53,3 @@ void ABossBase::PlayerInput()
 }
 
 
-void ABossBase::GetPlayerDistance()
-{
-	PlayerDistance = this->GetDistanceTo(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
-
-	AIController->SetToPlayerDistance(&PlayerDistance);
-}
