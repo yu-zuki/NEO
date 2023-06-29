@@ -20,10 +20,13 @@ class NEO_API ACharacterCamera : public AActor
 		class UCameraComponent* Follow_Camera;
 
 	// プレイヤーの情報
-	APawn* PlayerInfo;
+	ACharacter* PlayerInfo;
 
 	// 初期位置
 	FVector StartPos;
+
+	UPROPERTY(EditAnywhere, Category = "ViewPoint")
+		float PlayerToViewPointDistance_X;
 	
 public:	
 	// Sets default values for this actor's properties
