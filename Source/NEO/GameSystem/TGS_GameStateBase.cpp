@@ -303,7 +303,19 @@ void ATGS_GameStateBase::ExitBattleArea()
 	if (PlayerCharacter) {
 		APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 		if (PlayerController) {
-			PlayerController->SetViewTargetWithBlend(PlayerCharacter, 0.5f);
+
+			//PlayerŽæ“¾
+			ACharacter* tmp_Character = Cast<ACharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(),0) );
+			AActor* tmp_CameraActor = tmp_Character->GetOwner();
+			if (tmp_CameraActor)			{
+				PlayerController->SetViewTargetWithBlend(tmp_CameraActor, 0.5f);
+			}
+			else {
+				//Log
+				UE_LOG(LogTemp, Warning, TEXT("Player.GetOwner() : <CameraActor> is not found"));
+			}
+
+			
 		}
 		else {
 			UE_LOG(LogTemp, Warning, TEXT("PlayerController is not found"));
