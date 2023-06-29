@@ -322,7 +322,8 @@ void APlayerCharacter::Attack(int ComboNum /*= 0*/)
 		// コンボ可能な時,継続
 		if (CanCombo)
 		{
-			if (ComboIndex < 2)
+			// ラストアタックまでコンボ継続
+			if (ComboCntNames[ComboIndex] != ComboCntNames.Last())
 			{
 				++ComboIndex;
 			}
@@ -381,6 +382,7 @@ void APlayerCharacter::SetSwordCollision()
 
 	// ヒットした(=コリジョン判定を受けた)オブジェクトを格納する変数
 	TArray<struct FHitResult> OutHits;
+
 
 }
 
