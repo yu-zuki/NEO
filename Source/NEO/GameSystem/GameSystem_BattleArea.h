@@ -65,6 +65,10 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BattleArea")
 		class UProceduralMeshComponent* RightMesh;
+
+	//ãﬂÇ¢ë§ÇÃÉÅÉbÉVÉÖ
+UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BattleArea")
+		class UProceduralMeshComponent* NearMesh;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

@@ -102,12 +102,14 @@ void ATGS_GameMode::SetSubAction(ESubAction _eSubAction)
 	GetGameState()->SetSubAction(_eSubAction);
 }
 
-void ATGS_GameMode::SetIsOnBattleArea(bool bIsOnArea,AActor* Camera, class UProceduralMeshComponent* LeftMesh, class UProceduralMeshComponent* RightMesh)
+void ATGS_GameMode::SetIsOnBattleArea(bool bIsOnArea,AActor* Camera, class UProceduralMeshComponent* LeftMesh, class UProceduralMeshComponent* RightMesh, class UProceduralMeshComponent* NearMesh)
 {
 	GetGameState()->BattleAreaMeshs.Reset();
 
 	GetGameState()->BattleAreaMeshs.Add(LeftMesh);
 	GetGameState()->BattleAreaMeshs.Add(RightMesh);
+	GetGameState()->BattleAreaMeshs.Add(NearMesh);
+	
 
 	GetGameState()->bIsOnBattleArea = bIsOnArea; 
 	GetGameState()->BattleAreaCamera = Camera;

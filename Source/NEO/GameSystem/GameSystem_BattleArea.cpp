@@ -40,7 +40,11 @@ AGameSystem_BattleArea::AGameSystem_BattleArea()
 
 	RightMesh = CreateDefaultSubobject<UProceduralMeshComponent>(TEXT("RightProceduralMesh"));
 	RightMesh->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
+	
+	NearMesh = CreateDefaultSubobject<UProceduralMeshComponent>(TEXT("NearProceduralMesh"));
+	NearMesh->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
 }
+
 
 // Called when the game starts or when spawned
 void AGameSystem_BattleArea::BeginPlay()
@@ -162,7 +166,7 @@ void AGameSystem_BattleArea::CreateAreaMesh(SFrustumVertices FrustumVertices)
 	LeftMesh->CreateMeshSection_LinearColor(0, Vertices, Triangles, TArray<FVector>(), TArray<FVector2D>(), TArray<FLinearColor>(), TArray<FProcMeshTangent>(), true);
 
 	//　レンダーしない
-	LeftMesh->SetVisibility(false);
+	
 
 	//　衝突を無効に
 	LeftMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -178,29 +182,30 @@ void AGameSystem_BattleArea::CreateAreaMesh(SFrustumVertices FrustumVertices)
 	RightMesh->CreateMeshSection_LinearColor(0, Vertices, Triangles, TArray<FVector>(), TArray<FVector2D>(), TArray<FLinearColor>(), TArray<FProcMeshTangent>(), true);
 	
 	// 
-	RightMesh->SetVisibility(false);
+	
 
 	// 
 	RightMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	//近い平面の頂点を追加
+	Vertices.Reset();
+	Vertices.Add(FrustumVertices.BottomLeftNear);
+	Vertices.Add(FrustumVertices.TopLeftNear);
+	Vertices.Add(FrustumVertices.TopRightNear);
+	Vertices.Add(FrustumVertices.BottomRightNear);
+
+	//
+	NearMesh->CreateMeshSection_LinearColor(0, Vertices, Triangles, TArray<FVector>(), TArray<FVector2D>(), TArray<FLinearColor>(), TArray<FProcMeshTangent>(), true);
+	NearMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	
+	LeftMesh->SetVisibility(false);
+	RightMesh->SetVisibility(false);
+	NearMesh->SetVisibility(false);
 }
 
 void AGameSystem_BattleArea::AreaDebugDraw(SFrustumVertices FrustumVertices)
 {
 	//視錐台の頂点を描画する
-	DrawDebugLine(GetWorld(), FrustumVertices.BottomLeftNear, FrustumVertices.TopLeftNear, FColor::Red, false, lifeTime, 0, thickness);
-	DrawDebugLine(GetWorld(), FrustumVertices.TopLeftNear, FrustumVertices.TopRightNear, FColor::Red, false, lifeTime, 0, thickness);
-	DrawDebugLine(GetWorld(), FrustumVertices.TopRightNear, FrustumVertices.BottomRightNear, FColor::Red, false, lifeTime, 0, thickness);
-	DrawDebugLine(GetWorld(), FrustumVertices.BottomRightNear, FrustumVertices.BottomLeftNear, FColor::Red, false, lifeTime, 0, thickness);
-
-	DrawDebugLine(GetWorld(), FrustumVertices.BottomLeftFar, FrustumVertices.TopLeftFar, FColor::Red, false, lifeTime, 0, thickness);
-	DrawDebugLine(GetWorld(), FrustumVertices.TopLeftFar, FrustumVertices.TopRightFar, FColor::Red, false, lifeTime, 0, thickness);
-	DrawDebugLine(GetWorld(), FrustumVertices.TopRightFar, FrustumVertices.BottomRightFar, FColor::Red, false, lifeTime, 0, thickness);
-	DrawDebugLine(GetWorld(), FrustumVertices.BottomRightFar, FrustumVertices.BottomLeftFar, FColor::Red, false, lifeTime, 0, thickness);
-
-	DrawDebugLine(GetWorld(), FrustumVertices.BottomLeftNear, FrustumVertices.BottomLeftFar, FColor::Red, false, lifeTime, 0, thickness);
-	DrawDebugLine(GetWorld(), FrustumVertices.TopLeftNear, FrustumVertices.TopLeftFar, FColor::Red, false, lifeTime, 0, thickness);
-	DrawDebugLine(GetWorld(), FrustumVertices.TopRightNear, FrustumVertices.TopRightFar, FColor::Red, false, lifeTime, 0, thickness);
-	DrawDebugLine(GetWorld(), FrustumVertices.BottomRightNear, FrustumVertices.BottomRightFar, FColor::Red, false, lifeTime, 0, thickness);
 }
 
 void AGameSystem_BattleArea::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -212,7 +217,7 @@ void AGameSystem_BattleArea::BeginOverlap(UPrimitiveComponent* OverlappedCompone
 
 			ATGS_GameMode* GameMode = GetWorld()->GetAuthGameMode<ATGS_GameMode>();
 			if (ensure(GameMode))			{
-				GameMode->SetIsOnBattleArea(true, this, LeftMesh, RightMesh);
+				GameMode->SetIsOnBattleArea(true, this, LeftMesh, RightMesh, NearMesh);
 			}
 		}
 	}
