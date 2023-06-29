@@ -40,6 +40,7 @@ void ALancer::Tick(float DeltaTime)
         else if (DistanceToPlayer <= 150.0f)
         {
             PlayAnimMontage(Attack, 1, NAME_None);
+            return;
         }
     }
 }

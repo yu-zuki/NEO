@@ -15,15 +15,25 @@ public:
 	// Sets default values for this character's properties
 	ASoldier();
 
+    UPROPERTY(EditAnywhere, Category = "AI")
+        float DesiredDistance = 500.0f; // プレイヤーからの望ましい距離（3m）
+
+    UPROPERTY(EditAnywhere, Category = "AI")
+        float MovementSpeed = 300.0f; // 移動速度
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
+        UAnimMontage* Attack;
+    UPROPERTY()
+        class ACharacter* PlayerCharacter; // プレイヤーキャラクターの参照
 protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+    virtual void BeginPlay() override;
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+public:
+    virtual void Tick(float DeltaTime) override;
 
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+private:
+
+
+    FVector GetPlayerDirection() const;
+    float GetDistanceToPlayer() const;
 
 };
