@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -9,31 +7,36 @@
 UCLASS()
 class NEO_API ASoldier : public ACharacter
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
-	// Sets default values for this character's properties
-	ASoldier();
+    ASoldier();
 
-    UPROPERTY(EditAnywhere, Category = "AI")
-        float DesiredDistance = 500.0f; // プレイヤーからの望ましい距離（3m）
+    virtual void Tick(float DeltaTime) override;
 
-    UPROPERTY(EditAnywhere, Category = "AI")
-        float MovementSpeed = 300.0f; // 移動速度
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
-        UAnimMontage* Attack;
-    UPROPERTY()
-        class ACharacter* PlayerCharacter; // プレイヤーキャラクターの参照
 protected:
     virtual void BeginPlay() override;
 
-public:
-    virtual void Tick(float DeltaTime) override;
-
 private:
+    UPROPERTY(EditAnywhere, Category = "Movement")
+        float Acceleration; // 加速度
 
+    UPROPERTY(EditAnywhere, Category = "Movement")
+        float MaxSpeed; // 最大速度
 
-    FVector GetPlayerDirection() const;
-    float GetDistanceToPlayer() const;
+    UPROPERTY(EditAnywhere, Category = "Movement")
+        float DetectionRange; // 検知範囲
 
+    ACharacter* PlayerCharacter; // プレイヤーキャラクターへの参照
+    FVector TargetLocation; // 目標位置
+    bool bMovingForward; // 前進中フラグ
+
+    float TimeSinceLastMovement; // 前回の動作からの経過時間
+
+    void MoveForward(float Value);
+    void DetectTarget();
+    void SetNewTargetLocation();
+    bool IsPlayerInDetectionRange();
+    void StopMovement();
+    void RotateTowardsPlayer();
 };

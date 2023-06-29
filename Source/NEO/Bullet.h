@@ -28,7 +28,6 @@ private:
 		float DistanceSpeedDamping = 0.001f;
 
 	FVector MovementDirection;
-	
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
