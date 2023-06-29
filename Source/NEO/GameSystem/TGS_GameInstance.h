@@ -29,6 +29,7 @@ protected:
 	//EPlayerState BackupPlayerState;
 
 public:
+
 	//ƒQ[ƒ€‚Ìó‘Ô‚ğ•Û‘¶
 	UFUNCTION(BlueprintCallable, Category = "GameState")
 	void SaveGameStateData(EGameState& _SaveGameState);

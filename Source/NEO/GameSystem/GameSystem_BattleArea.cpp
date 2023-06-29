@@ -11,6 +11,7 @@
 #include "Engine/Engine.h"
 #include "Engine/GameViewportClient.h"
 #include "Camera/CameraComponent.h"
+#include "../PlayerCharacter.h"
 
 #include "ProceduralMeshComponent.h"
 #include "TGS_GameMode.h"
@@ -206,10 +207,12 @@ void AGameSystem_BattleArea::BeginOverlap(UPrimitiveComponent* OverlappedCompone
 {
 	ACharacter* Character = Cast<ACharacter>(OtherActor);
 	if (Character) {
-		//コンポーネントを破壊
-		StaticMeshComponent->DestroyComponent();
+		if (Character->Tags[0] == EnterActorTag)		{
+			//コンポーネントを破壊
+			StaticMeshComponent->DestroyComponent();
 
-		ATGS_GameMode* GameMode = Cast<ATGS_GameMode>(GetWorld()->GetAuthGameMode());
-		GameMode->SetIsOnBattleArea(true, this,LeftMesh,RightMesh);
+			ATGS_GameMode* GameMode = Cast<ATGS_GameMode>(GetWorld()->GetAuthGameMode());
+			GameMode->SetIsOnBattleArea(true, this, LeftMesh, RightMesh);
+		}
 	}
 }
