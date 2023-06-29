@@ -9,6 +9,7 @@
 
 // Sets default values
 ACharacterCamera::ACharacterCamera()
+	: PlayerToViewPointDistance_X(200.f)
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -41,11 +42,8 @@ void ACharacterCamera::BeginPlay()
 	{
 		PlayerController->SetViewTargetWithBlend(this);
 	}
-	ACharacter* PlayerChara = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
-	PlayerChara->SetOwner(this);
-
-	// プレイヤーの情報
-	PlayerInfo = UGameplayStatics::GetPlayerPawn(this->GetWorld(), 0);	
+	PlayerInfo = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
+	PlayerInfo->SetOwner(this);
 
 	// 初期位置
 	StartPos = GetActorLocation();
@@ -59,6 +57,6 @@ void ACharacterCamera::Tick(float DeltaTime)
 	// プレイヤーの現在位置取得
 	FVector PlayerPos = PlayerInfo->GetActorLocation();
 
-	SetActorLocation(FVector(StartPos.X, PlayerPos.Y,StartPos.Z));
+	SetActorLocation(FVector(StartPos.X, PlayerPos.Y + PlayerToViewPointDistance_X,StartPos.Z));
 }
 

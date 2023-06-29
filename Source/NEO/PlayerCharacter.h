@@ -90,6 +90,10 @@ protected:
 	UFUNCTION(BlueprintCallable)
 		void SetSwordCollision();
 
+	// ダメージを与える処理
+	UFUNCTION(BlueprintCallable)
+		float GetDamageAmount()const { return DamageAmount * ((float)ComboIndex + 1.f); }
+
 	// ダメージを受ける処理
 	void TakedDamage();
 

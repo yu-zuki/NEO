@@ -27,7 +27,7 @@ APlayerCharacter::APlayerCharacter()
 	, IsAttacking(false)
 	, CanCombo(false)
 	, ComboIndex(0)
-	, DamageAmount(2.f)
+	, DamageAmount(10.f)
 	, HP(100)
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
