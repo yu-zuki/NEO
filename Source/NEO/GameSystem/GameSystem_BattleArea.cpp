@@ -206,13 +206,15 @@ void AGameSystem_BattleArea::AreaDebugDraw(SFrustumVertices FrustumVertices)
 void AGameSystem_BattleArea::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	ACharacter* Character = Cast<ACharacter>(OtherActor);
-	if (Character) {
-		if (Character->Tags[0] == EnterActorTag)		{
-			//コンポーネントを破壊
-			StaticMeshComponent->DestroyComponent();
+	if (Character)	{
+		if (Character->ActorHasTag(EnterActorTag))		{
+			StaticMeshComponent->DestroyComponent();	// コンポーネントを破壊
 
-			ATGS_GameMode* GameMode = Cast<ATGS_GameMode>(GetWorld()->GetAuthGameMode());
-			GameMode->SetIsOnBattleArea(true, this, LeftMesh, RightMesh);
+			ATGS_GameMode* GameMode = GetWorld()->GetAuthGameMode<ATGS_GameMode>();
+			if (ensure(GameMode))			{
+				GameMode->SetIsOnBattleArea(true, this, LeftMesh, RightMesh);
+			}
 		}
 	}
 }
+

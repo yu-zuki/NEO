@@ -5,6 +5,7 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "GameFramework/Character.h"
 
 // Sets default values
 ACharacterCamera::ACharacterCamera()
@@ -40,6 +41,8 @@ void ACharacterCamera::BeginPlay()
 	{
 		PlayerController->SetViewTargetWithBlend(this);
 	}
+	ACharacter* PlayerChara = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
+	PlayerChara->SetOwner(this);
 
 	// ƒvƒŒƒCƒ„[‚Ìî•ñ
 	PlayerInfo = UGameplayStatics::GetPlayerPawn(this->GetWorld(), 0);	
