@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
+#include "GameSystem\InputCharacter.h"
+
 #include "PlayerCharacter.generated.h"
 
 class UInputAction;
@@ -13,7 +15,7 @@ class USkeletalMeshComponent;
 class UCharacterMovementComponent;
 
 UCLASS()
-class NEO_API APlayerCharacter : public ACharacter
+class NEO_API APlayerCharacter : public AInputCharacter
 {
 	GENERATED_BODY()
 
