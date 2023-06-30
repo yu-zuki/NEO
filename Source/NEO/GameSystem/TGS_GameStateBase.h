@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/GameStateBase.h"
 #include "InputCharacter.h"
+#include "Engine/TargetPoint.h"
 
 #include "TGS_GameStateBase.generated.h"
 
@@ -127,6 +128,10 @@ protected:
 
 	//バトルエリアの初期化処理
 	void InitBattleArea();
+
+public:
+	TArray<class ASpawnPoint*> BattleAreaSpawnPoints;
+	int32 BattleAreaEnemyCount = 0;
 
 public:
 	//バトルエリアのフラグ

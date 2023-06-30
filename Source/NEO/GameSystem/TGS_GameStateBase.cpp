@@ -256,7 +256,7 @@ void ATGS_GameStateBase::OnInBattleArea()
 		bIsOnBattleArea = false;
 	}
 
-	if (bIsOnBattleArea != true) {
+	if (bIsOnBattleArea != true || BattleAreaEnemyCount <= 0) {
 		//バトルエリアから出る
 		ExitBattleArea();
 		SetCurrentState(EGameState::EGame_Playing);
