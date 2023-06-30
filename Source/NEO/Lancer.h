@@ -5,7 +5,7 @@
 #include "Lancer.generated.h"
 
 UCLASS()
-class NEO_API ALancer : public ACharacter
+class NEO_API ALancer : public AEnamyBase
 {
     GENERATED_BODY()
 

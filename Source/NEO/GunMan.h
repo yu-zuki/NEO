@@ -9,7 +9,7 @@
 #include "GunMan.generated.h"
 
 UCLASS()
-class NEO_API AGunMan : public ACharacter
+class NEO_API AGunMan : public AEnamyBase
 {
 	GENERATED_BODY()
 

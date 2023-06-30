@@ -5,7 +5,7 @@
 #include "Soldier.generated.h"
 
 UCLASS()
-class NEO_API ASoldier : public ACharacter
+class NEO_API ASoldier : public AEnamyBase
 {
     GENERATED_BODY()
 

@@ -2,6 +2,8 @@
 
 
 #include "EnamyBase.h"
+#include "GameSystem/TGS_GameMode.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AEnamyBase::AEnamyBase()
@@ -11,10 +13,21 @@ AEnamyBase::AEnamyBase()
 
 }
 
+void AEnamyBase::DestoryEnemy()
+{
+	ATGS_GameMode* GameMode =Cast<ATGS_GameMode>( UGameplayStatics::GetGameMode(GetWorld()) );
+	if (GameMode)
+	{
+		GameMode->DestroyEnemy(this,IsAreaEnemy);
+	}
+}
+
 // Called when the game starts or when spawned
 void AEnamyBase::BeginPlay()
 {
 	Super::BeginPlay();
+
+	SpawnDefaultController();
 	
 }
 
