@@ -6,6 +6,8 @@
 #include "Kismet/GameplayStatics.h"
 #include "Blueprint/UserWidget.h"
 
+#include "ProceduralMeshComponent.h"
+
 //test
 #include "JumpModuleActor.h"
 
@@ -102,8 +104,29 @@ void ATGS_GameStateBase::ClearEnemies()
 
 void ATGS_GameStateBase::InitCurrentState()
 {
-	//CurrentState = EGameState::EGame_None;
-	ECurrentState = GetGameInstance()->LoadGameStateData();		//インスタンスからゲームの状態を読み込む
+	//今のレベルの名前を取得
+	FString CurrentLevelName = GetWorld()->GetMapName();
+	//レベル名の先頭にある"/Game/"を削除
+	CurrentLevelName.RemoveFromStart(GetWorld()->StreamingLevelsPrefix);
+
+	if ((FName)CurrentLevelName == GameTitleLevelName)
+	{
+		ECurrentState = EGameState::EGame_Title;
+	}
+	else if ((FName)CurrentLevelName == GamePlayLevelName)
+	{
+		ECurrentState = EGameState::EGame_Playing;
+	}
+	else if ((FName)CurrentLevelName == GameOverLevelName)
+	{
+		ECurrentState = EGameState::EGame_Over;
+	}
+
+	//インスタンスからゲームの状態を読み込む
+	if (ECurrentState != GetGameInstance()->LoadGameStateData()) {
+		GetGameInstance()->SaveGameStateData(ECurrentState);
+		UE_LOG(LogTemp, Warning, TEXT("Not starting from GameTitle"));
+	}		
 
 	if (ECurrentState == EGameState::EGame_Playing)
 	{
@@ -121,7 +144,6 @@ void ATGS_GameStateBase::InitCurrentState()
 		else {
 			UE_LOG(LogTemp, Warning, TEXT("Widget_GameMenuClass or Widget_PlayerStatusClass is not found"));
 		}
-
 	}
 }
 
@@ -151,30 +173,10 @@ void ATGS_GameStateBase::OnGameTitle()
 
 void ATGS_GameStateBase::OnGamePlaying(float DeltaTime)
 {
-	//switch(UseSubAction())
-	//{ 
-	//case ESubAction::ESubAction_Enter:
-	//	//Debug用
-	//	if (true)
-	//	{
-	//		/*JumpModuleActor =Cast<AJumpModuleActor>( UGameplayStatics::GetActorOfClass(GetWorld(), AJumpModuleActor::StaticClass()) ) ;
-
-	//		if (JumpModuleActor)		{
-	//		JumpModuleActor->StartJumpByGravity(fJumpHeight, fGravityAcceleration);
-	//		}*/
-
-	//		//バトルエリアに入る
-	//		EnterBattleArea(nullptr);
-	//		SetCurrentState(EGameState::EGame_InBattleArea);
-	//	}
-	//	break;
-	//}	
-
 	//Debug用
 	if (bIsOnBattleArea)	{
 		EnterBattleArea();
 		SetCurrentState(EGameState::EGame_InBattleArea);
-
 		return;
 	}
 
@@ -250,27 +252,23 @@ void ATGS_GameStateBase::OnGamePause()
 void ATGS_GameStateBase::OnInBattleArea()
 {
 	//Debug用 BattleAreaから出る
-	if (UseSubAction() == ESubAction::ESubAction_Enter) {
-		bIsOnBattleArea = false;
-	}
-
-	if (bIsOnBattleArea != true) {
+	if (UseSubAction() == ESubAction::ESubAction_Enter || BattleAreaEnemyCount <= 0) {
 		//バトルエリアから出る
 		ExitBattleArea();
 		SetCurrentState(EGameState::EGame_Playing);
 	}
+
 }
 
 void ATGS_GameStateBase::EnterBattleArea()
 {
 	//バトルエリアを有効化
-	for (auto Wall : BattleAreaWalls)	{
-		if (Wall)		{
-			Wall->SetActorEnableCollision(true);
-			Wall->SetActorHiddenInGame(false);
+	for (auto Mesh : BattleAreaMeshs)	{
+		if (Mesh)		{
+			Mesh->SetCollisionEnabled(ECollisionEnabled::QueryOnly);;
 		}
 		else {
-			UE_LOG(LogTemp, Warning, TEXT("Wall is not found"));
+			UE_LOG(LogTemp, Warning, TEXT("MeshWall is not found"));
 		}
 	}
 
@@ -284,19 +282,27 @@ void ATGS_GameStateBase::EnterBattleArea()
 			UE_LOG(LogTemp, Warning, TEXT("PlayerController is not found"));
 		}
 	}
+
+	//GameModeを使って、バトルエリアに敵をスポーンさせる。　＜設計が悪い＞
+	ATGS_GameMode* GameMode = Cast<ATGS_GameMode>(GetWorld()->GetAuthGameMode());
+	if (GameMode) {
+		GameMode->SpawnEnemyInBattleArea();
+	}
+	else {
+		UE_LOG(LogTemp, Warning, TEXT("GameMode is not found"));
+	}
 }
 
 void ATGS_GameStateBase::ExitBattleArea()
 {
+	bIsOnBattleArea = false;
 	//バトルエリアを無効化
-	for (auto Wall : BattleAreaWalls)
-	{
-		if (Wall) {
-			Wall->SetActorEnableCollision(false);
-			Wall->SetActorHiddenInGame(true);
+	for (auto Mesh : BattleAreaMeshs) {
+		if (Mesh) {
+			Mesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		}
 		else {
-			UE_LOG(LogTemp, Warning, TEXT("Wall is not found"));
+			UE_LOG(LogTemp, Warning, TEXT("MeshWall is not found"));
 		}
 	}
 
@@ -304,7 +310,19 @@ void ATGS_GameStateBase::ExitBattleArea()
 	if (PlayerCharacter) {
 		APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 		if (PlayerController) {
-			PlayerController->SetViewTargetWithBlend(PlayerCharacter, 0.5f);
+
+			//Player取得
+			ACharacter* tmp_Character = Cast<ACharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(),0) );
+			AActor* tmp_CameraActor = tmp_Character->GetOwner();
+			if (tmp_CameraActor)			{
+				PlayerController->SetViewTargetWithBlend(tmp_CameraActor, 0.5f);
+			}
+			else {
+				//Log
+				UE_LOG(LogTemp, Warning, TEXT("Player.GetOwner() : <CameraActor> is not found"));
+			}
+
+			
 		}
 		else {
 			UE_LOG(LogTemp, Warning, TEXT("PlayerController is not found"));
@@ -314,23 +332,8 @@ void ATGS_GameStateBase::ExitBattleArea()
 
 void ATGS_GameStateBase::InitBattleArea()
 {
-	if (AreaWallsTag.IsValid())
-	{
-		//バトルエリアの壁を取得
-		UGameplayStatics::GetAllActorsWithTag(GetWorld(), AreaWallsTag, BattleAreaWalls);
-
-		//バトルエリアの壁がない場合はエラーを出す
-		if (BattleAreaWalls.Num() == 0 ) {
-			UE_LOG(LogTemp, Error, TEXT("AreaWallsTag is not Found"));
-			return;
-		}
-
-		//バトルエリアを無効化
-		ExitBattleArea();
-	}
-	else {
-		UE_LOG(LogTemp, Error, TEXT("AreaWallsTag is not Found"));
-	}
+	//バトルエリアを無効化
+	ExitBattleArea();
 }
 
 AActor* ATGS_GameStateBase::GetBattleAreaCamera()

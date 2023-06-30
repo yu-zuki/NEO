@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
+#include "GameSystem\InputCharacter.h"
+
 #include "PlayerCharacter.generated.h"
 
 class UInputAction;
@@ -13,33 +15,16 @@ class USkeletalMeshComponent;
 class UCharacterMovementComponent;
 
 UCLASS()
-class NEO_API APlayerCharacter : public ACharacter
+class NEO_API APlayerCharacter : public AInputCharacter
 {
 	GENERATED_BODY()
-
-	// 属性
-	enum Attribute_State
-	{
-		State_Fire = 0,
-		State_Ice,
-		State_Wind
-	};
-
-private:
-
-	// コンボ
-	enum Attack_State
-	{
-		State_Combo1 = 0,
-		State_Combo2,
-		State_Ult
-	};
 
 	// プレイヤー
 	enum Player_State
 	{
 		State_Idle = 0,
-		State_Jump
+		State_Jump,
+		State_Death
 	};
 
 	/** MappingContext */
@@ -57,18 +42,11 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 		UInputAction* RunAction;
 
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-		UInputAction* SwitchAction;
-
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 		UInputAction* ComboAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 		UInputAction* ComboAction2;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-		UInputAction* UltAction;
 
 
 public:
@@ -93,28 +71,36 @@ protected:
 	bool IsPlayerGrounded()const;
 
 	// 攻撃
-	void Attack();
+	void Attack(int ComboNum = 0);
 
 	// 一つ目のコンボ
 	void Combo1();
 
-	// 2つ目のコンボ
+	// 二つ目のコンボ
 	void Combo2();
 
-	// コンボリセット
-	void ResetCombo();
+	// コンボ継続
+	UFUNCTION(BlueprintCallable)
+		void ContinuationCombo();
 
-	// 必殺技
-	void UltimateAttack();
+	// コンボリセット
+	UFUNCTION(BlueprintCallable)
+		void ResetCombo();
+
+	// ダメージを与える処理
+	UFUNCTION(BlueprintCallable)
+		void SetSwordCollision();
+
+	// ダメージ量を返す関数
+	UFUNCTION(BlueprintCallable)
+		float GetDamageAmount()const { return DamageAmount * ((float)ComboIndex + 1.f); }
 
 	// ダメージを受ける処理
-	void TakedDamage();
-
-	// 属性切り替え
-	void SwitchAttribute();
+	UFUNCTION(BlueprintCallable)
+		void TakedDamage(float _damage);
 
 	// アニメーション再生
-	void PlayAnimation();
+	void PlayAnimation(UAnimMontage* ToPlayAnimMontage,FName StartSectionName = "None");
 
 public:	
 	// Called every frame
@@ -129,20 +115,20 @@ public:
 	// アニメーションの設定
 	void SetupAnimationAsset();
 
-	UFUNCTION(BlueprintCallable)
-		int GetAttribute()const { return AttrState; }
-
+	// 刀のメッシュと当たり判定の設定
+	void SetupSword();
 
 	// 剣のメッシュ
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Mesh, meta = (AllowPrivateAccess = "true"))
 		class USkeletalMeshComponent* SwordMesh;
 
+	//剣の当たり判定
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Collision, meta = (AllowPrivateAccess = "true"))
+		class UCapsuleComponent* SwordCollision;
+
 	// アニメーション保管用
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Animation)
 		TArray<UAnimMontage*> ComboAnimMontages;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Animation)
-		UAnimMontage* UltAnimMontage;
 
 	// キャラクターの動き
 	UCharacterMovementComponent* CharacterMovementComp;
@@ -157,7 +143,7 @@ private:
 	float frames;					// フレーム		
 
 	UPROPERTY(EditAnywhere)
-		float height = 150;			// ジャンプの高さ
+		float height;				// ジャンプの高さ
 
 	const float radPerFrame = 3.14f / 30.f;
 
@@ -165,11 +151,7 @@ private:
 
 	Player_State PlayerState;		// プレイヤーのステート
 
-	Attribute_State AttrState;		// 属性のステート
-
 	bool IsAttacking;				// 攻撃中のフラグ
-
-	Attack_State AttackState;		// 攻撃のステート
 
 	bool CanCombo;					// コンボ継続できるか
 
@@ -178,5 +160,7 @@ private:
 	TArray<FName> ComboCntNames;	// コンボの段数(First,Second,Third・・・)
 
 	UPROPERTY(EditAnywhere, Category = Damage)
-	float DamageAmount;				// ダメージ量
+	float DamageAmount;				// 与ダメージ量
+
+	float HP;						// HP
 };

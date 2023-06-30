@@ -7,7 +7,10 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputCharacter.h"
-
+#include "ProceduralMeshComponent.h"
+#include "SpawnPoint.h"
+#include "Engine/World.h"
+#include "../EnamyBase.h"
 
 ATGS_GameMode::ATGS_GameMode()
 {
@@ -68,6 +71,27 @@ void ATGS_GameMode::RespawnPlayer()
 {
 }
 
+void ATGS_GameMode::SpawnEnemyInBattleArea()
+{
+	//Check SpawnPoints
+	if (GetGameState()->BattleAreaSpawnPoints.Num() == 0) {
+		UE_LOG(LogTemp, Error, TEXT("SpawnPoints is not found"));
+		return;
+	}
+
+	//スポーン
+	UWorld* World = GetWorld();
+	if (!World) return;
+
+
+	for (ASpawnPoint* spawnPoint : GetGameState()->BattleAreaSpawnPoints) {
+		if (!spawnPoint) continue; //Check SpawnPoint
+
+		//敵を生成する
+		SpawnEnemy(spawnPoint);
+	}
+}
+
 void ATGS_GameMode::SpawnEnemy(AActor* _enemy, FTransform _tranceform)
 {
 	//敵を生成する
@@ -77,11 +101,38 @@ void ATGS_GameMode::SpawnEnemy(AActor* _enemy, FTransform _tranceform)
 	GetGameState()->AddEnemy(enemy);
 }
 
-void ATGS_GameMode::DestroyEnemy(AActor* _enemy)
+AActor* ATGS_GameMode::SpawnEnemy(ASpawnPoint* spawnPoint)
+{
+	//NULL Check
+	if (!spawnPoint) {
+		UE_LOG(LogTemp, Error, TEXT("SpawnPoint is not found"));
+		return nullptr;
+	}
+
+	//Transformを取得する
+	FTransform spawnTransform = spawnPoint->GetTransform();
+
+	//SpawnPointを使って、敵を生成する
+	AEnamyBase* Enemy = Cast<AEnamyBase> ( GetWorld()->SpawnActor(spawnPoint->GetSpawnActorClass()) );
+	Enemy->SetActorTransform(spawnTransform);
+	Enemy->IsAreaEnemy = true;		//Flag Set 
+
+	//敵をゲームステートに登録する
+	GetGameState()->AddEnemy(Enemy);
+
+	GetGameState()->BattleAreaEnemyCount += 1;
+
+	return Enemy;
+}
+
+void ATGS_GameMode::DestroyEnemy(AActor* _enemy,bool BattleAreaEnemy)
 {
 	//敵をゲームステートから削除する
 	GetGameState()->RemoveEnemy(_enemy);
 
+	if(BattleAreaEnemy) {
+		GetGameState()->BattleAreaEnemyCount -= 1;
+	}
 }
 
 void ATGS_GameMode::ClearEnemy()
@@ -101,15 +152,40 @@ void ATGS_GameMode::SetSubAction(ESubAction _eSubAction)
 	GetGameState()->SetSubAction(_eSubAction);
 }
 
-void ATGS_GameMode::SetIsOnBattleArea(bool bIsOnArea,AActor* Camera)
+void ATGS_GameMode::SetIsOnBattleArea(bool bIsOnArea, TArray<class ASpawnPoint*> SpawnPoints,
+	AActor* Camera = nullptr,
+	class UProceduralMeshComponent* LeftMesh = nullptr,
+	class UProceduralMeshComponent* RightMesh = nullptr,
+	class UProceduralMeshComponent* NearMesh = nullptr)
 {
+	//NULL Check
+	if (Camera && LeftMesh && RightMesh && NearMesh) {
+		GetGameState()->BattleAreaMeshs.Reset();
+
+		GetGameState()->BattleAreaMeshs.Add(LeftMesh);
+		GetGameState()->BattleAreaMeshs.Add(RightMesh);
+		GetGameState()->BattleAreaMeshs.Add(NearMesh);
+
+		GetGameState()->BattleAreaCamera = Camera;
+
+		//スポーンポイントをゲームステートに登録する
+		GetGameState()->BattleAreaSpawnPoints.Reset();
+		for(auto spawnPoint : SpawnPoints) {
+			GetGameState()->BattleAreaSpawnPoints.Add(spawnPoint);
+		}
+	}
+
 	GetGameState()->bIsOnBattleArea = bIsOnArea; 
-	GetGameState()->BattleAreaCamera = Camera;
 }
 
 bool ATGS_GameMode::GetIsOnBattleArea()
 {
 	return GetGameState()->bIsOnBattleArea;
+}
+
+int32 ATGS_GameMode::GetBattleAreaEnemyNum()
+{
+	 return GetGameState()->BattleAreaEnemyCount;
 }
 
 ATGS_GameStateBase* ATGS_GameMode::GetGameState()

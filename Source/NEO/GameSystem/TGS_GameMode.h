@@ -46,8 +46,15 @@ public:
 	void DestroyPlayer(AActor* _player);
 	void RespawnPlayer();
 
+	//バトルエリアにいる敵をスポーンする
+	void SpawnEnemyInBattleArea();
+
 	void SpawnEnemy(AActor* _enemy, FTransform _tranceform);
-	void DestroyEnemy(AActor* _enemy);
+	AActor* SpawnEnemy(ASpawnPoint* spawnPoint);
+
+	UFUNCTION(BlueprintCallable, Category = "GameSystem")
+	void DestroyEnemy(AActor* _enemy, bool BattleAreaEnemy = false);
+
 	void ClearEnemy();
 
 	void SetState_GameOver();
@@ -55,9 +62,17 @@ public:
 	void SetSubAction(ESubAction _eSubAction);
 
 	UFUNCTION(BlueprintCallable, Category = "Area")
-		void SetIsOnBattleArea(bool bIsOnArea, AActor* Camera);
+		void SetIsOnBattleArea(bool bIsOnArea, TArray<class ASpawnPoint*> SpawnPoints, 
+			AActor* Camera,
+			class UProceduralMeshComponent* LeftMesh,
+			class UProceduralMeshComponent* RightMesh, 
+			class UProceduralMeshComponent* NearMesh
+			);
+	
 	UFUNCTION(BlueprintCallable, Category = "Area")
 		bool GetIsOnBattleArea();
+
+	int32 GetBattleAreaEnemyNum();
 
 private:
 	class ATGS_GameStateBase* GetGameState();

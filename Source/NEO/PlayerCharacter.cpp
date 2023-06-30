@@ -22,24 +22,19 @@ APlayerCharacter::APlayerCharacter()
 	: IsControl(true)
 	, IsRunning(false)
 	, frames(0.f)
+	, height(150.f)
 	, PlayerState(State_Idle)
-	, AttrState(State_Fire)
 	, IsAttacking(false)
-	, AttackState(State_Combo1)
 	, CanCombo(false)
 	, ComboIndex(0)
-	, DamageAmount(2.f)
+	, DamageAmount(10.f)
+	, HP(100)
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	// プレイヤーの設定
 	AutoPossessPlayer = EAutoReceiveInput::Player0;
-
-	// Don't rotate when the controller rotates. Let that just affect the camera.
-	bUseControllerRotationPitch = false;
-	bUseControllerRotationYaw = false;
-	bUseControllerRotationRoll = false;
 
 	// キャラクターコンポーネント取得
 	CharacterMovementComp = GetCharacterMovement();
@@ -48,6 +43,9 @@ APlayerCharacter::APlayerCharacter()
 
 	// アニメーションセットアップ
 	SetupAnimationAsset();
+
+	// 武器のセットアップ
+	SetupSword();
 
 	// ボタン設定
 	SetupDefoultMappingContext();	
@@ -63,7 +61,7 @@ void APlayerCharacter::BeginPlay()
 	{
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 		{
-			Subsystem->AddMappingContext(DefaultMappingContext, 0);
+			Subsystem->AddMappingContext(DefaultMappingContext, 1);
 		}
 	}
 }
@@ -80,6 +78,8 @@ void APlayerCharacter::Tick(float DeltaTime)
 	case State_Jump:
 		Jump();
 		break;
+	case State_Death:
+		break;
 	}
 
 }
@@ -87,6 +87,8 @@ void APlayerCharacter::Tick(float DeltaTime)
 // Called to bind functionality to input
 void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
+
 	// Set up action bindings
 	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent)) {
 
@@ -100,17 +102,11 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		EnhancedInputComponent->BindAction(RunAction, ETriggerEvent::Started, this, &APlayerCharacter::Run);
 		EnhancedInputComponent->BindAction(RunAction, ETriggerEvent::Completed, this, &APlayerCharacter::Run);
 
-		// 属性切り替え
-		EnhancedInputComponent->BindAction(SwitchAction, ETriggerEvent::Started, this, &APlayerCharacter::SwitchAttribute);
-
 		// コンボ1
 		EnhancedInputComponent->BindAction(ComboAction, ETriggerEvent::Started, this, &APlayerCharacter::Combo1);
 
 		// コンボ2
-		EnhancedInputComponent->BindAction(ComboAction, ETriggerEvent::Started, this, &APlayerCharacter::Combo2);
-
-		// 必殺技
-		EnhancedInputComponent->BindAction(UltAction, ETriggerEvent::Started, this, &APlayerCharacter::UltimateAttack);
+		EnhancedInputComponent->BindAction(ComboAction2, ETriggerEvent::Started, this, &APlayerCharacter::Combo2);
 	}
 }
 
@@ -123,10 +119,20 @@ void APlayerCharacter::SetupDefoultMappingContext()
 	AssetPath.Add("/Game/Player/Input/Actions/IA_Move");
 	AssetPath.Add("/Game/Player/Input/Actions/IA_Dash");
 	AssetPath.Add("/Game/Player/Input/Actions/IA_Jump");
-	AssetPath.Add("/Game/Player/Input/Actions/IA_SwitchAttribute");
 	AssetPath.Add("/Game/Player/Input/Actions/IA_Combo1");
 	AssetPath.Add("/Game/Player/Input/Actions/IA_Combo2");
-	AssetPath.Add("/Game/Player/Input/Actions/IA_Ult");
+
+	// ------------------同期ver
+
+	// ボタンのマッピング設定
+	DefaultMappingContext = LoadObject<UInputMappingContext>(nullptr, TEXT("/Game/0122/Player/Input/IMC_Default"));
+
+	// 各アクションのマッピング
+	MoveAction = LoadObject<UInputAction>(nullptr, TEXT("/Game/0122/Player/Input/Actions/IA_Move"));
+	RunAction = LoadObject<UInputAction>(nullptr, TEXT("/Game/0122/Player/Input/Actions/IA_Dash"));
+	JumpAction = LoadObject<UInputAction>(nullptr, TEXT("/Game/0122/Player/Input/Actions/IA_Jump"));
+	ComboAction = LoadObject<UInputAction>(nullptr, TEXT("/Game/0122/Player/Input/Actions/IA_Combo1"));
+	ComboAction2 = LoadObject<UInputAction>(nullptr, TEXT("/Game/0122/Player/Input/Actions/IA_Combo2"));
 
 	//// 非同期読み込みリクエストの作成
 	//FAsyncLoadCallback AsyncCallback;
@@ -142,37 +148,52 @@ void APlayerCharacter::SetupDefoultMappingContext()
 	//	StreamableManager.RequestAsyncLoad(AssetPath[i], Delegate);
 	//}
 
-	// ボタンのマッピング設定
-	DefaultMappingContext = LoadObject<UInputMappingContext>(nullptr, TEXT("/Game/Player/Input/IMC_Default"));
 }
-
 
 // アニメーションの設定
 void APlayerCharacter::SetupAnimationAsset()
 {
-	// アニメーションアセットを検索して格納
-	//ConstructorHelpers::FObjectFinder<UAnimMontage> ComboMontage(TEXT("/Game/Player/Animation/Montage/Combo/sword/SwordCombo"));
-	//ConstructorHelpers::FObjectFinder<UAnimMontage> ComboMontage2(TEXT("/Game/Player/Animation/Montage/Combo/sword/SwordCombo2"));
-	//ConstructorHelpers::FObjectFinder<UAnimMontage> UltMontage(TEXT("/Game/Player/Animation/Montage/hissatu"));
+	//アニメーションアセットを検索して格納
+	ConstructorHelpers::FObjectFinder<UAnimMontage> ComboMontage(TEXT("/Game/0122/Player/Animation/Montage/Combo/SwordCombo"));
+	ConstructorHelpers::FObjectFinder<UAnimMontage> ComboMontage2(TEXT("/Game/0122/Player/Animation/Montage/Combo/SwordCombo2"));
 
-	//if (ComboMontage.Succeeded())
-	//{
-	//	ComboAnimMontages.Add(ComboMontage.Object);
-	//}
+	if (ComboMontage.Succeeded())
+	{
+		ComboAnimMontages.Add(ComboMontage.Object);
+	}
 
-	//if (ComboMontage2.Succeeded())
-	//{
-	//	ComboAnimMontages.Add(ComboMontage2.Object);
-	//}
-
-	//if (UltMontage.Succeeded())
-	//{
-	//	UltAnimMontage = UltMontage.Object;
-	//}
+	if (ComboMontage2.Succeeded())
+	{
+		ComboAnimMontages.Add(ComboMontage2.Object);
+	}
 
 	// コンボの名前格納
-	ComboCntNames = { "First", "Second", "Third" };
+	ComboCntNames = { "First", "Second", "Third"/*,"Fourth"*/};
 }
+
+void APlayerCharacter::SetupSword()
+{
+	// 剣のコンポーネントを作成
+	SwordMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("WeaponMesh"));
+
+	// 剣のアセット設定
+	ConstructorHelpers::FObjectFinder<USkeletalMesh> swordMesh(TEXT("/Game/0122/Player/Weapon/Weapons/Blade/Swords/Blade_BlackKnight/SK_Blade_BlackKnight"));
+
+	if (swordMesh.Succeeded())
+	{
+		SwordMesh->SetSkeletalMeshAsset(swordMesh.Object);
+	}
+
+	// 体のメッシュに追従
+	SwordMesh->SetupAttachment(GetMesh(),"hand_rSocket");
+
+	// 剣の当たり判定作成
+	SwordCollision = CreateDefaultSubobject<UCapsuleComponent>(TEXT("WeaponCollision"));
+
+	// 剣のメッシュに追従
+	SwordCollision->SetupAttachment(SwordMesh);
+}
+
 
 void APlayerCharacter::Move(const FInputActionValue& Value)
 {
@@ -241,7 +262,7 @@ void APlayerCharacter::Jump()
 	// 位置更新
 	SetActorLocation(FVector(NowPos.X, NowPos.Y, SinValue));
 	
-	// 着地処理
+	// 着地処理 ジャンプ開始から数フレーム後から判定開始
 	if (IsPlayerGrounded() && frames >= 20.f)
 	{
 		PlayerState = State_Idle;
@@ -262,25 +283,28 @@ bool APlayerCharacter::IsPlayerGrounded() const
 }
 
 // 攻撃
-void APlayerCharacter::Attack()
+void APlayerCharacter::Attack(int ComboNum /*= 0*/)
 {
 	if (!IsAttacking)
 	{
 		// 攻撃中フラグオン
 		IsAttacking = true;
-
-		// アニメーション再生
-		PlayAnimation();
 	}
 	else
 	{
 		// コンボ可能な時,継続
 		if (CanCombo)
 		{
-			// アニメーション再生
-			PlayAnimation();
+			// ラストアタックまでコンボ継続
+			if (ComboCntNames[ComboIndex] != ComboCntNames.Last())
+			{
+				++ComboIndex;
+			}
 		}
 	}
+
+	// 攻撃のアニメーション再生
+	PlayAnimation(ComboAnimMontages[ComboNum], ComboCntNames[ComboIndex]);
 }
 
 // コンボ1
@@ -289,11 +313,8 @@ void APlayerCharacter::Combo1()
 	// コントロール可能か
 	if (!IsControl) { return; }
 
-	// ステートを1つ目のコンボへ
-	AttackState = State_Combo1;
-
 	// 攻撃
-	Attack();
+	Attack(0);
 }
 
 // コンボ2
@@ -302,12 +323,17 @@ void APlayerCharacter::Combo2()
 	// コントロール可能か
 	if (!IsControl) { return; }
 
-	// ステートを2つ目のコンボへ
-	AttackState = State_Combo2;
-
 	// 攻撃
-	Attack();
+	Attack(1);
 }
+
+// コンボ継続
+void APlayerCharacter::ContinuationCombo()
+{
+	IsControl = true;
+	CanCombo = true;
+}
+
 
 // コンボリセット
 void APlayerCharacter::ResetCombo()
@@ -315,79 +341,51 @@ void APlayerCharacter::ResetCombo()
 	// フラグリセット
 	IsAttacking = false;
 	CanCombo = false;
+	IsControl = true;
 
 	// コンボリセット
 	ComboIndex = 0;
 }
 
-// 必殺技
-void APlayerCharacter::UltimateAttack()
+void APlayerCharacter::SetSwordCollision()
 {
-	// コントロール不能へ
-	IsControl = false;
+	// コリジョン判定で無視する項目を指定(今回はこのActor自分自身。thisポインタで指定)
+	FCollisionQueryParams CollisionParams;
+	CollisionParams.AddIgnoredActor(this);
 
-	// ステートを必殺技へ
-	AttackState = State_Ult;
+	// ヒットした(=コリジョン判定を受けた)オブジェクトを格納する変数
+	TArray<struct FHitResult> OutHits;
 
-	// 必殺技アニメーション再生
-	PlayAnimation();
-}
-
-void APlayerCharacter::TakedDamage()
-{
 
 }
 
-void APlayerCharacter::SwitchAttribute()
+void APlayerCharacter::TakedDamage(float _damage)
 {
-	// コントロール可能か
-	if (!IsControl) { return; }
-
-	// 風属性の時炎に戻る
-	if (AttrState == State_Wind)
+	if (HP)
 	{
-		AttrState = State_Fire;
+		// HP計算
+		HP -= _damage;
 	}
 	else
 	{
-		// それ以外は順番通り
-		AttrState = static_cast<Attribute_State>(AttrState + 1);
+		PlayerState = State_Death;
 	}
 }
 
-void APlayerCharacter::PlayAnimation()
+void APlayerCharacter::PlayAnimation(UAnimMontage* ToPlayAnimMontage, FName StartSectionName /*= "None"*/)
 {
 	// コントロール不能へ
 	IsControl = false;
 
 	// 再生するアニメーションを格納
-	UAnimMontage* ToPlayAnimMontage = nullptr;
+	UAnimMontage* toPlayAnimMontage = ToPlayAnimMontage;
 
-	// 再生開始位置
-	FName StartSectionName = "None";
-
-	// 攻撃の種類でアニメーションを切り替え
-	switch (AttackState)
+	// 何段目か
+	FName StartSection = StartSectionName;
+	
+	// アニメーション再生
+	if (toPlayAnimMontage != nullptr)
 	{
-	case State_Combo1:
-		ToPlayAnimMontage = ComboAnimMontages[State_Combo1];
-		StartSectionName = ComboCntNames[ComboIndex];
-		break;
-	case State_Combo2:
-		ToPlayAnimMontage = ComboAnimMontages[State_Combo2];
-		StartSectionName = ComboCntNames[ComboIndex];
-		break;
-	case State_Ult:
-		ToPlayAnimMontage = UltAnimMontage;
-		break;
+		PlayAnimMontage(toPlayAnimMontage, 1.f, StartSection);
 	}
-
-	if (ToPlayAnimMontage != nullptr)
-	{
-		// アニメーション再生
-		PlayAnimMontage(ToPlayAnimMontage, 1.f, StartSectionName);
-	}
-
-	// 次のコンボへ
-	++ComboIndex;
 }

@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/GameStateBase.h"
 #include "InputCharacter.h"
+#include "Engine/TargetPoint.h"
 
 #include "TGS_GameStateBase.generated.h"
 
@@ -129,11 +130,17 @@ protected:
 	void InitBattleArea();
 
 public:
+	TArray<class ASpawnPoint*> BattleAreaSpawnPoints;
+	int32 BattleAreaEnemyCount = 0;
+
+public:
 	//バトルエリアのフラグ
 	bool bIsOnBattleArea;
 
 	//バトルエリアのカメラ
 	AActor* BattleAreaCamera;
+
+	TArray<class UProceduralMeshComponent*> BattleAreaMeshs;
 
 	AActor* GetBattleAreaCamera();
 //---------------------------------------------------------------------------------------------------------------------
