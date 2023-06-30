@@ -13,8 +13,8 @@ AOdaBase::AOdaBase():
 	OdaSpeed(1.f),
 	FastOdaSpeed(1.65),
 	FlontTimer(0),
-	ChangeFlontTimer(20),
 	OdaMoveEnum(ECPPOdaEnum::Stay1),
+	ChangeFlontTimer(20),
 	SwitchStayMove(true),
 	WaitTime(0)
 {
@@ -159,6 +159,21 @@ void AOdaBase::OdaBack1(int Timer) {
 
 }
 
+float AOdaBase::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser)
+{
+	const float ActualDamage = Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
+	if (ActualDamage > 0.f)
+	{
+		Health -= ActualDamage;
+		if (Health <= 0.f)
+		{
+			//‘Ì—Í‚ª0ˆÈ‰º‚É‚È‚Á‚½‚Æ‚«‚Ìˆ—
+		}
+	}
+
+	return ActualDamage;
+
+}
 
 
 void AOdaBase::FlontMove(float Speed)

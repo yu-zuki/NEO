@@ -37,6 +37,10 @@ public:
 	//キャラクタームーブメント
 	UPROPERTY()
 		UCharacterMovementComponent* NobunagaMovement;
+
+	//ダメージ処理
+	float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser);
+
 	
 	//前方向をとる
 	UPROPERTY()
@@ -75,6 +79,10 @@ public:
 	//行動変更時間設定
 	UPROPERTY(EditAnywhere)
 		int ChangeFlontTimer;
+
+	//体力
+	UPROPERTY()
+	float Health;
 
 	//前方移動
 	UFUNCTION()
