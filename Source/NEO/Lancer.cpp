@@ -50,12 +50,7 @@ void ALancer::Tick(float DeltaTime)
             FRotator TargetRotation = PlayerDirection.Rotation();
             SetActorRotation(FMath::RInterpTo(GetActorRotation(), TargetRotation, DeltaTime, 5.0f));
         }
-        //150à»â∫ÇæÇ¡ÇΩÇÁçUåÇ
-        else if (DistanceToPlayer <= 150.0f)
-        {
-            PlayAnimMontage(Attack, 1, NAME_None);
-            return;
-        }
+       
     }
 }
 
