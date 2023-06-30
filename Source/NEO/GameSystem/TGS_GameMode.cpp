@@ -10,6 +10,7 @@
 #include "ProceduralMeshComponent.h"
 #include "SpawnPoint.h"
 #include "Engine/World.h"
+#include "../EnamyBase.h"
 
 ATGS_GameMode::ATGS_GameMode()
 {
@@ -112,8 +113,9 @@ AActor* ATGS_GameMode::SpawnEnemy(ASpawnPoint* spawnPoint)
 	FTransform spawnTransform = spawnPoint->GetTransform();
 
 	//SpawnPoint‚ðŽg‚Á‚ÄA“G‚ð¶¬‚·‚é
-	AActor* Enemy = GetWorld()->SpawnActor(spawnPoint->GetSpawnActorClass());
+	AEnamyBase* Enemy = Cast<AEnamyBase> ( GetWorld()->SpawnActor(spawnPoint->GetSpawnActorClass()) );
 	Enemy->SetActorTransform(spawnTransform);
+	Enemy->IsAreaEnemy = true;		//Flag Set 
 
 	//“G‚ðƒQ[ƒ€ƒXƒe[ƒg‚É“o˜^‚·‚é
 	GetGameState()->AddEnemy(Enemy);

@@ -6,6 +6,8 @@
 #include "GameFramework/Character.h"
 #include "PlayerCharacter.h"
 #include "Bullet.h"
+#include "EnamyBase.h"
+
 #include "GunMan.generated.h"
 
 UCLASS()

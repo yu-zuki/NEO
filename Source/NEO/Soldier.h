@@ -2,6 +2,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "EnamyBase.h"
+
 #include "Soldier.generated.h"
 
 UCLASS()
