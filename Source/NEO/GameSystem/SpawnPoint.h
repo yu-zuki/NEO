@@ -16,7 +16,8 @@ class NEO_API ASpawnPoint : public ATargetPoint
 
 //protected:
 	//Actor‚ÌClass
-UPROPERTY(EditAnywhere, Category = "Spawn")
+protected:
+UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn")
 	TSubclassOf<AActor> ActorClass;
 public:
 	//Actor‚ÌClass‚ð•Ô‚·

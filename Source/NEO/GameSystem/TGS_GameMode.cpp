@@ -102,6 +102,12 @@ void ATGS_GameMode::SpawnEnemy(AActor* _enemy, FTransform _tranceform)
 
 AActor* ATGS_GameMode::SpawnEnemy(ASpawnPoint* spawnPoint)
 {
+	//NULL Check
+	if (!spawnPoint) {
+		UE_LOG(LogTemp, Error, TEXT("SpawnPoint is not found"));
+		return nullptr;
+	}
+
 	//Transform‚ðŽæ“¾‚·‚é
 	FTransform spawnTransform = spawnPoint->GetTransform();
 

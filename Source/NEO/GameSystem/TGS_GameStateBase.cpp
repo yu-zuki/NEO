@@ -252,15 +252,12 @@ void ATGS_GameStateBase::OnGamePause()
 void ATGS_GameStateBase::OnInBattleArea()
 {
 	//Debug用 BattleAreaから出る
-	if (UseSubAction() == ESubAction::ESubAction_Enter) {
-		bIsOnBattleArea = false;
-	}
-
-	if (bIsOnBattleArea != true || BattleAreaEnemyCount <= 0) {
+	if (UseSubAction() == ESubAction::ESubAction_Enter || BattleAreaEnemyCount <= 0) {
 		//バトルエリアから出る
 		ExitBattleArea();
 		SetCurrentState(EGameState::EGame_Playing);
 	}
+
 }
 
 void ATGS_GameStateBase::EnterBattleArea()
@@ -285,10 +282,20 @@ void ATGS_GameStateBase::EnterBattleArea()
 			UE_LOG(LogTemp, Warning, TEXT("PlayerController is not found"));
 		}
 	}
+
+	//GameModeを使って、バトルエリアに敵をスポーンさせる。　＜設計が悪い＞
+	ATGS_GameMode* GameMode = Cast<ATGS_GameMode>(GetWorld()->GetAuthGameMode());
+	if (GameMode) {
+		GameMode->SpawnEnemyInBattleArea();
+	}
+	else {
+		UE_LOG(LogTemp, Warning, TEXT("GameMode is not found"));
+	}
 }
 
 void ATGS_GameStateBase::ExitBattleArea()
 {
+	bIsOnBattleArea = false;
 	//バトルエリアを無効化
 	for (auto Mesh : BattleAreaMeshs) {
 		if (Mesh) {

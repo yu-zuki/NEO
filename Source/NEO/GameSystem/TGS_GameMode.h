@@ -52,8 +52,9 @@ public:
 	void SpawnEnemy(AActor* _enemy, FTransform _tranceform);
 	AActor* SpawnEnemy(ASpawnPoint* spawnPoint);
 
-	void DestroyEnemy(AActor* _enemy, bool BattleAreaEnemy = false)
-		;
+	UFUNCTION(BlueprintCallable, Category = "GameSystem")
+	void DestroyEnemy(AActor* _enemy, bool BattleAreaEnemy = false);
+
 	void ClearEnemy();
 
 	void SetState_GameOver();

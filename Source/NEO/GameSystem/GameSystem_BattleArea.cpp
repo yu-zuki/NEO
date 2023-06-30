@@ -70,13 +70,6 @@ void AGameSystem_BattleArea::BeginPlay()
 void AGameSystem_BattleArea::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	if (bIsInBattleArea) {
-		if (CheckEnemyCount() < 0)
-		{
-			ExitBattleArea();
-		}
-	}
 }
 
 
@@ -251,11 +244,6 @@ void AGameSystem_BattleArea::EnterBattleArea()
 
 void AGameSystem_BattleArea::ExitBattleArea()
 {
-	ATGS_GameMode* GameMode = GetWorld()->GetAuthGameMode<ATGS_GameMode>();
-	if (GameMode) {
-		bIsInBattleArea = false;
-		GameMode->SetIsOnBattleArea(bIsInBattleArea,SpawnPoints,nullptr,nullptr,nullptr,nullptr);
-	}
 }
 
 void AGameSystem_BattleArea::GetSpawnPoints()
@@ -265,7 +253,7 @@ void AGameSystem_BattleArea::GetSpawnPoints()
 	TArray<AActor*> ASpawnPoints;
 
 	//tagを使ってSpawnPointsの取得
-	UGameplayStatics::GetAllActorsWithTag(GetWorld(), TEXT("SpawnPoint"), ASpawnPoints);
+	UGameplayStatics::GetAllActorsWithTag(GetWorld(), SpawnPointTag, ASpawnPoints);
 
 	//SpawnPointsをSpawnPointのデータ型に変換
 	for (AActor* SpawnPoint : ASpawnPoints)	{
