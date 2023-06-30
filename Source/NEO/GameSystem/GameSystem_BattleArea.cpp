@@ -238,8 +238,13 @@ int32 AGameSystem_BattleArea::CheckEnemyCount()
 void AGameSystem_BattleArea::EnterBattleArea()
 {
 	ATGS_GameMode* GameMode = GetWorld()->GetAuthGameMode<ATGS_GameMode>();
-	if (ensure(GameMode)) {
+	if (GameMode) {
 		bIsInBattleArea = true;
+		if (SpawnPoints.Num() == 0) {
+			UE_LOG(LogTemp, Warning, TEXT("SpawnPoints is empty"));
+			return;
+		}
+
 		GameMode->SetIsOnBattleArea(bIsInBattleArea, SpawnPoints, this, LeftMesh, RightMesh, NearMesh);
 	}
 }
@@ -247,7 +252,7 @@ void AGameSystem_BattleArea::EnterBattleArea()
 void AGameSystem_BattleArea::ExitBattleArea()
 {
 	ATGS_GameMode* GameMode = GetWorld()->GetAuthGameMode<ATGS_GameMode>();
-	if (ensure(GameMode)) {
+	if (GameMode) {
 		bIsInBattleArea = false;
 		GameMode->SetIsOnBattleArea(bIsInBattleArea,SpawnPoints,nullptr,nullptr,nullptr,nullptr);
 	}
