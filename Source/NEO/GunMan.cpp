@@ -97,7 +97,7 @@ float AGunMan::GetDistanceToPlayer() const
 void AGunMan::FacePlayer()
 {
     // プレイヤーキャラクターの位置を取得
-    FVector PlayerLocation = UGameplayStatics::GetPlayerCharacter(this, 0)->GetActorLocation();
+    FVector PlayerLocation = PlayerCharacter->GetActorLocation();
 
     // プレイヤーキャラクターの位置に向かってLancerを回転させる
     FRotator TargetRotation = (PlayerLocation - GetActorLocation()).Rotation();
