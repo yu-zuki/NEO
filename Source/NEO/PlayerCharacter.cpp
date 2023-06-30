@@ -78,6 +78,8 @@ void APlayerCharacter::Tick(float DeltaTime)
 	case State_Jump:
 		Jump();
 		break;
+	case State_Death:
+		break;
 	}
 
 }
@@ -357,9 +359,17 @@ void APlayerCharacter::SetSwordCollision()
 
 }
 
-void APlayerCharacter::TakedDamage()
+void APlayerCharacter::TakedDamage(float _damage)
 {
-
+	if (HP)
+	{
+		// HPŒvŽZ
+		HP -= _damage;
+	}
+	else
+	{
+		PlayerState = State_Death;
+	}
 }
 
 void APlayerCharacter::PlayAnimation(UAnimMontage* ToPlayAnimMontage, FName StartSectionName /*= "None"*/)

@@ -23,7 +23,8 @@ class NEO_API APlayerCharacter : public AInputCharacter
 	enum Player_State
 	{
 		State_Idle = 0,
-		State_Jump
+		State_Jump,
+		State_Death
 	};
 
 	/** MappingContext */
@@ -90,12 +91,13 @@ protected:
 	UFUNCTION(BlueprintCallable)
 		void SetSwordCollision();
 
-	// ダメージを与える処理
+	// ダメージ量を返す関数
 	UFUNCTION(BlueprintCallable)
 		float GetDamageAmount()const { return DamageAmount * ((float)ComboIndex + 1.f); }
 
 	// ダメージを受ける処理
-	void TakedDamage();
+	UFUNCTION(BlueprintCallable)
+		void TakedDamage(float _damage);
 
 	// アニメーション再生
 	void PlayAnimation(UAnimMontage* ToPlayAnimMontage,FName StartSectionName = "None");
@@ -158,7 +160,7 @@ private:
 	TArray<FName> ComboCntNames;	// コンボの段数(First,Second,Third・・・)
 
 	UPROPERTY(EditAnywhere, Category = Damage)
-	float DamageAmount;				// ダメージ量
+	float DamageAmount;				// 与ダメージ量
 
-	float HP;
+	float HP;						// HP
 };
