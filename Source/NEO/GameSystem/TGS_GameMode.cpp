@@ -8,7 +8,8 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputCharacter.h"
 #include "ProceduralMeshComponent.h"
-
+#include "SpawnPoint.h"
+#include "Engine/World.h"
 
 ATGS_GameMode::ATGS_GameMode()
 {
@@ -69,6 +70,27 @@ void ATGS_GameMode::RespawnPlayer()
 {
 }
 
+void ATGS_GameMode::SpawnEnemyInBattleArea()
+{
+	//Check SpawnPoints
+	if (GetGameState()->BattleAreaSpawnPoints.Num() == 0) {
+		UE_LOG(LogTemp, Error, TEXT("SpawnPoints is not found"));
+		return;
+	}
+
+	//ƒXƒ|[ƒ“
+	UWorld* World = GetWorld();
+	if (!World) return;
+
+
+	for (ASpawnPoint* spawnPoint : GetGameState()->BattleAreaSpawnPoints) {
+		if (!spawnPoint) continue; //Check SpawnPoint
+
+		//“G‚ð¶¬‚·‚é
+		SpawnEnemy(spawnPoint);
+	}
+}
+
 void ATGS_GameMode::SpawnEnemy(AActor* _enemy, FTransform _tranceform)
 {
 	//“G‚ð¶¬‚·‚é
@@ -78,11 +100,31 @@ void ATGS_GameMode::SpawnEnemy(AActor* _enemy, FTransform _tranceform)
 	GetGameState()->AddEnemy(enemy);
 }
 
-void ATGS_GameMode::DestroyEnemy(AActor* _enemy)
+AActor* ATGS_GameMode::SpawnEnemy(ASpawnPoint* spawnPoint)
+{
+	//Transform‚ðŽæ“¾‚·‚é
+	FTransform spawnTransform = spawnPoint->GetTransform();
+
+	//SpawnPoint‚ðŽg‚Á‚ÄA“G‚ð¶¬‚·‚é
+	AActor* Enemy = GetWorld()->SpawnActor(spawnPoint->GetSpawnActorClass());
+	Enemy->SetActorTransform(spawnTransform);
+
+	//“G‚ðƒQ[ƒ€ƒXƒe[ƒg‚É“o˜^‚·‚é
+	GetGameState()->AddEnemy(Enemy);
+
+	GetGameState()->BattleAreaEnemyCount += 1;
+
+	return Enemy;
+}
+
+void ATGS_GameMode::DestroyEnemy(AActor* _enemy,bool BattleAreaEnemy)
 {
 	//“G‚ðƒQ[ƒ€ƒXƒe[ƒg‚©‚çíœ‚·‚é
 	GetGameState()->RemoveEnemy(_enemy);
 
+	if(BattleAreaEnemy) {
+		GetGameState()->BattleAreaEnemyCount -= 1;
+	}
 }
 
 void ATGS_GameMode::ClearEnemy()
@@ -102,22 +144,40 @@ void ATGS_GameMode::SetSubAction(ESubAction _eSubAction)
 	GetGameState()->SetSubAction(_eSubAction);
 }
 
-void ATGS_GameMode::SetIsOnBattleArea(bool bIsOnArea,AActor* Camera, class UProceduralMeshComponent* LeftMesh, class UProceduralMeshComponent* RightMesh, class UProceduralMeshComponent* NearMesh)
+void ATGS_GameMode::SetIsOnBattleArea(bool bIsOnArea, TArray<class ASpawnPoint*> SpawnPoints,
+	AActor* Camera = nullptr,
+	class UProceduralMeshComponent* LeftMesh = nullptr,
+	class UProceduralMeshComponent* RightMesh = nullptr,
+	class UProceduralMeshComponent* NearMesh = nullptr)
 {
-	GetGameState()->BattleAreaMeshs.Reset();
+	//NULL Check
+	if (Camera && LeftMesh && RightMesh && NearMesh) {
+		GetGameState()->BattleAreaMeshs.Reset();
 
-	GetGameState()->BattleAreaMeshs.Add(LeftMesh);
-	GetGameState()->BattleAreaMeshs.Add(RightMesh);
-	GetGameState()->BattleAreaMeshs.Add(NearMesh);
-	
+		GetGameState()->BattleAreaMeshs.Add(LeftMesh);
+		GetGameState()->BattleAreaMeshs.Add(RightMesh);
+		GetGameState()->BattleAreaMeshs.Add(NearMesh);
+
+		GetGameState()->BattleAreaCamera = Camera;
+
+		//ƒXƒ|[ƒ“ƒ|ƒCƒ“ƒg‚ðƒQ[ƒ€ƒXƒe[ƒg‚É“o˜^‚·‚é
+		GetGameState()->BattleAreaSpawnPoints.Reset();
+		for(auto spawnPoint : SpawnPoints) {
+			GetGameState()->BattleAreaSpawnPoints.Add(spawnPoint);
+		}
+	}
 
 	GetGameState()->bIsOnBattleArea = bIsOnArea; 
-	GetGameState()->BattleAreaCamera = Camera;
 }
 
 bool ATGS_GameMode::GetIsOnBattleArea()
 {
 	return GetGameState()->bIsOnBattleArea;
+}
+
+int32 ATGS_GameMode::GetBattleAreaEnemyNum()
+{
+	 return GetGameState()->BattleAreaEnemyCount;
 }
 
 ATGS_GameStateBase* ATGS_GameMode::GetGameState()

@@ -15,6 +15,7 @@
 
 #include "ProceduralMeshComponent.h"
 #include "TGS_GameMode.h"
+#include "SpawnPoint.h"
 
 // Sets default values
 AGameSystem_BattleArea::AGameSystem_BattleArea()
@@ -61,12 +62,21 @@ void AGameSystem_BattleArea::BeginPlay()
 	GetRootComponent()->SetRelativeTransform(Transform);
 
 	StaticMeshComponent->OnComponentBeginOverlap.AddDynamic(this, &AGameSystem_BattleArea::BeginOverlap);
+	
+	GetSpawnPoints();
 }
 
 // Called every frame
 void AGameSystem_BattleArea::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (bIsInBattleArea) {
+		if (CheckEnemyCount() < 0)
+		{
+			ExitBattleArea();
+		}
+	}
 }
 
 
@@ -215,11 +225,47 @@ void AGameSystem_BattleArea::BeginOverlap(UPrimitiveComponent* OverlappedCompone
 		if (Character->ActorHasTag(EnterActorTag))		{
 			StaticMeshComponent->DestroyComponent();	// コンポーネントを破壊
 
-			ATGS_GameMode* GameMode = GetWorld()->GetAuthGameMode<ATGS_GameMode>();
-			if (ensure(GameMode))			{
-				GameMode->SetIsOnBattleArea(true, this, LeftMesh, RightMesh, NearMesh);
-			}
+			EnterBattleArea();
 		}
 	}
+}
+
+int32 AGameSystem_BattleArea::CheckEnemyCount()
+{
+	return 0;
+}
+
+void AGameSystem_BattleArea::EnterBattleArea()
+{
+	ATGS_GameMode* GameMode = GetWorld()->GetAuthGameMode<ATGS_GameMode>();
+	if (ensure(GameMode)) {
+		bIsInBattleArea = true;
+		GameMode->SetIsOnBattleArea(bIsInBattleArea, SpawnPoints, this, LeftMesh, RightMesh, NearMesh);
+	}
+}
+
+void AGameSystem_BattleArea::ExitBattleArea()
+{
+	ATGS_GameMode* GameMode = GetWorld()->GetAuthGameMode<ATGS_GameMode>();
+	if (ensure(GameMode)) {
+		bIsInBattleArea = false;
+		GameMode->SetIsOnBattleArea(bIsInBattleArea,SpawnPoints,nullptr,nullptr,nullptr,nullptr);
+	}
+}
+
+void AGameSystem_BattleArea::GetSpawnPoints()
+{
+	SpawnPoints.Reset();
+	//SpawnPointsの取得
+	TArray<AActor*> ASpawnPoints;
+
+	//tagを使ってSpawnPointsの取得
+	UGameplayStatics::GetAllActorsWithTag(GetWorld(), TEXT("SpawnPoint"), ASpawnPoints);
+
+	//SpawnPointsをSpawnPointのデータ型に変換
+	for (AActor* SpawnPoint : ASpawnPoints)	{
+		SpawnPoints.Add(Cast<ASpawnPoint>(SpawnPoint));
+	}
+
 }
 

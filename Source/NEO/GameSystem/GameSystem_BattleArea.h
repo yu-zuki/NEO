@@ -69,6 +69,19 @@ protected:
 	//近い側のメッシュ
 UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BattleArea")
 		class UProceduralMeshComponent* NearMesh;
+
+		//SpawnPointのタグ名
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BattleArea")
+		FName SpawnPointTag = "SpawnPoint";
+
+	//敵のカウント
+	int32 EnemyCount = 0;
+
+	//flag
+	bool bIsInBattleArea = false;
+
+	TArray<class ASpawnPoint*> SpawnPoints;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -87,5 +100,16 @@ public:
 	UFUNCTION()
 	void BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	
+	//エリア内の敵の数をチェック
+	int32 CheckEnemyCount();
+
+	//バトルエリアに入る
+	void EnterBattleArea();
+
+	//バトルエリアから出る
+	void ExitBattleArea();
+
+	//SpawnActorを取得する
+	void GetSpawnPoints();
 
 };
