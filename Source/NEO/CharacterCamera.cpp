@@ -20,7 +20,6 @@ ACharacterCamera::ACharacterCamera()
 	CameraBoom->TargetArmLength = 500.0f; // The camera follows at this distance behind the character	
 	CameraBoom->bUsePawnControlRotation = true; // Rotate the arm based on the controller
 	CameraBoom->bInheritPitch = false;
-	CameraBoom->SetRelativeLocation(FVector(0.f, 0.f, 100.f));
 	CameraBoom->SetRelativeRotation(FRotator(-12.f, 0.f, 0.f));
 	CameraBoom->bDoCollisionTest = false;
 
@@ -45,8 +44,10 @@ void ACharacterCamera::BeginPlay()
 	PlayerInfo = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
 	PlayerInfo->SetOwner(this);
 
-	// ‰ŠúˆÊ’u
-	StartPos = GetActorLocation();
+	// ‰ŠúˆÊ’uÝ’è
+	StartPos = PlayerInfo->GetActorLocation();
+	StartPos = FVector(StartPos.X - 150.f, StartPos.Y + PlayerToViewPointDistance_X, StartPos.Z + 100.f);
+	SetActorLocation(StartPos);
 }
 
 // Called every frame
