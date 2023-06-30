@@ -3,9 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "CPPOdaEnum.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Runtime/Engine/Classes/Kismet/KismetMathLibrary.h"
 #include "OdaBase.generated.h"
 
 UCLASS()
@@ -39,6 +41,24 @@ public:
 	//‘O•ûŒü‚ğ‚Æ‚é
 	UPROPERTY()
 	FVector ForwardDirection;
+
+	//—ñ‹“Œ^
+	ECPPOdaEnum OdaMoveEnum;
+
+	//‘Ò‹@ŠÖ”
+	UPROPERTY()
+	bool SwitchStayMove;
+
+	int WaitTime;
+
+	void OdaStay1(int Timer);
+
+	void OdaMove1(int Timer);
+
+	void OdaMove2(int Timer);
+
+	void OdaBack1(int Timer);
+
 
 	//’Êí‚ÌˆÚ“®‘¬“x
 	UPROPERTY(EditAnywhere)
