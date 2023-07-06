@@ -28,16 +28,24 @@ public:
 	UFUNCTION()
 		ABossBase* GetPlayerKey();
 
+
 	UPROPERTY()
 		UBehaviorTreeComponent* BehaviorComp;
-
 	UPROPERTY()
 		UBlackboardComponent* BlackboardComp;
 
 	UPROPERTY(EditDefaultsOnly, Category = AI)
-		FName PlayerKeyName;
+		FName PlayerKeyName;	
+
+
+	UFUNCTION(BlueprintCallable)
+		FORCEINLINE UBehaviorTreeComponent* GetBehaviorComp() const { return BehaviorComp; }
+
+	UFUNCTION(BlueprintCallable)
+		FORCEINLINE UBlackboardComponent* GetBlackboardComp() const { return BlackboardComp; }
 
 protected:
+
 	// AIControllerÇÃPawnèäéù
 	virtual void OnPossess(class APawn* InPawn) override;
 
@@ -49,6 +57,5 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = AI)
 		class UBehaviorTree* BehaviorTree;
 
-	FORCEINLINE UBehaviorTreeComponent* GetBehaviorComp() const { return BehaviorComp; }
-	FORCEINLINE UBlackboardComponent* GetBlackboardComp() const { return BlackboardComp; }
+
 };

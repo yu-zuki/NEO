@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "GameFramework/Actor.h"
 #include "Kismet/GameplayStatics.h"
 #include "PlayerCharacter.h"
 #include "BossBase.generated.h"
@@ -32,10 +33,11 @@ public:
 	UPROPERTY(EditAnywhere)
 	USceneComponent* DefaultSceneRoot;
 
-	FString Skeletal_Path = TEXT("SkeletalMesh'/Game/Enemy/BOSS/Boss_Mesh.BossMesh'");
+	//Player‚Ì’l‚ğ‘ã“ü‚·‚é‚½‚ß‚ÌŠÖ”
+	void PlayerInput();
 
-
-
-	
+public:
+	UPROPERTY(EditAnywhere)
+	float PlayerDistance;
 
 };

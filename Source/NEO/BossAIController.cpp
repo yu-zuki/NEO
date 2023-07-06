@@ -6,12 +6,12 @@
 
 ABossAIController::ABossAIController(const class FObjectInitializer& ObjectInitializer)
 {
-	BehaviorComp = ObjectInitializer.CreateDefaultSubobject<UBehaviorTreeComponent>(this, TEXT("BT_BossAI"));
-	BlackboardComp = ObjectInitializer.CreateDefaultSubobject<UBlackboardComponent>(this, TEXT("BB_BossAI"));
+	BehaviorComp = ObjectInitializer.CreateDefaultSubobject<UBehaviorTreeComponent>(this, TEXT("BehaviorComp"));
+	BlackboardComp = ObjectInitializer.CreateDefaultSubobject<UBlackboardComponent>(this, TEXT("BlackboardComp"));
 
 	// 作成したビヘイビアツリーを設定
-	//ConstructorHelpers::FObjectFinder<UBehaviorTree> BTFinder(TEXT("/Game/0113/BOSS/BT_BossAI.BT_BossAI"));
-	//BehaviorTree = BTFinder.Object;
+	ConstructorHelpers::FObjectFinder<UBehaviorTree> BTFinder(TEXT("/Game/0113/BOSS/BT_BossAI.BT_BossAI"));
+	BehaviorTree = BTFinder.Object;
 
 	PlayerKeyName = "Player";
 }
@@ -26,8 +26,9 @@ void ABossAIController::OnPossess(APawn* InPawn)
 	Super::OnPossess(InPawn);
 
 	// AIControllerがPawn所持した際にBBとBTを使用
+	this->RunBehaviorTree(BehaviorTree);
 	BlackboardComp->InitializeBlackboard(*BehaviorTree->BlackboardAsset);
-	BehaviorComp->StartTree(*BehaviorTree);
+
 }
 
 void ABossAIController::OnUnPossess()
@@ -44,9 +45,12 @@ void ABossAIController::SetPlayerKey(APawn* player)
 	BlackboardComp->SetValueAsObject(PlayerKeyName, player);
 }
 
+
+
 ABossBase* ABossAIController::GetPlayerKey()
 {
 	ensure(BlackboardComp);
 
 	return Cast<ABossBase>(BlackboardComp->GetValueAsObject(PlayerKeyName));
 }
+
