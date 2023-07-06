@@ -38,8 +38,6 @@ APlayerCharacter::APlayerCharacter()
 
 	// キャラクターコンポーネント取得
 	CharacterMovementComp = GetCharacterMovement();
-	CharacterMovementComp->bOrientRotationToMovement = true;
-	CharacterMovementComp->RotationRate = FRotator(0.0f, 500.0f, 0.0f); // ...at this rotation rat
 
 	// アニメーションセットアップ
 	SetupAnimationAsset();
@@ -218,6 +216,26 @@ void APlayerCharacter::Move(const FInputActionValue& Value)
 		// add movement
 		AddMovementInput(ForwardDirection, MovementVector.Y);
 		AddMovementInput(RightDirection, MovementVector.X);
+
+		// 向く方向
+		float Direction;
+
+		// 方向指定
+		if (MovementVector.Y)
+		{
+			Direction = 90.f;
+		}
+		else if (MovementVector.Y == 0)
+		{
+			Direction = Rotation.Pitch;
+		}
+		else
+		{
+			Direction = -90.f;
+		}
+
+		// セット
+		SetActorRotation(FRotator(0.f, Direction, 0.f));
 	}
 }
 
