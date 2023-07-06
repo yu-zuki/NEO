@@ -17,6 +17,8 @@
 #include "Async/Async.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
+#define DIRECTION (90.f)
+
 // Sets default values
 APlayerCharacter::APlayerCharacter()
 	: IsControl(true)
@@ -217,25 +219,8 @@ void APlayerCharacter::Move(const FInputActionValue& Value)
 		AddMovementInput(ForwardDirection, MovementVector.Y);
 		AddMovementInput(RightDirection, MovementVector.X);
 
-		// 向く方向
-		float Direction;
-
-		// 方向指定
-		if (MovementVector.Y)
-		{
-			Direction = 90.f;
-		}
-		else if (MovementVector.Y == 0)
-		{
-			Direction = Rotation.Pitch;
-		}
-		else
-		{
-			Direction = -90.f;
-		}
-
-		// セット
-		SetActorRotation(FRotator(0.f, Direction, 0.f));
+		// 移動方向に回転
+		RotateCharacter(MovementVector.Y);
 	}
 }
 
@@ -253,11 +238,11 @@ void APlayerCharacter::JumpStart()
 	// コントロール可能か
 	if (!IsControl) { return; }
 
-	// ジャンプ開始
+	// 地上にいたらジャンプ開始
 	if (IsPlayerGrounded())
 	{
 		// ジャンプ時間
-		frames = 0;
+		frames = 0.f;
 
 		JumpBeforePos_Z = GetActorLocation().Z;
 
@@ -271,20 +256,21 @@ void APlayerCharacter::Jump()
 	FVector NowPos = GetActorLocation();
 
 	// Sinで高さ更新
-	float SinValue = height * FMath::Sin(radPerFrame * frames) + JumpBeforePos_Z;
+	float SinValue = height * FMath::Sin(radPerFrame * frames);
 
+	// ジャンプ前の高さから位置更新
+	const FVector nextPos(FVector(NowPos.X, NowPos.Y, SinValue + JumpBeforePos_Z));
 
-	// フレーム+1
-	frames += 1.f;
-
-	// 位置更新
-	SetActorLocation(FVector(NowPos.X, NowPos.Y, SinValue));
+	SetActorLocation(nextPos);
 	
-	// 着地処理 ジャンプ開始から数フレーム後から判定開始
+	// 着地処理 下降開始から判定開始
 	if (IsPlayerGrounded() && frames >= 20.f)
 	{
 		PlayerState = State_Idle;
 	}
+
+	// フレーム+1
+	frames += 1.f;
 }
 
 bool APlayerCharacter::IsPlayerGrounded() const
@@ -344,6 +330,31 @@ void APlayerCharacter::Combo2()
 	// 攻撃
 	Attack(1);
 }
+
+void APlayerCharacter::RotateCharacter(float nowInput_Y)
+{
+	// 入力がない場合は何もしない
+	if (nowInput_Y == 0) { return; }
+
+	// 向く方向
+	float Direction;
+
+	// 入力の値に応じて前か後ろを向く
+	if (nowInput_Y == 1.f)
+	{
+		Direction = DIRECTION;
+	}
+	else
+	{
+		Direction = -DIRECTION;
+	}
+
+	// 新しい方向にセット
+	const FRotator nowRotate = FRotator(0.f, Direction, 0.f);
+
+	SetActorRotation(nowRotate);
+}
+
 
 // コンボ継続
 void APlayerCharacter::ContinuationCombo()

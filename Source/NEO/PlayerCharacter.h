@@ -79,6 +79,9 @@ protected:
 	// 二つ目のコンボ
 	void Combo2();
 
+	// キャラクターの回転
+	void RotateCharacter(float nowInput_Y);
+
 	// コンボ継続
 	UFUNCTION(BlueprintCallable)
 		void ContinuationCombo();
@@ -135,7 +138,6 @@ public:
 
 	// キャラクターの動き
 	UCharacterMovementComponent* CharacterMovementComp;
-
 
 private:
 
