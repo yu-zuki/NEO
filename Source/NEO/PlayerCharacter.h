@@ -99,6 +99,9 @@ protected:
 	UFUNCTION(BlueprintCallable)
 		void TakedDamage(float _damage);
 
+	UFUNCTION(BlueprintCallable)
+		float GetHP()const { return HP; }
+
 	// アニメーション再生
 	void PlayAnimation(UAnimMontage* ToPlayAnimMontage,FName StartSectionName = "None");
 

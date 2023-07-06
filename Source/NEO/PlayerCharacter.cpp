@@ -365,10 +365,31 @@ void APlayerCharacter::TakedDamage(float _damage)
 	{
 		// HPŒvŽZ
 		HP -= _damage;
+
+		if (IsAttacking)
+		{
+			IsAttacking = false;
+		}
+		
+		if (CanCombo)
+		{
+			CanCombo = false;
+		}
+
+		if (!IsControl)
+		{
+			IsControl = true;
+		}
+
+		if (ComboIndex)
+		{
+			ComboIndex = 0;
+		}
 	}
 	else
 	{
 		PlayerState = State_Death;
+		IsControl = false;
 	}
 }
 
