@@ -1,9 +1,7 @@
 #pragma once
-
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "EnamyBase.h"
-
 #include "Lancer.generated.h"
 
 UCLASS()
@@ -13,11 +11,11 @@ class NEO_API ALancer : public AEnamyBase
 
 public:
     ALancer();
-  UPROPERTY(EditAnywhere, Category = "AI")
-        float DesiredDistance = 300.0f; // プレイヤーからの望ましい距離（3m）
+    UPROPERTY(EditAnywhere, Category = "AI")
+        float DesiredDistance = 100.0f; // プレイヤーからの望ましい距離（3m）
 
     UPROPERTY(EditAnywhere, Category = "AI")
-        float MovementSpeed = 300.0f; // 移動速度
+        float MovementSpeed = 10.0f; // 移動速度
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
         UAnimMontage * Attack;
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
@@ -63,10 +61,10 @@ protected:
 
 public:
     virtual void Tick(float DeltaTime) override;
-
+    
+    virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 private:
-  
-
     FVector GetPlayerDirection() const;
     float GetDistanceToPlayer() const;
+
 };

@@ -1,13 +1,11 @@
 #include "Lancer.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/Controller.h"
 #include "Kismet/GameplayStatics.h"
 
 ALancer::ALancer()
 {
-    // キャラクターの移動方式を設定
-    GetCharacterMovement()->bOrientRotationToMovement = true;
-    GetCharacterMovement()->RotationRate = FRotator(0.0f, 540.0f, 0.0f);
-    GetCharacterMovement()->MaxWalkSpeed = MovementSpeed;
+    // キャラクターの移動方式を設
     MaxHealth = 100;
     Health = MaxHealth;
     bIsJumping = false;
@@ -19,7 +17,8 @@ ALancer::ALancer()
     fJumpHeight = 100.0f;
     //ジャンプ開始時の位置
     vJumpStartLocation = GetActorLocation();
-
+    
+    
 }
 
 
@@ -35,32 +34,43 @@ void ALancer::BeginPlay()
 void ALancer::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
-
+    // Make the character's Y-axis always face towards the camera/player
+    if (GEngine && GEngine->GetFirstLocalPlayerController(GetWorld()))
+    {
+        FVector PlayerLocation = GEngine->GetFirstLocalPlayerController(GetWorld())->GetPawn()->GetActorLocation();
+        FVector CharacterLocation = GetActorLocation();
+        FVector DirectionToPlayer = PlayerLocation - CharacterLocation;
+        FRotator NewRotation = DirectionToPlayer.Rotation();
+        NewRotation.Pitch = 0.f;
+        NewRotation.Roll = 0.f;
+        NewRotation.Yaw +=180.f;
+        SetActorRotation(NewRotation);
+        FVector CharacterForward = GetActorForwardVector();
+        float DotProduct = FVector::DotProduct(CharacterForward, DirectionToPlayer.GetSafeNormal());
+        if (DotProduct < 0.f)
+        {
+            // Rotate Y-axis by 180 degrees
+            NewRotation.Yaw += 180.f;
+        }
+    }
     if (PlayerCharacter)
     {
         // プレイヤーとの距離を取得
         float DistanceToPlayer = GetDistanceToPlayer();
-
         // プレイヤーとの距離が望ましい距離よりも離れている場合、プレイヤーに近づく
         if (DistanceToPlayer > DesiredDistance)
         {
             FVector PlayerDirection = GetPlayerDirection();
             AddMovementInput(PlayerDirection);
-            //プレイヤーのほうを向く
-            FRotator TargetRotation = PlayerDirection.Rotation();
-            SetActorRotation(FMath::RInterpTo(GetActorRotation(), TargetRotation, DeltaTime, 5.0f));
         }
-       
     }
 }
-
 FVector ALancer::GetPlayerDirection() const
 {
     FVector PlayerLocation = PlayerCharacter->GetActorLocation();
     FVector LancerLocation = GetActorLocation();
     return FVector(PlayerLocation.X - LancerLocation.X, PlayerLocation.Y - LancerLocation.Y, 0.0f).GetSafeNormal();
 }
-
 float ALancer::GetDistanceToPlayer() const
 {
     FVector PlayerLocation = PlayerCharacter->GetActorLocation();
@@ -136,3 +146,13 @@ void ALancer::EndJumpByGravity()
     //重力加速度をリセット
     fGravityAcceleration = 0.0f;
 }
+// Called to bind functionality to input
+void ALancer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+{
+    Super::SetupPlayerInputComponent(PlayerInputComponent);
+}
+
+
+
+
+
