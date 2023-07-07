@@ -42,6 +42,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Level")
 		void ChangeNextLevel(ENextLevel NextLevel);					//目標のLevelに遷移する
 
+//---------------------------------------スポーン＆デストロイ---------------------------------------
 	void SpawnPlayer(AActor* _player, FTransform _tranceform);
 	void DestroyPlayer(AActor* _player);
 	void RespawnPlayer();
@@ -57,10 +58,12 @@ public:
 
 	void ClearEnemy();
 
+//--------------------------------------------キー入力---------------------------------------------
 	void SetState_GameOver();
 
 	void SetSubAction(ESubAction _eSubAction);
 
+//-----------------------------------------バトルエリア-------------------------------------------
 	UFUNCTION(BlueprintCallable, Category = "Area")
 		void SetIsOnBattleArea(bool bIsOnArea, TArray<class ASpawnPoint*> SpawnPoints, 
 			AActor* Camera,
@@ -74,7 +77,12 @@ public:
 
 	int32 GetBattleAreaEnemyNum();
 
+//---------------------------------------ゲームUI---------------------------------------
+	void SetUI_Enemy(FName _ActorName, int32 _NowHp, int32 _MaxHp);
+
 private:
 	class ATGS_GameStateBase* GetGameState();
 
+	ATGS_GameStateBase* GameState = nullptr;		//キャシュー
+		
 };

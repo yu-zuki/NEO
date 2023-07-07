@@ -10,6 +10,7 @@
 
 //test
 #include "JumpModuleActor.h"
+#include "Ingame_WG.h"
 
 ATGS_GameStateBase::ATGS_GameStateBase()
 	:ECurrentState(EGameState::EGame_None), EchangeLevel(EChangeLevel::EChangeLevel_None)
@@ -131,7 +132,7 @@ void ATGS_GameStateBase::InitCurrentState()
 	if (ECurrentState == EGameState::EGame_Playing)
 	{
 		if (Widget_GameMenuClass && Widget_PlayerStatusClass) {
-			UUserWidget* Widget_GameMenu = CreateWidget<UUserWidget>(GetWorld(), Widget_GameMenuClass, "GameMenu");
+			Widget_GameMenu = CreateWidget<UIngame_WG>(GetWorld(), Widget_GameMenuClass, "GameMenu");
 			UUserWidget* Widget_PlayerStatus = CreateWidget<UUserWidget>(GetWorld(), Widget_PlayerStatusClass, "PlayerStatus");
 
 			if (Widget_PlayerStatus) {

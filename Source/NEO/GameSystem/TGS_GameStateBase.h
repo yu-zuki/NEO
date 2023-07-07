@@ -176,20 +176,9 @@ public:
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI")
-		TSubclassOf<class UUserWidget> Widget_GameMenuClass;			// ゲームメニューのUI
+		TSubclassOf<class UIngame_WG> Widget_GameMenuClass;			// ゲームメニューのUI
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI")
 		TSubclassOf<class UUserWidget> Widget_PlayerStatusClass;		// プレイヤーのステータスのUI
-
-protected:
-
-	//機能テスト用アクター
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Test")
-		class AJumpModuleActor* JumpModuleActor;
-
-	//重力加速度的跳跃实现所需要的变量
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Jump")
-		float fJumpHeight;					//跳跃高度
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Jump")
-		float fGravityAcceleration;			//重力加速度
+public:
+	UIngame_WG* Widget_GameMenu;
 };

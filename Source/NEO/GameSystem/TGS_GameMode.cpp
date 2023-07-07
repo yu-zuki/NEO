@@ -11,6 +11,7 @@
 #include "SpawnPoint.h"
 #include "Engine/World.h"
 #include "../EnamyBase.h"
+#include "Ingame_WG.h"
 
 ATGS_GameMode::ATGS_GameMode()
 {
@@ -188,15 +189,24 @@ int32 ATGS_GameMode::GetBattleAreaEnemyNum()
 	 return GetGameState()->BattleAreaEnemyCount;
 }
 
+void ATGS_GameMode::SetUI_Enemy(FName _ActorName, int32 _NowHp, int32 _MaxHp)
+{
+	GetGameState()->Widget_GameMenu->SetWidgetValue(_ActorName, _NowHp, _MaxHp);
+}
+
 ATGS_GameStateBase* ATGS_GameMode::GetGameState()
 {
-	ATGS_GameStateBase* gameState = Cast<ATGS_GameStateBase>(UGameplayStatics::GetGameState(GetWorld()));
-	if(gameState) {
-		return gameState;
-	}
-	else	{
-		UE_LOG(LogTemp, Error, TEXT("Game State is not found"));
-		return nullptr;
+	if (GameState == nullptr)
+	{
+		ATGS_GameStateBase* gameState = Cast<ATGS_GameStateBase>(UGameplayStatics::GetGameState(GetWorld()));
+		if (gameState) {
+			GameState = gameState;
+		}
+		else {
+			UE_LOG(LogTemp, Error, TEXT("Game State is not found"));
+			return nullptr;
+		}
 	}
 
+	return GameState;
 }
