@@ -337,20 +337,22 @@ void APlayerCharacter::RotateCharacter(float nowInput_Y)
 	if (nowInput_Y == 0) { return; }
 
 	// 向く方向
-	float Direction;
+	FVector2D Direction;
 
 	// 入力の値に応じて前か後ろを向く
 	if (nowInput_Y == 1.f)
 	{
-		Direction = DIRECTION;
+		Direction.X = -25.f;
+		Direction.Y = DIRECTION;
 	}
 	else
 	{
-		Direction = -DIRECTION;
+		Direction.X = 25.f;
+		Direction.Y = -DIRECTION;
 	}
 
 	// 新しい方向にセット
-	const FRotator nowRotate = FRotator(0.f, Direction, 0.f);
+	const FRotator nowRotate = FRotator(0.f, Direction.Y, Direction.X);
 
 	SetActorRotation(nowRotate);
 }
