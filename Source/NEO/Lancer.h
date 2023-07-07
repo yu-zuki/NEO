@@ -15,7 +15,7 @@ public:
         float DesiredDistance = 100.0f; // プレイヤーからの望ましい距離（3m）
 
     UPROPERTY(EditAnywhere, Category = "AI")
-        float MovementSpeed = 10.0f; // 移動速度
+        float MovementSpeed = 100.0f; // 移動速度
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
         UAnimMontage * Attack;
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
@@ -56,9 +56,12 @@ public:
     //ジャンプの終了
     UFUNCTION(BlueprintCallable, Category = "Jump")
         void EndJumpByGravity();
+    
 protected:
     virtual void BeginPlay() override;
-
+    // Called to rotate the character towards the player
+    UFUNCTION()
+        void OnPlayerOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 public:
     virtual void Tick(float DeltaTime) override;
     

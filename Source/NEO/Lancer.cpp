@@ -1,5 +1,6 @@
 #include "Lancer.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "GameFramework/Controller.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -9,6 +10,10 @@ ALancer::ALancer()
     MaxHealth = 100;
     Health = MaxHealth;
     bIsJumping = false;
+    // キャラクターの移動方式を設定
+    GetCharacterMovement()->bOrientRotationToMovement = true;
+    GetCharacterMovement()->RotationRate = FRotator(0.0f, 540.0f, 0.0f);
+    GetCharacterMovement()->MaxWalkSpeed = MovementSpeed;
     //重力加速度
     fGravityAcceleration = 9.8f;
     //ジャンプ時間
@@ -18,7 +23,12 @@ ALancer::ALancer()
     //ジャンプ開始時の位置
     vJumpStartLocation = GetActorLocation();
     
-    
+    // オーバーラップイベント
+    GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+    GetCapsuleComponent()->SetCollisionObjectType(ECC_Pawn);
+    GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+    GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &ALancer::OnPlayerOverlap);
+
 }
 
 
@@ -29,13 +39,14 @@ void ALancer::BeginPlay()
 
     // プレイヤーキャラクターの参照を取得
     PlayerCharacter = UGameplayStatics::GetPlayerCharacter(this, 0);
+    GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &ALancer::OnPlayerOverlap);
 }
 
-void ALancer::Tick(float DeltaTime)
+void ALancer::OnPlayerOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-    Super::Tick(DeltaTime);
-    // Make the character's Y-axis always face towards the camera/player
-    if (GEngine && GEngine->GetFirstLocalPlayerController(GetWorld()))
+    
+        APawn* PlayerPawn = Cast<APawn>(OtherActor);
+    if (PlayerPawn)
     {
         FVector PlayerLocation = GEngine->GetFirstLocalPlayerController(GetWorld())->GetPawn()->GetActorLocation();
         FVector CharacterLocation = GetActorLocation();
@@ -43,7 +54,7 @@ void ALancer::Tick(float DeltaTime)
         FRotator NewRotation = DirectionToPlayer.Rotation();
         NewRotation.Pitch = 0.f;
         NewRotation.Roll = 0.f;
-        NewRotation.Yaw +=180.f;
+        NewRotation.Yaw += 180.f;
         SetActorRotation(NewRotation);
         FVector CharacterForward = GetActorForwardVector();
         float DotProduct = FVector::DotProduct(CharacterForward, DirectionToPlayer.GetSafeNormal());
@@ -53,6 +64,11 @@ void ALancer::Tick(float DeltaTime)
             NewRotation.Yaw += 180.f;
         }
     }
+}
+
+void ALancer::Tick(float DeltaTime)
+{
+    Super::Tick(DeltaTime);
     if (PlayerCharacter)
     {
         // プレイヤーとの距離を取得
