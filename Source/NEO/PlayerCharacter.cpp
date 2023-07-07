@@ -40,6 +40,7 @@ APlayerCharacter::APlayerCharacter()
 
 	// キャラクターコンポーネント取得
 	CharacterMovementComp = GetCharacterMovement();
+	CharacterMovementComp->MaxWalkSpeed = 500.f;
 
 	// アニメーションセットアップ
 	SetupAnimationAsset();
@@ -230,7 +231,19 @@ void APlayerCharacter::Run()
 	// コントロール可能か
 	if (!IsControl) { return; }
 
-	IsRunning = (!IsRunning) ? (true) : (false);
+	if (!IsRunning)
+	{
+		// ダッシュオン
+		IsRunning = true;
+		CharacterMovementComp->MaxWalkSpeed = 600.f;
+	}
+	else
+	{
+		// ダッシュオン
+		IsRunning = false;
+		CharacterMovementComp->MaxWalkSpeed = 500.f;
+	}
+
 }
 
 void APlayerCharacter::JumpStart()
