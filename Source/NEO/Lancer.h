@@ -59,14 +59,14 @@ public:
     
 protected:
     virtual void BeginPlay() override;
-    // Called to rotate the character towards the player
-    UFUNCTION()
-        void OnPlayerOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-public:
+    
+    
     virtual void Tick(float DeltaTime) override;
     
     virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 private:
+    UPROPERTY(EditAnywhere, Category = "Rotation")
+        bool bIsRotation;
     FVector GetPlayerDirection() const;
     float GetDistanceToPlayer() const;
 
