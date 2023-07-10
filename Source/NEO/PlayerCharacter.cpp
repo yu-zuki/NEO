@@ -31,12 +31,29 @@ APlayerCharacter::APlayerCharacter()
 	CharacterMovementComp->MaxWalkSpeed = 500.f;
 
 	// アニメーションセットアップ
-	SetupAnimationAsset();
+	TCHAR* AnimationAssetPaths[2];
+
+	AnimationAssetPaths[0] = TEXT("Game/0122/Player/Animation/Montage/Combo/SwordCombo");
+	AnimationAssetPaths[1] = TEXT("Game/0122/Player/Animation/Montage/Combo/SwordCombo2");
+
+
+	SetupAnimationAsset(AnimationAssetPaths);
 
 	// 武器のセットアップ
 
 	// ボタン設定
-	SetupDefoultMappingContext();	
+	TCHAR* defaultMappingContext = TEXT("Game/0122/Player/Input/IMC_Default");
+
+	// それぞれのアクション
+	TArray<TCHAR*> inputAction;
+	inputAction.Add(TEXT("Game/0122/Player/Input/Actions/IA_Move"));
+	inputAction.Add(TEXT("Game/0122/Player/Input/Actions/IA_Dash"));
+	inputAction.Add(TEXT("Game/0122/Player/Input/Actions/IA_Jump"));
+	inputAction.Add(TEXT("Game/0122/Player/Input/Actions/IA_Combo1"));
+	inputAction.Add(TEXT("Game/0122/Player/Input/Actions/IA_Combo2"));
+
+	// セット
+	SetupDefoultMappingContext(defaultMappingContext, inputAction);
 }
 
 // Called when the game starts or when spawned
@@ -45,13 +62,13 @@ void APlayerCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	//Add Input Mapping Context
-	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
-	{
-		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
-		{
-			Subsystem->AddMappingContext(DefaultMappingContext, 1);
-		}
-	}
+	//if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
+	//{
+	//	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
+	//	{
+	//		Subsystem->AddMappingContext(DefaultMappingContext, 1);
+	//	}
+	//}
 }
 
 // Called every frame
@@ -59,16 +76,6 @@ void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	switch (PlayerState)
-	{
-	case State_Idle:
-		break;
-	case State_Jump:
-		Jump();
-		break;
-	case State_Death:
-		break;
-	}
 
 }
 

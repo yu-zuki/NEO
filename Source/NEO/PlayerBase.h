@@ -8,39 +8,32 @@
 #include "GameSystem\InputCharacter.h"
 #include "PlayerBase.generated.h"
 
+struct InputAction
+{
+	UInputMappingContext* DefaultMappingContext;
+	UInputAction* MoveAction;
+	UInputAction* RunAction;
+	UInputAction* JumpAction;
+	UInputAction* ComboAction1;
+	UInputAction* ComboAction2;
+};
+
 UCLASS()
 class NEO_API APlayerBase : public AInputCharacter
 {
 	GENERATED_BODY()
 
 	// プレイヤー
-		enum Player_State
+	enum Player_State
 	{
 		State_Idle = 0,
 		State_Jump,
 		State_Death
 	};
 
-	/** MappingContext */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-		UInputMappingContext* DefaultMappingContext;
+	// 入力用構造体
+	InputAction InputMapping;
 
-	/** Jump Input Action */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-		UInputAction* JumpAction;
-
-	/** Move Input Action */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-		UInputAction* MoveAction;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-		UInputAction* RunAction;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-		UInputAction* ComboAction;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-		UInputAction* ComboAction2;
 
 public:
 	// Sets default values for this character's properties
@@ -109,7 +102,7 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	// ボタンの設定
-	void SetupDefoultMappingContext();
+	void SetupDefoultMappingContext(TCHAR* MappingAssetPath, TArray<TCHAR*> InputActionAssetPaths);
 
 	// アニメーションの設定
 	virtual void SetupAnimationAsset(TCHAR* AnimAssetPath[2]);

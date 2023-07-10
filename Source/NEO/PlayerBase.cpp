@@ -41,9 +41,6 @@ APlayerBase::APlayerBase()
 	// キャラクターコンポーネント取得
 	CharacterMovementComp = GetCharacterMovement();
 	CharacterMovementComp->MaxWalkSpeed = 500.f;
-
-	// ボタン設定
-	SetupDefoultMappingContext();
 }
 
 // Called when the game starts or when spawned
@@ -56,7 +53,7 @@ void APlayerBase::BeginPlay()
 	{
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 		{
-			Subsystem->AddMappingContext(DefaultMappingContext, 1);
+			Subsystem->AddMappingContext(InputMapping.DefaultMappingContext, 1);
 		}
 	}
 }
@@ -84,46 +81,59 @@ void APlayerBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent))
+	{
+		// 移動
+		EnhancedInputComponent->BindAction(InputMapping.MoveAction, ETriggerEvent::Triggered, this, &APlayerBase::Move);
+
+		// 走る
+		EnhancedInputComponent->BindAction(InputMapping.RunAction, ETriggerEvent::Started, this, &APlayerBase::Run);
+		EnhancedInputComponent->BindAction(InputMapping.RunAction, ETriggerEvent::Completed, this, &APlayerBase::Run);
+
+		// ジャンプ
+		EnhancedInputComponent->BindAction(InputMapping.JumpAction, ETriggerEvent::Started, this, &APlayerBase::JumpStart);
+
+		// コンボアクション
+		EnhancedInputComponent->BindAction(InputMapping.ComboAction1, ETriggerEvent::Started, this, &APlayerBase::Combo1);
+		EnhancedInputComponent->BindAction(InputMapping.ComboAction2, ETriggerEvent::Started, this, &APlayerBase::Combo2);
+	}
 }
 
 // ボタンの設定
-void APlayerBase::SetupDefoultMappingContext()
+void APlayerBase::SetupDefoultMappingContext(TCHAR* MappingAssetPath, TArray<TCHAR*> InputActionAssetPaths)
 {
-	// パス保存用配列を用意して格納
-	TArray<FString> AssetPath;
-
-	AssetPath.Add("/Game/Player/Input/Actions/IA_Move");
-	AssetPath.Add("/Game/Player/Input/Actions/IA_Dash");
-	AssetPath.Add("/Game/Player/Input/Actions/IA_Jump");
-	AssetPath.Add("/Game/Player/Input/Actions/IA_Combo1");
-	AssetPath.Add("/Game/Player/Input/Actions/IA_Combo2");
-
-	// ------------------同期ver
-
 	// ボタンのマッピング設定
-	DefaultMappingContext = LoadObject<UInputMappingContext>(nullptr, TEXT("/Game/0122/Player/Input/IMC_Default"));
+	InputMapping.DefaultMappingContext = LoadObject<UInputMappingContext>(nullptr, MappingAssetPath);
 
 	// 各アクションのマッピング
-	MoveAction = LoadObject<UInputAction>(nullptr, TEXT("/Game/0122/Player/Input/Actions/IA_Move"));
-	RunAction = LoadObject<UInputAction>(nullptr, TEXT("/Game/0122/Player/Input/Actions/IA_Dash"));
-	JumpAction = LoadObject<UInputAction>(nullptr, TEXT("/Game/0122/Player/Input/Actions/IA_Jump"));
-	ComboAction = LoadObject<UInputAction>(nullptr, TEXT("/Game/0122/Player/Input/Actions/IA_Combo1"));
-	ComboAction2 = LoadObject<UInputAction>(nullptr, TEXT("/Game/0122/Player/Input/Actions/IA_Combo2"));
+	for (int i = 0; i < InputActionAssetPaths.Num(); ++i)
+	{
+		// 一時保存用
+		UInputAction* tempInputAction = LoadObject<UInputAction>(nullptr, InputActionAssetPaths[i]);
 
-	//// 非同期読み込みリクエストの作成
-	//FAsyncLoadCallback AsyncCallback;
+		switch (i)
+		{
+		case 1:
+			InputMapping.MoveAction = tempInputAction;
+			break;
+		case 2:
+			InputMapping.RunAction = tempInputAction;
+			break;
+		case 3:
+			InputMapping.JumpAction = tempInputAction;
+			break;
+		case 4:
+			InputMapping.ComboAction1 = tempInputAction;
+			break;
+		case 5:
+			InputMapping.ComboAction2 = tempInputAction;
+			break;
+		default:
+			UE_LOG(LogTemp, Error, TEXT("InputAction Array reference error"));
+			break;
 
-	//// 読み込み
-	//for (int i = 0; i < AssetPath.Num(); ++i)
-	//{
-
-	//	FAsyncLoadCallback AsyncCallback;
-	//	AsyncCallback.BindUObject(this, &APlayerCharacter::SetupAnimationAsset);
-
-	//	// アセットの非同期読み込み
-	//	StreamableManager.RequestAsyncLoad(AssetPath[i], Delegate);
-	//}
-
+		}
+	}
 }
 
 // アニメーションの設定
