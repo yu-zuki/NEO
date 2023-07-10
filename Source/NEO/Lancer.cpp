@@ -23,11 +23,7 @@ ALancer::ALancer()
     //ジャンプ開始時の位置
     vJumpStartLocation = GetActorLocation();
     
-    // オーバーラップイベント
-    GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-    GetCapsuleComponent()->SetCollisionObjectType(ECC_Pawn);
-    GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
-    GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &ALancer::OnPlayerOverlap);
+   
 
 }
 
@@ -39,32 +35,8 @@ void ALancer::BeginPlay()
 
     // プレイヤーキャラクターの参照を取得
     PlayerCharacter = UGameplayStatics::GetPlayerCharacter(this, 0);
-    GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &ALancer::OnPlayerOverlap);
 }
 
-void ALancer::OnPlayerOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-    
-        APawn* PlayerPawn = Cast<APawn>(OtherActor);
-    if (PlayerPawn)
-    {
-        FVector PlayerLocation = GEngine->GetFirstLocalPlayerController(GetWorld())->GetPawn()->GetActorLocation();
-        FVector CharacterLocation = GetActorLocation();
-        FVector DirectionToPlayer = PlayerLocation - CharacterLocation;
-        FRotator NewRotation = DirectionToPlayer.Rotation();
-        NewRotation.Pitch = 0.f;
-        NewRotation.Roll = 0.f;
-        NewRotation.Yaw += 180.f;
-        SetActorRotation(NewRotation);
-        FVector CharacterForward = GetActorForwardVector();
-        float DotProduct = FVector::DotProduct(CharacterForward, DirectionToPlayer.GetSafeNormal());
-        if (DotProduct < 0.f)
-        {
-            // Rotate Y-axis by 180 degrees
-            NewRotation.Yaw += 180.f;
-        }
-    }
-}
 
 void ALancer::Tick(float DeltaTime)
 {
@@ -80,6 +52,28 @@ void ALancer::Tick(float DeltaTime)
             AddMovementInput(PlayerDirection);
         }
     }
+    // キャラクターの位置を取得
+    FVector CharacterLocation = GetActorLocation();
+
+    // 自分の座標を取得
+    FVector MyLocation = GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorLocation();
+
+    // キャラクターの位置と自分の位置を比較してY軸より前にいるかどうかを判定
+    bIsRotation = CharacterLocation.Y > MyLocation.Y;
+    // bIsRotationがtrueなら
+    if (bIsRotation)
+    {
+        FRotator NewRotation = GetActorRotation();
+        NewRotation.Yaw = -90.0f;
+        SetActorRotation(NewRotation);
+    }
+    else
+    {
+        FRotator NewRotation = GetActorRotation();
+        NewRotation.Yaw = 90.0f;
+        SetActorRotation(NewRotation);
+    }
+
 }
 FVector ALancer::GetPlayerDirection() const
 {
