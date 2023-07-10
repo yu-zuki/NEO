@@ -35,6 +35,8 @@ void ALancer::BeginPlay()
 
     // プレイヤーキャラクターの参照を取得
     PlayerCharacter = UGameplayStatics::GetPlayerCharacter(this, 0);
+    // 5秒ごとにCheckPlayerInFront関数を実行するタイマーをセット
+    GetWorldTimerManager().SetTimer(TimerHandle_CheckPlayerInFront, this, &ALancer::CheckPlayerInFront, 3.0f, true);
 }
 
 
@@ -162,7 +164,24 @@ void ALancer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
     Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
+void ALancer::CheckPlayerInFront()
+{
+    // 自分の位置を取得
+    FVector MyLocation = GetActorLocation();
 
+    // 自プレイヤーの位置を取得
+    FVector PlayerLocation = GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorLocation();
+
+    // 自プレイヤーがLancerの目の前にいるかどうかを判定
+    FVector DirectionToPlayer = PlayerLocation - MyLocation;
+    float DotProduct = FVector::DotProduct(DirectionToPlayer.GetSafeNormal(), GetActorForwardVector());
+    bIsPlayerInFront = DotProduct > 0.0f;
+
+    if (bIsPlayerInFront)
+    {
+        PlayAnimMontage(Attack, 1, NAME_None);
+    }
+}
 
 
 

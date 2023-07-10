@@ -69,5 +69,8 @@ private:
         bool bIsRotation;
     FVector GetPlayerDirection() const;
     float GetDistanceToPlayer() const;
+    FTimerHandle TimerHandle_CheckPlayerInFront;
+    bool bIsPlayerInFront;
+    void CheckPlayerInFront();
 
 };
