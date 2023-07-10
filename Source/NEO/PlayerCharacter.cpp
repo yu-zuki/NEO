@@ -33,27 +33,14 @@ APlayerCharacter::APlayerCharacter()
 	// アニメーションセットアップ
 	TCHAR* AnimationAssetPaths[2];
 
-	AnimationAssetPaths[0] = TEXT("Game/0122/Player/Animation/Montage/Combo/SwordCombo");
-	AnimationAssetPaths[1] = TEXT("Game/0122/Player/Animation/Montage/Combo/SwordCombo2");
+	AnimationAssetPaths[0] = TEXT("/Game/0122/Player/Animation/Montage/Combo/SwordCombo");
+	AnimationAssetPaths[1] = TEXT("/Game/0122/Player/Animation/Montage/Combo/SwordCombo2");
 
 
 	SetupAnimationAsset(AnimationAssetPaths);
 
 	// 武器のセットアップ
 
-	// ボタン設定
-	TCHAR* defaultMappingContext = TEXT("Game/0122/Player/Input/IMC_Default");
-
-	// それぞれのアクション
-	TArray<TCHAR*> inputAction;
-	inputAction.Add(TEXT("Game/0122/Player/Input/Actions/IA_Move"));
-	inputAction.Add(TEXT("Game/0122/Player/Input/Actions/IA_Dash"));
-	inputAction.Add(TEXT("Game/0122/Player/Input/Actions/IA_Jump"));
-	inputAction.Add(TEXT("Game/0122/Player/Input/Actions/IA_Combo1"));
-	inputAction.Add(TEXT("Game/0122/Player/Input/Actions/IA_Combo2"));
-
-	// セット
-	SetupDefoultMappingContext(defaultMappingContext, inputAction);
 }
 
 // Called when the game starts or when spawned
@@ -76,6 +63,19 @@ void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+// Called to bind functionality to input
+void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+{
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
+
+}
+
+// プレイヤーのデータを初期化
+void APlayerCharacter::SetupPlayerData()
+{
+	Super::SetupPlayerData();
 
 }
 

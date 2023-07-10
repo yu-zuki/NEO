@@ -8,14 +8,29 @@
 #include "GameSystem\InputCharacter.h"
 #include "PlayerBase.generated.h"
 
-struct InputAction
+// inputAction
+USTRUCT(BlueprintType)
+struct FMainAction
 {
-	UInputMappingContext* DefaultMappingContext;
-	UInputAction* MoveAction;
-	UInputAction* RunAction;
-	UInputAction* JumpAction;
-	UInputAction* ComboAction1;
-	UInputAction* ComboAction2;
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		UInputMappingContext* DefaultMappingContext;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		UInputAction* MoveAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		UInputAction* RunAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		UInputAction* JumpAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		UInputAction* ComboAction1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		UInputAction* ComboAction2;
 };
 
 UCLASS()
@@ -31,10 +46,9 @@ class NEO_API APlayerBase : public AInputCharacter
 		State_Death
 	};
 
-	// 入力用構造体
-	InputAction InputMapping;
 
-
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		FMainAction MainActionMapping;
 public:
 	// Sets default values for this character's properties
 	APlayerBase();
@@ -43,6 +57,7 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+public:
 	/** Called for movement input */
 	void Move(const FInputActionValue& Value);
 
@@ -65,6 +80,8 @@ protected:
 	// 二つ目のコンボ
 	void Combo2();
 
+protected:
+
 	// キャラクターの回転
 	void RotateCharacter(float nowInput_Y);
 
@@ -78,7 +95,7 @@ protected:
 
 	// ダメージを与える処理
 	UFUNCTION(BlueprintCallable)
-		virtual void SetCollision();
+		virtual void SetoCollision();
 
 	// ダメージ量を返す関数
 	UFUNCTION(BlueprintCallable)
@@ -101,14 +118,17 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	// プレイヤーのデータを初期化
+	virtual void SetupPlayerData();
+
 	// ボタンの設定
-	void SetupDefoultMappingContext(TCHAR* MappingAssetPath, TArray<TCHAR*> InputActionAssetPaths);
+	void SetupMainActionMapping();
 
 	// アニメーションの設定
-	virtual void SetupAnimationAsset(TCHAR* AnimAssetPath[2]);
+	void SetupAnimationAsset(TCHAR* AnimAssetPath[2]);
 
 	// 武器のメッシュの設定
-	virtual void SetupWeapon(TCHAR* WeaponAssetPath,FName PublicName = "Weapon");
+	void SetupWeapon(TCHAR* WeaponAssetPath,FName PublicName = "Weapon");
 
 	virtual void SetupCollision();
 
@@ -140,17 +160,17 @@ protected:
 
 	const float radPerFrame = 3.14f / 30.f;
 
-	float JumpBeforePos_Z;			// ジャンプ前の高さ
+	float JumpBeforePos_Z;					// ジャンプ前の高さ
 
-	Player_State PlayerState;		// プレイヤーのステート
+	Player_State PlayerState;				// プレイヤーのステート
 
-	bool IsAttacking;				// 攻撃中のフラグ
+	bool IsAttacking;						// 攻撃中のフラグ
 
-	bool CanCombo;					// コンボ継続できるか
+	bool CanCombo;							// コンボ継続できるか
 
-	int ComboIndex;					// 何段目のコンボか
+	int ComboIndex;							// 何段目のコンボか
 
-	TArray<FName> ComboCntNames;	// コンボの段数(First,Second,Third・・・)
+	TArray<FName> ComboStartSectionNames;	// コンボの段数(First,Second,Third・・・)
 
 	UPROPERTY(EditAnywhere, Category = Damage)
 		float DamageAmount;			// 与ダメージ量

@@ -41,6 +41,8 @@ APlayerBase::APlayerBase()
 	// キャラクターコンポーネント取得
 	CharacterMovementComp = GetCharacterMovement();
 	CharacterMovementComp->MaxWalkSpeed = 500.f;
+
+
 }
 
 // Called when the game starts or when spawned
@@ -53,7 +55,7 @@ void APlayerBase::BeginPlay()
 	{
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 		{
-			Subsystem->AddMappingContext(InputMapping.DefaultMappingContext, 1);
+			Subsystem->AddMappingContext(MainActionMapping.DefaultMappingContext, 1);
 		}
 	}
 }
@@ -84,54 +86,70 @@ void APlayerBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent))
 	{
 		// 移動
-		EnhancedInputComponent->BindAction(InputMapping.MoveAction, ETriggerEvent::Triggered, this, &APlayerBase::Move);
-
-		// 走る
-		EnhancedInputComponent->BindAction(InputMapping.RunAction, ETriggerEvent::Started, this, &APlayerBase::Run);
-		EnhancedInputComponent->BindAction(InputMapping.RunAction, ETriggerEvent::Completed, this, &APlayerBase::Run);
-
+		EnhancedInputComponent->BindAction(MainActionMapping.MoveAction, ETriggerEvent::Triggered, this, &APlayerBase::Move);
+	
+		// 走る							
+		EnhancedInputComponent->BindAction(MainActionMapping.RunAction, ETriggerEvent::Started, this, &APlayerBase::Run);
+		EnhancedInputComponent->BindAction(MainActionMapping.RunAction, ETriggerEvent::Completed, this, &APlayerBase::Run);
+		
 		// ジャンプ
-		EnhancedInputComponent->BindAction(InputMapping.JumpAction, ETriggerEvent::Started, this, &APlayerBase::JumpStart);
+		EnhancedInputComponent->BindAction(MainActionMapping.JumpAction, ETriggerEvent::Started, this, &APlayerBase::JumpStart);
 
 		// コンボアクション
-		EnhancedInputComponent->BindAction(InputMapping.ComboAction1, ETriggerEvent::Started, this, &APlayerBase::Combo1);
-		EnhancedInputComponent->BindAction(InputMapping.ComboAction2, ETriggerEvent::Started, this, &APlayerBase::Combo2);
+		EnhancedInputComponent->BindAction(MainActionMapping.ComboAction1, ETriggerEvent::Started, this, &APlayerBase::Combo1);
+		EnhancedInputComponent->BindAction(MainActionMapping.ComboAction2, ETriggerEvent::Started, this, &APlayerBase::Combo2);
 	}
 }
 
-// ボタンの設定
-void APlayerBase::SetupDefoultMappingContext(TCHAR* MappingAssetPath, TArray<TCHAR*> InputActionAssetPaths)
+// プレイヤーのデータを初期化
+void APlayerBase::SetupPlayerData()
 {
+	SetupMainActionMapping();
+}
+
+// ボタンの設定
+void APlayerBase::SetupMainActionMapping()
+{
+	// ボタン設定
+	TCHAR* defaultMappingContext = TEXT("/Game/0122/Player/Input/IMC_Default");
+
+	// それぞれのアクションのパス
+	TArray<TCHAR*> inputActionPaths;
+	inputActionPaths.Add(TEXT("/Game/0122/Player/Input/Actions/IA_Move"));
+	inputActionPaths.Add(TEXT("/Game/0122/Player/Input/Actions/IA_Dash"));
+	inputActionPaths.Add(TEXT("/Game/0122/Player/Input/Actions/IA_Jump"));
+	inputActionPaths.Add(TEXT("/Game/0122/Player/Input/Actions/IA_Combo1"));
+	inputActionPaths.Add(TEXT("/Game/0122/Player/Input/Actions/IA_Combo2"));
+
 	// ボタンのマッピング設定
-	InputMapping.DefaultMappingContext = LoadObject<UInputMappingContext>(nullptr, MappingAssetPath);
+	MainActionMapping.DefaultMappingContext = LoadObject<UInputMappingContext>(nullptr, defaultMappingContext);
 
 	// 各アクションのマッピング
-	for (int i = 0; i < InputActionAssetPaths.Num(); ++i)
+	for (int i = 0; i < inputActionPaths.Num(); ++i)
 	{
 		// 一時保存用
-		UInputAction* tempInputAction = LoadObject<UInputAction>(nullptr, InputActionAssetPaths[i]);
+		UInputAction* tempInputAction = LoadObject<UInputAction>(nullptr, inputActionPaths[i]);
 
 		switch (i)
 		{
+		case 0:
+			MainActionMapping.MoveAction = tempInputAction;
+			break;
 		case 1:
-			InputMapping.MoveAction = tempInputAction;
+			MainActionMapping.RunAction = tempInputAction;
 			break;
 		case 2:
-			InputMapping.RunAction = tempInputAction;
+			MainActionMapping.JumpAction = tempInputAction;
 			break;
 		case 3:
-			InputMapping.JumpAction = tempInputAction;
+			MainActionMapping.ComboAction1 = tempInputAction;
 			break;
 		case 4:
-			InputMapping.ComboAction1 = tempInputAction;
-			break;
-		case 5:
-			InputMapping.ComboAction2 = tempInputAction;
+			MainActionMapping.ComboAction2 = tempInputAction;
 			break;
 		default:
 			UE_LOG(LogTemp, Error, TEXT("InputAction Array reference error"));
 			break;
-
 		}
 	}
 }
@@ -151,7 +169,7 @@ void APlayerBase::SetupAnimationAsset(TCHAR* AnimAssetPath[2])
 	}
 
 	// コンボの名前格納
-	ComboCntNames = { "First", "Second", "Third"/*,"Fourth"*/ };
+	ComboStartSectionNames = { "First", "Second", "Third"/*,"Fourth"*/ };
 }
 
 void APlayerBase::SetupWeapon(TCHAR* WeaponAssetPath, FName PublicName/* = "Weapon"*/)
@@ -302,7 +320,7 @@ void APlayerBase::Attack(int AttackNum /*= 0*/)
 		if (CanCombo)
 		{
 			// ラストアタックまでコンボ継続
-			if (ComboCntNames[ComboIndex] != ComboCntNames.Last())
+			if (ComboStartSectionNames[ComboIndex] != ComboStartSectionNames.Last())
 			{
 				++ComboIndex;
 			}
@@ -310,7 +328,7 @@ void APlayerBase::Attack(int AttackNum /*= 0*/)
 	}
 
 	// 攻撃のアニメーション再生
-	PlayAnimation(ComboAnimMontages[AttackNum], ComboCntNames[ComboIndex]);
+	PlayAnimation(ComboAnimMontages[AttackNum], ComboStartSectionNames[ComboIndex]);
 }
 
 // コンボ1
@@ -380,7 +398,7 @@ void APlayerBase::ResetCombo()
 	ComboIndex = 0;
 }
 
-void APlayerBase::SetCollision()
+void APlayerBase::SetoCollision()
 {
 	// コリジョン判定で無視する項目を指定(今回はこのActor自分自身。thisポインタで指定)
 	FCollisionQueryParams CollisionParams;

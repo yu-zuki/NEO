@@ -11,7 +11,6 @@ class NEO_API APlayerCharacter : public APlayerBase
 {
 	GENERATED_BODY()
 
-
 public:
 	// Sets default values for this character's properties
 	APlayerCharacter();
@@ -26,6 +25,9 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	// Called to bind functionality to input
-	//virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	// プレイヤーのデータを初期化
+	void SetupPlayerData() override;
 
 };
