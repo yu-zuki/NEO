@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "PlayerCharacter.h"
 #include "Bullet.h"
+#include "TrajectoryBullet.h"
 #include "EnamyBase.h"
 
 #include "GunMan.generated.h"
@@ -63,17 +64,24 @@ public:
 	//ÉWÉÉÉìÉvÇÃèIóπ
 	UFUNCTION(BlueprintCallable, Category = "Jump")
 		void EndJumpByGravity();
-	
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 	int32 CallTracker = 5;
 	UFUNCTION()
 	void SpawnBullet();
+	UFUNCTION()
+	void BlinkTrajectoryBullet();
+	
 	UPROPERTY(EditDefaultsOnly, Category = "Spawning")
 		TSubclassOf<class ABullet> BulletClass;
+	UPROPERTY(EditDefaultsOnly, Category = "Spawning")
+		TSubclassOf<class ATrajectoryBullet> TrajectoryBulletClass;
+	UPROPERTY()
+		FTimerHandle TimerHandle_Blink;
 
-	FTimerHandle TimerHandle;
+	UPROPERTY()
+		FTimerHandle TimerHandle_Destroy;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

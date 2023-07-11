@@ -7,6 +7,8 @@
 #include "Camera/PlayerCameraManager.h"
 #include "Engine/World.h"
 #include "Bullet.h"
+#include "TrajectoryBullet.h"
+#include "TimerManager.h"
 #include "Kismet/GameplayStatics.h"
 
 
@@ -30,6 +32,7 @@ AGunMan::AGunMan()
     fJumpHeight = 100.0f;
     //ジャンプ開始時の位置
     vJumpStartLocation = GetActorLocation();
+   
 }
 
 // Called when the game starts or when spawned
@@ -39,7 +42,7 @@ void AGunMan::BeginPlay()
     // プレイヤーキャラクターの参照を取得
     PlayerCharacter = UGameplayStatics::GetPlayerCharacter(this, 0);
     
-    GetWorldTimerManager().SetTimer(TimerHandle, this, &AGunMan::SpawnBullet, 3.0f, true);
+    GetWorldTimerManager().SetTimer(TimerHandle_Blink, this, &AGunMan::BlinkTrajectoryBullet, 2.0f, false);
 }
     
 
@@ -96,12 +99,35 @@ void AGunMan::Tick(float DeltaTime)
 }
 void AGunMan::SpawnBullet()
 {
-    if (BulletClass)
-    {
-        FActorSpawnParameters SpawnParams;
-        GetWorld()->SpawnActor<ABullet>(BulletClass, GetActorLocation() + FVector(0.f, 0.f, 50.f), GetActorRotation(), SpawnParams);
-    }
+    FVector SpawnLocation = GetActorLocation() + GetActorForwardVector() * 100.0f; // 100.0fは適宜調整してください
+    FRotator SpawnRotation = GetActorRotation();
+    GetWorld()->SpawnActor<ABullet>(BulletClass, SpawnLocation, SpawnRotation);
+    
+    
 }
+
+void AGunMan::BlinkTrajectoryBullet()
+{
+   
+    FVector SpawnLocation = GetActorLocation() + GetActorForwardVector() * 200.0f; // 200.0fは適宜調整してください
+    FRotator SpawnRotation = GetActorRotation();
+    ATrajectoryBullet* TrajectoryBullet = GetWorld()->SpawnActor<ATrajectoryBullet>(TrajectoryBulletClass, SpawnLocation, SpawnRotation);
+
+    if (TrajectoryBullet)
+    {
+       
+        TrajectoryBullet->StartBlinking();
+
+        
+        FTimerHandle TimerHandle_BulletSpawn;
+        GetWorldTimerManager().SetTimer(TimerHandle_BulletSpawn, this, &AGunMan::SpawnBullet, 2.0f, false);
+    }
+
+    
+    FTimerHandle TimerHandle_NextSequence;
+    GetWorldTimerManager().SetTimer(TimerHandle_NextSequence, this, &AGunMan::BlinkTrajectoryBullet, 4.0f, false);
+}
+
 FVector AGunMan::GetPlayerDirection() const
 {
     FVector PlayerLocation = PlayerCharacter->GetActorLocation();
