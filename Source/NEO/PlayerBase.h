@@ -33,6 +33,26 @@ struct FMainAction
 		UInputAction* ComboAction2;
 };
 
+// inputAction
+USTRUCT(BlueprintType)
+struct FPlayerStatus
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		float HP;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		float DamageAmount;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		float JumpHeight;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		float ComboDamageFactor;
+};
+
+
 UCLASS()
 class NEO_API APlayerBase : public AInputCharacter
 {
@@ -49,6 +69,10 @@ class NEO_API APlayerBase : public AInputCharacter
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		FMainAction MainActionMapping;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		FPlayerStatus PlayerStatus;
+
 public:
 	// Sets default values for this character's properties
 	APlayerBase();
@@ -86,30 +110,30 @@ protected:
 	void RotateCharacter(float nowInput_Y);
 
 	// コンボ継続
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable,Category = "ComboAction")
 		void ContinuationCombo();
 
 	// コンボリセット
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "ComboAction")
 		void ResetCombo();
 
 	// ダメージを与える処理
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "ComboAction")
 		virtual void SetoCollision();
 
 	// ダメージ量を返す関数
-	UFUNCTION(BlueprintCallable)
-		float GetDamageAmount()const { return DamageAmount * ((float)ComboIndex + 1.f); }
+	UFUNCTION(BlueprintCallable,Category = "GetStatus")
+		float GetDamageAmount()const { return PlayerStatus.DamageAmount * (((float)ComboIndex + 1.f) * PlayerStatus.ComboDamageFactor); }
 
 	// ダメージを受ける処理
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "GetStatus")
 		void TakedDamage(float _damage);
 
-	UFUNCTION(BlueprintCallable)
-		float GetHP()const { return HP; }
+	UFUNCTION(BlueprintCallable, Category = "GetStatus")
+		float GetHP()const { return PlayerStatus.HP; }
 
 	// アニメーション再生
-	void PlayAnimation(UAnimMontage* ToPlayAnimMontage, FName StartSectionName = "None");
+	void PlayAnimation(UAnimMontage* _toPlayAnimMontage, FName _startSectionName = "None", float _playRate = 1.f);
 
 public:
 	// Called every frame
@@ -121,6 +145,9 @@ public:
 	// プレイヤーのデータを初期化
 	virtual void SetupPlayerData();
 
+	// プレイヤーのステータスパラメータ初期化
+	void SetupPlayerStatus(float _hp = 100.f, float _damageAmount = 10.f, float _jumpHeight = 150.f, float _comboDamageFactor = 1.f);
+
 	// ボタンの設定
 	void SetupMainActionMapping();
 
@@ -128,7 +155,7 @@ public:
 	void SetupAnimationAsset(TCHAR* AnimAssetPath[2]);
 
 	// 武器のメッシュの設定
-	void SetupWeaponMesh(TCHAR* WeaponAssetPath,FName PublicName = "Weapon");
+	void SetupWeaponMesh(TCHAR* WeaponAssetPath,FName PublicName = "WeaponMesh");
 
 	virtual void SetupCollision();
 
@@ -155,9 +182,6 @@ protected:
 
 	float frames;					// フレーム		
 
-	UPROPERTY(EditAnywhere)
-		float height;				// ジャンプの高さ
-
 	const float radPerFrame = 3.14f / 30.f;
 
 	float JumpBeforePos_Z;					// ジャンプ前の高さ
@@ -171,9 +195,4 @@ protected:
 	int ComboIndex;							// 何段目のコンボか
 
 	TArray<FName> ComboStartSectionNames;	// コンボの段数(First,Second,Third・・・)
-
-	UPROPERTY(EditAnywhere, Category = Damage)
-		float DamageAmount;			// 与ダメージ量
-
-	float HP;						// HP
 };

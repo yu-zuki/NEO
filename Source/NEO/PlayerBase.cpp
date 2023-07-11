@@ -24,13 +24,10 @@ APlayerBase::APlayerBase()
 	: IsControl(true)
 	, IsRunning(false)
 	, frames(0.f)
-	, height(150.f)
 	, PlayerState(State_Idle)
 	, IsAttacking(false)
 	, CanCombo(false)
 	, ComboIndex(0)
-	, DamageAmount(10.f)
-	, HP(100)
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -106,7 +103,20 @@ void APlayerBase::SetupPlayerData()
 {
 	// メインアクションのボタンをマッピング
 	SetupMainActionMapping();
+
+	// プレイヤーのステータス初期化
+	SetupPlayerStatus();
 }
+
+// プレイヤーのステータスパラメータ初期化
+void APlayerBase::SetupPlayerStatus(float _hp /*= 100.f*/, float _damageAmount /*= 10.f*/, float _jumpHeight /*= 150.f*/, float _comboDamageFactor /*= 1.f*/)
+{
+	PlayerStatus.HP = _hp;
+	PlayerStatus.DamageAmount = _damageAmount;
+	PlayerStatus.JumpHeight = _jumpHeight;
+	PlayerStatus.ComboDamageFactor = _comboDamageFactor;
+}
+
 
 // ボタンの設定
 void APlayerBase::SetupMainActionMapping()
@@ -173,7 +183,7 @@ void APlayerBase::SetupAnimationAsset(TCHAR* AnimAssetPath[2])
 	ComboStartSectionNames = { "First", "Second", "Third"/*,"Fourth"*/ };
 }
 
-void APlayerBase::SetupWeaponMesh(TCHAR* WeaponAssetPath, FName PublicName/* = "Weapon"*/)
+void APlayerBase::SetupWeaponMesh(TCHAR* WeaponAssetPath, FName PublicName/* = "WeaponMesh"*/)
 {
 	// 武器のコンポーネントを作成
 	WeaponMesh = CreateDefaultSubobject<USkeletalMeshComponent>(PublicName);
@@ -277,7 +287,7 @@ void APlayerBase::Jump()
 	FVector NowPos = GetActorLocation();
 
 	// Sinで高さ更新
-	float SinValue = height * FMath::Sin(radPerFrame * frames);
+	float SinValue = PlayerStatus.JumpHeight * FMath::Sin(radPerFrame * frames);
 
 	// ジャンプ前の高さから位置更新
 	const FVector nextPos(FVector(NowPos.X, NowPos.Y, SinValue + JumpBeforePos_Z));
@@ -329,7 +339,7 @@ void APlayerBase::Attack(int AttackNum /*= 0*/)
 	}
 
 	// 攻撃のアニメーション再生
-	PlayAnimation(ComboAnimMontages[AttackNum], ComboStartSectionNames[ComboIndex]);
+	PlayAnimation(ComboAnimMontages[AttackNum],ComboStartSectionNames[ComboIndex]);
 }
 
 // コンボ1
@@ -413,10 +423,10 @@ void APlayerBase::SetoCollision()
 
 void APlayerBase::TakedDamage(float _damage)
 {
-	if (HP)
+	if (PlayerStatus.HP)
 	{
 		// HP計算
-		HP -= _damage;
+		PlayerStatus.HP -= _damage;
 
 		if (IsAttacking)
 		{
@@ -445,20 +455,17 @@ void APlayerBase::TakedDamage(float _damage)
 	}
 }
 
-void APlayerBase::PlayAnimation(UAnimMontage* ToPlayAnimMontage, FName StartSectionName /*= "None"*/)
+void APlayerBase::PlayAnimation(UAnimMontage* _toPlayAnimMontage, FName _startSectionName /*= "None"*/, float _playRate /*= 1.f*/)
 {
 	// コントロール不能へ
 	IsControl = false;
 
 	// 再生するアニメーションを格納
-	UAnimMontage* toPlayAnimMontage = ToPlayAnimMontage;
-
-	// 何段目か
-	FName StartSection = StartSectionName;
+	UAnimMontage* toPlayAnimMontage = _toPlayAnimMontage;
 
 	// アニメーション再生
 	if (toPlayAnimMontage != nullptr)
 	{
-		PlayAnimMontage(toPlayAnimMontage, 1.f, StartSection);
+		PlayAnimMontage(_toPlayAnimMontage, _playRate, _startSectionName);
 	}
 }
