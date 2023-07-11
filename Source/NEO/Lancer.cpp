@@ -1,5 +1,6 @@
 #include "Lancer.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "GameFramework/Controller.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -9,6 +10,10 @@ ALancer::ALancer()
     MaxHealth = 100;
     Health = MaxHealth;
     bIsJumping = false;
+    // キャラクターの移動方式を設定
+    GetCharacterMovement()->bOrientRotationToMovement = true;
+    GetCharacterMovement()->RotationRate = FRotator(0.0f, 540.0f, 0.0f);
+    GetCharacterMovement()->MaxWalkSpeed = MovementSpeed;
     //重力加速度
     fGravityAcceleration = 9.8f;
     //ジャンプ時間
@@ -18,7 +23,8 @@ ALancer::ALancer()
     //ジャンプ開始時の位置
     vJumpStartLocation = GetActorLocation();
     
-    
+   
+
 }
 
 
@@ -29,30 +35,14 @@ void ALancer::BeginPlay()
 
     // プレイヤーキャラクターの参照を取得
     PlayerCharacter = UGameplayStatics::GetPlayerCharacter(this, 0);
+    // 5秒ごとにCheckPlayerInFront関数を実行するタイマーをセット
+    GetWorldTimerManager().SetTimer(TimerHandle_CheckPlayerInFront, this, &ALancer::CheckPlayerInFront, 3.0f, true);
 }
+
 
 void ALancer::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
-    // Make the character's Y-axis always face towards the camera/player
-    if (GEngine && GEngine->GetFirstLocalPlayerController(GetWorld()))
-    {
-        FVector PlayerLocation = GEngine->GetFirstLocalPlayerController(GetWorld())->GetPawn()->GetActorLocation();
-        FVector CharacterLocation = GetActorLocation();
-        FVector DirectionToPlayer = PlayerLocation - CharacterLocation;
-        FRotator NewRotation = DirectionToPlayer.Rotation();
-        NewRotation.Pitch = 0.f;
-        NewRotation.Roll = 0.f;
-        NewRotation.Yaw +=180.f;
-        SetActorRotation(NewRotation);
-        FVector CharacterForward = GetActorForwardVector();
-        float DotProduct = FVector::DotProduct(CharacterForward, DirectionToPlayer.GetSafeNormal());
-        if (DotProduct < 0.f)
-        {
-            // Rotate Y-axis by 180 degrees
-            NewRotation.Yaw += 180.f;
-        }
-    }
     if (PlayerCharacter)
     {
         // プレイヤーとの距離を取得
@@ -64,6 +54,28 @@ void ALancer::Tick(float DeltaTime)
             AddMovementInput(PlayerDirection);
         }
     }
+    // キャラクターの位置を取得
+    FVector CharacterLocation = GetActorLocation();
+
+    // 自分の座標を取得
+    FVector MyLocation = GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorLocation();
+
+    // キャラクターの位置と自分の位置を比較してY軸より前にいるかどうかを判定
+    bIsRotation = CharacterLocation.Y > MyLocation.Y;
+    // bIsRotationがtrueなら
+    if (bIsRotation)
+    {
+        FRotator NewRotation = GetActorRotation();
+        NewRotation.Yaw = -90.0f;
+        SetActorRotation(NewRotation);
+    }
+    else
+    {
+        FRotator NewRotation = GetActorRotation();
+        NewRotation.Yaw = 90.0f;
+        SetActorRotation(NewRotation);
+    }
+
 }
 FVector ALancer::GetPlayerDirection() const
 {
@@ -152,7 +164,24 @@ void ALancer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
     Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
+void ALancer::CheckPlayerInFront()
+{
+    // 自分の位置を取得
+    FVector MyLocation = GetActorLocation();
 
+    // 自プレイヤーの位置を取得
+    FVector PlayerLocation = GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorLocation();
+
+    // 自プレイヤーがLancerの目の前にいるかどうかを判定
+    FVector DirectionToPlayer = PlayerLocation - MyLocation;
+    float DotProduct = FVector::DotProduct(DirectionToPlayer.GetSafeNormal(), GetActorForwardVector());
+    bIsPlayerInFront = DotProduct > 0.0f;
+
+    if (bIsPlayerInFront)
+    {
+        PlayAnimMontage(Attack, 1, NAME_None);
+    }
+}
 
 
 

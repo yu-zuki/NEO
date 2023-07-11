@@ -1,115 +1,204 @@
-// Fill out your copyright notice in the Description page of Project Settings.
 #include "Soldier.h"
-#include "Kismet/GameplayStatics.h"
-#include "Math/UnrealMathUtility.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
-#include "DrawDebugHelpers.h"
+#include "TimerManager.h"
+#include "AIController.h"
+#include "GameFramework/Controller.h"
+#include "Kismet/GameplayStatics.h"
 
 ASoldier::ASoldier()
 {
-    PrimaryActorTick.bCanEverTick = true;
-
-    // 初期設定値
-    Acceleration = 500.0f;
-    MaxSpeed = 1000.0f;
-    DetectionRange = 500.0f;
-    bMovingForward = false;
-    TimeSinceLastMovement = 0.0f;
-   
+    // キャラクターの移動方式を設
+    MaxHealth = 100;
+    Health = MaxHealth;
+    bIsJumping = false;
+    // キャラクターの移動方式を設定
+    GetCharacterMovement()->bOrientRotationToMovement = true;
+    GetCharacterMovement()->RotationRate = FRotator(0.0f, 540.0f, 0.0f);
+    
+    //重力加速度
+    fGravityAcceleration = 9.8f;
+    //ジャンプ時間
+    fJumpTime = 0.0f;
+    //ジャンプ高さ
+    fJumpHeight = 100.0f;
+    //ジャンプ開始時の位置
+    vJumpStartLocation = GetActorLocation();
+    //攻撃の間隔
+    DelayBeforeAttack = 2.0f;
+    AttackInterval = 5.0f;
+    MoveSpeed = 600.0f;
 }
+
+
 
 void ASoldier::BeginPlay()
 {
     Super::BeginPlay();
-    PlayerCharacter = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
-    SetNewTargetLocation();
+
+    // プレイヤーキャラクターの参照を取得
+    PlayerCharacter = UGameplayStatics::GetPlayerCharacter(this, 0);
+    // 2秒後に攻撃を開始する
+    GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &ASoldier::StartAttack, DelayBeforeAttack, false);
 }
+
 
 void ASoldier::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
+    // キャラクターの位置を取得
+    FVector CharacterLocation = GetActorLocation();
 
-    TimeSinceLastMovement += DeltaTime;
-    DetectTarget();
+    // 自分の座標を取得
+    FVector MyLocation = GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorLocation();
 
-    if (bMovingForward)
+    // キャラクターの位置と自分の位置を比較してY軸より前にいるかどうかを判定
+    bIsRotation = CharacterLocation.Y > MyLocation.Y;
+    // bIsRotationがtrueなら
+    if (bIsRotation)
     {
-        MoveForward(1.0f);
+        FRotator NewRotation = GetActorRotation();
+        NewRotation.Yaw = -90.0f;
+        SetActorRotation(NewRotation);
+    }
+    else
+    {
+        FRotator NewRotation = GetActorRotation();
+        NewRotation.Yaw = 90.0f;
+        SetActorRotation(NewRotation);
+    }
 
-        // 一定距離通過後、停止して新たな目標位置を設定
-        if (GetActorLocation().X >= TargetLocation.X)
+}
+void ASoldier::StartAttack()
+{
+    // プレイヤーに向かって突撃する
+    MoveToPlayer();
+
+    // 指定の間隔で攻撃を繰り返す
+    GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &ASoldier::RepeatAttack, AttackInterval, true);
+}
+void ASoldier::RepeatAttack()
+{
+    /*
+     // プレイヤーとの距離を計算
+    APawn* PlayerPawn = UGameplayStatics::GetPlayerPawn(this, 0);
+    if (PlayerPawn)
+    {
+        FVector PlayerLocation = PlayerPawn->GetActorLocation();
+        FVector SoldierLocation = GetActorLocation();
+        float Distance = FVector::Dist(PlayerLocation, SoldierLocation);
+
+        // プレイヤーとの距離が一定範囲内でなければプレイヤーに向かって突撃する
+        if (Distance > MaxDistanceFromPlayer)
         {
-            bMovingForward = false;
-            SetNewTargetLocation();
+            MoveToPlayer();
         }
-    }
+    
+     }
+    */
+   
+    MoveToPlayer();
 }
 
-
-void ASoldier::MoveForward(float Value)
+void ASoldier::MoveToPlayer()
 {
-    if (Value != 0.0f)
+    APawn* PlayerPawn = UGameplayStatics::GetPlayerPawn(this, 0);
+    if (PlayerPawn)
     {
-        // 加速度を適用して速度を変更
-        FVector Direction = GetActorForwardVector();
-        FVector Velocity = Direction * Acceleration * Value;
-        FVector NewLocation = GetActorLocation() + Velocity * GetWorld()->DeltaTimeSeconds;
+        PlayerLocation = PlayerPawn->GetActorLocation();
 
-        // 速度制限
-        float CurrentSpeed = GetVelocity().Size();
-        if (CurrentSpeed + Acceleration * GetWorld()->DeltaTimeSeconds <= MaxSpeed)
+        // プレイヤーの方向に進む
+        FVector Direction = PlayerLocation - GetActorLocation();
+        Direction.Z = 0.0f;
+        Direction.Normalize();
+
+        // 移動速度を設定
+        UCharacterMovementComponent* MovementComponent = GetCharacterMovement();
+        if (MovementComponent)
         {
-            SetActorLocation(NewLocation);
+            MovementComponent->MaxWalkSpeed = MoveSpeed;
         }
+
+        // まっすぐ進む
+        AddMovementInput(Direction, 1.0f);
     }
 }
-
-void ASoldier::DetectTarget()
+void ASoldier::ApplyDamage(float DamageAmount, float DeltaTime)
 {
-     if (PlayerCharacter)
-    {
-        // プレイヤーとの距離を測定
-        float Distance = FVector::Distance(GetActorLocation(), PlayerCharacter->GetActorLocation());
+    Health -= DamageAmount;
 
-        // 一定範囲に近づいたら移動を開始
-        if (!bMovingForward && Distance <= DetectionRange && TimeSinceLastMovement >= 2.0f)
+    if (Health <= 0.0f)
+    {
+        //ジャンプ処理
+        JumpingByGravity(DeltaTime);
+        PlayAnimMontage(Death, 1, NAME_None);
+
+    }
+    else
+    {
+        PlayAnimMontage(Damage_Reaction, 1, NAME_None);
+    }
+}
+void ASoldier::StartJumpByGravity(float JumpHeight, float GravityAcceleration)
+{
+    if (!bIsJumping)
+    {
+        //ジャンプを開始
+        fJumpTime = 0.0f;
+        fJumpHeight = JumpHeight;
+        fGravityAcceleration = GravityAcceleration;
+
+        bIsJumping = true;
+    }
+}
+void ASoldier::JumpingByGravity(float DeltaTime)
+{
+    if (bIsJumping)
+    {
+        //ジャンプ中
+        fJumpTime += DeltaTime;
+
+        //ジャンプの移動距離を計算
+        float fCurrentJumpHeight = fJumpHeight * FMath::Sin(fJumpTime) - 0.5f * fGravityAcceleration * FMath::Pow(fJumpTime, 2.0f);
+
+        //キャラクターに移動距離を反映
+        FVector vCurrentLocation = GetActorLocation();
+        vCurrentLocation.Z = vJumpStartLocation.Z + fCurrentJumpHeight;
+        SetActorLocation(vCurrentLocation);
+
+        //ジャンプを終了するかどうかを判断
+        if (fCurrentJumpHeight <= 0.0f)
         {
-            bMovingForward = true;
-            TimeSinceLastMovement = 0.0f; // 再度同じことをするために経過時間をリセット
+            EndJumpByGravity();
         }
+
     }
-}
-void ASoldier::SetNewTargetLocation()
-{
-    if (PlayerCharacter)
-    {
-        TargetLocation = PlayerCharacter->GetActorLocation();
-    }
-}
-bool ASoldier::IsPlayerInDetectionRange()
-{
-    if (PlayerCharacter && !PlayerCharacter->IsPendingKill())
-    {
-        float Distance = FVector::Distance(GetActorLocation(), PlayerCharacter->GetActorLocation());
-        return Distance <= DetectionRange;
-    }
-    return false;
 }
 
-void ASoldier::StopMovement()
+/**
+ * 重力ジャンプを終了する
+ */
+void ASoldier::EndJumpByGravity()
 {
-    bMovingForward = false;
-    SetActorRotation((PlayerCharacter->GetActorLocation() - GetActorLocation()).Rotation());
-}
-void ASoldier::RotateTowardsPlayer()
-{
-    if (PlayerCharacter && !PlayerCharacter->IsPendingKill())
-    {
-        FVector TargetDirection = PlayerCharacter->GetActorLocation() - GetActorLocation();
-        TargetDirection.Z = 0.0f; // Yawのみに制限するためにZ軸を0に設定
-        FRotator TargetRotation = TargetDirection.Rotation();
+    //ジャンプを終了
+    bIsJumping = false;
 
-        // プレイヤーの方向を向く
-        SetActorRotation(TargetRotation);
-    }
+    //ジャンプ時間をリセット
+    fJumpTime = 0.0f;
+
+    //ジャンプ高さをリセット
+    fJumpHeight = 0.0f;
+
+    //重力加速度をリセット
+    fGravityAcceleration = 0.0f;
 }
+// Called to bind functionality to input
+void ASoldier::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+{
+    Super::SetupPlayerInputComponent(PlayerInputComponent);
+}
+
+
+
+
+

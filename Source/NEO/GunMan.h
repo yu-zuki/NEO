@@ -79,6 +79,8 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	
 private:
+	UPROPERTY(EditAnywhere, Category = "Rotation")
+		bool bIsRotation;
 	FVector GetPlayerDirection() const;
 	
 	float GetDistanceToPlayer() const;
