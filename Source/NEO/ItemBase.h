@@ -6,6 +6,11 @@
 #include "GameFramework/Actor.h"
 #include "ItemBase.generated.h"
 
+
+class USkeletalMeshComponent;
+class UStaticMeshComponent;
+class UStaticMesh;
+
 UCLASS()
 class NEO_API AItemBase : public AActor
 {
@@ -22,5 +27,18 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	//
+	UPROPERTY(EditAnywhere)
+		TObjectPtr<USceneComponent> DefaultSceneRoot;
+
+	// StaticMesh Component
+	UPROPERTY(EditAnywhere)
+		TObjectPtr<UStaticMeshComponent> StaticMesh;
+
+	//スポーンするアイテムを倒した相手によって変えられるようにする
+
+
+
 
 };
