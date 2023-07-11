@@ -30,17 +30,8 @@ APlayerCharacter::APlayerCharacter()
 	CharacterMovementComp = GetCharacterMovement();
 	CharacterMovementComp->MaxWalkSpeed = 500.f;
 
-	// アニメーションセットアップ
-	TCHAR* AnimationAssetPaths[2];
-
-	AnimationAssetPaths[0] = TEXT("/Game/0122/Player/Animation/Montage/Combo/SwordCombo");
-	AnimationAssetPaths[1] = TEXT("/Game/0122/Player/Animation/Montage/Combo/SwordCombo2");
-
-
-	SetupAnimationAsset(AnimationAssetPaths);
-
-	// 武器のセットアップ
-
+	// プレイヤーのデータセット
+	SetupPlayerData();
 }
 
 // Called when the game starts or when spawned
@@ -77,5 +68,20 @@ void APlayerCharacter::SetupPlayerData()
 {
 	Super::SetupPlayerData();
 
+	// アニメーションセットアップ
+	TCHAR* AnimationAssetPaths[2];
+
+	// アニメーションアセットのパス
+	AnimationAssetPaths[0] = TEXT("/Game/0122/Player/Animation/Montage/Combo/SwordCombo");
+	AnimationAssetPaths[1] = TEXT("/Game/0122/Player/Animation/Montage/Combo/SwordCombo2");
+
+	// セット
+	SetupAnimationAsset(AnimationAssetPaths);
+
+	// 武器のメッシュのパス
+	TCHAR* WeaponAssetPath = TEXT("/Game/0122/Player/Weapon/Weapons/Blade/Swords/Blade_BlackKnight/SK_Blade_BlackKnight");
+
+	// セット
+	SetupWeaponMesh(WeaponAssetPath, "WeaponMesh");
 }
 

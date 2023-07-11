@@ -128,7 +128,7 @@ public:
 	void SetupAnimationAsset(TCHAR* AnimAssetPath[2]);
 
 	// •Ší‚ÌƒƒbƒVƒ…‚Ìİ’è
-	void SetupWeapon(TCHAR* WeaponAssetPath,FName PublicName = "Weapon");
+	void SetupWeaponMesh(TCHAR* WeaponAssetPath,FName PublicName = "Weapon");
 
 	virtual void SetupCollision();
 

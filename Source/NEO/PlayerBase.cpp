@@ -104,6 +104,7 @@ void APlayerBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 // プレイヤーのデータを初期化
 void APlayerBase::SetupPlayerData()
 {
+	// メインアクションのボタンをマッピング
 	SetupMainActionMapping();
 }
 
@@ -172,7 +173,7 @@ void APlayerBase::SetupAnimationAsset(TCHAR* AnimAssetPath[2])
 	ComboStartSectionNames = { "First", "Second", "Third"/*,"Fourth"*/ };
 }
 
-void APlayerBase::SetupWeapon(TCHAR* WeaponAssetPath, FName PublicName/* = "Weapon"*/)
+void APlayerBase::SetupWeaponMesh(TCHAR* WeaponAssetPath, FName PublicName/* = "Weapon"*/)
 {
 	// 武器のコンポーネントを作成
 	WeaponMesh = CreateDefaultSubobject<USkeletalMeshComponent>(PublicName);
