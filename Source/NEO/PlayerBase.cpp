@@ -16,6 +16,7 @@
 #include "Engine/AssetManager.h"
 #include "Async/Async.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include <type_traits>
 
 #define DIRECTION (90.f)
 
@@ -107,7 +108,7 @@ void APlayerBase::SetupPlayerData()
 	// プレイヤーのステータス初期化
 	SetupPlayerStatus();
 
-	SetupCollisionComponent();
+
 }
 
 // プレイヤーのステータスパラメータ初期化
@@ -205,8 +206,17 @@ void APlayerBase::SetupWeaponMesh(TCHAR* WeaponAssetPath, FName PublicName/* = "
 	}
 }
 
-void APlayerBase::SetupCollisionComponent()
+template<class T>
+void APlayerBase::SetupCollisionComponent(T CollisionComp,FName PublicName /*= "CollisionComp"*/)
 {
+	static_assert(std::is_same<T, UBoxComponent>::value || std::is_same<T, USphereComponent>::value || std::is_same<T, UCapsuleComponent>::value,
+		"「T」は UBoxComponent,USphereComponent,UCapsuleComponent のどれか ");
+
+	tempCollisionComp = CreateDefaultSubobject<T>(PublicName);
+
+	tempCollisionComp->SetupAttachment(RootComponent);
+
+	return tempCollisionComp;
 }
 
 

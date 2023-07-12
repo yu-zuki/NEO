@@ -57,9 +57,6 @@ struct FPlayerStatus
 		float JumpHeight;
 };
 
-// テンプレート
-template<class T>
-
 UCLASS()
 class NEO_API APlayerBase : public AInputCharacter
 {
@@ -165,8 +162,10 @@ public:
 	void SetupWeaponMesh(TCHAR* WeaponAssetPath,FName PublicName = "WeaponMesh");
 
 
+	// テンプレート
 	// コリジョン設定
-	void SetupCollisionComponent(T CollisionComp);
+	template<class T>
+	void SetupCollisionComponent(T CollisionComp, FName PublicName = "CollisionComp");
 
 	// 武器のメッシュ
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Mesh, meta = (AllowPrivateAccess = "true"))

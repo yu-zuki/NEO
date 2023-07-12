@@ -5,6 +5,7 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/BoxComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/InputComponent.h"
@@ -68,6 +69,12 @@ void APlayerCharacter::SetupPlayerData()
 {
 	Super::SetupPlayerData();
 
+	// 武器のメッシュのパス
+	TCHAR* WeaponAssetPath = TEXT("/Game/0122/Player/Weapon/Weapons/Blade/Swords/Blade_BlackKnight/SK_Blade_BlackKnight");
+
+	// セット
+	SetupWeaponMesh(WeaponAssetPath, "WeaponMesh");
+
 	// アニメーションセットアップ
 	TCHAR* AnimationAssetPaths[2];
 
@@ -78,10 +85,5 @@ void APlayerCharacter::SetupPlayerData()
 	// セット
 	SetupAnimationAsset(AnimationAssetPaths);
 
-	// 武器のメッシュのパス
-	TCHAR* WeaponAssetPath = TEXT("/Game/0122/Player/Weapon/Weapons/Blade/Swords/Blade_BlackKnight/SK_Blade_BlackKnight");
-
-	// セット
-	SetupWeaponMesh(WeaponAssetPath, "WeaponMesh");
 }
 
