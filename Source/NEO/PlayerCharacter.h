@@ -19,6 +19,9 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	//•Ší‚Ì“–‚½‚è”»’è
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SwordCollision", meta = (AllowPrivateAccess = "true"))
+		class UBoxComponent* WeaponCollision;
 
 public:	
 	// Called every frame

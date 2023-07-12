@@ -8,6 +8,11 @@
 #include "GameSystem\InputCharacter.h"
 #include "PlayerBase.generated.h"
 
+// 前方宣言
+class USphereComponent;
+class UCapsuleComponent;
+class UBoxComponent;
+
 // inputAction
 USTRUCT(BlueprintType)
 struct FMainAction
@@ -46,12 +51,14 @@ struct FPlayerStatus
 		float DamageAmount;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		float JumpHeight;
+		float ComboDamageFactor;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		float ComboDamageFactor;
+		float JumpHeight;
 };
 
+// テンプレート
+template<class T>
 
 UCLASS()
 class NEO_API APlayerBase : public AInputCharacter
@@ -157,15 +164,13 @@ public:
 	// 武器のメッシュの設定
 	void SetupWeaponMesh(TCHAR* WeaponAssetPath,FName PublicName = "WeaponMesh");
 
-	virtual void SetupCollision();
+
+	// コリジョン設定
+	void SetupCollisionComponent(T CollisionComp);
 
 	// 武器のメッシュ
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Mesh, meta = (AllowPrivateAccess = "true"))
 		class USkeletalMeshComponent* WeaponMesh;
-
-	//武器の当たり判定
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Collision, meta = (AllowPrivateAccess = "true"))
-		class UCapsuleComponent* WeaponCollision;
 
 	// アニメーション保管用
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Animation)

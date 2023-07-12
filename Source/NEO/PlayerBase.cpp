@@ -106,6 +106,8 @@ void APlayerBase::SetupPlayerData()
 
 	// プレイヤーのステータス初期化
 	SetupPlayerStatus();
+
+	SetupCollisionComponent();
 }
 
 // プレイヤーのステータスパラメータ初期化
@@ -203,13 +205,8 @@ void APlayerBase::SetupWeaponMesh(TCHAR* WeaponAssetPath, FName PublicName/* = "
 	}
 }
 
-void APlayerBase::SetupCollision()
+void APlayerBase::SetupCollisionComponent()
 {
-	// 剣の当たり判定作成
-	WeaponCollision = CreateDefaultSubobject<UCapsuleComponent>(TEXT("WeaponCollision"));
-
-	// 剣のメッシュに追従
-	WeaponCollision->SetupAttachment(WeaponMesh);
 }
 
 
