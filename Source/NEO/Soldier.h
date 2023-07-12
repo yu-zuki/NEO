@@ -3,7 +3,6 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "EnamyBase.h"
-
 #include "Soldier.generated.h"
 
 UCLASS()
@@ -62,29 +61,14 @@ protected:
 
     virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-    UPROPERTY(EditDefaultsOnly, Category = "AI")
-        float DelayBeforeAttack;
+    UPROPERTY(EditDefaultsOnly, Category = "Movement")
+        float MovementRadius;
 
-    UPROPERTY(EditDefaultsOnly, Category = "AI")
-        float AttackInterval;
 
-    UFUNCTION()
-        void StartAttack();
-
-    UFUNCTION()
-        void RepeatAttack();
-
-    UPROPERTY(EditDefaultsOnly, Category = "AI")
-        float MaxDistanceFromPlayer;
-
-    UPROPERTY(EditDefaultsOnly, Category = "AI")
-        float MoveSpeed;
 
 private:
     UPROPERTY(EditAnywhere, Category = "Rotation")
         bool bIsRotation;
-    UFUNCTION()
-        void MoveToPlayer();
-    FVector PlayerLocation;
-    FTimerHandle AttackTimerHandle;
+ 
+    FVector InitialLocation;
 };

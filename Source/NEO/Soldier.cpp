@@ -2,7 +2,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "TimerManager.h"
-#include "AIController.h"
+#include "Math/UnrealMathUtility.h"
 #include "GameFramework/Controller.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -24,10 +24,9 @@ ASoldier::ASoldier()
     fJumpHeight = 100.0f;
     //ジャンプ開始時の位置
     vJumpStartLocation = GetActorLocation();
-    //攻撃の間隔
-    DelayBeforeAttack = 2.0f;
-    AttackInterval = 5.0f;
-    MoveSpeed = 600.0f;
+    
+    PrimaryActorTick.bCanEverTick = true;
+    MovementRadius = 500.0f; // 移動範囲の半径を設定
 }
 
 
@@ -36,10 +35,8 @@ void ASoldier::BeginPlay()
 {
     Super::BeginPlay();
 
-    // プレイヤーキャラクターの参照を取得
-    PlayerCharacter = UGameplayStatics::GetPlayerCharacter(this, 0);
-    // 2秒後に攻撃を開始する
-    GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &ASoldier::StartAttack, DelayBeforeAttack, false);
+    InitialLocation = GetActorLocation(); // 初期位置を保存
+
 }
 
 
@@ -67,60 +64,22 @@ void ASoldier::Tick(float DeltaTime)
         NewRotation.Yaw = 90.0f;
         SetActorRotation(NewRotation);
     }
+    // ランダムな移動ベクトルを生成
+    FVector RandomMovement = FVector(FMath::FRandRange(-1.0f, 1.0f), FMath::FRandRange(-1.0f, 1.0f), 0.0f);
+    RandomMovement.Normalize();
 
-}
-void ASoldier::StartAttack()
-{
-    // プレイヤーに向かって突撃する
-    MoveToPlayer();
+    // 移動範囲内のランダムな位置を計算
+    FVector TargetLocation = InitialLocation + RandomMovement * MovementRadius;
 
-    // 指定の間隔で攻撃を繰り返す
-    GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &ASoldier::RepeatAttack, AttackInterval, true);
-}
-void ASoldier::RepeatAttack()
-{
-    /*
-     // プレイヤーとの距離を計算
-    APawn* PlayerPawn = UGameplayStatics::GetPlayerPawn(this, 0);
-    if (PlayerPawn)
+    // プレイヤーとの距離が一定範囲内であれば移動する
+    FVector PlayerLocation = GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorLocation();
+    float DistanceToPlayer = FVector::Dist(InitialLocation, PlayerLocation);
+    if (DistanceToPlayer > MovementRadius)
     {
-        FVector PlayerLocation = PlayerPawn->GetActorLocation();
-        FVector SoldierLocation = GetActorLocation();
-        float Distance = FVector::Dist(PlayerLocation, SoldierLocation);
-
-        // プレイヤーとの距離が一定範囲内でなければプレイヤーに向かって突撃する
-        if (Distance > MaxDistanceFromPlayer)
-        {
-            MoveToPlayer();
-        }
-    
-     }
-    */
-   
-    MoveToPlayer();
-}
-
-void ASoldier::MoveToPlayer()
-{
-    APawn* PlayerPawn = UGameplayStatics::GetPlayerPawn(this, 0);
-    if (PlayerPawn)
-    {
-        PlayerLocation = PlayerPawn->GetActorLocation();
-
-        // プレイヤーの方向に進む
-        FVector Direction = PlayerLocation - GetActorLocation();
-        Direction.Z = 0.0f;
-        Direction.Normalize();
-
-        // 移動速度を設定
-        UCharacterMovementComponent* MovementComponent = GetCharacterMovement();
-        if (MovementComponent)
-        {
-            MovementComponent->MaxWalkSpeed = MoveSpeed;
-        }
-
-        // まっすぐ進む
-        AddMovementInput(Direction, 1.0f);
+        // 移動先に向かって移動する
+        FVector MovementDirection = TargetLocation - GetActorLocation();
+        MovementDirection.Normalize();
+        SetActorLocation(GetActorLocation() + MovementDirection * DeltaTime * GetCharacterMovement()->MaxWalkSpeed);
     }
 }
 void ASoldier::ApplyDamage(float DamageAmount, float DeltaTime)
