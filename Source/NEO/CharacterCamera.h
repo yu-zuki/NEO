@@ -25,8 +25,8 @@ class NEO_API ACharacterCamera : public AActor
 	// èâä˙à íu
 	FVector StartPos;
 
-	UPROPERTY(EditAnywhere, Category = "ViewPoint")
-		float PlayerToViewPointDistance_X;
+	UPROPERTY(EditAnywhere, Category = "PlayerToViewPointDistance")
+		FVector PlayerToViewPointDistance;
 	
 public:	
 	// Sets default values for this actor's properties
