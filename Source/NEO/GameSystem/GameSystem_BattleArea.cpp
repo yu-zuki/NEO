@@ -11,7 +11,7 @@
 #include "Engine/Engine.h"
 #include "Engine/GameViewportClient.h"
 #include "Camera/CameraComponent.h"
-#include "../PlayerCharacter.h"
+#include "NEO\PlayerSystem\PlayerCharacter.h"
 
 #include "ProceduralMeshComponent.h"
 #include "TGS_GameMode.h"

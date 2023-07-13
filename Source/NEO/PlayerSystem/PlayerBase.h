@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
-#include "GameSystem\InputCharacter.h"
+#include "NEO/GameSystem/InputCharacter.h"
 #include "PlayerBase.generated.h"
 
 // ‘O•ûéŒ¾

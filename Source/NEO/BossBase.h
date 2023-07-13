@@ -6,7 +6,7 @@
 #include "GameFramework/Character.h"
 #include "GameFramework/Actor.h"
 #include "Kismet/GameplayStatics.h"
-#include "PlayerCharacter.h"
+#include "PlayerSystem\PlayerCharacter.h"
 #include "BossBase.generated.h"
 
 UCLASS()
