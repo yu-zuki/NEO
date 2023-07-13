@@ -61,14 +61,20 @@ protected:
 
     virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+    void EnableTick();
+
     UPROPERTY(EditDefaultsOnly, Category = "Movement")
         float MovementRadius;
-
-
+    
+    
 
 private:
     UPROPERTY(EditAnywhere, Category = "Rotation")
         bool bIsRotation;
- 
+    UPROPERTY(EditAnywhere, Category = "Location")
+        bool bIsLocation;
+    FTimerHandle TimerHandle;
     FVector InitialLocation;
+    FVector StartingLocation;
+
 };

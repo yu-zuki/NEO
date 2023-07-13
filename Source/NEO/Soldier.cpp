@@ -27,6 +27,7 @@ ASoldier::ASoldier()
     
     PrimaryActorTick.bCanEverTick = true;
     MovementRadius = 500.0f; // ˆÚ“®”ÍˆÍ‚Ì”¼Œa‚ðÝ’è
+    bIsLocation = true;
 }
 
 
@@ -74,13 +75,30 @@ void ASoldier::Tick(float DeltaTime)
     // ƒvƒŒƒCƒ„[‚Æ‚Ì‹——£‚ªˆê’è”ÍˆÍ“à‚Å‚ ‚ê‚ÎˆÚ“®‚·‚é
     FVector PlayerLocation = GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorLocation();
     float DistanceToPlayer = FVector::Dist(InitialLocation, PlayerLocation);
-    if (DistanceToPlayer > MovementRadius)
-    {
+    bIsRotation = CharacterLocation.Y > MyLocation.Y;
+   
+     if (DistanceToPlayer > MovementRadius)
+        {
         // ˆÚ“®æ‚ÉŒü‚©‚Á‚ÄˆÚ“®‚·‚é
         FVector MovementDirection = TargetLocation - GetActorLocation();
         MovementDirection.Normalize();
         SetActorLocation(GetActorLocation() + MovementDirection * DeltaTime * GetCharacterMovement()->MaxWalkSpeed);
+        
+       
+        }
+    
+   
+    else
+    {
+        FVector ForwardDirection = GetActorForwardVector();
+        SetActorLocation(GetActorLocation() + ForwardDirection *10.0f);
+        
     }
+
+}
+void ASoldier::EnableTick()
+{
+    SetActorTickEnabled(true);
 }
 void ASoldier::ApplyDamage(float DamageAmount, float DeltaTime)
 {
@@ -156,6 +174,7 @@ void ASoldier::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
     Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
+
 
 
 
