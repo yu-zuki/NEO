@@ -15,6 +15,10 @@ class NEO_API UPlayer_UMG : public UUserWidget
 	GENERATED_BODY()
 
 public:
+	virtual void NativeConstruct() override;
+	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
+
+public:
 	UPROPERTY(Meta = (BindWidget))
 		class UCanvasPanel* Canvas;
 
@@ -25,4 +29,21 @@ public:
 	//Skill âÊëú
 	UPROPERTY(Meta = (BindWidget))
 		class UImage* SkillImage;
+
+//-------------------------------
+	//widgetValue
+	float fPlayerHP = 0.f;
+	float fPlayerHPMaxHP = 0.f;
+
+	FName PlayerHPName = FName("None");
+
+	void SetPlayerInfo(float& HP, float& MaxHP) {
+		fPlayerHP = HP;
+		fPlayerHPMaxHP = MaxHP;
+	}
+
+	//GetHPÅì
+	float GetHPPercent() {
+		return fPlayerHP / fPlayerHPMaxHP;
+	}
 };
