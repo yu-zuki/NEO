@@ -82,8 +82,8 @@ void APlayerCharacter::SetupPlayerData()
 	AnimationAssetPaths[0] = TEXT("/Game/0122/Player/Animation/Montage/Combo/SwordCombo");
 	AnimationAssetPaths[1] = TEXT("/Game/0122/Player/Animation/Montage/Combo/SwordCombo2");
 
-	// ƒZƒbƒg
 	SetupAnimationAsset(AnimationAssetPaths);
 
+	WeaponCollision = SetupCollisionComponent(WeaponCollision);
 }
 

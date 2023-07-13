@@ -11,7 +11,6 @@
 // 前方宣言
 class USphereComponent;
 class UCapsuleComponent;
-class UBoxComponent;
 
 // inputAction
 USTRUCT(BlueprintType)
@@ -165,7 +164,19 @@ public:
 	// テンプレート
 	// コリジョン設定
 	template<class T>
-	void SetupCollisionComponent(T CollisionComp, FName PublicName = "CollisionComp");
+	T* SetupCollisionComponent(T* CollisionComp, FName PublicName = "CollisionComp")
+	{
+		static_assert(std::is_same<T, UBoxComponent>::value || std::is_same<T, USphereComponent>::value || std::is_same<T, UCapsuleComponent>::value,
+			"「T」は UBoxComponent,USphereComponent,UCapsuleComponent のどれか ");
+
+		CollisionComp = CreateDefaultSubobject<T>(PublicName);
+
+		CollisionComp->SetupAttachment(RootComponent);
+
+		return CollisionComp;
+	}
+
+
 
 	// 武器のメッシュ
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Mesh, meta = (AllowPrivateAccess = "true"))

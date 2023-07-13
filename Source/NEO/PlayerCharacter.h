@@ -31,6 +31,6 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	// プレイヤーのデータを初期化
-	void SetupPlayerData() override;
+	virtual void SetupPlayerData() override;
 
 };

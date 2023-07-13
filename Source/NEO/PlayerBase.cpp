@@ -16,6 +16,7 @@
 #include "Engine/AssetManager.h"
 #include "Async/Async.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Components/BoxComponent.h"
 #include <type_traits>
 
 #define DIRECTION (90.f)
@@ -205,21 +206,6 @@ void APlayerBase::SetupWeaponMesh(TCHAR* WeaponAssetPath, FName PublicName/* = "
 		WeaponMesh->SetupAttachment(GetMesh(), "hand_rSocket");
 	}
 }
-
-template<class T>
-void APlayerBase::SetupCollisionComponent(T CollisionComp,FName PublicName /*= "CollisionComp"*/)
-{
-	static_assert(std::is_same<T, UBoxComponent>::value || std::is_same<T, USphereComponent>::value || std::is_same<T, UCapsuleComponent>::value,
-		"ÅuTÅvÇÕ UBoxComponent,USphereComponent,UCapsuleComponent ÇÃÇ«ÇÍÇ© ");
-
-	tempCollisionComp = CreateDefaultSubobject<T>(PublicName);
-
-	tempCollisionComp->SetupAttachment(RootComponent);
-
-	return tempCollisionComp;
-}
-
-
 
 void APlayerBase::Move(const FInputActionValue& Value)
 {
