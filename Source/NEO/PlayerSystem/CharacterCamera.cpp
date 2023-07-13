@@ -9,7 +9,6 @@
 
 // Sets default values
 ACharacterCamera::ACharacterCamera()
-	: PlayerToViewPointDistance_X(200.f)
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -46,7 +45,7 @@ void ACharacterCamera::BeginPlay()
 
 	// 初期位置設定
 	StartPos = PlayerInfo->GetActorLocation();
-	StartPos = FVector(StartPos.X - 150.f, StartPos.Y + PlayerToViewPointDistance_X, StartPos.Z + 100.f);
+	PlayerToViewPointDistance = FVector(0.f, 0.f, 0.f);
 	SetActorLocation(StartPos);
 }
 
@@ -58,6 +57,6 @@ void ACharacterCamera::Tick(float DeltaTime)
 	// プレイヤーの現在位置取得
 	FVector PlayerPos = PlayerInfo->GetActorLocation();
 
-	SetActorLocation(FVector(StartPos.X, PlayerPos.Y + PlayerToViewPointDistance_X,StartPos.Z));
+	SetActorLocation(FVector(StartPos.X - PlayerToViewPointDistance.Z, PlayerPos.Y + PlayerToViewPointDistance.X,StartPos.Z + PlayerToViewPointDistance.Y));
 }
 

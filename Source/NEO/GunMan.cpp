@@ -3,7 +3,7 @@
 
 #include "GunMan.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "PlayerCharacter.h"
+#include "PlayerSystem\PlayerCharacter.h"
 #include "Camera/PlayerCameraManager.h"
 #include "Engine/World.h"
 #include "Bullet.h"

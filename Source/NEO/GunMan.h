@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
-#include "PlayerCharacter.h"
+#include "PlayerSystem\PlayerCharacter.h"
 #include "Bullet.h"
 #include "TrajectoryBullet.h"
 #include "EnamyBase.h"

@@ -3,24 +3,25 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Character.h"
-#include "GameFramework/Actor.h"
-#include "Kismet/GameplayStatics.h"
-#include "PlayerSystem\PlayerCharacter.h"
-#include "BossBase.generated.h"
+#include "PlayerBase.h"
+#include "PlayerCharacter.generated.h"
 
 UCLASS()
-class NEO_API ABossBase : public ACharacter
+class NEO_API APlayerCharacter : public APlayerBase
 {
 	GENERATED_BODY()
 
 public:
 	// Sets default values for this character's properties
-	ABossBase();
+	APlayerCharacter();
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	//武器の当たり判定
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SwordCollision", meta = (AllowPrivateAccess = "true"))
+		class UBoxComponent* WeaponCollision;
 
 public:	
 	// Called every frame
@@ -29,15 +30,7 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	//Sceneコンポーネント
-	UPROPERTY(EditAnywhere)
-	USceneComponent* DefaultSceneRoot;
-
-	//Playerの値を代入するための関数
-	void PlayerInput();
-
-public:
-	UPROPERTY(EditAnywhere)
-	float PlayerDistance;
+	// プレイヤーのデータを初期化
+	virtual void SetupPlayerData() override;
 
 };
