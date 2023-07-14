@@ -23,15 +23,7 @@ AGunMan::AGunMan()
     GetCharacterMovement()->MaxWalkSpeed = MovementSpeed;
     MaxHealth = 100;
     Health = MaxHealth;
-    bIsJumping = false;
-    //重力加速度
-    fGravityAcceleration = 9.8f;
-    //ジャンプ時間
-    fJumpTime = 0.0f;
-    //ジャンプ高さ
-    fJumpHeight = 100.0f;
-    //ジャンプ開始時の位置
-    vJumpStartLocation = GetActorLocation();
+    
    
 }
 
@@ -151,6 +143,7 @@ void AGunMan::FacePlayer()
     FRotator TargetRotation = (PlayerLocation - GetActorLocation()).Rotation();
     SetActorRotation(TargetRotation);
 }
+/*
 void AGunMan::ApplyDamage(float DamageAmount, float DeltaTime)
 {
     Health -= DamageAmount;
@@ -167,56 +160,4 @@ void AGunMan::ApplyDamage(float DamageAmount, float DeltaTime)
         PlayAnimMontage(Damage_Reaction, 1, NAME_None);
     }
 }
-void AGunMan::StartJumpByGravity(float JumpHeight, float GravityAcceleration)
-{
-    if (!bIsJumping)
-    {
-        //ジャンプを開始
-        fJumpTime = 0.0f;
-        fJumpHeight = JumpHeight;
-        fGravityAcceleration = GravityAcceleration;
-
-        bIsJumping = true;
-    }
-}
-void AGunMan::JumpingByGravity(float DeltaTime)
-{
-    if (bIsJumping)
-    {
-        //ジャンプ中
-        fJumpTime += DeltaTime;
-
-        //ジャンプの移動距離を計算
-        float fCurrentJumpHeight = fJumpHeight * FMath::Sin(fJumpTime) - 0.5f * fGravityAcceleration * FMath::Pow(fJumpTime, 2.0f);
-
-        //キャラクターに移動距離を反映
-        FVector vCurrentLocation = GetActorLocation();
-        vCurrentLocation.Z = vJumpStartLocation.Z + fCurrentJumpHeight;
-        SetActorLocation(vCurrentLocation);
-
-        //ジャンプを終了するかどうかを判断
-        if (fCurrentJumpHeight <= 0.0f)
-        {
-            EndJumpByGravity();
-        }
-
-    }
-}
-
-/**
- * 重力ジャンプを終了する
- */
-void AGunMan::EndJumpByGravity()
-{
-    //ジャンプを終了
-    bIsJumping = false;
-
-    //ジャンプ時間をリセット
-    fJumpTime = 0.0f;
-
-    //ジャンプ高さをリセット
-    fJumpHeight = 0.0f;
-
-    //重力加速度をリセット
-    fGravityAcceleration = 0.0f;
-}
+*/

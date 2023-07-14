@@ -15,7 +15,7 @@ class NEO_API UPlayer_UMG : public UUserWidget
 	GENERATED_BODY()
 
 public:
-	virtual void NativeConstruct() override;
+	//virtual void NativeConstruct() override;
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 
 public:
