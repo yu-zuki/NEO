@@ -8,7 +8,6 @@
 #include "Bullet.h"
 #include "TrajectoryBullet.h"
 #include "EnamyBase.h"
-
 #include "GunMan.generated.h"
 
 UCLASS()
@@ -54,5 +53,5 @@ private:
 	FVector GetPlayerDirection() const;
 	
 	float GetDistanceToPlayer() const;
-	void FacePlayer();
+	
 };

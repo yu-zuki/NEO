@@ -44,7 +44,7 @@ void AGunMan::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	Health = MaxHealth;
-    FacePlayer();
+   
     if (PlayerCharacter)
     {
         // プレイヤーとの距離を取得
@@ -55,9 +55,7 @@ void AGunMan::Tick(float DeltaTime)
         {
             FVector PlayerDirection = GetPlayerDirection();
             AddMovementInput(PlayerDirection);
-            //プレイヤーのほうを向く
-            FRotator TargetRotation = PlayerDirection.Rotation();
-            SetActorRotation(FMath::RInterpTo(GetActorRotation(), TargetRotation, DeltaTime, 5.0f));
+      
         }
         else if (DistanceToPlayer < DesiredDistance - 100.0f) // プレイヤーが望ましい距離-100以下に入った場合
         {
@@ -94,14 +92,14 @@ void AGunMan::SpawnBullet()
     FVector SpawnLocation = GetActorLocation() + GetActorForwardVector() * 100.0f; // 100.0fは適宜調整してください
     FRotator SpawnRotation = GetActorRotation();
     GetWorld()->SpawnActor<ABullet>(BulletClass, SpawnLocation, SpawnRotation);
-    
+    MovementSpeed = 200.0f;
     
 }
 
 void AGunMan::BlinkTrajectoryBullet()
 {
    
-    FVector SpawnLocation = GetActorLocation() + GetActorForwardVector() * 200.0f; // 200.0fは適宜調整してください
+    FVector SpawnLocation = GetActorLocation() + GetActorForwardVector() * 100.0f; 
     FRotator SpawnRotation = GetActorRotation();
     ATrajectoryBullet* TrajectoryBullet = GetWorld()->SpawnActor<ATrajectoryBullet>(TrajectoryBulletClass, SpawnLocation, SpawnRotation);
 
@@ -113,11 +111,13 @@ void AGunMan::BlinkTrajectoryBullet()
         
         FTimerHandle TimerHandle_BulletSpawn;
         GetWorldTimerManager().SetTimer(TimerHandle_BulletSpawn, this, &AGunMan::SpawnBullet, 2.0f, false);
+        MovementSpeed = 0.0f;
     }
 
-    
+  
     FTimerHandle TimerHandle_NextSequence;
     GetWorldTimerManager().SetTimer(TimerHandle_NextSequence, this, &AGunMan::BlinkTrajectoryBullet, 4.0f, false);
+    MovementSpeed = 200.0f;
 }
 
 FVector AGunMan::GetPlayerDirection() const
@@ -132,16 +132,6 @@ float AGunMan::GetDistanceToPlayer() const
     FVector PlayerLocation = PlayerCharacter->GetActorLocation();
     FVector GunManLocation = GetActorLocation();
     return FVector::Distance(PlayerLocation, GunManLocation);
-}
-
-void AGunMan::FacePlayer()
-{
-    // プレイヤーキャラクターの位置を取得
-    FVector PlayerLocation = PlayerCharacter->GetActorLocation();
-
-    // プレイヤーキャラクターの位置に向かってLancerを回転させる
-    FRotator TargetRotation = (PlayerLocation - GetActorLocation()).Rotation();
-    SetActorRotation(TargetRotation);
 }
 /*
 void AGunMan::ApplyDamage(float DamageAmount, float DeltaTime)
