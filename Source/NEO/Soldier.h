@@ -19,22 +19,27 @@ protected:
 
     virtual void Tick(float DeltaTime) override;
 
-    virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+  
 
-    void EnableTick();
-
-    UPROPERTY(EditDefaultsOnly, Category = "Movement")
-        float MovementRadius;
-    
-    
+  
 
 private:
     UPROPERTY(EditAnywhere, Category = "Rotation")
         bool bIsRotation;
     UPROPERTY(EditAnywhere, Category = "Location")
         bool bIsLocation;
-    FTimerHandle TimerHandle;
-    FVector InitialLocation;
-    FVector StartingLocation;
+    // The time the soldier started moving towards the player
+   
+
+    float TimeStartedMoving;
+
+    // The time the soldier should stop moving towards the player
+    float TimeToStopMoving;
+
+    // The time the soldier should start moving towards the player again
+    float TimeToStartMovingAgain;
+
+    // The player character
+    ACharacter* PlayerCharacter;
 
 };

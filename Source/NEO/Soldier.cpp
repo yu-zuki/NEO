@@ -18,8 +18,8 @@ ASoldier::ASoldier()
 
     
     PrimaryActorTick.bCanEverTick = true;
-    MovementRadius = 500.0f; // 移動範囲の半径を設定
-    bIsLocation = true;
+    TimeToStopMoving = -1.0f;
+ 
 }
 
 
@@ -28,8 +28,12 @@ void ASoldier::BeginPlay()
 {
     Super::BeginPlay();
 
-    InitialLocation = GetActorLocation(); // 初期位置を保存
+    PlayerCharacter = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
 
+    // Start moving towards the player
+    TimeStartedMoving = GetWorld()->GetTimeSeconds();
+    TimeToStopMoving = TimeStartedMoving + 5.0f;
+    GetCharacterMovement()->MaxWalkSpeed = 200.0f;
 }
 
 
@@ -50,6 +54,7 @@ void ASoldier::Tick(float DeltaTime)
         FRotator NewRotation = GetActorRotation();
         NewRotation.Yaw = -90.0f;
         SetActorRotation(NewRotation);
+        
     }
     else
     {
@@ -57,46 +62,35 @@ void ASoldier::Tick(float DeltaTime)
         NewRotation.Yaw = 90.0f;
         SetActorRotation(NewRotation);
     }
-    // ランダムな移動ベクトルを生成
-    FVector RandomMovement = FVector(FMath::FRandRange(-1.0f, 1.0f), FMath::FRandRange(-1.0f, 1.0f), 0.0f);
-    RandomMovement.Normalize();
 
-    // 移動範囲内のランダムな位置を計算
-    FVector TargetLocation = InitialLocation + RandomMovement * MovementRadius;
-
-    // プレイヤーとの距離が一定範囲内であれば移動する
-    FVector PlayerLocation = GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorLocation();
-    float DistanceToPlayer = FVector::Dist(InitialLocation, PlayerLocation);
-    bIsRotation = CharacterLocation.Y > MyLocation.Y;
-   
-     if (DistanceToPlayer > MovementRadius)
-        {
-        // 移動先に向かって移動する
-        FVector MovementDirection = TargetLocation - GetActorLocation();
-        MovementDirection.Normalize();
-        SetActorLocation(GetActorLocation() + MovementDirection * DeltaTime * GetCharacterMovement()->MaxWalkSpeed);
-        
-       
-        }
-    
-   
-    else
+    float CurrentTime = GetWorld()->GetTimeSeconds();
+    // If the soldier should be moving towards the player
+    if (TimeToStopMoving >= 0.0f && CurrentTime < TimeToStopMoving)
     {
-        FVector ForwardDirection = GetActorForwardVector();
-        SetActorLocation(GetActorLocation() + ForwardDirection *10.0f);
-        
-    }
+        // Calculate the direction to the player
+        FVector DirectionToPlayer = PlayerCharacter->GetActorLocation() - GetActorLocation();
+        DirectionToPlayer.Normalize();
 
+        // Move towards the player
+        AddMovementInput(DirectionToPlayer);
+    }
+    // If the soldier should be resting
+    else if (TimeToStopMoving >= 0.0f && CurrentTime < TimeToStartMovingAgain)
+    {
+        // Do nothing (rest)
+    }
+    // If the soldier should start moving towards the player again
+    else if (TimeToStartMovingAgain >= 0.0f && CurrentTime >= TimeToStartMovingAgain)
+    {
+        // Start moving towards the player again
+        TimeStartedMoving = CurrentTime;
+        TimeToStopMoving = TimeStartedMoving + 2.0f;
+        TimeToStartMovingAgain = TimeToStopMoving + 3.0f; // Start moving again after 3 seconds of rest
+    }
 }
-void ASoldier::EnableTick()
-{
-    SetActorTickEnabled(true);
-}
-// Called to bind functionality to input
-void ASoldier::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-    Super::SetupPlayerInputComponent(PlayerInputComponent);
-}
+
+
+
 
 
 
