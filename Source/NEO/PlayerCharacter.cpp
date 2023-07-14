@@ -87,3 +87,49 @@ void APlayerCharacter::SetupPlayerData()
 	WeaponCollision = SetupCollisionComponent(WeaponCollision);
 }
 
+// 攻撃
+void APlayerCharacter::Attack(int AttackNum /*= 0*/)
+{
+	if (!IsAttacking)
+	{
+		// 攻撃中フラグオン
+		IsAttacking = true;
+	}
+	else
+	{
+		// コンボ可能な時,継続
+		if (CanCombo)
+		{
+			// ラストアタックまでコンボ継続
+			if (ComboStartSectionNames[ComboIndex] != ComboStartSectionNames.Last())
+			{
+				++ComboIndex;
+			}
+		}
+	}
+
+	// 攻撃のアニメーション再生
+	PlayAnimation(ComboAnimMontages[AttackNum], ComboStartSectionNames[ComboIndex]);
+}
+
+
+// コンボ1
+void APlayerCharacter::Combo1()
+{
+	// コントロール可能か
+	if (!IsControl) { return; }
+
+	// 攻撃
+	Attack(0);
+}
+
+// コンボ2
+void APlayerCharacter::Combo2()
+{
+	// コントロール可能か
+	if (!IsControl) { return; }
+
+	// 攻撃
+	Attack(1);
+}
+

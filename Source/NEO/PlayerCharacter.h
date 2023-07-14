@@ -6,6 +6,8 @@
 #include "PlayerBase.h"
 #include "PlayerCharacter.generated.h"
 
+
+
 UCLASS()
 class NEO_API APlayerCharacter : public APlayerBase
 {
@@ -32,5 +34,15 @@ public:
 
 	// プレイヤーのデータを初期化
 	virtual void SetupPlayerData() override;
+
+	// 攻撃
+	virtual void Attack(int AttackNum = 0) override;
+
+
+	// 一つ目のコンボ
+	virtual void Combo1() override;
+
+	// 二つ目のコンボ
+	virtual void Combo2()override;
 
 };

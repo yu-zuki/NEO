@@ -35,6 +35,7 @@ struct FMainAction
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		UInputAction* ComboAction2;
+
 };
 
 // inputAction
@@ -99,13 +100,13 @@ public:
 	bool IsPlayerGrounded()const;
 
 	// 攻撃
-	void Attack(int AttackNum = 0);
+	virtual void Attack(int AttackNum = 0);
 
 	// 一つ目のコンボ
-	void Combo1();
+	virtual void Combo1();
 
 	// 二つ目のコンボ
-	void Combo2();
+	virtual void Combo2();
 
 protected:
 
