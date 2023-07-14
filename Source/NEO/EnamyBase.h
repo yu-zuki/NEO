@@ -73,4 +73,14 @@ public:
 		virtual void ApplyDamage(float DamageAmount, float DeltaTime);
 
 	float GetHP() { return Health; }
+
+	//UserWidget class
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
+		TSubclassOf<class UUserWidget> EnemyWidgetClass;
+
+	//UserWidget Component 
+	class UWidgetComponent* EnemyWidget;
+
+	//ƒJƒƒ‰‚ÉŒü‚«‚Ìİ’è
+	void SetFaceCamera();
 };

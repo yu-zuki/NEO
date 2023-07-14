@@ -55,4 +55,9 @@ public:
 	float GetHPPercent() {
 		return fEnemyHP / fEnemyMaxHP;
 	}
+
+	float GetEnemyHP();
+
+	//ƒJƒƒ‰‚ÉŒü‚«‚Ìİ’è
+	void SetFaceCamera();
 };
