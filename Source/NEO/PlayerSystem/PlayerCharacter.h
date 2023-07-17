@@ -21,7 +21,7 @@ protected:
 
 	//武器の当たり判定
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SwordCollision", meta = (AllowPrivateAccess = "true"))
-		class UBoxComponent* WeaponCollision;
+		class UCapsuleComponent* WeaponCollision;
 
 public:	
 	// Called every frame
@@ -32,5 +32,8 @@ public:
 
 	// プレイヤーのデータを初期化
 	virtual void SetupPlayerData() override;
+
+	// コリジョン
+	void SetCollision();
 
 };

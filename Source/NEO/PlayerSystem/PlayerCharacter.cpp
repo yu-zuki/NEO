@@ -40,14 +40,6 @@ void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	//Add Input Mapping Context
-	//if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
-	//{
-	//	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
-	//	{
-	//		Subsystem->AddMappingContext(DefaultMappingContext, 1);
-	//	}
-	//}
 }
 
 // Called every frame
@@ -72,8 +64,10 @@ void APlayerCharacter::SetupPlayerData()
 	// 武器のメッシュのパス
 	TCHAR* WeaponAssetPath = TEXT("/Game/0122/Player/Weapon/Weapons/Blade/Swords/Blade_BlackKnight/SK_Blade_BlackKnight");
 
-	// セット
-	SetupWeaponMesh(WeaponAssetPath, "WeaponMesh");
+	WeaponMesh = APlayerBase::SetupWeaponMesh(WeaponMesh, WeaponAssetPath, "WeaponMesh");
+
+	// コリジョン設定
+	SetupCollisionComponent(WeaponCollision);
 
 	// アニメーションセットアップ
 	TCHAR* AnimationAssetPaths[2];
@@ -83,7 +77,14 @@ void APlayerCharacter::SetupPlayerData()
 	AnimationAssetPaths[1] = TEXT("/Game/0122/Player/Animation/Montage/Combo/SwordCombo2");
 
 	SetupAnimationAsset(AnimationAssetPaths);
-
-	WeaponCollision = SetupCollisionComponent(WeaponCollision);
 }
 
+void APlayerCharacter::SetCollision()
+{
+	// コリジョン判定で無視する項目を指定(今回はこのActor自分自身。thisポインタで指定)
+	FCollisionQueryParams CollisionParams;
+	CollisionParams.AddIgnoredActor(this);
+
+	// ヒットした(=コリジョン判定を受けた)オブジェクトを格納する変数
+	TArray<struct FHitResult> OutHits;
+}

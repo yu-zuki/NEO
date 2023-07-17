@@ -17,7 +17,6 @@
 #include "Async/Async.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/BoxComponent.h"
-#include <type_traits>
 
 #define DIRECTION (90.f)
 
@@ -185,26 +184,6 @@ void APlayerBase::SetupAnimationAsset(TCHAR* AnimAssetPath[2])
 
 	// コンボの名前格納
 	ComboStartSectionNames = { "First", "Second", "Third"/*,"Fourth"*/ };
-}
-
-void APlayerBase::SetupWeaponMesh(TCHAR* WeaponAssetPath, FName PublicName/* = "WeaponMesh"*/)
-{
-	// 武器のコンポーネントを作成
-	WeaponMesh = CreateDefaultSubobject<USkeletalMeshComponent>(PublicName);
-
-	if (WeaponAssetPath)
-	{
-		// 武器のアセット設定
-		ConstructorHelpers::FObjectFinder<USkeletalMesh> weaponMesh(WeaponAssetPath);
-
-		if (weaponMesh.Succeeded())
-		{
-			WeaponMesh->SetSkeletalMeshAsset(weaponMesh.Object);
-		}
-
-		// 体のメッシュに追従
-		WeaponMesh->SetupAttachment(GetMesh(), "hand_rSocket");
-	}
 }
 
 void APlayerBase::Move(const FInputActionValue& Value)
@@ -402,16 +381,9 @@ void APlayerBase::ResetCombo()
 	ComboIndex = 0;
 }
 
-void APlayerBase::SetoCollision()
+void APlayerBase::SetCollision()
 {
-	// コリジョン判定で無視する項目を指定(今回はこのActor自分自身。thisポインタで指定)
-	FCollisionQueryParams CollisionParams;
-	CollisionParams.AddIgnoredActor(this);
-
-	// ヒットした(=コリジョン判定を受けた)オブジェクトを格納する変数
-	TArray<struct FHitResult> OutHits;
-
-
+	return;
 }
 
 void APlayerBase::TakedDamage(float _damage)
@@ -462,3 +434,4 @@ void APlayerBase::PlayAnimation(UAnimMontage* _toPlayAnimMontage, FName _startSe
 		PlayAnimMontage(_toPlayAnimMontage, _playRate, _startSectionName);
 	}
 }
+

@@ -6,11 +6,17 @@
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
 #include "NEO/GameSystem/InputCharacter.h"
+#include <unordered_map>
+#include <type_traits>
 #include "PlayerBase.generated.h"
 
 // 前方宣言
+class UBoxComponent;
 class USphereComponent;
 class UCapsuleComponent;
+class UStaticMeshComponent;
+class USkeletalMeshComponent;
+
 
 // inputAction
 USTRUCT(BlueprintType)
@@ -99,13 +105,13 @@ public:
 	bool IsPlayerGrounded()const;
 
 	// 攻撃
-	void Attack(int AttackNum = 0);
+	virtual void Attack(int AttackNum = 0);
 
 	// 一つ目のコンボ
-	void Combo1();
+	virtual void Combo1();
 
 	// 二つ目のコンボ
-	void Combo2();
+	virtual void Combo2();
 
 protected:
 
@@ -122,7 +128,7 @@ protected:
 
 	// ダメージを与える処理
 	UFUNCTION(BlueprintCallable, Category = "ComboAction")
-		virtual void SetoCollision();
+		virtual void SetCollision();
 
 	// ダメージ量を返す関数
 	UFUNCTION(BlueprintCallable,Category = "GetStatus")
@@ -157,30 +163,102 @@ public:
 	// アニメーションの設定
 	void SetupAnimationAsset(TCHAR* AnimAssetPath[2]);
 
-	// 武器のメッシュの設定
-	void SetupWeaponMesh(TCHAR* WeaponAssetPath,FName PublicName = "WeaponMesh");
+	/**
+	 * @brief 引数がスタティックメッシュの場合の関数
+	 *
+	 * @param MeshComp - 武器のコンポーネント
+	 * @param WeaponAssetPath - 武器のメッシュアセットのパス
+	 * @param PublicName - 武器の公開名
+	 * @return UStaticMeshComponent* - 武器のコンポーネント
+	*/
+	UStaticMeshComponent* SetupWeaponStaticMesh(class UStaticMeshComponent* MeshComp, TCHAR* WeaponAssetPath, FName PublicName)
+	{
+		// 武器のコンポーネントを作成
+		MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(PublicName);
 
+		if (WeaponAssetPath)
+		{
+			// 武器のアセット設定
+			ConstructorHelpers::FObjectFinder< UStaticMesh > weaponMesh(WeaponAssetPath);
 
-	// テンプレート
-	// コリジョン設定
+			if (weaponMesh.Succeeded())
+			{
+				MeshComp->SetStaticMesh(weaponMesh.Object);
+			}
+
+			// 体のメッシュに追従
+			MeshComp->SetupAttachment(GetMesh(), "hand_rSocket");
+		}
+
+		return MeshComp;
+	}
+
+	/**
+	* @brief 引数がスケリタルメッシュの場合の関数
+	*
+	 * @param MeshComp  - 武器のコンポーネント
+	 * @param WeaponAssetPath - 武器のメッシュアセットのパス
+	 * @param PublicName - 武器の公開名
+	 * @return USkeletalMeshComponent* - 武器のコンポーネント
+	*/
+	USkeletalMeshComponent* SetupWeaponSkeletalMesh(USkeletalMeshComponent* MeshComp, TCHAR* WeaponAssetPath, FName PublicName)
+	{
+		// 武器のコンポーネントを作成
+		MeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(PublicName);
+
+		if (WeaponAssetPath)
+		{
+			// 武器のアセット設定
+			ConstructorHelpers::FObjectFinder< USkeletalMesh > weaponMesh(WeaponAssetPath);
+
+			if (weaponMesh.Succeeded())
+			{
+				MeshComp->SetSkeletalMeshAsset(weaponMesh.Object);
+			}
+
+			// 体のメッシュに追従
+			MeshComp->SetupAttachment(GetMesh(), "hand_rSocket");
+		}
+
+		return MeshComp;
+	}
+
+	//2023/7/14 16:20 董：Error解決↓ (Castを使用することで　SetupWeaponStaticMesh　の　template<class U>　を消すことで解決できました)
+	template<class U>
+	U* SetupWeaponMesh(U* MeshComp,TCHAR* WeaponAssetPath, FName PublicName = "WeaponMesh")
+	{
+		// 判定
+		if (std::is_same<U, UStaticMeshComponent>::value)
+		{
+			APlayerBase::SetupWeaponStaticMesh(Cast<UStaticMeshComponent>(MeshComp), WeaponAssetPath, PublicName);
+		}
+		else if  (std::is_same<U, USkeletalMeshComponent>::value)
+		{
+			APlayerBase::SetupWeaponSkeletalMesh(Cast<USkeletalMeshComponent>(MeshComp), WeaponAssetPath, PublicName);
+		}
+
+		return MeshComp;
+	}
+
+	// コリジョンコンポーネント作成テンプレート
 	template<class T>
 	T* SetupCollisionComponent(T* CollisionComp, FName PublicName = "CollisionComp")
 	{
 		static_assert(std::is_same<T, UBoxComponent>::value || std::is_same<T, USphereComponent>::value || std::is_same<T, UCapsuleComponent>::value,
-			"「T」は UBoxComponent,USphereComponent,UCapsuleComponent のどれか ");
+			"「T」は UBoxComponent,USphereComponent,UCapsuleComponent のいずれか ");
 
+		// 対応するオブジェクト生成
 		CollisionComp = CreateDefaultSubobject<T>(PublicName);
 
-		CollisionComp->SetupAttachment(RootComponent);
+		// 武器のメッシュに追従
+		CollisionComp->SetupAttachment(WeaponMesh);
 
 		return CollisionComp;
 	}
 
-
-
 	// 武器のメッシュ
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Mesh, meta = (AllowPrivateAccess = "true"))
-		class USkeletalMeshComponent* WeaponMesh;
+		USkeletalMeshComponent* WeaponMesh;
 
 	// アニメーション保管用
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Animation)
