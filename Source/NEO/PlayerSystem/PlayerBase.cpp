@@ -124,7 +124,7 @@ void APlayerBase::SetupPlayerStatus(float _hp /*= 100.f*/, float _damageAmount /
 void APlayerBase::SetupMainActionMapping()
 {
 	// ボタン設定
-	TCHAR* defaultMappingContext = TEXT("/Game/0122/Player/Input/IMC_Default");
+	TCHAR* defaultMappingContext = TEXT("/Game/0122/Player/Input/IMC_MainAction");
 
 	// それぞれのアクションのパス
 	TArray<TCHAR*> inputActionPaths;
