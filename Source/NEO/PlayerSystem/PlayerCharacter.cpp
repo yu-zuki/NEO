@@ -87,24 +87,33 @@ void APlayerCharacter::SetCollision()
 
 	TArray<FHitResult> HitResults;
 
+	// 当たり判定を取る範囲
 	FVector Start = WeaponCollision->GetComponentLocation();
 	FVector End = Start;
 	FQuat Rot = WeaponCollision->GetComponentQuat();
 	FCollisionShape CollisionShape = FCollisionShape::MakeCapsule(WeaponCollision->GetScaledCapsuleRadius(), WeaponCollision->GetScaledCapsuleHalfHeight());
 
+	// あたっているか確認
 	bool isHit = GetWorld()->SweepMultiByChannel(HitResults, Start, End, Rot, ECollisionChannel::ECC_GameTraceChannel1, CollisionShape, CollisionParams);
 
-	for (const FHitResult HitResult : HitResults) 
+	if (isHit)
 	{
-		if (HitResult.GetActor()->ActorHasTag("Enemy"))
+		for (const FHitResult HitResult : HitResults)
 		{
-			AEnamyBase* Enemy = Cast<AEnamyBase>(HitResult.GetActor());
-
-			if (Enemy)
+			// ヒットしたアクターが"Enemy"タグを持っていたら
+			if (HitResult.GetActor()->ActorHasTag("Enemy"))
 			{
-				Enemy->ApplyDamage(GetDamageAmount());
+
+				// エネミーのdamage処理
+				AEnamyBase* Enemy = Cast<AEnamyBase>(HitResult.GetActor());
+
+				if (Enemy)
+				{
+					// ヒットストップ
+					AttackAssistComp->HitStop();
+					Enemy->ApplyDamage(GetDamageAmount(), 0.f);
+				}
 			}
 		}
 	}
-
 }

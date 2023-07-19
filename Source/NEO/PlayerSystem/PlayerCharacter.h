@@ -35,5 +35,4 @@ public:
 
 	// ƒRƒŠƒWƒ‡ƒ“
 	void SetCollision();
-
 };
