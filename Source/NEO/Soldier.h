@@ -12,34 +12,21 @@ class NEO_API ASoldier : public AEnamyBase
 
 public:
     ASoldier();
-
-
+    UPROPERTY(EditAnywhere, Category = "AI")
+        float MovementSpeed = 100.0f; // à⁄ìÆë¨ìx
+    UPROPERTY(EditAnywhere, Category = "AI")
+        float DesiredDistance = -500.0f;//ñ]Ç‹ÇµÇ¢ãóó£
 protected:
     virtual void BeginPlay() override;
 
     virtual void Tick(float DeltaTime) override;
-
-  
-
-  
-
-private:
+    FVector GetPlayerDirection() const;
+    float GetDistanceToPlayer() const;
+public:
     UPROPERTY(EditAnywhere, Category = "Rotation")
         bool bIsRotation;
-    UPROPERTY(EditAnywhere, Category = "Location")
-        bool bIsLocation;
-    // The time the soldier started moving towards the player
-   
+    //ÇRïbÇ≤Ç∆Ç…ìÆÇ≠É^ÉCÉ}Å[
+    FTimerHandle MoveStraightTimerHandle;
 
-    float TimeStartedMoving;
-
-    // The time the soldier should stop moving towards the player
-    float TimeToStopMoving;
-
-    // The time the soldier should start moving towards the player again
-    float TimeToStartMovingAgain;
-
-    // The player character
-    ACharacter* PlayerCharacter;
-
+    
 };

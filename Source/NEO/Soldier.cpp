@@ -10,16 +10,12 @@ ASoldier::ASoldier()
 {
     // キャラクターの移動方式を設
     MaxHealth = 100;
-    Health = MaxHealth;
-    bIsJumping = false;
     // キャラクターの移動方式を設定
     GetCharacterMovement()->bOrientRotationToMovement = true;
     GetCharacterMovement()->RotationRate = FRotator(0.0f, 540.0f, 0.0f);
-
-    
-    PrimaryActorTick.bCanEverTick = true;
-    TimeToStopMoving = -1.0f;
- 
+    GetCharacterMovement()->MaxWalkSpeed = MovementSpeed;
+    Health = MaxHealth;
+    bIsJumping = false;
 }
 
 
@@ -30,10 +26,6 @@ void ASoldier::BeginPlay()
 
     PlayerCharacter = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
 
-    // Start moving towards the player
-    TimeStartedMoving = GetWorld()->GetTimeSeconds();
-    TimeToStopMoving = TimeStartedMoving + 5.0f;
-    GetCharacterMovement()->MaxWalkSpeed = 200.0f;
 }
 
 
@@ -45,7 +37,24 @@ void ASoldier::Tick(float DeltaTime)
 
     // 自分の座標を取得
     FVector MyLocation = GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorLocation();
+    // プレイヤーとの距離を取得
+    float DistanceToPlayer = GetDistanceToPlayer();
 
+    // プレイヤーとの距離が望ましい距離よりも離れている場合、プレイヤーに近づく
+    if (DistanceToPlayer > DesiredDistance)
+    {
+        FVector PlayerDirection = GetPlayerDirection();
+        AddMovementInput(PlayerDirection);
+        MovementSpeed = 100.0f;
+        bIsRotation = true;
+    }
+    else if (DistanceToPlayer < DesiredDistance +100.0f) // プレイヤーが望ましい距離-100以下に入った場合
+    {
+        
+        MovementSpeed = 200.0f;
+        
+        bIsRotation = false;
+    }
     // キャラクターの位置と自分の位置を比較してY軸より前にいるかどうかを判定
     bIsRotation = CharacterLocation.Y > MyLocation.Y;
     // bIsRotationがtrueなら
@@ -54,7 +63,7 @@ void ASoldier::Tick(float DeltaTime)
         FRotator NewRotation = GetActorRotation();
         NewRotation.Yaw = -90.0f;
         SetActorRotation(NewRotation);
-        
+
     }
     else
     {
@@ -63,34 +72,21 @@ void ASoldier::Tick(float DeltaTime)
         SetActorRotation(NewRotation);
     }
 
-    float CurrentTime = GetWorld()->GetTimeSeconds();
-    // If the soldier should be moving towards the player
-    if (TimeToStopMoving >= 0.0f && CurrentTime < TimeToStopMoving)
-    {
-        // Calculate the direction to the player
-        FVector DirectionToPlayer = PlayerCharacter->GetActorLocation() - GetActorLocation();
-        DirectionToPlayer.Normalize();
-
-        // Move towards the player
-        AddMovementInput(DirectionToPlayer);
-    }
-    // If the soldier should be resting
-    else if (TimeToStopMoving >= 0.0f && CurrentTime < TimeToStartMovingAgain)
-    {
-        // Do nothing (rest)
-    }
-    // If the soldier should start moving towards the player again
-    else if (TimeToStartMovingAgain >= 0.0f && CurrentTime >= TimeToStartMovingAgain)
-    {
-        // Start moving towards the player again
-        TimeStartedMoving = CurrentTime;
-        TimeToStopMoving = TimeStartedMoving + 2.0f;
-        TimeToStartMovingAgain = TimeToStopMoving + 3.0f; // Start moving again after 3 seconds of rest
-    }
 }
 
+FVector ASoldier::GetPlayerDirection() const
+{
+    FVector PlayerLocation = PlayerCharacter->GetActorLocation();
+    FVector GunManLocation = GetActorLocation();
+    return FVector(PlayerLocation.X - GunManLocation.X, PlayerLocation.Y - GunManLocation.Y, 0.0f).GetSafeNormal();
+}
 
-
+float ASoldier::GetDistanceToPlayer() const
+{
+    FVector PlayerLocation = PlayerCharacter->GetActorLocation();
+    FVector GunManLocation = GetActorLocation();
+    return FVector::Distance(PlayerLocation, GunManLocation);
+}
 
 
 
