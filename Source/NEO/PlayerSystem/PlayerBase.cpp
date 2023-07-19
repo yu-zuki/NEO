@@ -40,7 +40,8 @@ APlayerBase::APlayerBase()
 	CharacterMovementComp = GetCharacterMovement();
 	CharacterMovementComp->MaxWalkSpeed = 500.f;
 
-
+	// アタックアシストコンポーネント作成
+	AttackAssistComp = CreateDefaultSubobject<UAttackAssistComponent>(TEXT("AttackAssist"));
 }
 
 // Called when the game starts or when spawned
@@ -290,6 +291,9 @@ bool APlayerBase::IsPlayerGrounded() const
 // 攻撃
 void APlayerBase::Attack(int AttackNum /*= 0*/)
 {
+	// プレイヤーの角度修正
+	AttackAssistComp->CorrectAttackAngle();
+
 	if (!IsAttacking)
 	{
 		// 攻撃中フラグオン

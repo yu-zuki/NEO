@@ -8,6 +8,7 @@
 #include "NEO/GameSystem/InputCharacter.h"
 #include <unordered_map>
 #include <type_traits>
+#include "AttackAssistComponent.h"
 #include "PlayerBase.generated.h"
 
 // 前方宣言
@@ -262,6 +263,9 @@ public:
 	// 武器のメッシュ
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Mesh, meta = (AllowPrivateAccess = "true"))
 		USkeletalMeshComponent* WeaponMesh;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = AttackAssist, meta = (AllowPrivateAccess = "true"))
+		class UAttackAssistComponent* AttackAssistComp;
 
 	// アニメーション保管用
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Animation)

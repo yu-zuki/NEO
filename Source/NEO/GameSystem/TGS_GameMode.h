@@ -80,7 +80,8 @@ public:
 //---------------------------------------ゲームUI---------------------------------------
 	void SetUI_Enemy(FName _ActorName, int32 _NowHp, int32 _MaxHp);
 
-private:
+protected:
+	UFUNCTION(BlueprintCallable, Category = "GameSystem")
 	class ATGS_GameStateBase* GetGameState();
 
 	ATGS_GameStateBase* GameState = nullptr;		//キャシュー

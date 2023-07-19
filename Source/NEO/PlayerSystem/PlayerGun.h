@@ -4,16 +4,16 @@
 
 #include "CoreMinimal.h"
 #include "PlayerBase.h"
-#include "PlayerCharacter.generated.h"
+#include "PlayerGun.generated.h"
 
 UCLASS()
-class NEO_API APlayerCharacter : public APlayerBase
+class NEO_API APlayerGun : public APlayerBase
 {
 	GENERATED_BODY()
 
 public:
 	// Sets default values for this character's properties
-	APlayerCharacter();
+	APlayerGun();
 
 protected:
 	// Called when the game starts or when spawned
@@ -21,9 +21,9 @@ protected:
 
 	//武器の当たり判定
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SwordCollision", meta = (AllowPrivateAccess = "true"))
-		class UCapsuleComponent* WeaponCollision;
+		class UBoxComponent* WeaponCollision;
 
-public:	
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
@@ -33,6 +33,15 @@ public:
 	// プレイヤーのデータを初期化
 	virtual void SetupPlayerData() override;
 
-	// コリジョン
-	void SetCollision();
+
+	// 攻撃
+	virtual void Attack(int AttackNum = 0) override;
+
+
+	// 一つ目のコンボ
+	virtual void Combo1() override;
+
+	// 二つ目のコンボ
+	virtual void Combo2()override;
+
 };

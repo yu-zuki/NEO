@@ -72,7 +72,9 @@ public:
 	FDateTime GameStartTime;						// ゲームの開始時間
 	FDateTime GameEndTime;							// ゲームの終了時間
 
-	bool bIsGameOver;								// 外部からゲームオーバーを設定　するためのフラグ
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "GameOver")
+		bool bIsGameOver;								// 外部からゲームオーバーを設定　するためのフラグ
 
 
 public:
