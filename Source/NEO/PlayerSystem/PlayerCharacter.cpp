@@ -102,7 +102,7 @@ void APlayerCharacter::SetCollision()
 
 			if (Enemy)
 			{
-				Enemy->ApplyDamage(GetDamageAmount(), 0.f);
+				Enemy->ApplyDamage(GetDamageAmount());
 			}
 		}
 	}

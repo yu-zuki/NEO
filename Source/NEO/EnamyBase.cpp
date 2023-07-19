@@ -66,21 +66,10 @@ void AEnamyBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 
 
 
-void AEnamyBase::ApplyDamage(float DamageAmount, float DeltaTime)
+void AEnamyBase::ApplyDamage(float DamageAmount)
 {
 	Health -= DamageAmount;
 
-	if (Health <= 0.0f)
-	{
-		//ƒWƒƒƒ“ƒvˆ—
-		JumpingByGravity(DeltaTime);
-		PlayAnimMontage(Death, 1, NAME_None);
-
-	}
-	else
-	{
-		PlayAnimMontage(Damage_Reaction, 1, NAME_None);
-	}
 }
 void AEnamyBase::StartJumpByGravity(float JumpHeight, float GravityAcceleration)
 {

@@ -70,7 +70,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
 		float  MaxHealth;
 	UFUNCTION(BlueprintCallable, Category = "Health")
-		virtual void ApplyDamage(float DamageAmount, float DeltaTime);
+		virtual void ApplyDamage(float DamageAmount);
 
 	float GetHP() { return Health; }
 

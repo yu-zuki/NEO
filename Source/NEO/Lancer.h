@@ -1,6 +1,7 @@
 #pragma once
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Components/BoxComponent.h"
 #include "EnamyBase.h"
 #include "Lancer.generated.h"
 
@@ -17,7 +18,13 @@ public:
     UPROPERTY(EditAnywhere, Category = "AI")
         float MovementSpeed = 100.0f; // ˆÚ“®‘¬“x
    
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Collision")
+        class UBoxComponent* BoxCollision;
+    
+    UFUNCTION()
+        void OnBoxCollision(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
    
+    
     
 protected:
     virtual void BeginPlay() override;
@@ -26,6 +33,7 @@ protected:
     virtual void Tick(float DeltaTime) override;
     
     virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
 private:
     UPROPERTY(EditAnywhere, Category = "Rotation")
         bool bIsRotation;
@@ -34,5 +42,5 @@ private:
     FTimerHandle TimerHandle_CheckPlayerInFront;
     bool bIsPlayerInFront;
     void CheckPlayerInFront();
-
+   
 };
