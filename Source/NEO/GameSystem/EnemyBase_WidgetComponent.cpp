@@ -28,18 +28,18 @@ void UEnemyBase_WidgetComponent::LookAtPlayer()
 		APlayerCameraManager* CameraManager = PlayerController->PlayerCameraManager;
 		if (CameraManager == nullptr) return;
 
-		/*UCameraComponent* CameraComponent = Cast<UCameraComponent>(CameraManager->GetViewTarget()->GetComponentByClass(UCameraComponent::StaticClass()));
-		if (CameraComponent == nullptr) return;*/
-		/*FVector CameraLocation = CameraComponent->GetComponentLocation();*/
+		UCameraComponent* CameraComponent = Cast<UCameraComponent>(CameraManager->GetViewTarget()->GetComponentByClass(UCameraComponent::StaticClass()));
+		if (CameraComponent == nullptr) return;
+
+		FVector CameraLocation = CameraComponent->GetComponentLocation();
 	
-		FVector CameraLocation = CameraManager->GetCameraLocation();
 		//Look at camera
 		FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(GetComponentLocation(), CameraLocation);
 
 		//ReSet rotation
 		LookAtRotation.Pitch = 0.0f;
 		LookAtRotation.Roll = 0.0f;
-
+		LookAtRotation.Yaw = 180.f;
 		//Apply rotation
 		SetWorldRotation(LookAtRotation);
 	}
