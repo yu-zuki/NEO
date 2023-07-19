@@ -97,8 +97,9 @@ void APlayerCharacter::SetCollision()
 	{
 		for (const FHitResult HitResult : HitResults)
 		{
+			AActor* tempActor = HitResult.GetActor();
 			// ヒットしたアクターが"Enemy"タグを持っていたら
-			if (HitResult.GetActor()->ActorHasTag("Enemy"))
+			if (tempActor && tempActor->ActorHasTag("Enemy"))
 			{
 
 				// エネミーのdamage処理
