@@ -17,6 +17,7 @@
 #include "Engine/AssetManager.h"
 #include "Async/Async.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "NEO/EnamyBase.h"
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -81,10 +82,29 @@ void APlayerCharacter::SetupPlayerData()
 
 void APlayerCharacter::SetCollision()
 {
-	// コリジョン判定で無視する項目を指定(今回はこのActor自分自身。thisポインタで指定)
 	FCollisionQueryParams CollisionParams;
 	CollisionParams.AddIgnoredActor(this);
 
-	// ヒットした(=コリジョン判定を受けた)オブジェクトを格納する変数
-	TArray<struct FHitResult> OutHits;
+	TArray<FHitResult> HitResults;
+
+	FVector Start = WeaponCollision->GetComponentLocation();
+	FVector End = Start;
+	FQuat Rot = WeaponCollision->GetComponentQuat();
+	FCollisionShape CollisionShape = FCollisionShape::MakeCapsule(WeaponCollision->GetScaledCapsuleRadius(), WeaponCollision->GetScaledCapsuleHalfHeight());
+
+	bool isHit = GetWorld()->SweepMultiByChannel(HitResults, Start, End, Rot, ECollisionChannel::ECC_GameTraceChannel1, CollisionShape, CollisionParams);
+
+	for (const FHitResult HitResult : HitResults) 
+	{
+		if (HitResult.GetActor()->ActorHasTag("Enemy"))
+		{
+			AEnamyBase* Enemy = Cast<AEnamyBase>(HitResult.GetActor());
+
+			if (Enemy)
+			{
+				Enemy->ApplyDamage(GetDamageAmount(), 0.f);
+			}
+		}
+	}
+
 }

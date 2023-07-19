@@ -250,8 +250,11 @@ public:
 		// 対応するオブジェクト生成
 		CollisionComp = CreateDefaultSubobject<T>(PublicName);
 
-		// 武器のメッシュに追従
-		CollisionComp->SetupAttachment(WeaponMesh);
+		if (CollisionComp)
+		{
+			// 武器のメッシュに追従
+			CollisionComp->SetupAttachment(GetMesh(), "hand_rSocket");
+		}
 
 		return CollisionComp;
 	}

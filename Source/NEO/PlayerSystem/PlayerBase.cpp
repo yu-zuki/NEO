@@ -102,13 +102,11 @@ void APlayerBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 // プレイヤーのデータを初期化
 void APlayerBase::SetupPlayerData()
 {
-	// メインアクションのボタンをマッピング
-	SetupMainActionMapping();
-
 	// プレイヤーのステータス初期化
 	SetupPlayerStatus();
 
-
+	// メインアクションのボタンをマッピング
+	SetupMainActionMapping();
 }
 
 // プレイヤーのステータスパラメータ初期化
