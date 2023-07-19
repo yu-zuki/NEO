@@ -17,7 +17,8 @@ public:
 
     UPROPERTY(EditAnywhere, Category = "AI")
         float MovementSpeed = 100.0f; // ˆÚ“®‘¬“x
-   
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character Mesh")
+        class USkeletalMeshComponent* WeaponBaseMesh;
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Collision")
         class UBoxComponent* BoxCollision;
     

@@ -10,7 +10,7 @@
 #include "ProceduralMeshComponent.h"
 #include "SpawnPoint.h"
 #include "Engine/World.h"
-#include "../EnamyBase.h"
+#include "NEO/Enemy/EnamyBase.h"
 #include "Ingame_WG.h"
 
 ATGS_GameMode::ATGS_GameMode()

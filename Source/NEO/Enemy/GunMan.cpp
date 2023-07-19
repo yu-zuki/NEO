@@ -3,7 +3,7 @@
 
 #include "GunMan.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "PlayerSystem\PlayerCharacter.h"
+#include "NEO/PlayerSystem\PlayerCharacter.h"
 #include "Camera/PlayerCameraManager.h"
 #include "Engine/World.h"
 #include "Bullet.h"
@@ -99,7 +99,7 @@ void AGunMan::SpawnBullet()
 void AGunMan::BlinkTrajectoryBullet()
 {
    
-    FVector SpawnLocation = GetActorLocation() + GetActorForwardVector() * 100.0f; 
+    FVector SpawnLocation = GetActorLocation() + GetActorForwardVector() * 50.0f; 
     FRotator SpawnRotation = GetActorRotation();
     ATrajectoryBullet* TrajectoryBullet = GetWorld()->SpawnActor<ATrajectoryBullet>(TrajectoryBulletClass, SpawnLocation, SpawnRotation);
 

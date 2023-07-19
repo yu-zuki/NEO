@@ -16,9 +16,10 @@ ALancer::ALancer()
     GetCharacterMovement()->RotationRate = FRotator(0.0f, 540.0f, 0.0f);
     GetCharacterMovement()->MaxWalkSpeed = MovementSpeed;
 
- 
+    WeaponBaseMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("FX_wepon_base"));
+    WeaponBaseMesh->SetupAttachment(GetMesh());
     BoxCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxCollision"));
-    BoxCollision->SetupAttachment(GetMesh(), "FX_wepon_base");
+    BoxCollision->SetupAttachment(WeaponBaseMesh);
     BoxCollision->OnComponentBeginOverlap.AddDynamic(this, &ALancer::OnBoxCollision);
 }
 

@@ -4,7 +4,7 @@
 #include "Enemy_UMG.h"
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
-#include "../EnamyBase.h"
+#include "NEO/Enemy/EnamyBase.h"
 #include "Camera/CameraComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 

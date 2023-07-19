@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "EnamyBase.h" // スポーンするEnemyキャラクターのヘッダーファイルをインクルードしてください
+#include "NEO/Enemy/EnamyBase.h" // スポーンするEnemyキャラクターのヘッダーファイルをインクルードしてください
 #include "EnemySpawner.generated.h"
 
 UCLASS()

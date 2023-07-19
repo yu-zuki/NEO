@@ -17,7 +17,7 @@
 #include "Engine/AssetManager.h"
 #include "Async/Async.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "NEO/EnamyBase.h"
+#include "NEO/Enemy/EnamyBase.h"
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()

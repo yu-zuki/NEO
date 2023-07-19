@@ -2,14 +2,14 @@
 
 
 #include "EnamyBase.h"
-#include "GameSystem/TGS_GameMode.h"
+#include "NEO/GameSystem/TGS_GameMode.h"
 #include "Kismet/GameplayStatics.h"
-#include "GameSystem/Enemy_UMG.h"
+#include "NEO/GameSystem/Enemy_UMG.h"
 #include "Components/WidgetComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Camera/CameraComponent.h"
-#include "GameSystem/EnemyBase_WidgetComponent.h"
+#include "NEO/GameSystem/EnemyBase_WidgetComponent.h"
 
 // Sets default values
 AEnamyBase::AEnamyBase()
@@ -69,7 +69,10 @@ void AEnamyBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 void AEnamyBase::ApplyDamage(float DamageAmount)
 {
 	Health -= DamageAmount;
-
+    if (Health < 0)
+    {
+        DestoryEnemy(); 
+    }
 }
 void AEnamyBase::StartJumpByGravity(float JumpHeight, float GravityAcceleration)
 {
