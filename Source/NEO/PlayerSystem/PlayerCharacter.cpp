@@ -25,9 +25,6 @@ APlayerCharacter::APlayerCharacter()
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	// プレイヤーの設定
-	AutoPossessPlayer = EAutoReceiveInput::Player0;
-
 	// キャラクターコンポーネント取得
 	CharacterMovementComp = GetCharacterMovement();
 	CharacterMovementComp->MaxWalkSpeed = 500.f;
@@ -111,7 +108,7 @@ void APlayerCharacter::SetCollision()
 				{
 					// ヒットストップ
 					AttackAssistComp->HitStop();
-					Enemy->ApplyDamage(GetDamageAmount(), 0.f);
+					Enemy->ApplyDamage(GetDamageAmount());
 				}
 			}
 		}

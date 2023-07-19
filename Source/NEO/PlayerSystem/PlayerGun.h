@@ -6,9 +6,6 @@
 #include "PlayerBase.h"
 #include "PlayerGun.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class NEO_API APlayerGun : public APlayerBase
 {
