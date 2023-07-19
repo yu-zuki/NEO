@@ -9,6 +9,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Camera/CameraComponent.h"
+#include "GameSystem/EnemyBase_WidgetComponent.h"
 
 // Sets default values
 AEnamyBase::AEnamyBase()
@@ -25,12 +26,9 @@ AEnamyBase::AEnamyBase()
     //ジャンプ開始時の位置
     vJumpStartLocation = GetActorLocation();
 
-    //UMG Create
-    EnemyWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("Enemy_UMG"));
-    EnemyWidget->SetupAttachment(RootComponent);
-
-    //描画モード World
-    EnemyWidget->SetWidgetSpace(EWidgetSpace::World);
+	//UI Create
+	EnemyWidget = CreateDefaultSubobject<UEnemyBase_WidgetComponent>(TEXT("EnemyWidget"));
+	EnemyWidget->SetupAttachment(RootComponent);
 }
 
 void AEnamyBase::DestoryEnemy()
@@ -48,27 +46,15 @@ void AEnamyBase::BeginPlay()
 	Super::BeginPlay();
 
 	SpawnDefaultController();
-
-    //UMG Set
-    if (EnemyWidgetClass) {
-	    EnemyWidget->SetWidgetClass(EnemyWidgetClass);
-
-        //Cast EnemyuUMG
-        UEnemy_UMG* EnemyUMG = Cast<UEnemy_UMG>(EnemyWidget->GetUserWidgetObject());
-    if (EnemyUMG)		{
-        FName Name = FName("Name");
-        EnemyUMG->SetEnemyInfo(Health, MaxHealth,Name);
-		}
-    }
-
-	
 }
 
 // Called every frame
 void AEnamyBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-    SetFaceCamera();
+
+	//Enemy Hp Set
+	EnemyWidget->SetHPInfo(Health, MaxHealth);
 }
 
 // Called to bind functionality to input
@@ -94,30 +80,6 @@ void AEnamyBase::ApplyDamage(float DamageAmount, float DeltaTime)
 	else
 	{
 		PlayAnimMontage(Damage_Reaction, 1, NAME_None);
-	}
-}
-void AEnamyBase::SetFaceCamera()
-{
-    //カメラのを取得
-	AActor* ViewTarget = GetWorld()->GetFirstPlayerController()->GetViewTarget();
-	UCameraComponent* CameraComponent = ViewTarget->FindComponentByClass<UCameraComponent>();
-	if (true) {
-
-        FVector CameraLocation = GetWorld()->GetFirstPlayerController()->PlayerCameraManager->GetCameraLocation();
-
-        //カメラの位置を向く
-		FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(
-            EnemyWidget->GetComponentLocation(), CameraLocation);
-
-        //軸を固定
-         LookAtRotation.Pitch = 0.0f;
-         LookAtRotation.Roll = 0.0f;
-
-         //回転設定
-         EnemyWidget->SetWorldRotation(LookAtRotation);
-	}
-    else	{
-		UE_LOG(LogTemp, Warning, TEXT("CameraComponent is null"));
 	}
 }
 void AEnamyBase::StartJumpByGravity(float JumpHeight, float GravityAcceleration)

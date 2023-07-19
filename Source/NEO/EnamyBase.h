@@ -74,13 +74,10 @@ public:
 
 	float GetHP() { return Health; }
 
-	//UserWidget class
+
+	//////////////////////////////////////////////////////////////////////////
+	///UI
+public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
-		TSubclassOf<class UUserWidget> EnemyWidgetClass;
-
-	//UserWidget Component 
-	class UWidgetComponent* EnemyWidget;
-
-	//ƒJƒƒ‰‚ÉŒü‚«‚Ìİ’è
-	void SetFaceCamera();
+		class UEnemyBase_WidgetComponent* EnemyWidget;
 };
