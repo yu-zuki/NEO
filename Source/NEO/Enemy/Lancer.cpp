@@ -105,7 +105,11 @@ void ALancer::CheckPlayerInFront()
 
     if (bIsPlayerInFront)
     {
-        PlayAnimMontage(Attack, 1, NAME_None);
+        if (FMath::FRand()<0.25f)
+        {
+             PlayAnimMontage(Attack, 1, NAME_None);
+        }
+      
     }
 }
 
