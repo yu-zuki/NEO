@@ -29,7 +29,7 @@ APlayerCharacter::APlayerCharacter()
 	CharacterMovementComp = GetCharacterMovement();
 	CharacterMovementComp->MaxWalkSpeed = 500.f;
 
-	// プレイヤーのデータセット
+	// プレイヤーのデータセットアップ
 	SetupPlayerData();
 }
 
@@ -54,7 +54,12 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 }
 
-// プレイヤーのデータを初期化
+
+/*
+ * 関数名　　　　：SetupPlayerData()
+ * 処理内容　　　：プレイヤーのデータ初期化(APlayerBaseからオーバーライド)
+ * 戻り値　　　　：なし
+ */
 void APlayerCharacter::SetupPlayerData()
 {
 	Super::SetupPlayerData();
@@ -62,7 +67,7 @@ void APlayerCharacter::SetupPlayerData()
 	// 武器のメッシュのパス
 	TCHAR* WeaponAssetPath = TEXT("/Game/0122/Player/Weapon/Weapons/Blade/Swords/Blade_BlackKnight/SK_Blade_BlackKnight");
 
-	WeaponMesh = APlayerBase::SetupWeaponMesh(WeaponMesh, WeaponAssetPath, "WeaponMesh");
+	SetupWeaponMesh(WeaponMesh, WeaponAssetPath, "WeaponMesh");
 
 	// コリジョン設定
 	SetupCollisionComponent(WeaponCollision);
@@ -77,6 +82,12 @@ void APlayerCharacter::SetupPlayerData()
 	SetupAnimationAsset(AnimationAssetPaths);
 }
 
+
+/*
+ * 関数名　　　　：SetCollision()
+ * 処理内容　　　：プレイヤーの攻撃の当たり判定(APlayerBaseからオーバーライド)
+ * 戻り値　　　　：なし
+ */
 void APlayerCharacter::SetCollision()
 {
 	FCollisionQueryParams CollisionParams;

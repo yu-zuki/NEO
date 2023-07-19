@@ -19,7 +19,7 @@ class UStaticMeshComponent;
 class USkeletalMeshComponent;
 
 
-// inputAction
+//-----------------inputAction------------------------------------------------------------
 USTRUCT(BlueprintType)
 struct FMainAction
 {
@@ -43,8 +43,9 @@ struct FMainAction
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		UInputAction* ComboAction2;
 };
+//----------------------------------------------------------------------------------------
 
-// inputAction
+//-----------------PlayerStatus------------------------------------------------------------
 USTRUCT(BlueprintType)
 struct FPlayerStatus
 {
@@ -62,17 +63,19 @@ struct FPlayerStatus
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		float JumpHeight;
 };
+//----------------------------------------------------------------------------------------
 
 UCLASS()
 class NEO_API APlayerBase : public AInputCharacter
 {
 	GENERATED_BODY()
 
-	// プレイヤー
+	// プレイヤーのステート
 	enum Player_State
 	{
 		State_Idle = 0,
 		State_Jump,
+		State_TakeDamage,
 		State_Death
 	};
 
@@ -92,8 +95,10 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
-	/** Called for movement input */
-	void Move(const FInputActionValue& Value);
+
+	//----------------入力で呼び出される関数-----------------------------
+	// 移動
+	void Move(const FInputActionValue& _value);
 
 	// ダッシュ切り替え
 	void Run();
@@ -106,19 +111,18 @@ public:
 	bool IsPlayerGrounded()const;
 
 	// 攻撃
-	virtual void Attack(int AttackNum = 0);
+	virtual void Attack(int _attackNum = 0);
 
 	// 一つ目のコンボ
 	virtual void Combo1();
 
 	// 二つ目のコンボ
 	virtual void Combo2();
+	//-------------------------------------------------------------------
 
 protected:
 
-	// キャラクターの回転
-	void RotateCharacter(float nowInput_Y);
-
+	//-----------------AnimBPで呼び出し(攻撃や被ダメージ処理)--------------------------------------------------------------------------------------------
 	// コンボ継続
 	UFUNCTION(BlueprintCallable,Category = "ComboAction")
 		void ContinuationCombo();
@@ -141,9 +145,16 @@ protected:
 
 	UFUNCTION(BlueprintCallable, Category = "GetStatus")
 		float GetHP()const { return PlayerStatus.HP; }
+	//---------------------------------------------------------------------------------------------------------------------------------------------------
+
 
 	// アニメーション再生
 	void PlayAnimation(UAnimMontage* _toPlayAnimMontage, FName _startSectionName = "None", float _playRate = 1.f);
+
+private:
+
+	// キャラクターの回転
+	void RotateCharacter(float _nowInput_Y);
 
 public:
 	// Called every frame
@@ -152,6 +163,8 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+
+	//------------------プレイヤーのセットアップ---------------------------------------------------------------------------------------------------------
 	// プレイヤーのデータを初期化
 	virtual void SetupPlayerData();
 
@@ -164,86 +177,20 @@ public:
 	// アニメーションの設定
 	void SetupAnimationAsset(TCHAR* AnimAssetPath[2]);
 
-	/**
-	 * @brief 引数がスタティックメッシュの場合の関数
-	 *
-	 * @param MeshComp - 武器のコンポーネント
-	 * @param WeaponAssetPath - 武器のメッシュアセットのパス
-	 * @param PublicName - 武器の公開名
-	 * @return UStaticMeshComponent* - 武器のコンポーネント
-	*/
-	UStaticMeshComponent* SetupWeaponStaticMesh(class UStaticMeshComponent* MeshComp, TCHAR* WeaponAssetPath, FName PublicName)
-	{
-		// 武器のコンポーネントを作成
-		MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(PublicName);
+	// 引数によってスタティックメッシュかスケルタルメッシュのセットアップ
+	void SetupWeaponMesh(UStaticMeshComponent*& MeshComp, TCHAR* WeaponAssetPath, FName PublicName = "WeaponMesh");
+	void SetupWeaponMesh(USkeletalMeshComponent*& MeshComp, TCHAR* WeaponAssetPath, FName PublicName = "WeaponMesh");
 
-		if (WeaponAssetPath)
-		{
-			// 武器のアセット設定
-			ConstructorHelpers::FObjectFinder< UStaticMesh > weaponMesh(WeaponAssetPath);
-
-			if (weaponMesh.Succeeded())
-			{
-				MeshComp->SetStaticMesh(weaponMesh.Object);
-			}
-
-			// 体のメッシュに追従
-			MeshComp->SetupAttachment(GetMesh(), "hand_rSocket");
-		}
-
-		return MeshComp;
-	}
-
-	/**
-	* @brief 引数がスケリタルメッシュの場合の関数
-	*
-	 * @param MeshComp  - 武器のコンポーネント
-	 * @param WeaponAssetPath - 武器のメッシュアセットのパス
-	 * @param PublicName - 武器の公開名
-	 * @return USkeletalMeshComponent* - 武器のコンポーネント
-	*/
-	USkeletalMeshComponent* SetupWeaponSkeletalMesh(USkeletalMeshComponent* MeshComp, TCHAR* WeaponAssetPath, FName PublicName)
-	{
-		// 武器のコンポーネントを作成
-		MeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(PublicName);
-
-		if (WeaponAssetPath)
-		{
-			// 武器のアセット設定
-			ConstructorHelpers::FObjectFinder< USkeletalMesh > weaponMesh(WeaponAssetPath);
-
-			if (weaponMesh.Succeeded())
-			{
-				MeshComp->SetSkeletalMeshAsset(weaponMesh.Object);
-			}
-
-			// 体のメッシュに追従
-			MeshComp->SetupAttachment(GetMesh(), "hand_rSocket");
-		}
-
-		return MeshComp;
-	}
-
-	//2023/7/14 16:20 董：Error解決↓ (Castを使用することで　SetupWeaponStaticMesh　の　template<class U>　を消すことで解決できました)
-	template<class U>
-	U* SetupWeaponMesh(U* MeshComp,TCHAR* WeaponAssetPath, FName PublicName = "WeaponMesh")
-	{
-		// 判定
-		if (std::is_same<U, UStaticMeshComponent>::value)
-		{
-			APlayerBase::SetupWeaponStaticMesh(Cast<UStaticMeshComponent>(MeshComp), WeaponAssetPath, PublicName);
-		}
-		else if  (std::is_same<U, USkeletalMeshComponent>::value)
-		{
-			APlayerBase::SetupWeaponSkeletalMesh(Cast<USkeletalMeshComponent>(MeshComp), WeaponAssetPath, PublicName);
-		}
-
-		return MeshComp;
-	}
-
-	// コリジョンコンポーネント作成テンプレート
+	// ---------コリジョンコンポーネント作成テンプレート
+	/*
+	 * 関数名　　　　：SetupCollisionComponent()
+	 * 処理内容　　　：武器のコリジョンセットアップ
+	 * 引数１　　　　：T* CollisionComp・・・・・・・・・コリジョンコンポーネント(「T」は UBoxComponent,USphereComponent,UCapsuleComponent のいずれか)
+	 * 引数２　　　　：FName PublicName・・・・・・・・・エディタでの公開名
+	 * 戻り値　　　　：なし
+	 */
 	template<class T>
-	T* SetupCollisionComponent(T* CollisionComp, FName PublicName = "CollisionComp")
+	void SetupCollisionComponent(T*& CollisionComp, FName PublicName = "CollisionComp")
 	{
 		static_assert(std::is_same<T, UBoxComponent>::value || std::is_same<T, USphereComponent>::value || std::is_same<T, UCapsuleComponent>::value,
 			"「T」は UBoxComponent,USphereComponent,UCapsuleComponent のいずれか ");
@@ -256,23 +203,27 @@ public:
 			// 武器のメッシュに追従
 			CollisionComp->SetupAttachment(GetMesh(), "hand_rSocket");
 		}
-
-		return CollisionComp;
 	}
+	//---------------------------------------------------------------------------------------------------------------------------------------------------
 
+
+	//-----------------コンポーネント変数--------------------------------------------------------------------------
 	// 武器のメッシュ
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Mesh, meta = (AllowPrivateAccess = "true"))
 		USkeletalMeshComponent* WeaponMesh;
 
+	// 攻撃のアシスト用コンポーネント
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = AttackAssist, meta = (AllowPrivateAccess = "true"))
 		class UAttackAssistComponent* AttackAssistComp;
+
+	// キャラクターの動き
+	UCharacterMovementComponent* CharacterMovementComp;
+	//-------------------------------------------------------------------------------------------------------------
+
 
 	// アニメーション保管用
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Animation)
 		TArray<UAnimMontage*> ComboAnimMontages;
-
-	// キャラクターの動き
-	UCharacterMovementComponent* CharacterMovementComp;
 
 protected:
 

@@ -30,9 +30,6 @@ public:
 	// ヒットストップ処理
 	void HitStop();
 
-	// ヒットエフェクト
-	void HitEffect();
-
 	// エフェクトスポーン
 	void SpawnHitEffect();
 
@@ -47,7 +44,7 @@ private:
 
 protected:
 
-	//-------------機能のON・OFF---------------------------------------------------
+	//-------------各機能のON・OFF---------------------------------------------------
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack Assist")
 		bool bUseCorrectAttackAngle = true;
 
@@ -63,11 +60,11 @@ protected:
 		float LineLength;
 		
 	// HitStopで止まる時間
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AttackAssist")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack Assist")
 		float SpeedDuringHitStop;
 
 	// HitStopで止まる時間
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AttackAssist")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack Assist")
 		float HitStopTime;
 
 

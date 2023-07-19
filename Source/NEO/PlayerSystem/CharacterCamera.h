@@ -25,6 +25,7 @@ class NEO_API ACharacterCamera : public AActor
 	// 初期位置
 	FVector StartPos;
 
+	// プレイヤーから注視点の位置までの距離
 	UPROPERTY(EditAnywhere, Category = "PlayerToViewPointDistance")
 		FVector PlayerToViewPointDistance;
 	

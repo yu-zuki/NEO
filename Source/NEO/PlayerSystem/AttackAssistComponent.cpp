@@ -32,7 +32,12 @@ void UAttackAssistComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
 
-// 攻撃の角度修正
+
+/*
+ * 関数名　　　　：CorrectAttackAngle()
+ * 処理内容　　　：角度を補正して攻撃を当たりやすくする(直線状にいる敵)
+ * 戻り値　　　　：なし
+ */
 void UAttackAssistComponent::CorrectAttackAngle()
 {
 	// 機能のオン・オフ
@@ -56,7 +61,12 @@ void UAttackAssistComponent::CorrectAttackAngle()
 	}
 }
 
-// ヒットストップ処理
+
+/*
+ * 関数名　　　　：HitStop()
+ * 処理内容　　　：ヒットストップを起こす
+ * 戻り値　　　　：なし
+ */
 void UAttackAssistComponent::HitStop()
 {
 	// 機能のオン・オフ
@@ -77,58 +87,75 @@ void UAttackAssistComponent::HitStop()
 	TimerManager.SetTimer(TimerHandle_HitStop, this, &UAttackAssistComponent::EndHitStop, HitStopTime, false);
 }
 
-// ヒットエフェクト
-void UAttackAssistComponent::HitEffect()
+
+/*
+ * 関数名　　　　：SpawnHitEffect()
+ * 処理内容　　　：ヒットエフェクトをスポーン
+ * 戻り値　　　　：なし
+ */
+void UAttackAssistComponent::SpawnHitEffect()
 {
 	// 機能のオン・オフ
 	if (!bUseHitEffect) { return; }
 
 
-
 }
 
-// エフェクトスポーン
-void UAttackAssistComponent::SpawnHitEffect()
-{
-
-}
-
-// 前方にいるActorを返す
+/*
+ * 関数名　　　　：GetFrontActor()
+ * 処理内容　　　：敵が直線状にいるか判定
+ * 戻り値　　　　：見つけた敵の情報を返す
+ */
 AActor* UAttackAssistComponent::GetFrontActor()
 {
-	// レイを飛ばす
-	// 飛ばす方向指定
-	float Rotation_Z = GetOwner()->GetActorRotation().Yaw;
-	float LineDirection = (Rotation_Z > 0) ? (LineLength) : (-LineLength);
+	// 所有者の情報取得
+	AActor* pOwner = GetOwner();
 
-	// 始点
-	FVector start = GetOwner()->GetActorLocation();
-
-	// 終点
-	FVector end = FVector(start.X, start.Y + LineDirection, start.Z);
-
-	FCollisionQueryParams CollisionParams;
-	CollisionParams.AddIgnoredActor(GetOwner());
-
-	// 当たったオブジェクト格納用
-	FHitResult OutHit;
-
-	// ヒットした場合true
-	bool isHit = GetWorld()->LineTraceSingleByChannel(OutHit, start, end, ECC_WorldStatic, CollisionParams);
-
-	DrawDebugLine(GetWorld(),start,end, FColor::Green, true, 1.0f);
-
-	AActor* HitEnemy = OutHit.GetActor();
-
-	if (isHit && HitEnemy != nullptr)
+	if (pOwner)
 	{
-		return HitEnemy;
+		// レイを飛ばす
+		// 飛ばす方向指定
+		float Rotation_Z = pOwner->GetActorRotation().Yaw;
+		float LineDirection = (Rotation_Z > 0) ? (LineLength) : (-LineLength);
+
+		// 始点
+		FVector start = pOwner->GetActorLocation();
+
+		// 終点
+		FVector end = FVector(start.X, start.Y + LineDirection, start.Z);
+
+		// 自身を除く
+		FCollisionQueryParams CollisionParams;
+		CollisionParams.AddIgnoredActor(pOwner);
+
+		// 当たったオブジェクト格納用
+		FHitResult OutHit;
+
+		// ヒットした場合true
+		bool isHit = GetWorld()->LineTraceSingleByChannel(OutHit, start, end, ECC_WorldStatic, CollisionParams);
+		DrawDebugLine(GetWorld(), start, end, FColor::Green, true, 1.0f);
+
+		if (isHit)
+		{
+			AActor* HitEnemy = OutHit.GetActor();
+
+			// "Enemy"タグを持っているActorのみを返す
+			if (HitEnemy->ActorHasTag("Enemy"))
+			{
+				return HitEnemy;
+			}
+		}
 	}
 
 	return nullptr;
 }
 
-// ヒットストップ終了
+
+/*
+ * 関数名　　　　：EndHitStop()
+ * 処理内容　　　：ヒットストップ終了
+ * 戻り値　　　　：なし
+ */
 void UAttackAssistComponent::EndHitStop()
 {
 	//CharacterGet

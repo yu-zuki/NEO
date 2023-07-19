@@ -44,6 +44,7 @@ APlayerBase::APlayerBase()
 	AttackAssistComp = CreateDefaultSubobject<UAttackAssistComponent>(TEXT("AttackAssist"));
 }
 
+
 // Called when the game starts or when spawned
 void APlayerBase::BeginPlay()
 {
@@ -59,6 +60,7 @@ void APlayerBase::BeginPlay()
 	}
 }
 
+
 // Called every frame
 void APlayerBase::Tick(float DeltaTime)
 {
@@ -71,11 +73,14 @@ void APlayerBase::Tick(float DeltaTime)
 	case State_Jump:
 		Jump();
 		break;
+	case State_TakeDamage:
+		break;
 	case State_Death:
 		break;
 	}
 
 }
+
 
 // Called to bind functionality to input
 void APlayerBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -100,7 +105,12 @@ void APlayerBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	}
 }
 
-// プレイヤーのデータを初期化
+
+/*
+ * 関数名　　　　：SetupPlayerData()
+ * 処理内容　　　：プレイヤーのデータ初期化
+ * 戻り値　　　　：なし
+ */
 void APlayerBase::SetupPlayerData()
 {
 	// プレイヤーのステータス初期化
@@ -110,7 +120,16 @@ void APlayerBase::SetupPlayerData()
 	SetupMainActionMapping();
 }
 
-// プレイヤーのステータスパラメータ初期化
+
+/*
+ * 関数名　　　　：SetupPlayerStatus()
+ * 処理内容　　　：プレイヤーのステータス初期化
+ * 引数１　　　　：float _hp・・・・・・・・・HPの初期値 
+ * 引数２　　　　：float _damageAmount・・・・攻撃力の初期値
+ * 引数３　　　　：float _jumpHeight・・・・・ジャンプ力の初期値
+ * 引数４　　　　：float _comboDamageFactor・コンボごとのダメージの倍率
+ * 戻り値　　　　：なし
+ */
 void APlayerBase::SetupPlayerStatus(float _hp /*= 100.f*/, float _damageAmount /*= 10.f*/, float _jumpHeight /*= 150.f*/, float _comboDamageFactor /*= 1.f*/)
 {
 	PlayerStatus.HP = _hp;
@@ -120,7 +139,11 @@ void APlayerBase::SetupPlayerStatus(float _hp /*= 100.f*/, float _damageAmount /
 }
 
 
-// ボタンの設定
+/*
+ * 関数名　　　　：SetupMainActionMapping()
+ * 処理内容　　　：プレイヤーの入力マッピング
+ * 戻り値　　　　：なし
+ */
 void APlayerBase::SetupMainActionMapping()
 {
 	// ボタン設定
@@ -167,7 +190,13 @@ void APlayerBase::SetupMainActionMapping()
 	}
 }
 
-// アニメーションの設定
+
+/*
+ * 関数名　　　　：SetupAnimationAsset()
+ * 処理内容　　　：プレイヤーのコンボ用アニメーションセットアップ
+ * 引数１　　　　：TCHAR* AnimAssetPath[2]・・・２種類のコンボ用アニメーションアセットのパス
+ * 戻り値　　　　：なし
+ */
 void APlayerBase::SetupAnimationAsset(TCHAR* AnimAssetPath[2])
 {
 	// アセットを探してセット
@@ -185,13 +214,20 @@ void APlayerBase::SetupAnimationAsset(TCHAR* AnimAssetPath[2])
 	ComboStartSectionNames = { "First", "Second", "Third"/*,"Fourth"*/ };
 }
 
-void APlayerBase::Move(const FInputActionValue& Value)
+
+/*
+ * 関数名　　　　：Move()
+ * 処理内容　　　：プレイヤーの入力受付(移動処理)
+ * 引数１　　　　：FInputActionValue& Value・・・入力量
+ * 戻り値　　　　：なし
+ */
+void APlayerBase::Move(const FInputActionValue& _value)
 {
 	// コントロール可能か
 	if (!IsControl) { return; }
 
 	// input is a Vector2D
-	FVector2D MovementVector = Value.Get<FVector2D>();
+	FVector2D MovementVector = _value.Get<FVector2D>();
 
 	if (Controller != nullptr)
 	{
@@ -214,7 +250,12 @@ void APlayerBase::Move(const FInputActionValue& Value)
 	}
 }
 
-// ダッシュ切り替え
+
+/*
+ * 関数名　　　　：Run()
+ * 処理内容　　　：プレイヤーの入力受付(ダッシュ切り替え)
+ * 戻り値　　　　：なし
+ */
 void APlayerBase::Run()
 {
 	// コントロール可能か
@@ -232,9 +273,14 @@ void APlayerBase::Run()
 		IsRunning = false;
 		CharacterMovementComp->MaxWalkSpeed = 500.f;
 	}
-
 }
 
+
+/*
+ * 関数名　　　　：JumpStart()
+ * 処理内容　　　：プレイヤーの入力受付(ジャンプ開始)
+ * 戻り値　　　　：なし
+ */
 void APlayerBase::JumpStart()
 {
 	// コントロール可能か
@@ -252,6 +298,12 @@ void APlayerBase::JumpStart()
 	}
 }
 
+
+/*
+ * 関数名　　　　：Jump()
+ * 処理内容　　　：プレイヤーのジャンプ中処理
+ * 戻り値　　　　：なし
+ */
 void APlayerBase::Jump()
 {
 	// 現在位置
@@ -275,6 +327,12 @@ void APlayerBase::Jump()
 	frames += 1.f;
 }
 
+
+/*
+ * 関数名　　　　：IsPlayerGrounded()
+ * 処理内容　　　：プレイヤーが地面についているか判定
+ * 戻り値　　　　：地面についていたらtrue
+ */
 bool APlayerBase::IsPlayerGrounded() const
 {
 	bool IsGrounded = false;
@@ -288,8 +346,14 @@ bool APlayerBase::IsPlayerGrounded() const
 	return IsGrounded;
 }
 
-// 攻撃
-void APlayerBase::Attack(int AttackNum /*= 0*/)
+
+/*
+ * 関数名　　　　：Attack()
+ * 処理内容　　　：プレイヤーの攻撃処理
+ * 引数１　　　　：int _attackNum・・・攻撃アニメーションの種類判別用
+ * 戻り値　　　　：なし
+ */
+void APlayerBase::Attack(int _attackNum /*= 0*/)
 {
 	// プレイヤーの角度修正
 	AttackAssistComp->CorrectAttackAngle();
@@ -313,10 +377,15 @@ void APlayerBase::Attack(int AttackNum /*= 0*/)
 	}
 
 	// 攻撃のアニメーション再生
-	PlayAnimation(ComboAnimMontages[AttackNum],ComboStartSectionNames[ComboIndex]);
+	PlayAnimation(ComboAnimMontages[_attackNum],ComboStartSectionNames[ComboIndex]);
 }
 
-// コンボ1
+
+/*
+ * 関数名　　　　：Combo1()
+ * 処理内容　　　：プレイヤーの入力受付(攻撃１つ目)
+ * 戻り値　　　　：なし
+ */
 void APlayerBase::Combo1()
 {
 	// コントロール可能か
@@ -326,7 +395,11 @@ void APlayerBase::Combo1()
 	Attack(0);
 }
 
-// コンボ2
+/*
+ * 関数名　　　　：Combo2()
+ * 処理内容　　　：プレイヤーの入力受付(攻撃２つ目)
+ * 戻り値　　　　：なし
+ */
 void APlayerBase::Combo2()
 {
 	// コントロール可能か
@@ -336,16 +409,23 @@ void APlayerBase::Combo2()
 	Attack(1);
 }
 
-void APlayerBase::RotateCharacter(float nowInput_Y)
+
+/*
+ * 関数名　　　　：RotateCharacter()
+ * 処理内容　　　：プレイヤーのステータス初期化
+ * 引数１　　　　：float _nowInput_Y・・・現在の移動入力値
+ * 戻り値　　　　：なし
+ */
+void APlayerBase::RotateCharacter(float _nowInput_Y)
 {
 	// 入力がない場合は何もしない
-	if (nowInput_Y == 0) { return; }
+	if (_nowInput_Y == 0) { return; }
 
 	// 向く方向
 	FVector2D Direction;
 
 	// 入力の値に応じて前か後ろを向く
-	if (nowInput_Y == 1.f)
+	if (_nowInput_Y == 1.f)
 	{
 		Direction.X = -25.f;
 		Direction.Y = DIRECTION;
@@ -363,7 +443,11 @@ void APlayerBase::RotateCharacter(float nowInput_Y)
 }
 
 
-// コンボ継続
+/*
+ * 関数名　　　　：ContinuationCombo()
+ * 処理内容　　　：コンボの継続
+ * 戻り値　　　　：なし
+ */
 void APlayerBase::ContinuationCombo()
 {
 	IsControl = true;
@@ -371,7 +455,11 @@ void APlayerBase::ContinuationCombo()
 }
 
 
-// コンボリセット
+/*
+ * 関数名　　　　：ResetCombo()
+ * 処理内容　　　：コンボリセット
+ * 戻り値　　　　：なし
+ */
 void APlayerBase::ResetCombo()
 {
 	// フラグリセット
@@ -383,11 +471,23 @@ void APlayerBase::ResetCombo()
 	ComboIndex = 0;
 }
 
+/*
+ * 関数名　　　　：SetCollision()
+ * 処理内容　　　：プレイヤーのコリジョン判定(オーバーライド用)
+ * 戻り値　　　　：なし
+ */
 void APlayerBase::SetCollision()
 {
 	return;
 }
 
+
+/*
+ * 関数名　　　　：TakedDamage()
+ * 処理内容　　　：プレイヤーの被ダメージ処理
+ * 引数１　　　　：float _damage・・・被ダメージ量
+ * 戻り値　　　　：なし
+ */
 void APlayerBase::TakedDamage(float _damage)
 {
 	if (PlayerStatus.HP)
@@ -422,6 +522,15 @@ void APlayerBase::TakedDamage(float _damage)
 	}
 }
 
+
+/*
+ * 関数名　　　　：PlayAnimation()
+ * 処理内容　　　：プレイヤーのステータス初期化
+ * 引数１　　　　：UAnimMontage* _toPlayAnimMontage ・・・再生するアニメーション
+ * 引数２　　　　：FName _startSectionName・・・・・・・・コンボの何段目から再生するか
+ * 引数３　　　　：float _playRate・・・・・・・・・・・・アニメーションの再生速度
+ * 戻り値　　　　：なし
+ */
 void APlayerBase::PlayAnimation(UAnimMontage* _toPlayAnimMontage, FName _startSectionName /*= "None"*/, float _playRate /*= 1.f*/)
 {
 	// コントロール不能へ
@@ -437,3 +546,60 @@ void APlayerBase::PlayAnimation(UAnimMontage* _toPlayAnimMontage, FName _startSe
 	}
 }
 
+
+/*
+ * 関数名　　　　：SetupWeaponMesh()
+ * 処理内容　　　：プレイヤーのメッシュをセットアップ(引数がStaticMeshの場合)
+ * 引数１　　　　：UStaticMeshComponent*& MeshComp・・・メッシュコンポーネント
+ * 引数２　　　　：TCHAR* WeaponAssetPath ・・・・・・・武器のアセットのパス
+ * 引数３　　　　：FName PublicName ・・・・・・・・・・エディタでの公開名
+ * 戻り値　　　　：なし
+ */
+void APlayerBase::SetupWeaponMesh(UStaticMeshComponent*& MeshComp, TCHAR* WeaponAssetPath, FName PublicName /*= "WeaponMesh"*/)
+{
+	// 武器のコンポーネントを作成
+	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(PublicName);
+
+	if (WeaponAssetPath)
+	{
+		// 武器のアセット設定
+		ConstructorHelpers::FObjectFinder< UStaticMesh > weaponMesh(WeaponAssetPath);
+
+		if (weaponMesh.Succeeded())
+		{
+			MeshComp->SetStaticMesh(weaponMesh.Object);
+		}
+
+		// 体のメッシュに追従
+		MeshComp->SetupAttachment(GetMesh(), "hand_rSocket");
+	}
+}
+
+
+/*
+ * 関数名　　　　：SetupWeaponMesh()
+ * 処理内容　　　：プレイヤーのメッシュをセットアップ(引数がSkeletalMeshの場合)
+ * 引数１　　　　：USkeletalMeshComponent*& MeshComp・・・メッシュコンポーネント
+ * 引数２　　　　：TCHAR* WeaponAssetPath ・・・・・・・・武器のアセットのパス
+ * 引数３　　　　：FName PublicName ・・・・・・・・・・・エディタでの公開名
+ * 戻り値　　　　：なし
+ */
+void APlayerBase::SetupWeaponMesh(USkeletalMeshComponent*& MeshComp, TCHAR* WeaponAssetPath, FName PublicName /*= "WeaponMesh"*/)
+{
+	// 武器のコンポーネントを作成
+	MeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(PublicName);
+
+	if (WeaponAssetPath)
+	{
+		// 武器のアセット設定
+		ConstructorHelpers::FObjectFinder< USkeletalMesh > weaponMesh(WeaponAssetPath);
+
+		if (weaponMesh.Succeeded())
+		{
+			MeshComp->SetSkeletalMeshAsset(weaponMesh.Object);
+		}
+
+		// 体のメッシュに追従
+		MeshComp->SetupAttachment(GetMesh(), "hand_rSocket");
+	}
+}
