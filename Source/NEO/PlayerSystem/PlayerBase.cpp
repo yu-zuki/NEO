@@ -73,12 +73,9 @@ void APlayerBase::Tick(float DeltaTime)
 	case State_Jump:
 		Jump();
 		break;
-	case State_TakeDamage:
-		break;
 	case State_Death:
 		break;
 	}
-
 }
 
 
@@ -118,6 +115,9 @@ void APlayerBase::SetupPlayerData()
 
 	// メインアクションのボタンをマッピング
 	SetupMainActionMapping();
+
+	// コンボの名前格納
+	ComboStartSectionNames = { "First", "Second", "Third"/*,"Fourth"*/ };
 }
 
 
@@ -192,26 +192,24 @@ void APlayerBase::SetupMainActionMapping()
 
 
 /*
- * 関数名　　　　：SetupAnimationAsset()
- * 処理内容　　　：プレイヤーのコンボ用アニメーションセットアップ
- * 引数１　　　　：TCHAR* AnimAssetPath[2]・・・２種類のコンボ用アニメーションアセットのパス
- * 戻り値　　　　：なし
+ * 関数名　　　　：GetAnimationAsset()
+ * 処理内容　　　：アニメーションアセットを返す
+ * 引数１　　　　：TCHAR* _animAssetPath ・・・アニメーションアセットのパス
+ * 戻り値　　　　：見つかったアニメーション
  */
-void APlayerBase::SetupAnimationAsset(TCHAR* AnimAssetPath[2])
+UAnimMontage* APlayerBase::GetAnimationAsset(TCHAR* _animAssetPath)
 {
 	// アセットを探してセット
-	for (int i = 0; i < 2; ++i)
-	{
-		ConstructorHelpers::FObjectFinder<UAnimMontage> ComboMontage(AnimAssetPath[i]);
+	ConstructorHelpers::FObjectFinder<UAnimMontage> AnimMontage(_animAssetPath);
 
-		if (ComboMontage.Succeeded())
-		{
-			ComboAnimMontages.Add(ComboMontage.Object);
-		}
+	if (AnimMontage.Succeeded())
+	{
+		UAnimMontage* tempAnimMontage = AnimMontage.Object;
+
+		return tempAnimMontage;
 	}
 
-	// コンボの名前格納
-	ComboStartSectionNames = { "First", "Second", "Third"/*,"Fourth"*/ };
+	return nullptr;
 }
 
 
@@ -495,28 +493,21 @@ void APlayerBase::TakedDamage(float _damage)
 		// HP計算
 		PlayerStatus.HP -= _damage;
 
+		// 攻撃中のフラグリセット
 		if (IsAttacking)
 		{
 			IsAttacking = false;
-		}
-
-		if (CanCombo)
-		{
 			CanCombo = false;
-		}
-
-		if (!IsControl)
-		{
 			IsControl = true;
-		}
-
-		if (ComboIndex)
-		{
 			ComboIndex = 0;
 		}
+
+		// 被ダメージアニメーション再生
+		PlayAnimation(DmageAnimMontage);
 	}
 	else
 	{
+		// HPが0未満なら死
 		PlayerState = State_Death;
 		IsControl = false;
 	}

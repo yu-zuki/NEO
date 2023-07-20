@@ -74,7 +74,10 @@ void APlayerGun::SetupPlayerData()
 
 	AnimationAssetPaths[1] = TEXT("/Game/0122/Player/Animation/Montage/Combo/SwordCombo2");
 
-	SetupAnimationAsset(AnimationAssetPaths);
+	for (int i = 0; i < 2; ++i)
+	{
+		ComboAnimMontages.Add(GetAnimationAsset(AnimationAssetPaths[i]));
+	}
 }
 
 // UŒ‚

@@ -33,6 +33,9 @@ public:
 	// プレイヤーのデータを初期化
 	virtual void SetupPlayerData() override;
 
+	// セットアップアニメーションアセット
+	void SetupAnimationAsset();
+
 	// コリジョン
 	void SetCollision();
 };

@@ -75,7 +75,6 @@ class NEO_API APlayerBase : public AInputCharacter
 	{
 		State_Idle = 0,
 		State_Jump,
-		State_TakeDamage,
 		State_Death
 	};
 
@@ -128,20 +127,23 @@ protected:
 		void ContinuationCombo();
 
 	// コンボリセット
-	UFUNCTION(BlueprintCallable, Category = "ComboAction")
+	UFUNCTION(BlueprintCallable, Category = "Action")
 		void ResetCombo();
 
 	// ダメージを与える処理
-	UFUNCTION(BlueprintCallable, Category = "ComboAction")
+	UFUNCTION(BlueprintCallable, Category = "Action")
 		virtual void SetCollision();
+
+	// ダメージを受ける処理
+	UFUNCTION(BlueprintCallable, Category = "Action")
+		void TakedDamage(float _damage);
+
+	UFUNCTION(BlueprintCallable, Category = "Action")
+		void SetControl(bool _isControl) { IsControl = _isControl; }
 
 	// ダメージ量を返す関数
 	UFUNCTION(BlueprintCallable,Category = "GetStatus")
 		float GetDamageAmount()const { return PlayerStatus.DamageAmount * (((float)ComboIndex + 1.f) * PlayerStatus.ComboDamageFactor); }
-
-	// ダメージを受ける処理
-	UFUNCTION(BlueprintCallable, Category = "GetStatus")
-		void TakedDamage(float _damage);
 
 	UFUNCTION(BlueprintCallable, Category = "GetStatus")
 		float GetHP()const { return PlayerStatus.HP; }
@@ -175,7 +177,7 @@ public:
 	void SetupMainActionMapping();
 
 	// アニメーションの設定
-	void SetupAnimationAsset(TCHAR* AnimAssetPath[2]);
+	UAnimMontage* GetAnimationAsset(TCHAR* _animAssetPath);
 
 	// 引数によってスタティックメッシュかスケルタルメッシュのセットアップ
 	void SetupWeaponMesh(UStaticMeshComponent*& MeshComp, TCHAR* WeaponAssetPath, FName PublicName = "WeaponMesh");
@@ -221,9 +223,13 @@ public:
 	//-------------------------------------------------------------------------------------------------------------
 
 
-	// アニメーション保管用
+	// コンボアニメーション保管用
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Animation)
 		TArray<UAnimMontage*> ComboAnimMontages;
+
+	// 被ダメージアニメーション
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Animation)
+		UAnimMontage* DmageAnimMontage;
 
 protected:
 
