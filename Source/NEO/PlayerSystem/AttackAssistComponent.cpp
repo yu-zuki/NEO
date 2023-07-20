@@ -133,7 +133,7 @@ AActor* UAttackAssistComponent::GetFrontActor()
 
 		// ƒqƒbƒg‚µ‚½ê‡true
 		bool isHit = GetWorld()->LineTraceSingleByChannel(OutHit, start, end, ECC_WorldStatic, CollisionParams);
-		DrawDebugLine(GetWorld(), start, end, FColor::Green, true, 1.0f);
+		//DrawDebugLine(GetWorld(), start, end, FColor::Green, true, 1.0f);
 
 		if (isHit)
 		{
