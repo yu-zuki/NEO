@@ -48,14 +48,23 @@ public:
 		virtual void ApplyDamage(float DamageAmount);
 
 	float GetHP() { return Health; }
-	// Called for jumping
-	void StartJump();
+	// Called for jumping and moving in air
+	void ProjectileMotion(float DeltaTime);
+	UPROPERTY(EditAnywhere,BlueprintReadOnly)
+		float InitialSpeed;
+
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+		float LaunchAngle;
 private:
 	bool bIsRotation;
 	//‚Á”ò‚Ôƒtƒ‰ƒO
-	bool bIsJumping;
-
 	
+	///////////////Î•û“ŠË/////////////////
+	bool bIsProjectile;
+	float Gravity;
+	float Time;
+	FVector InitialDirection;
 	//////////////////////////////////////////////////////////////////////////
 	///UI
 public:

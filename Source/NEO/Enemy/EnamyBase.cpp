@@ -16,8 +16,10 @@ AEnamyBase::AEnamyBase()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-    bIsJumping = false;
-   
+    InitialSpeed = 1000.0f;
+    LaunchAngle = 45.0f;
+    bIsProjectile = false;
+    Gravity = 9.8f;
 
 	//UI Create
 	EnemyWidget = CreateDefaultSubobject<UEnemyBase_WidgetComponent>(TEXT("EnemyWidget"));
@@ -39,6 +41,9 @@ void AEnamyBase::BeginPlay()
 	Super::BeginPlay();
 
 	SpawnDefaultController();
+
+    float rad = FMath::DegreesToRadians(LaunchAngle);
+    InitialDirection = FVector(cos(rad), 0, sin(rad));
 }
 
 // Called every frame
@@ -68,7 +73,10 @@ void AEnamyBase::Tick(float DeltaTime)
         NewRotation.Yaw = 90.0f;
         SetActorRotation(NewRotation);
     }
-   
+    if (bIsProjectile)
+    {
+        ProjectileMotion(DeltaTime);
+   }
 
 
 }
@@ -81,15 +89,23 @@ void AEnamyBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 }
 
 
-
 void AEnamyBase::ApplyDamage(float DamageAmount)
 {
 	Health -= DamageAmount;
     if (Health <= 0)
     {
-        bIsJumping = true;
-       
+        
+        bIsProjectile = true;
     }
+}
+
+void AEnamyBase::ProjectileMotion(float DeltaTime)
+{
+    Time += DeltaTime;
+    FVector CurrentVelocity = InitialSpeed * InitialDirection * Time;
+    CurrentVelocity.Z -= 0.5 * Gravity * Time * Time;
+    FVector NewLocation = GetActorLocation() + CurrentVelocity * DeltaTime;
+    SetActorLocation(NewLocation);
 }
 
 
