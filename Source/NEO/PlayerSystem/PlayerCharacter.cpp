@@ -98,9 +98,13 @@ void APlayerCharacter::SetupAnimationAsset()
 	}
 
 	// 被ダメージアニメーションのパス保管用
-	TCHAR* DamageAnimationAssetPaths = TEXT("/Game/0122/Player/Animation/Montage/Damaged");
+	TCHAR* DamageAnimationAssetPath = TEXT("/Game/0122/Player/Animation/Montage/Damaged");
 
-	DmageAnimMontage = GetAnimationAsset(DamageAnimationAssetPaths);
+	DamageAnimMontage = GetAnimationAsset(DamageAnimationAssetPath);
+
+	TCHAR* DeathAnimationAssetPath = TEXT("/Game/0122/Player/Animation/Montage/Death");
+
+	DeathAnimMontage = GetAnimationAsset(DeathAnimationAssetPath);
 }
 
 

@@ -503,13 +503,16 @@ void APlayerBase::TakedDamage(float _damage)
 		}
 
 		// 被ダメージアニメーション再生
-		PlayAnimation(DmageAnimMontage);
+		PlayAnimation(DamageAnimMontage);
 	}
 	else
 	{
 		// HPが0未満なら死
 		PlayerState = State_Death;
 		IsControl = false;
+
+		// 被ダメージアニメーション再生
+		//PlayAnimation(DeathAnimMontage);
 	}
 }
 
