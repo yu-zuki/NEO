@@ -70,21 +70,7 @@ void AGunMan::Tick(float DeltaTime)
     // 自分の座標を取得
     FVector MyLocation = GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorLocation();
 
-    // キャラクターの位置と自分の位置を比較してY軸より前にいるかどうかを判定
-    bIsRotation = CharacterLocation.Y > MyLocation.Y;
-    // bIsRotationがtrueなら
-    if (bIsRotation)
-    {
-        FRotator NewRotation = GetActorRotation();
-        NewRotation.Yaw = -90.0f;
-        SetActorRotation(NewRotation);
-    }
-    else
-    {
-        FRotator NewRotation = GetActorRotation();
-        NewRotation.Yaw = 90.0f;
-        SetActorRotation(NewRotation);
-    }
+   
 
 }
 void AGunMan::SpawnBullet()
@@ -133,21 +119,3 @@ float AGunMan::GetDistanceToPlayer() const
     FVector GunManLocation = GetActorLocation();
     return FVector::Distance(PlayerLocation, GunManLocation);
 }
-/*
-void AGunMan::ApplyDamage(float DamageAmount, float DeltaTime)
-{
-    Health -= DamageAmount;
-
-    if (Health <= 0.0f)
-    {
-        //ジャンプ処理
-        JumpingByGravity(DeltaTime);
-        PlayAnimMontage(Death, 1, NAME_None);
-
-    }
-    else
-    {
-        PlayAnimMontage(Damage_Reaction, 1, NAME_None);
-    }
-}
-*/

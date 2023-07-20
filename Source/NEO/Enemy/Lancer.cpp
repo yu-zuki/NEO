@@ -1,7 +1,6 @@
 #include "Lancer.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
-#include "Components/BoxComponent.h"
 #include "GameFramework/Controller.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -10,17 +9,12 @@ ALancer::ALancer()
     // キャラクターの移動方式を設
     MaxHealth = 100;
     Health = MaxHealth;
-    bIsJumping = false;
+   
     // キャラクターの移動方式を設定
     GetCharacterMovement()->bOrientRotationToMovement = true;
     GetCharacterMovement()->RotationRate = FRotator(0.0f, 540.0f, 0.0f);
     GetCharacterMovement()->MaxWalkSpeed = MovementSpeed;
 
-    WeaponBaseMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("FX_wepon_base"));
-    WeaponBaseMesh->SetupAttachment(GetMesh());
-    BoxCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxCollision"));
-    BoxCollision->SetupAttachment(WeaponBaseMesh);
-    BoxCollision->OnComponentBeginOverlap.AddDynamic(this, &ALancer::OnBoxCollision);
 }
 
 
@@ -50,28 +44,10 @@ void ALancer::Tick(float DeltaTime)
             AddMovementInput(PlayerDirection);
         }
     }
-    // キャラクターの位置を取得
-    FVector CharacterLocation = GetActorLocation();
+    
 
-    // 自分の座標を取得
-    FVector MyLocation = GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorLocation();
-
-    // キャラクターの位置と自分の位置を比較してY軸より前にいるかどうかを判定
-    bIsRotation = CharacterLocation.Y > MyLocation.Y;
-    // bIsRotationがtrueなら
-    if (bIsRotation)
-    {
-        FRotator NewRotation = GetActorRotation();
-        NewRotation.Yaw = -90.0f;
-        SetActorRotation(NewRotation);
-    }
-    else
-    {
-        FRotator NewRotation = GetActorRotation();
-        NewRotation.Yaw = 90.0f;
-        SetActorRotation(NewRotation);
-    }
-
+    
+    
 }
 void ALancer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -113,8 +89,5 @@ void ALancer::CheckPlayerInFront()
     }
 }
 
-void ALancer::OnBoxCollision(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
 
-}
 

@@ -15,7 +15,7 @@ ASoldier::ASoldier()
     GetCharacterMovement()->RotationRate = FRotator(0.0f, 540.0f, 0.0f);
     GetCharacterMovement()->MaxWalkSpeed = MovementSpeed;
     Health = MaxHealth;
-    bIsJumping = false;
+  
 }
 
 
@@ -32,11 +32,6 @@ void ASoldier::BeginPlay()
 void ASoldier::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
-    // キャラクターの位置を取得
-    FVector CharacterLocation = GetActorLocation();
-
-    // 自分の座標を取得
-    FVector MyLocation = GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorLocation();
     // プレイヤーとの距離を取得
     float DistanceToPlayer = GetDistanceToPlayer();
 
@@ -55,22 +50,7 @@ void ASoldier::Tick(float DeltaTime)
         
         bIsRotation = false;
     }
-    // キャラクターの位置と自分の位置を比較してY軸より前にいるかどうかを判定
-    bIsRotation = CharacterLocation.Y > MyLocation.Y;
-    // bIsRotationがtrueなら
-    if (bIsRotation)
-    {
-        FRotator NewRotation = GetActorRotation();
-        NewRotation.Yaw = -90.0f;
-        SetActorRotation(NewRotation);
-
-    }
-    else
-    {
-        FRotator NewRotation = GetActorRotation();
-        NewRotation.Yaw = 90.0f;
-        SetActorRotation(NewRotation);
-    }
+  
 
 }
 

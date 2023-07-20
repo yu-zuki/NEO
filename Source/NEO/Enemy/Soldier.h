@@ -23,7 +23,6 @@ protected:
     FVector GetPlayerDirection() const;
     float GetDistanceToPlayer() const;
 public:
-    UPROPERTY(EditAnywhere, Category = "Rotation")
         bool bIsRotation;
     //３秒ごとに動くタイマー
     FTimerHandle MoveStraightTimerHandle;
