@@ -5,6 +5,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
+#include "GameFramework/GameMode.h"
 #include "InputCharacter.h"
 
 #include "TGS_GameMode.generated.h"
@@ -15,7 +16,7 @@ enum class EChangeLevel : uint8;
  *
  */
 UCLASS()
-class NEO_API ATGS_GameMode : public AGameModeBase
+class NEO_API ATGS_GameMode : public AGameMode
 {
 	GENERATED_BODY()
 public:
@@ -31,9 +32,9 @@ protected:
 
 
 public:
-	void BeginPlay() override;
+	virtual void BeginPlay() override;
 
-	void StartPlay() override;
+	virtual void StartPlay() override;
 
 	void Tick(float DeltaTime) override;
 
@@ -78,7 +79,28 @@ public:
 	int32 GetBattleAreaEnemyNum();
 
 //---------------------------------------ゲームUI---------------------------------------
+public:
 	void SetUI_Enemy(FName _ActorName, int32 _NowHp, int32 _MaxHp);
+
+	UFUNCTION(BlueprintCallable, Category = "TitleUI")
+		EPlayerType GetPlayerType();
+
+	uint8 GetCurrentState();
+///////////////////////////////////////////////////////////
+///Player選択
+void SelctorPlayerType();
+
+class UTGS_GameInstance* GetGameInstance();
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Player")
+		TSubclassOf<class ACharacter> PlayerCharacterClassOne;			// プレイヤー1のキャラクター
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Player")
+		TSubclassOf<class ACharacter> PlayerCharacterClassTwo;			// プレイヤー2のキャラクター
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Player")
+		TSubclassOf<class ACharacter> PlayerCharacterClassThree;			// プレイヤー3のキャラクター
+
+	AActor* GetPlayStartPoint();
 
 protected:
 	UFUNCTION(BlueprintCallable, Category = "GameSystem")

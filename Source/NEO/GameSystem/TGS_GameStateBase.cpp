@@ -13,7 +13,7 @@
 #include "Ingame_WG.h"
 
 ATGS_GameStateBase::ATGS_GameStateBase()
-	:ECurrentState(EGameState::EGame_None), EchangeLevel(EChangeLevel::EChangeLevel_None)
+	:ECurrentState(EGameState::EGame_None), EchangeLevel(EChangeLevel::EChangeLevel_None), ECurrentPlayerType(EPlayerType::EPlayerType_None)
 {
 
 }
@@ -23,11 +23,16 @@ void ATGS_GameStateBase::InitGameState()
 {
 	PlayerCharacter = Cast<ACharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
 
+	//ECurrentPlayerType = EPlayerType::EPlayerType_1;
+	
 	//バトルエリアの初期化
 	InitBattleArea();
 
 	//ゲームの状態を初期化する
 	InitCurrentState();
+
+	//PlayerTypeを初期化する
+	InitPlayerType();
 }
 
 void ATGS_GameStateBase::UpdateGameState(float DeltaTime)
@@ -148,6 +153,11 @@ void ATGS_GameStateBase::InitCurrentState()
 	}
 }
 
+void ATGS_GameStateBase::InitPlayerType()
+{
+	ECurrentPlayerType = GetGameInstance()->LoadPlayerType();
+}
+
 bool ATGS_GameStateBase::IsGameOver()
 {
 	// 例：　/*if (player.hp < 0) { return true }*/
@@ -161,14 +171,26 @@ void ATGS_GameStateBase::OnGameTitle()
 	{
 		SetCurrentState(EGameState::EGame_Playing);					//意味ないかも
 		GetGameInstance()->SaveGameStateData(ECurrentState);		//インスタンスにゲームの状態を保存
+		GetGameInstance()->SavePlayerType(ECurrentPlayerType);		//インスタンスにPlayerTypeを保存
 
 		ChangeNextLevel(ENextLevel::ENextLevel_Playing);			//レベルを変更
 	}
 
+	ESubAction currentSubAction = UseSubAction();					//SubActionを取得
 	//Enterキーを押したら、ゲームを開始する
-	if (UseSubAction() == ESubAction::ESubAction_Enter) {
+	if (currentSubAction == ESubAction::ESubAction_Enter) {
 		EchangeLevel = EChangeLevel::EChangeLevel_Playing;
 	}
+	//PlayerTypeを選択
+	else if (currentSubAction == ESubAction::ESubAction_Right) {
+		//PlayerTypeを変更する
+		NextPlayerType();
+	}
+	else if (currentSubAction == ESubAction::ESubAction_Left) {
+		//PlayerTypeを変更する
+		BackPlayerType();
+	}
+
 }
 
 
@@ -406,6 +428,44 @@ void ATGS_GameStateBase::ChangeLevel(FName NextLevelName)
 void ATGS_GameStateBase::SetSubAction(ESubAction _subAction)
 {
 	CurrentSubAction = _subAction;
+}
+
+void ATGS_GameStateBase::NextPlayerType()
+{
+	if (ECurrentPlayerType == EPlayerType::EPlayerType_None)	{
+		ECurrentPlayerType = EPlayerType::EPlayerType_1;
+	}
+	else if (ECurrentPlayerType == EPlayerType::EPlayerType_1) {
+		ECurrentPlayerType = EPlayerType::EPlayerType_2;
+	}
+	else if (ECurrentPlayerType == EPlayerType::EPlayerType_2) {
+		ECurrentPlayerType = EPlayerType::EPlayerType_3;
+	}
+	else if (ECurrentPlayerType == EPlayerType::EPlayerType_3) {
+		ECurrentPlayerType = EPlayerType::EPlayerType_1;
+	}
+	else {
+		UE_LOG(LogTemp, Error, TEXT("ECurrentPlayerType is not found"));
+	}
+}
+
+void ATGS_GameStateBase::BackPlayerType()
+{
+	if (ECurrentPlayerType == EPlayerType::EPlayerType_None) {
+		ECurrentPlayerType = EPlayerType::EPlayerType_3;
+	}
+	else if (ECurrentPlayerType == EPlayerType::EPlayerType_1) {
+		ECurrentPlayerType = EPlayerType::EPlayerType_3;
+	}
+	else if (ECurrentPlayerType == EPlayerType::EPlayerType_2) {
+		ECurrentPlayerType = EPlayerType::EPlayerType_1;
+	}
+	else if (ECurrentPlayerType == EPlayerType::EPlayerType_3) {
+		ECurrentPlayerType = EPlayerType::EPlayerType_2;
+	}
+	else {
+		UE_LOG(LogTemp, Error, TEXT("ECurrentPlayerType is not found"));
+	}
 }
 
 /**

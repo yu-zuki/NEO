@@ -24,6 +24,9 @@ protected:
 	//保存のデータ
 	EGameState BackupGameState;
 
+	//PlayerTypeの状態を保存
+	EPlayerType BackupPlayerType;
+
 	////Playerの状態を保存
 	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "GameState")
 	//EPlayerState BackupPlayerState;
@@ -37,5 +40,13 @@ public:
 	//ゲームの状態を取得
 	UFUNCTION(BlueprintCallable, Category = "GameState")
 	EGameState LoadGameStateData() const;
+
+	//プレイヤーの状態を保存
+	UFUNCTION(BlueprintCallable, Category = "GameState")
+	void SavePlayerType(EPlayerType& _SavePlayerType);
+
+	//プレイヤーの状態を取得
+	UFUNCTION(BlueprintCallable, Category = "GameState")
+	EPlayerType LoadPlayerType() const;
 
 };

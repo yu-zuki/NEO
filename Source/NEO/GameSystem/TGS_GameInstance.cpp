@@ -3,9 +3,11 @@
 
 #include "TGS_GameInstance.h"
 
+
 UTGS_GameInstance::UTGS_GameInstance(const FObjectInitializer& ObjectInitializer)
 {
 	BackupGameState = EGameState::EGame_Title;	// Default
+	BackupPlayerType = EPlayerType::EPlayerType_1;
 }
 
 void UTGS_GameInstance::SaveGameStateData(EGameState& _SaveGameState)
@@ -16,4 +18,14 @@ void UTGS_GameInstance::SaveGameStateData(EGameState& _SaveGameState)
 EGameState UTGS_GameInstance::LoadGameStateData() const
 {
 	return BackupGameState;						// Load	
+}
+
+void UTGS_GameInstance::SavePlayerType(EPlayerType& _SavePlayerType)
+{
+	BackupPlayerType = _SavePlayerType;
+}
+
+EPlayerType UTGS_GameInstance::LoadPlayerType() const
+{
+	return BackupPlayerType;
 }

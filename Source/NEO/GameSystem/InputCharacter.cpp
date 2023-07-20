@@ -5,6 +5,9 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "TGS_GameMode.h"
+#include "Kismet/GameplayStatics.h"
+#include "TGS_GameStateBase.h"
+#include "TGS_GameInstance.h"
 
 // Sets default values
 AInputCharacter::AInputCharacter()
@@ -21,10 +24,19 @@ void AInputCharacter::BeginPlay()
 	//Add Input Mapping Context
 	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
 	{
-		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
-		{
-			//第一引数はコンテキスト名、第二引数は優先度
-			Subsystem->AddMappingContext(SubMappingContext, 0);
+		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))		{
+			
+			EGameState ECurrentState = static_cast<EGameState>(
+			Cast<UTGS_GameInstance>(GetGameInstance())->LoadGameStateData());
+
+			//GameMode の取得
+			if (ECurrentState == EGameState::EGame_Playing)			{
+				//第一引数はコンテキスト名、第二引数は優先度
+				Subsystem->AddMappingContext(SubMappingContext, 0);
+			}
+			else			{
+				Subsystem->AddMappingContext(SubMappingContext, 2);
+			}
 		}
 	}
 }
