@@ -24,9 +24,6 @@ APlayerGun::APlayerGun()
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	// プレイヤーの設定
-	AutoPossessPlayer = EAutoReceiveInput::Player0;
-
 	// キャラクターコンポーネント取得
 	CharacterMovementComp = GetCharacterMovement();
 	CharacterMovementComp->MaxWalkSpeed = 500.f;
@@ -39,6 +36,7 @@ APlayerGun::APlayerGun()
 void APlayerGun::BeginPlay()
 {
 	Super::BeginPlay();
+
 }
 
 void APlayerGun::Tick(float DeltaTime)
@@ -63,7 +61,10 @@ void APlayerGun::SetupPlayerData()
 	TCHAR* WeaponAssetPath = TEXT("/Game/0122/Player/Weapon/Weapons/Blade/Swords/Blade_BlackKnight/SK_Blade_BlackKnight");
 
 	// セット
-	WeaponMesh = SetupWeaponMesh(WeaponMesh,WeaponAssetPath, "WeaponMesh");
+	SetupWeaponMesh(WeaponMesh, WeaponAssetPath, "WeaponMesh");
+
+	SetupCollisionComponent(WeaponCollision);
+
 	// アニメーションセットアップ
 	TCHAR* AnimationAssetPaths[2];
 
@@ -73,45 +74,46 @@ void APlayerGun::SetupPlayerData()
 
 	AnimationAssetPaths[1] = TEXT("/Game/0122/Player/Animation/Montage/Combo/SwordCombo2");
 
-	SetupAnimationAsset(AnimationAssetPaths);
-
-	//WeaponCollision = SetupCollisionComponent(WeaponCollision);
+	for (int i = 0; i < 2; ++i)
+	{
+		ComboAnimMontages.Add(GetAnimationAsset(AnimationAssetPaths[i]));
+	}
 }
 
 // 攻撃
 void APlayerGun::Attack(int AttackNum)
 {
-	if (!IsAttacking)
-	{
-		// 攻撃中フラグオン
-		IsAttacking = true;
-	}
-	else
-	{
-		// コンボ可能な時,継続
-		if (CanCombo)
-		{
-			// ラストアタックまでコンボ継続
-			if (ComboStartSectionNames[ComboIndex] != ComboStartSectionNames.Last())
-			{
-				++ComboIndex;
-			}
-		}
-	}
+	//if (!IsAttacking)
+	//{
+	//	// 攻撃中フラグオン
+	//	IsAttacking = true;
+	//}
+	//else
+	//{
+	//	// コンボ可能な時,継続
+	//	if (CanCombo)
+	//	{
+	//		// ラストアタックまでコンボ継続
+	//		if (ComboStartSectionNames[ComboIndex] != ComboStartSectionNames.Last())
+	//		{
+	//			++ComboIndex;
+	//		}
+	//	}
+	//}
 
-	// 攻撃のアニメーション再生
-	PlayAnimation(ComboAnimMontages[AttackNum], ComboStartSectionNames[ComboIndex]);
+	//// 攻撃のアニメーション再生
+	//PlayAnimation(ComboAnimMontages[AttackNum], ComboStartSectionNames[ComboIndex]);
 
 }
 
 // 攻撃
 void APlayerGun::Combo1()
 {
-	// コントロール可能か
-	if (!IsControl) { return; }
+	//// コントロール可能か
+	//if (!IsControl) { return; }
 
-	// 攻撃
-	Attack(0);
+	//// 攻撃
+	//Attack(0);
 
 }
 
@@ -119,13 +121,10 @@ void APlayerGun::Combo1()
 // 攻撃
 void APlayerGun::Combo2()
 {
-	// コントロール可能か
-	if (!IsControl) { return; }
+	//// コントロール可能か
+	//if (!IsControl) { return; }
 
-	// 攻撃
-	Attack(1);
+	//// 攻撃
+	//Attack(1);
 
 }
-
-
-
