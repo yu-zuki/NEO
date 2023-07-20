@@ -16,9 +16,7 @@ AEnamyBase::AEnamyBase()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-    bIsJumping = false;
-   
-
+    
 	//UI Create
 	EnemyWidget = CreateDefaultSubobject<UEnemyBase_WidgetComponent>(TEXT("EnemyWidget"));
 	EnemyWidget->SetupAttachment(RootComponent);
@@ -39,6 +37,9 @@ void AEnamyBase::BeginPlay()
 	Super::BeginPlay();
 
 	SpawnDefaultController();
+
+ 
+    
 }
 
 // Called every frame
@@ -68,7 +69,6 @@ void AEnamyBase::Tick(float DeltaTime)
         NewRotation.Yaw = 90.0f;
         SetActorRotation(NewRotation);
     }
-   
 
 
 }
@@ -81,17 +81,14 @@ void AEnamyBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 }
 
 
-
 void AEnamyBase::ApplyDamage(float DamageAmount)
 {
 	Health -= DamageAmount;
     if (Health <= 0)
     {
-        bIsJumping = true;
-       
+        PlayAnimMontage(Death, 1, NAME_None);
     }
 }
-
 
 
 

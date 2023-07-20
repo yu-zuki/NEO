@@ -24,7 +24,7 @@ AEnemyDamage::AEnemyDamage()
 	BoxComponent->OnComponentBeginOverlap.AddDynamic(this, &AEnemyDamage::OnOverlapBegin);
 
 	// Set the default damage amount
-	DamageAmount = 20.0f;
+	DamageAmount = 5.0f;
 }
 
 // Called when the game starts or when spawned
@@ -45,12 +45,20 @@ void AEnemyDamage::OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, cla
 {
 	if (OtherActor && (OtherActor != this) && OtherComp)
 	{
-		// Check if the other actor is the player
+		//触れたのがキャラクターか
 		ACharacter* MyCharacter = UGameplayStatics::GetPlayerCharacter(this, 0);
 		if (OtherActor == MyCharacter)
 		{
 			// Apply damage to the player
 			UGameplayStatics::ApplyDamage(MyCharacter, DamageAmount, GetInstigatorController(), this, UDamageType::StaticClass());
+			OverlappedComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+			FTimerHandle UnusedHandle;
+			GetWorldTimerManager().SetTimer(UnusedHandle, this, &AEnemyDamage::EnableCollision, 3.0f, false);
 		}
 	}
+}
+void AEnemyDamage::EnableCollision()
+{
+	
+	CollisionComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 }
