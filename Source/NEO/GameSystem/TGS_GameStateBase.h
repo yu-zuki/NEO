@@ -45,6 +45,16 @@ enum class EChangeLevel : uint8
 	EChangeLevel_Over UMETA(DisplayName = "ChangeLevel_Over"),					// ゲームオーバー
 
 };
+
+UENUM(BlueprintType)
+enum class EPlayerType : uint8
+{
+	EPlayerType_None UMETA(DisplayName = "PlayerType_None"),					// None
+	EPlayerType_1 UMETA(DisplayName = "PlayerType_1"),							// プレイヤー1
+	EPlayerType_2 UMETA(DisplayName = "PlayerType_2"),							// プレイヤー2
+	EPlayerType_3 UMETA(DisplayName = "PlayerType_3"),							// プレイヤー3
+};
+
 /**
  *
  */
@@ -95,6 +105,9 @@ public:
 
 	//CurrentStateの初期化
 	void InitCurrentState();
+
+	//PlayerTypeの初期化
+	void InitPlayerType();
 
 
 	bool IsGameOver();								// ゲームオーバーかどうかを判定
@@ -173,14 +186,35 @@ public:
 	void SetSubAction(ESubAction _subAction);
 	inline const ESubAction& GetCurrentSubAction() const { return CurrentSubAction; }
 
-	//-----------------------------------UI--------------------------------------------
-public:
+
+///////////////////////////////////////////
+///UI
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI")
 		TSubclassOf<class UIngame_WG> Widget_GameMenuClass;			// ゲームメニューのUI
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI")
 		TSubclassOf<class UUserWidget> Widget_PlayerStatusClass;		// プレイヤーのステータスのUI
+
+public:
+	EPlayerType ECurrentPlayerType;
+
+	UFUNCTION(CallInEditor)
+		void NextPlayerType();
+
+	UFUNCTION(CallInEditor)
+		void BackPlayerType();
+
+//////////////////////////////////////////////////////////////////////////
+///プレイヤーキャラクターの選択
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Player")
+		TSubclassOf<class ACharacter> PlayerCharacterClassOne;			// プレイヤー1のキャラクター
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Player")
+		TSubclassOf<class ACharacter> PlayerCharacterClassTwo;			// プレイヤー2のキャラクター
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Player")
+		TSubclassOf<class ACharacter> PlayerCharacterClassThree;			// プレイヤー3のキャラクター
+
 public:
 	UIngame_WG* Widget_GameMenu;
 };

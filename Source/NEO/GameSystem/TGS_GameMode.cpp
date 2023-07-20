@@ -1,6 +1,6 @@
 // 更新日：2023/6/5		更新者：董		更新内容：ゲームモードの基本クラスを作成
 // 更新日：2023/6/8		更新者：董		更新内容：ゲームモードのKeyInput機能、基本的な機能を作成
-
+// 更新日：2023/7/20	更新者：董		更新内容：プレイヤーの選択機能を追加（GameModeのところに、プレイヤーのBPを設定、PlayStart　Objectが必須）
 #include "TGS_GameMode.h"
 #include "Kismet/GameplayStatics.h"
 #include "TGS_GameStateBase.h"
@@ -12,22 +12,31 @@
 #include "Engine/World.h"
 #include "NEO/Enemy/EnamyBase.h"
 #include "Ingame_WG.h"
+#include "TGS_GameInstance.h"
+#include "GameFramework/PlayerStart.h"
+
 
 ATGS_GameMode::ATGS_GameMode()
 {
+	SelctorPlayerType();
 }
 
 void ATGS_GameMode::BeginPlay()
 {
+
 	Super::BeginPlay();
+	//ゲームステートを作成する
+	GetGameState()->InitGameState();
+	GetGameState()->GameStartTime = FDateTime::Now();
+
 }
 
 void ATGS_GameMode::StartPlay()
 {
+	SelctorPlayerType();
+
 	Super::StartPlay();
-	//ゲームステートを作成する
-	GetGameState()->InitGameState();
-	GetGameState()->GameStartTime = FDateTime::Now();
+
 }
 
 void ATGS_GameMode::Tick(float DeltaTime)
@@ -37,11 +46,15 @@ void ATGS_GameMode::Tick(float DeltaTime)
 	//ゲームステートを更新する
 	ATGS_GameStateBase* gameState = Cast<ATGS_GameStateBase>(UGameplayStatics::GetGameState(GetWorld()));
 	if (gameState) {
+		//gameState->SetSubAction(ESubAction::ESubAction_None);
+
 		gameState->UpdateGameState(DeltaTime);
+
 	}
 	else {
 		UE_LOG(LogTemp, Error, TEXT("Game State is not found"));
 	}
+
 
 }
 
@@ -194,6 +207,94 @@ void ATGS_GameMode::SetUI_Enemy(FName _ActorName, int32 _NowHp, int32 _MaxHp)
 	GetGameState()->Widget_GameMenu->SetWidgetValue(_ActorName, _NowHp, _MaxHp);
 }
 
+EPlayerType ATGS_GameMode::GetPlayerType()
+{
+	return GetGameState()->ECurrentPlayerType;
+}
+
+uint8 ATGS_GameMode::GetCurrentState()
+{
+	EGameState CurrentState = GetGameState()->GetCurrentState();
+	return static_cast<uint8>(CurrentState);
+}
+
+void ATGS_GameMode::SelctorPlayerType()
+{
+	//NULL CHECK
+	if (PlayerCharacterClassOne && PlayerCharacterClassTwo && PlayerCharacterClassThree) {
+
+		UTGS_GameInstance* GameInstance = GetGameInstance();
+		if (!GameInstance) {
+			DefaultPawnClass = PlayerCharacterClassOne;
+			return;
+		}
+
+		AActor* SpawnPoint = GetPlayStartPoint();
+		FTransform SpawnPointT = SpawnPoint->GetTransform();
+
+		//Defauly Pawn Classを設定する	
+		switch (GetGameInstance()->LoadPlayerType())
+		{
+		case EPlayerType::EPlayerType_None:
+			return;
+			break;
+		case EPlayerType::EPlayerType_1:
+			//DefaultPawnClass = PlayerCharacterClassOne;
+			DefaultPawnClass = PlayerCharacterClassOne;
+			break;
+		case EPlayerType::EPlayerType_2:
+			//DefaultPawnClass = PlayerCharacterClassTwo;
+			DefaultPawnClass = PlayerCharacterClassTwo;
+			break;
+		case EPlayerType::EPlayerType_3:
+			//DefaultPawnClass = PlayerCharacterClassThree;
+			DefaultPawnClass = PlayerCharacterClassThree;
+			break;
+		}
+
+		//プレイヤーを生成する
+		APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+		if (PlayerController) {
+			PlayerController->Possess(GetWorld()->SpawnActor<APawn>(DefaultPawnClass, SpawnPointT));
+		}
+	}
+	else {
+		UE_LOG(LogTemp, Error, TEXT("PlayerCharacterClass is not found"));
+	}
+}
+
+//void ATGS_GameMode::BPFunction_Implementation()
+//{
+//	//GetInstance
+//	UTGS_GameInstance* GameInstance = GetGameInstance();
+//	if (GameInstance)	{
+//		//LoadPlayerType
+//		EPlayerType PlayerType = GameInstance->LoadPlayerType();
+//		switch (PlayerType)
+//		{
+//		case EPlayerType::EPlayerType_None:
+//			break;
+//		case EPlayerType::EPlayerType_1:
+//			break;
+//		case EPlayerType::EPlayerType_2:
+//			break;
+//		case EPlayerType::EPlayerType_3:
+//			break;
+//		}
+//	}
+//}
+
+AActor* ATGS_GameMode::GetPlayStartPoint()
+{
+	//スポーンポイントを取得する
+	TArray<AActor*> Actors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlayerStart::StaticClass(), Actors);
+	if (Actors.Num() > 0) {
+		return Actors[0];
+	}
+	return nullptr;
+}
+
 ATGS_GameStateBase* ATGS_GameMode::GetGameState()
 {
 	if (GameState == nullptr)
@@ -209,4 +310,16 @@ ATGS_GameStateBase* ATGS_GameMode::GetGameState()
 	}
 
 	return GameState;
+}
+
+UTGS_GameInstance* ATGS_GameMode::GetGameInstance()
+{
+	UTGS_GameInstance* GameInstance = Cast<UTGS_GameInstance>(GetWorld()->GetGameInstance());
+	if (GameInstance) {
+		return GameInstance;
+	}
+	else {
+		UE_LOG(LogTemp, Error, TEXT("GameInstance is not Found"));
+	}
+	return nullptr;
 }

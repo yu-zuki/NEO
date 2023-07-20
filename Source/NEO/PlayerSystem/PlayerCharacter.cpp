@@ -67,19 +67,40 @@ void APlayerCharacter::SetupPlayerData()
 	// 武器のメッシュのパス
 	TCHAR* WeaponAssetPath = TEXT("/Game/0122/Player/Weapon/Weapons/Blade/Swords/Blade_BlackKnight/SK_Blade_BlackKnight");
 
+	// 武器のメッシュ設定
 	SetupWeaponMesh(WeaponMesh, WeaponAssetPath, "WeaponMesh");
 
 	// コリジョン設定
 	SetupCollisionComponent(WeaponCollision);
 
-	// アニメーションセットアップ
-	TCHAR* AnimationAssetPaths[2];
+	// アニメーションアセット設定
+	SetupAnimationAsset();
+}
+
+
+/*
+ * 関数名　　　　：SetupAnimationAsset()
+ * 処理内容　　　：アニメーションアセットのセットアップ
+ * 戻り値　　　　：なし
+ */
+void APlayerCharacter::SetupAnimationAsset()
+{
+	// コンボアニメーションのパス保管用
+	TCHAR* ComboAnimationAssetPaths[2];
 
 	// アニメーションアセットのパス
-	AnimationAssetPaths[0] = TEXT("/Game/0122/Player/Animation/Montage/Combo/SwordCombo");
-	AnimationAssetPaths[1] = TEXT("/Game/0122/Player/Animation/Montage/Combo/SwordCombo2");
+	ComboAnimationAssetPaths[0] = TEXT("/Game/0122/Player/Animation/Montage/Combo/SwordCombo");
+	ComboAnimationAssetPaths[1] = TEXT("/Game/0122/Player/Animation/Montage/Combo/SwordCombo2");
 
-	SetupAnimationAsset(AnimationAssetPaths);
+	for (int i = 0; i < 2; ++i)
+	{
+		ComboAnimMontages.Add(GetAnimationAsset(ComboAnimationAssetPaths[i]));
+	}
+
+	// 被ダメージアニメーションのパス保管用
+	TCHAR* DamageAnimationAssetPaths = TEXT("/Game/0122/Player/Animation/Montage/Damaged");
+
+	DmageAnimMontage = GetAnimationAsset(DamageAnimationAssetPaths);
 }
 
 

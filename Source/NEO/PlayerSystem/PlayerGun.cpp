@@ -61,7 +61,7 @@ void APlayerGun::SetupPlayerData()
 	TCHAR* WeaponAssetPath = TEXT("/Game/0122/Player/Weapon/Weapons/Blade/Swords/Blade_BlackKnight/SK_Blade_BlackKnight");
 
 	// ƒZƒbƒg
-	SetupWeaponMesh(WeaponMesh,WeaponAssetPath, "WeaponMesh");
+	SetupWeaponMesh(WeaponMesh, WeaponAssetPath, "WeaponMesh");
 
 	SetupCollisionComponent(WeaponCollision);
 
@@ -74,7 +74,10 @@ void APlayerGun::SetupPlayerData()
 
 	AnimationAssetPaths[1] = TEXT("/Game/0122/Player/Animation/Montage/Combo/SwordCombo2");
 
-	SetupAnimationAsset(AnimationAssetPaths);
+	for (int i = 0; i < 2; ++i)
+	{
+		ComboAnimMontages.Add(GetAnimationAsset(AnimationAssetPaths[i]));
+	}
 }
 
 // UŒ‚
@@ -125,6 +128,3 @@ void APlayerGun::Combo2()
 	//Attack(1);
 
 }
-
-
-
