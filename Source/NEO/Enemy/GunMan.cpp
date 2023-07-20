@@ -43,7 +43,7 @@ void AGunMan::BeginPlay()
 void AGunMan::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	Health = MaxHealth;
+	
    
     if (PlayerCharacter)
     {
