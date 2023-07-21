@@ -88,9 +88,9 @@ void AEnamyBase::ApplyDamage(float DamageAmount)
     {
 
         PlayAnimMontage(Death, 1, NAME_None);
-
+        GetWorldTimerManager().SetTimer(TimerHandle_DestroyEnemy, this, &AEnamyBase::AfterDeath, 2.0f, true);
     }
-    GetWorldTimerManager().SetTimer(TimerHandle_DestroyEnemy, this, &AEnamyBase::AfterDeath, 2.0f, true);
+
 }
 void AEnamyBase::AfterDeath()
 {
