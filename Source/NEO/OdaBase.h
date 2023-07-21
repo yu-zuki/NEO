@@ -11,6 +11,7 @@
 #include "Animation/AnimMontage.h"
 #include "Runtime/Engine/Classes/Kismet/KismetMathLibrary.h"
 #include "Math/UnrealMathUtility.h"		//RandRangeを使うために必要なヘッダー
+#include "Math/Vector.h"				//Dist(距離)を使うために必要なヘッダー
 #include "Components/BoxComponent.h"
 #include "Engine/EngineTypes.h"
 #include "Components/StaticMeshComponent.h"
@@ -49,6 +50,10 @@ public:
 	UPROPERTY()
 	AOdaBase* OdaNobunaga;
 
+	//プレイヤーキャラクター
+	UPROPERTY()
+		AActor* PlayerChara;
+
 	//剣のコリジョン
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "BoxComp", meta = (AllowPrivateAccess = "true"))
 	UBoxComponent* BoxComp;
@@ -68,10 +73,6 @@ public:
 	//時間の取得
 	int FlameCounter;
 
-	//前方向をとる
-	UPROPERTY()
-	FVector ForwardDirection;
-
 	//列挙型
 	ECPPOdaEnum OdaMoveEnum;
 
@@ -81,6 +82,19 @@ public:
 
 	//int型のカウンター
 	int WaitTime;
+
+	//ボスとプレイヤーとの距離
+	//X軸
+	//ボス
+	FVector BossPosX;
+	//プレイヤー
+	FVector PlayerPosX;
+	//Y軸
+	//ボス
+	FVector BossPosY;
+	//プレイヤー
+	FVector PlayerPosY;
+
 
 
 	//ボスのステートでの処理

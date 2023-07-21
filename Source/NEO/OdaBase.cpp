@@ -42,10 +42,8 @@ void AOdaBase::BeginPlay()
 	Super::BeginPlay();
 	SpawnDefaultController();
 
-	NobunagaMovement = (GetCharacterMovement());
-	ForwardDirection = (GetActorForwardVector());
-
-	
+	NobunagaMovement = (GetCharacterMovement());	
+	PlayerChara = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
 }
 
 
@@ -71,8 +69,16 @@ void AOdaBase::Tick(float DeltaTime)
 		//プレイヤーの方を向く
 		ToPlayerRotate();
 	}
-	//ボスの前情報を取る
-	ForwardDirection = GetActorForwardVector();
+
+	//距離を取る
+	//X軸
+	BossPosX = FVector(GetActorLocation().X, 0.f, 0.f);
+	PlayerPosX = FVector(PlayerChara->GetActorLocation().Y, 0.f, 0.f);
+
+	//Y軸
+	BossPosY = FVector(0.f, GetActorLocation().Y, 0.f);
+	PlayerPosY = FVector(0.f, PlayerChara->GetActorLocation().Y, 0.f);
+
 	//カウンター起動
 	WaitTime++;
 	//UKismetSystemLibrary::PrintString(this, FString::FromInt(WaitTime), true, true, FColor::Cyan, 2.f, TEXT("None"));
@@ -137,7 +143,37 @@ void AOdaBase::OdaStay1(int Timer)
 	{
 		isMotionPlaying = true;
 	}
-	//プレイヤーとの距離が400離れるか60フレームたったら
+	//プレイヤーとの距離の判定
+	if (FVector::Dist(BossPosX,PlayerPosX) <= 10.f)
+	{
+		if (FMath::RandRange(0,100) <= 20)
+		{
+			if (Timer % 40 == 0)
+			{
+				//軸を合わせに行く
+				if (this->GetActorLocation().X < UGameplayStatics::GetPlayerPawn(GetWorld(), 0)->GetActorLocation().X)
+				{
+					BossMove(FastOdaSpeed * 2, FVector(1.f, 0.f, 0.f));
+				}
+				else
+				{
+					BossMove(FastOdaSpeed * 2, FVector(-1.f, 0.f, 0.f));
+				}
+			}
+		}
+	}
+
+	else if (FVector::Dist(BossPosY,PlayerPosY) <= 200.f)
+	{
+		//近接攻撃
+		OdaMoveEnum = ECPPOdaEnum::Attack1;
+	}
+
+	else
+	{
+		OdaMoveEnum = ECPPOdaEnum::Attack2;
+	}
+
 	if (GetDistanceTo(UGameplayStatics::GetPlayerPawn(GetWorld(), 0)) >= 400 && WaitTime >= 60)
 	{
 		//二分一
@@ -170,7 +206,7 @@ void AOdaBase::OdaMove1(int Timer)
 	if (SwitchStayMove)
 	{
 		//動かす処理を呼び出す
-		BossMove(FastOdaSpeed*2, ForwardDirection);
+		BossMove(FastOdaSpeed*2, FVector(1.f, 0.f, 0.f));
 	}
 	//軸を合わせる
 	else
@@ -186,7 +222,7 @@ void AOdaBase::OdaMove1(int Timer)
 		}
 	}
 	//プレイヤーとの距離が近かったら
-	if (GetDistanceTo(UGameplayStatics::GetPlayerPawn(GetWorld(), 0)) <= 300.f) {
+	if (GetDistanceTo(UGameplayStatics::GetPlayerPawn(GetWorld(), 0)) <= 250.f) {
 		OdaMoveEnum = ECPPOdaEnum::Attack1;
 		SwitchStayMove = false;
 		WaitTime = 0;
@@ -341,7 +377,7 @@ void AOdaBase::BossMove(float Speed, FVector MoveSize)
 
 void AOdaBase::BackMove(float Speed)
 {
-	AddMovementInput(ForwardDirection, -Speed);
+	AddMovementInput(FVector(-1.f,0.f,0.f), -Speed);
 }
 
 void AOdaBase::Death()

@@ -6,7 +6,6 @@
 #include "Animation/AnimMontage.h"
 #include "Animation/AnimInstance.h"
 
-
 #include "OdaBase.h"
 
 void UBossAttack1_AN::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
