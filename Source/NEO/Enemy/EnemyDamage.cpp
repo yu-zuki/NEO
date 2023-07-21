@@ -11,8 +11,8 @@ AEnemyDamage::AEnemyDamage()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	UBoxComponent* BoxComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("RootComponent"));
-	RootComponent = BoxComponent;
+	UBoxComponent* BoxComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("CollisionComponent"));
+	CollisionComponent = BoxComponent;
 
 	// Set the sphere's collision profile
 	BoxComponent->SetCollisionProfileName(TEXT("Trigger"));
