@@ -7,8 +7,18 @@
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetSystemLibrary.h"
+#include "Animation/AnimMontage.h"
 #include "Runtime/Engine/Classes/Kismet/KismetMathLibrary.h"
+#include "Math/UnrealMathUtility.h"		//RandRangeを使うために必要なヘッダー
+#include "Components/BoxComponent.h"
+#include "Engine/EngineTypes.h"
+#include "Components/StaticMeshComponent.h"
+#include "Templates/SubclassOf.h"
+#include "PlayerCharacter.h"
+
 #include "OdaBase.generated.h"
+
 
 UCLASS()
 class NEO_API AOdaBase : public ACharacter
@@ -24,15 +34,24 @@ protected:
 	virtual void BeginPlay() override;
 
 public:	
+
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	//シーンコンポーネント
+	UPROPERTY()
+		USceneComponent* Parent;
+
 	//ボスキャラクター
 	UPROPERTY()
 	AOdaBase* OdaNobunaga;
+
+	//剣のコリジョン
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "BoxComp", meta = (AllowPrivateAccess = "true"))
+	UBoxComponent* BoxComp;
 
 	//キャラクタームーブメント
 	UPROPERTY()
@@ -42,7 +61,13 @@ public:
 	UFUNCTION()
 	float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser);
 
-	
+	//ダメージタイプクラス
+	UPROPERTY()
+		TSubclassOf < class UDamageType > DamageTypeClass;
+
+	//時間の取得
+	int FlameCounter;
+
 	//前方向をとる
 	UPROPERTY()
 	FVector ForwardDirection;
@@ -54,8 +79,11 @@ public:
 	UPROPERTY()
 	bool SwitchStayMove;
 
+	//int型のカウンター
 	int WaitTime;
 
+
+	//ボスのステートでの処理
 	void OdaStay1(int Timer);
 
 	void OdaMove1(int Timer);
@@ -63,6 +91,10 @@ public:
 	void OdaMove2(int Timer);
 
 	void OdaBack1(int Timer);
+
+	void OdaAttack1(int Timer);
+
+	void OdaAttack2(int Timer);
 
 
 	//通常の移動速度
@@ -72,14 +104,33 @@ public:
 	//急な速度
 	UPROPERTY(EditAnywhere)
 		float FastOdaSpeed;
-
-	//前方移動変更カウンター
-	UPROPERTY()
-		int FlontTimer;
 	
 	//行動変更時間設定
 	UPROPERTY(EditAnywhere)
 		int ChangeFlontTimer;
+
+	//モーションを一回だけ流すための変数
+	bool isMotionPlaying;
+
+	//衝撃波の出現タイミングの調整
+	UPROPERTY()
+		bool isShockWaveSpawnTiming;
+
+	//衝撃波の出現タイミングの調整するための関数
+	UFUNCTION()
+		void ShockWaveSpawnFlagChange();
+
+	//衝撃波を出現させる為の変数
+	UPROPERTY(EditAnywhere)
+		TSubclassOf<AActor>ShockWaveSpawn;
+
+	//攻撃のフラグ
+	UPROPERTY(BlueprintReadOnly)
+		bool IsAttackNow;
+
+	//攻撃のフラグを切り替える為の関数
+	UFUNCTION()
+		void AttackFlagChange();
 
 	//体力
 	UPROPERTY()
@@ -87,15 +138,31 @@ public:
 
 	//HPが連続で減らないようにロック
 	UPROPERTY()
-		bool isHPRock;
+		bool isHPLock;
+
 	//HPが連続で減らないようにロックするための関数
 	UFUNCTION()
-		void HPRock(bool _isHPRock);
+		void HPLock();
 
+	//プレイヤーの方向に向ける処理
+	UFUNCTION()
+		void ToPlayerRotate();
+
+	//ノックバックするモーション
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AniMontage", meta = (AllowPrivateAccess = "true"))
+		class UAnimMontage* AnimMontage_BossKnockMontage;		//メモ：変数を作る際AnimMontage_は必須らしい
+
+	//攻撃する仮モーション
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AniMontage", meta = (AllowPrivateAccess = "true"))
+		class UAnimMontage* AnimMontage_BossAttack1;
+
+	//衝撃波攻撃する仮モーション
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AniMontage", meta = (AllowPrivateAccess = "true"))
+		class UAnimMontage* AnimMontage_BossAttack2;
 
 	//前方移動
 	UFUNCTION()
-		void FlontMove(float Speed);
+		void BossMove(float Speed , FVector MoveSize);
 
 	//後方移動
 	UFUNCTION()
