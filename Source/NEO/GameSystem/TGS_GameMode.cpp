@@ -14,6 +14,7 @@
 #include "Ingame_WG.h"
 #include "TGS_GameInstance.h"
 #include "GameFramework/PlayerStart.h"
+#include "../OdaBase.h"
 
 
 ATGS_GameMode::ATGS_GameMode()
@@ -127,16 +128,31 @@ AActor* ATGS_GameMode::SpawnEnemy(ASpawnPoint* spawnPoint)
 	FTransform spawnTransform = spawnPoint->GetTransform();
 
 	//SpawnPoint‚ğg‚Á‚ÄA“G‚ğ¶¬‚·‚é
+	AOdaBase* Boss = Cast<AOdaBase>(GetWorld()->SpawnActor(spawnPoint->GetSpawnActorClass()));
 	AEnamyBase* Enemy = Cast<AEnamyBase> ( GetWorld()->SpawnActor(spawnPoint->GetSpawnActorClass()) );
-	Enemy->SetActorTransform(spawnTransform);
-	Enemy->IsAreaEnemy = true;		//Flag Set 
+	if (Enemy)	{
+		Enemy->SetActorTransform(spawnTransform);
+		Enemy->IsAreaEnemy = true;		//Flag Set 
 
-	//“G‚ğƒQ[ƒ€ƒXƒe[ƒg‚É“o˜^‚·‚é
-	GetGameState()->AddEnemy(Enemy);
+		//“G‚ğƒQ[ƒ€ƒXƒe[ƒg‚É“o˜^‚·‚é
+		GetGameState()->AddEnemy(Enemy);
 
-	GetGameState()->BattleAreaEnemyCount += 1;
+		GetGameState()->BattleAreaEnemyCount += 1;
+		return Enemy;
+	}
+	else if(Boss){
+		Boss->SetActorTransform(spawnTransform);
+		Boss->IsAreaEnemy = true;		//Flag Set 
 
-	return Enemy;
+		//“G‚ğƒQ[ƒ€ƒXƒe[ƒg‚É“o˜^‚·‚é
+		GetGameState()->AddEnemy(Boss);
+
+		GetGameState()->BattleAreaEnemyCount += 1;
+		return Boss;
+	}
+
+	return nullptr;
+
 }
 
 void ATGS_GameMode::DestroyEnemy(AActor* _enemy,bool BattleAreaEnemy)

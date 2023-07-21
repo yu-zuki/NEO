@@ -18,6 +18,7 @@
 #include "Async/Async.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "NEO/Enemy/EnamyBase.h"
+#include "../OdaBase.h"
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -140,12 +141,18 @@ void APlayerCharacter::SetCollision()
 
 				// エネミーのdamage処理
 				AEnamyBase* Enemy = Cast<AEnamyBase>(HitResult.GetActor());
+				AOdaBase* Oda = Cast<AOdaBase>(HitResult.GetActor());
 
 				if (Enemy)
 				{
 					// ヒットストップ
 					AttackAssistComp->HitStop();
 					Enemy->ApplyDamage(GetDamageAmount());
+				}
+				else if (Oda) {
+					// ヒットストップ
+					AttackAssistComp->HitStop();
+					Oda->ApplyDamage(GetDamageAmount());
 				}
 			}
 		}

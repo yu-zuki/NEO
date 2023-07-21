@@ -15,7 +15,7 @@
 #include "Engine/EngineTypes.h"
 #include "Components/StaticMeshComponent.h"
 #include "Templates/SubclassOf.h"
-#include "NEO/PlayerSystem/PlayerCharacter.h"
+#include "PlayerSystem/PlayerCharacter.h"
 
 #include "OdaBase.generated.h"
 
@@ -59,7 +59,7 @@ public:
 
 	//ダメージ処理
 	UFUNCTION()
-	float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser);
+	virtual void ApplyDamage(float Damage);
 
 	//ダメージタイプクラス
 	UPROPERTY()
@@ -167,4 +167,13 @@ public:
 	//後方移動
 	UFUNCTION()
 		void BackMove(float Speed);
+
+//////////////////////////////////////////////////////////////////////////
+//死亡処理
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Area")
+		bool IsAreaEnemy = false;
+
+	void Death();
+
 };
