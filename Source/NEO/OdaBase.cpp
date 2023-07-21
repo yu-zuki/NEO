@@ -11,7 +11,7 @@
 //コンストラクタ+変数の初期化
 AOdaBase::AOdaBase():
 	OdaNobunaga(this),
-	BoxComp(NULL),
+	BoxCompOne(NULL),
 	FlameCounter(0),
 	OdaMoveEnum(ECPPOdaEnum::Stay1),
 	SwitchStayMove(true),
@@ -21,14 +21,14 @@ AOdaBase::AOdaBase():
 	ChangeFlontTimer(20),
 	isMotionPlaying(false),
 	isShockWaveSpawnTiming(false),
-	Health(100),
-	MaxHealth(100.f)
+	Health(500.f),
+	MaxHealth(500.f)
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	BoxComp = CreateDefaultSubobject<UBoxComponent>(TEXT("SwordComponent"),true);
-	BoxComp->SetupAttachment(GetMesh(),"weapon_r");
+	BoxCompOne = CreateDefaultSubobject<UBoxComponent>(TEXT("Sword"));
+	BoxCompOne->SetupAttachment(GetMesh(),"weapon_r");
 
 	//UI Create
 	EnemyWidget = CreateDefaultSubobject<UEnemyBase_WidgetComponent>(TEXT("EnemyWidget"));
@@ -338,12 +338,12 @@ void AOdaBase::ShockWaveSpawnFlagChange()
 {
 	//衝撃波を出現させる為の変数をtrueに変える
 	isShockWaveSpawnTiming = true;
-	//もしIsAttackNowがtrueになっていたら
-	if (IsAttackNow == true)
-	{
-		//falseにしてみる
-		IsAttackNow = false;
-	}
+	////もしIsAttackNowがtrueになっていたら
+	//if (IsAttackNow == true)
+	//{
+	//	//falseにしてみる
+	//	IsAttackNow = false;
+	//}
 }
 
 

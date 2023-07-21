@@ -56,7 +56,7 @@ public:
 
 	//剣のコリジョン
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "BoxComp", meta = (AllowPrivateAccess = "true"))
-	UBoxComponent* BoxComp;
+		UBoxComponent* BoxCompOne;
 
 	//キャラクタームーブメント
 	UPROPERTY()
