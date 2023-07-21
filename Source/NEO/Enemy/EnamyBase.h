@@ -49,29 +49,7 @@ public:
 		virtual void ApplyDamage(float DamageAmount);
 
 	float GetHP() { return Health; }
-	// Called for jumping and moving in air
-<<<<<<< HEAD
-	void ProjectileMotion(float DeltaTime);
-	UPROPERTY(EditAnywhere,BlueprintReadOnly)
-		float InitialSpeed;
-
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-		float LaunchAngle;
-private:
-	bool bIsRotation;
-	//‚Á”ò‚Ôƒtƒ‰ƒO
-	
-	///////////////ŽÎ•û“ŠŽË/////////////////
-	bool bIsProjectile;
-	float Gravity;
-	float Time;
-	FVector InitialDirection;
-	//////////////////////////////////////////////////////////////////////////
-=======
-	
-	UPROPERTY(EditAnywhere,BlueprintReadOnly)
-		float InitialSpeed;
 	UPROPERTY()
 	FTimerHandle UnusedHandle;
 	
@@ -92,7 +70,6 @@ private:
 	bool bIsReactingToDamage;
 	bool bIsDead;
 	bool bIsAir;
->>>>>>> 895caac45da460713c5ce2d513d4c1ebd8f07b96
 	///UI
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
