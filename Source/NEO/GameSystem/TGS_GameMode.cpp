@@ -242,10 +242,17 @@ void ATGS_GameMode::SelctorPlayerType()
 		UTGS_GameInstance* GameInstance = GetGameInstance();
 		if (!GameInstance) {
 			DefaultPawnClass = PlayerCharacterClassOne;
+			UE_LOG(LogTemp, Error, TEXT("GameInstance is not found"));
 			return;
 		}
 
 		AActor* SpawnPoint = GetPlayStartPoint();
+		if (!SpawnPoint) {
+			DefaultPawnClass = PlayerCharacterClassOne;
+			UE_LOG(LogTemp, Error, TEXT("SpawnPoint is not found"));
+			return;
+		}
+
 		FTransform SpawnPointT = SpawnPoint->GetTransform();
 
 		//Defauly Pawn Class‚ğİ’è‚·‚é	
