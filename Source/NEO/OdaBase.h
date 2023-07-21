@@ -15,7 +15,7 @@
 #include "Engine/EngineTypes.h"
 #include "Components/StaticMeshComponent.h"
 #include "Templates/SubclassOf.h"
-#include "PlayerCharacter.h"
+#include "NEO/PlayerSystem/PlayerCharacter.h"
 
 #include "OdaBase.generated.h"
 
