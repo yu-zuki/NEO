@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "EnemyBaseAnimInstance.h"
 #include "EnamyBase.generated.h"
 
 UCLASS()
@@ -49,6 +50,7 @@ public:
 
 	float GetHP() { return Health; }
 	// Called for jumping and moving in air
+<<<<<<< HEAD
 	void ProjectileMotion(float DeltaTime);
 	UPROPERTY(EditAnywhere,BlueprintReadOnly)
 		float InitialSpeed;
@@ -66,8 +68,34 @@ private:
 	float Time;
 	FVector InitialDirection;
 	//////////////////////////////////////////////////////////////////////////
+=======
+	
+	UPROPERTY(EditAnywhere,BlueprintReadOnly)
+		float InitialSpeed;
+	UPROPERTY()
+	FTimerHandle UnusedHandle;
+	
+	bool IsIdol() const { return bIsIdol; }
+	bool IsWalking() const { return bIsWalking; }
+	bool IsRunning ()const { return bIsRunning; }
+	bool IsAttacking() const { return bIsAttacking; }
+	bool IsReactingToDamage() const { return bIsReactingToDamage; }
+	bool IsDead() const { return bIsDead; }
+	bool IsAir() const{ return bIsAir; }
+private:
+	bool bIsRotation;
+	///////////////////////////////アニメーション///////////////////////////////////////////
+	bool bIsIdol;
+	bool bIsWalking;
+	bool bIsRunning;
+	bool bIsAttacking;
+	bool bIsReactingToDamage;
+	bool bIsDead;
+	bool bIsAir;
+>>>>>>> 895caac45da460713c5ce2d513d4c1ebd8f07b96
 	///UI
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
 		class UEnemyBase_WidgetComponent* EnemyWidget;
+
 };

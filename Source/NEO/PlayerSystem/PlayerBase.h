@@ -143,7 +143,7 @@ protected:
 
 	// ダメージ量を返す関数
 	UFUNCTION(BlueprintCallable,Category = "GetStatus")
-		float GetDamageAmount()const { return PlayerStatus.DamageAmount * (((float)ComboIndex + 1.f) * PlayerStatus.ComboDamageFactor); }
+		float GetDamageAmount()const { return PlayerStatus.DamageAmount * (( (float)ComboIndex + 1.f) * PlayerStatus.ComboDamageFactor); }
 
 	UFUNCTION(BlueprintCallable, Category = "GetStatus")
 		float GetHP()const { return PlayerStatus.HP; }
@@ -229,7 +229,11 @@ public:
 
 	// 被ダメージアニメーション
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Animation)
-		UAnimMontage* DmageAnimMontage;
+		UAnimMontage* DamageAnimMontage;
+
+	// 死亡時アニメーション
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Animation)
+		UAnimMontage* DeathAnimMontage;
 
 protected:
 
