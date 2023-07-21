@@ -176,4 +176,10 @@ public:
 
 	void Death();
 
+//////////////////////////////////////////////////////////////////////////
+//UI
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
+		class UEnemyBase_WidgetComponent* EnemyWidget;
+
+		float MaxHealth;
 };

@@ -3,6 +3,7 @@
 
 #include "OdaBase.h"
 #include "GameSystem/TGS_GameMode.h"
+#include "GameSystem/EnemyBase_WidgetComponent.h"
 
 
 
@@ -20,13 +21,18 @@ AOdaBase::AOdaBase():
 	ChangeFlontTimer(20),
 	isMotionPlaying(false),
 	isShockWaveSpawnTiming(false),
-	Health(100)
+	Health(100),
+	MaxHealth(100.f)
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	BoxComp = CreateDefaultSubobject<UBoxComponent>(TEXT("SwordComponent"),true);
 	BoxComp->SetupAttachment(GetMesh(),"weapon_r");
+
+	//UI Create
+	EnemyWidget = CreateDefaultSubobject<UEnemyBase_WidgetComponent>(TEXT("EnemyWidget"));
+	EnemyWidget->SetupAttachment(RootComponent);
 
 }
 
@@ -53,6 +59,10 @@ void AOdaBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 void AOdaBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	//Enemy Hp Set
+	EnemyWidget->SetHPInfo(Health, MaxHealth);
+
 	//フレームごとに加算する
 	FlameCounter++;
 	//向きをプレイヤーの方に向ける(60フレーム毎に更新)

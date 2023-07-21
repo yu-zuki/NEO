@@ -259,6 +259,7 @@ void ATGS_GameMode::SelctorPlayerType()
 		switch (GetGameInstance()->LoadPlayerType())
 		{
 		case EPlayerType::EPlayerType_None:
+			DefaultPawnClass = PlayerCharacterClassOne;
 			return;
 			break;
 		case EPlayerType::EPlayerType_1:
