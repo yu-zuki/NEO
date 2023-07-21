@@ -2,6 +2,7 @@
 
 
 #include "OdaBase.h"
+#include "GameSystem/TGS_GameMode.h"
 
 
 
@@ -33,8 +34,10 @@ AOdaBase::AOdaBase():
 void AOdaBase::BeginPlay()
 {
 	Super::BeginPlay();
-	NobunagaMovement = (OdaNobunaga->GetCharacterMovement());
-	ForwardDirection = (OdaNobunaga->GetActorForwardVector());
+	SpawnDefaultController();
+
+	NobunagaMovement = (GetCharacterMovement());
+	ForwardDirection = (GetActorForwardVector());
 
 	
 }
@@ -45,7 +48,6 @@ void AOdaBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
-
 
 // Called every frame
 void AOdaBase::Tick(float DeltaTime)
@@ -60,7 +62,7 @@ void AOdaBase::Tick(float DeltaTime)
 		ToPlayerRotate();
 	}
 	//ボスの前情報を取る
-	ForwardDirection = OdaNobunaga->GetActorForwardVector();
+	ForwardDirection = GetActorForwardVector();
 	//カウンター起動
 	WaitTime++;
 	//UKismetSystemLibrary::PrintString(this, FString::FromInt(WaitTime), true, true, FColor::Cyan, 2.f, TEXT("None"));
@@ -299,33 +301,19 @@ void AOdaBase::ShockWaveSpawnFlagChange()
 }
 
 
-float AOdaBase::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser)
+void AOdaBase::ApplyDamage(float Damage)
 {
 	if (isHPLock != true)
 	{
 		//ノックバックのアニメーションを流す
 		PlayAnimMontage(AnimMontage_BossKnockMontage);
-		//変数にダメージ値を代入
-		const float ActualDamage = Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
-		//まだHPが残ってたら
-		if (ActualDamage > 0.f)
+		Health -= Damage;
+		//HPが0になったら
+		if (Health <= 0.f)
 		{
-			//HPを減らす
-			Health -= ActualDamage;
-			//HPが0になったら
-			if (Health <= 0.f)
-			{
-				//体力が0以下になったときの処理
-				Destroy();
-			}
+			//体力が0以下になったときの処理
+			Death();
 		}
-		//体力値の確認のためのプリントストリング
-		UKismetSystemLibrary::PrintString(this, FString::SanitizeFloat(ActualDamage), true, true, FColor::Cyan, 2.f, TEXT("None"));
-		return ActualDamage;
-	}
-	else
-	{
-		return 0.f;
 	}
 }
 
@@ -338,10 +326,19 @@ void AOdaBase::HPLock()
 //動き関連
 void AOdaBase::BossMove(float Speed, FVector MoveSize)
 {
-	OdaNobunaga->AddMovementInput(MoveSize, Speed);
+	AddMovementInput(MoveSize, Speed);
 }
 
 void AOdaBase::BackMove(float Speed)
 {
-	OdaNobunaga->AddMovementInput(ForwardDirection, -Speed);
+	AddMovementInput(ForwardDirection, -Speed);
+}
+
+void AOdaBase::Death()
+{
+	ATGS_GameMode* GameMode = Cast<ATGS_GameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	if (GameMode)
+	{
+		GameMode->DestroyEnemy(this, IsAreaEnemy);
+	}
 }
