@@ -146,7 +146,7 @@ void AOdaBase::OdaStay1(int Timer)
 	//プレイヤーとの距離の判定
 	if (FVector::Dist(BossPosX,PlayerPosX) <= 10.f)
 	{
-		if (FMath::RandRange(0,100) <= 20)
+		if (FMath::RandRange(0,100) <= 100)
 		{
 			if (Timer % 40 == 0)
 			{
@@ -163,7 +163,7 @@ void AOdaBase::OdaStay1(int Timer)
 		}
 	}
 
-	else if (FVector::Dist(BossPosY,PlayerPosY) <= 200.f)
+	else if (FVector::Dist(BossPosY,PlayerPosY) <= 100.f)
 	{
 		//近接攻撃
 		OdaMoveEnum = ECPPOdaEnum::Attack1;
@@ -275,16 +275,22 @@ void AOdaBase::OdaBack1(int Timer) {
 
 //攻撃１
 void AOdaBase::OdaAttack1(int Timer) {
-	if (isMotionPlaying == true)
+	//20フレーム後
+	if (Timer % 10 == 0)
 	{
-		//アニメーションを流す(今は仮)
-		PlayAnimMontage(AnimMontage_BossAttack1);
-		//一度だけ流したいのでフラグを切り替える
-		isMotionPlaying = false;
+		if (isMotionPlaying == true)
+		{
+			//アニメーションを流す(今は仮)
+			PlayAnimMontage(AnimMontage_BossAttack1);
+			//一度だけ流したいのでフラグを切り替える
+			isMotionPlaying = false;
+		}
 	}
 
-	//150フレームたったら
-	if (Timer % 150 == 0)
+
+
+	//130フレームたったら
+	if (Timer % 130 == 0)
 	{
 		//ステートを切り替える
 		OdaMoveEnum = ECPPOdaEnum::Stay1;
@@ -353,6 +359,9 @@ void AOdaBase::ApplyDamage(float Damage)
 	{
 		//ノックバックのアニメーションを流す
 		PlayAnimMontage(AnimMontage_BossKnockMontage);
+		//タイマーをリセットする
+		WaitTime = 0;
+
 		Health -= Damage;
 		//HPが0になったら
 		if (Health <= 0.f)
