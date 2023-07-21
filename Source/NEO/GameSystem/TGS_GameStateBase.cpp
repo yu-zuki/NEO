@@ -280,6 +280,13 @@ void ATGS_GameStateBase::OnInBattleArea()
 		ExitBattleArea();
 		SetCurrentState(EGameState::EGame_Playing);
 	}
+	else if (IsGameOver()) {
+		SetCurrentState(EGameState::EGame_Over);
+		GameEndTime = FDateTime::Now();
+
+		GetGameInstance()->SaveGameStateData(ECurrentState);		//インスタンスにゲームの状態を保存
+		ChangeNextLevel(ENextLevel::ENextLevel_Over);
+	}
 
 }
 

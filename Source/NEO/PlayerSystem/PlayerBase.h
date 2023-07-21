@@ -45,7 +45,7 @@ struct FMainAction
 };
 //----------------------------------------------------------------------------------------
 
-//-----------------PlayerStatus------------------------------------------------------------
+//-----------------PlayerStatus-----------------------------------------------------------
 USTRUCT(BlueprintType)
 struct FPlayerStatus
 {
@@ -55,6 +55,9 @@ struct FPlayerStatus
 		float HP;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		int RemainingLife;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		float DamageAmount;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
@@ -62,8 +65,31 @@ struct FPlayerStatus
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		float JumpHeight;
+
+
 };
 //----------------------------------------------------------------------------------------
+
+//-----------------アニメーション保管用-----------------------------------------------------
+USTRUCT(BlueprintType)
+struct FPlayerAnimation
+{
+	GENERATED_BODY()
+
+	// コンボ
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Animation)
+		TArray<UAnimMontage*> Combo;
+
+	// 被ダメージ
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Animation)
+		UAnimMontage* TakeDamage;
+
+	// 死亡時
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Animation)
+		UAnimMontage* Death;
+};
+//----------------------------------------------------------------------------------------
+
 
 UCLASS()
 class NEO_API APlayerBase : public AInputCharacter
@@ -84,6 +110,12 @@ class NEO_API APlayerBase : public AInputCharacter
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		FPlayerStatus PlayerStatus;
+
+protected:
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		FPlayerAnimation PlayerAnimation;
+
 
 public:
 	// Sets default values for this character's properties
@@ -145,8 +177,13 @@ protected:
 	UFUNCTION(BlueprintCallable,Category = "GetStatus")
 		float GetDamageAmount()const { return PlayerStatus.DamageAmount * (( (float)ComboIndex + 1.f) * PlayerStatus.ComboDamageFactor); }
 
+	// 現在のHPを返す
 	UFUNCTION(BlueprintCallable, Category = "GetStatus")
 		float GetHP()const { return PlayerStatus.HP; }
+
+	// 死亡時のアニメーションの再生を遅くする
+	UFUNCTION(BlueprintCallable, Category = "GetState")
+		void SlowDawnDeathAnimationRate();
 	//---------------------------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -157,6 +194,12 @@ private:
 
 	// キャラクターの回転
 	void RotateCharacter(float _nowInput_Y);
+
+	// 死亡処理呼び出し
+	void CallGameModeFunc_PlayerDeath();
+
+	// 死亡してからゲームオーバー画面に遷移するまでの時間
+	FTimerHandle TimerHandle_DeathToGameOver;
 
 public:
 	// Called every frame
@@ -171,7 +214,8 @@ public:
 	virtual void SetupPlayerData();
 
 	// プレイヤーのステータスパラメータ初期化
-	void SetupPlayerStatus(float _hp = 100.f, float _damageAmount = 10.f, float _jumpHeight = 150.f, float _comboDamageFactor = 1.f);
+	void SetupPlayerStatus(float _hp = 100.f, int _remainingLife = 3.f, float _damageAmount = 10.f,
+							float _jumpHeight = 150.f, float _comboDamageFactor = 1.f);
 
 	// ボタンの設定
 	void SetupMainActionMapping();
@@ -221,19 +265,6 @@ public:
 	// キャラクターの動き
 	UCharacterMovementComponent* CharacterMovementComp;
 	//-------------------------------------------------------------------------------------------------------------
-
-
-	// コンボアニメーション保管用
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Animation)
-		TArray<UAnimMontage*> ComboAnimMontages;
-
-	// 被ダメージアニメーション
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Animation)
-		UAnimMontage* DamageAnimMontage;
-
-	// 死亡時アニメーション
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Animation)
-		UAnimMontage* DeathAnimMontage;
 
 protected:
 

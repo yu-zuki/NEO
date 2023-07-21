@@ -60,7 +60,8 @@ public:
 	void ClearEnemy();
 
 //--------------------------------------------ÉLÅ[ì¸óÕ---------------------------------------------
-	void SetState_GameOver();
+	UFUNCTION(BlueprintCallable, Category = "GameSystem")
+		void SetState_GameOver();
 
 	void SetSubAction(ESubAction _eSubAction);
 

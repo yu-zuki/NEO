@@ -17,6 +17,7 @@
 #include "Async/Async.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/BoxComponent.h"
+#include "NEO/GameSystem/TGS_GameMode.h"
 
 #define DIRECTION (90.f)
 
@@ -125,14 +126,17 @@ void APlayerBase::SetupPlayerData()
  * 関数名　　　　：SetupPlayerStatus()
  * 処理内容　　　：プレイヤーのステータス初期化
  * 引数１　　　　：float _hp・・・・・・・・・HPの初期値 
- * 引数２　　　　：float _damageAmount・・・・攻撃力の初期値
- * 引数３　　　　：float _jumpHeight・・・・・ジャンプ力の初期値
- * 引数４　　　　：float _comboDamageFactor・コンボごとのダメージの倍率
+ * 引数２		
+ * 引数３　　　　：float _damageAmount・・・・攻撃力の初期値
+ * 引数４　　　　：float _jumpHeight・・・・・ジャンプ力の初期値
+ * 引数５　　　　：float _comboDamageFactor・コンボごとのダメージの倍率
  * 戻り値　　　　：なし
  */
-void APlayerBase::SetupPlayerStatus(float _hp /*= 100.f*/, float _damageAmount /*= 10.f*/, float _jumpHeight /*= 150.f*/, float _comboDamageFactor /*= 1.f*/)
+void APlayerBase::SetupPlayerStatus(float _hp /*= 100.f*/, int _remainingLife /*= 3.f*/, float _damageAmount /*= 10.f*/,
+									float _jumpHeight /*= 150.f*/, float _comboDamageFactor /*= 1.f*/)
 {
 	PlayerStatus.HP = _hp;
+	PlayerStatus.RemainingLife = _remainingLife;
 	PlayerStatus.DamageAmount = _damageAmount;
 	PlayerStatus.JumpHeight = _jumpHeight;
 	PlayerStatus.ComboDamageFactor = _comboDamageFactor;
@@ -375,7 +379,7 @@ void APlayerBase::Attack(int _attackNum /*= 0*/)
 	}
 
 	// 攻撃のアニメーション再生
-	PlayAnimation(ComboAnimMontages[_attackNum],ComboStartSectionNames[ComboIndex]);
+	PlayAnimation(PlayerAnimation.Combo[_attackNum],ComboStartSectionNames[ComboIndex]);
 }
 
 
@@ -442,6 +446,59 @@ void APlayerBase::RotateCharacter(float _nowInput_Y)
 
 
 /*
+ * 関数名　　　　：SlowDawnDeathAnimationRate()
+ * 処理内容　　　：死亡時アニメーション引き伸ばし
+ * 戻り値　　　　：なし
+ */
+void APlayerBase::SlowDawnDeathAnimationRate()
+{
+	// 遅くする
+	GetMesh()->GlobalAnimRateScale = 0.01;
+
+
+	//HitStopを停止
+	FTimerManager& TimerManager = GetWorld()->GetTimerManager();
+	TimerManager.SetTimer(TimerHandle_DeathToGameOver, this, &APlayerBase::CallGameModeFunc_PlayerDeath, 3.f, false);
+}
+
+
+/*
+ * 関数名　　　　：CallGameModeFunc_PlayerDeath()
+ * 処理内容　　　：死亡時のゲームモード内の関数呼び出し
+ * 　　　　　　　　残機が残ってたらリスポーン,なくなったらゲームオーバー
+ * 戻り値　　　　：なし
+ */
+void APlayerBase::CallGameModeFunc_PlayerDeath()
+{
+	//// ゲームモード作成
+	//ATGS_GameMode* gameMode = Cast<ATGS_GameMode>(GetWorld()->GetAuthGameMode());
+
+	//if (gameMode)
+	//{
+	//	// 残機があるうちはリスポーン
+	//	if (PlayerStatus.RemainingLife > 0)
+	//	{
+	//		// プレイヤーリスポーン
+	//		gameMode->RespawnPlayer();
+
+	//		// 残機-１
+	//		PlayerStatus.RemainingLife -= 1;
+	//	}
+	//	// それ以外はゲームオーバー
+	//	else
+	//	{
+	//		// ゲームオーバーへ
+	//		gameMode->SetState_GameOver();
+
+	//		// プレイヤー削除
+	//		gameMode->DestroyPlayer(this);
+	//	}
+	//}
+}
+
+
+
+/*
  * 関数名　　　　：ContinuationCombo()
  * 処理内容　　　：コンボの継続
  * 戻り値　　　　：なし
@@ -493,27 +550,34 @@ void APlayerBase::TakedDamage(float _damage)
 		// HP計算
 		PlayerStatus.HP -= _damage;
 
-		// 攻撃中のフラグリセット
-		if (IsAttacking)
+		// HPが0以下になったら
+		if (PlayerStatus.HP <= 0.f)
 		{
-			IsAttacking = false;
-			CanCombo = false;
-			IsControl = true;
-			ComboIndex = 0;
+			// HPが0以下なら死
+			PlayerState = State_Death;
+
+			IsControl = false;
+
+			// 死亡アニメーション再生
+			PlayAnimation(PlayerAnimation.Death);
 		}
+		else
+		{
+			// 攻撃中のフラグリセット
+			if (IsAttacking)
+			{
+				IsAttacking = false;
+				CanCombo = false;
+				IsControl = true;
+				ComboIndex = 0;
+			}
 
-		// 被ダメージアニメーション再生
-		PlayAnimation(DamageAnimMontage);
+			// 被ダメージアニメーション再生
+			PlayAnimation(PlayerAnimation.TakeDamage);
+		}
 	}
-	else
-	{
-		// HPが0未満なら死
-		PlayerState = State_Death;
-		IsControl = false;
 
-		// 被ダメージアニメーション再生
-		//PlayAnimation(DeathAnimMontage);
-	}
+
 }
 
 

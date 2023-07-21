@@ -95,17 +95,17 @@ void APlayerCharacter::SetupAnimationAsset()
 
 	for (int i = 0; i < 2; ++i)
 	{
-		ComboAnimMontages.Add(GetAnimationAsset(ComboAnimationAssetPaths[i]));
+		(PlayerAnimation.Combo).Add(GetAnimationAsset(ComboAnimationAssetPaths[i]));
 	}
 
 	// 被ダメージアニメーションのパス保管用
 	TCHAR* DamageAnimationAssetPath = TEXT("/Game/0122/Player/Animation/Montage/Damaged");
 
-	DamageAnimMontage = GetAnimationAsset(DamageAnimationAssetPath);
+	PlayerAnimation.TakeDamage = GetAnimationAsset(DamageAnimationAssetPath);
 
 	TCHAR* DeathAnimationAssetPath = TEXT("/Game/0122/Player/Animation/Montage/Death");
 
-	DeathAnimMontage = GetAnimationAsset(DeathAnimationAssetPath);
+	PlayerAnimation.Death = GetAnimationAsset(DeathAnimationAssetPath);
 }
 
 
