@@ -33,7 +33,8 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
+	UPROPERTY()
+		FTimerHandle TimerHandle_DestroyEnemy;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -48,10 +49,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Health")
 		virtual void ApplyDamage(float DamageAmount);
 
+	void AfterDeath();
+
+	
+
 	float GetHP() { return Health; }
 	
-	UPROPERTY()
-	FTimerHandle UnusedHandle;
 	
 	bool IsIdol() const { return bIsIdol; }
 	bool IsWalking() const { return bIsWalking; }
