@@ -128,8 +128,11 @@ AActor* ATGS_GameMode::SpawnEnemy(ASpawnPoint* spawnPoint)
 	FTransform spawnTransform = spawnPoint->GetTransform();
 
 	//SpawnPoint‚ğg‚Á‚ÄA“G‚ğ¶¬‚·‚é
-	AOdaBase* Boss = Cast<AOdaBase>(GetWorld()->SpawnActor(spawnPoint->GetSpawnActorClass()));
-	AEnamyBase* Enemy = Cast<AEnamyBase> ( GetWorld()->SpawnActor(spawnPoint->GetSpawnActorClass()) );
+	AActor* spawn_Actor = GetWorld()->SpawnActor(spawnPoint->GetSpawnActorClass());
+
+	AOdaBase* Boss = Cast<AOdaBase>(spawn_Actor);
+	AEnamyBase* Enemy = Cast<AEnamyBase> (spawn_Actor);
+
 	if (Enemy)	{
 		Enemy->SetActorTransform(spawnTransform);
 		Enemy->IsAreaEnemy = true;		//Flag Set 
