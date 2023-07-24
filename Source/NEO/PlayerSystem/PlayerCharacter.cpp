@@ -30,7 +30,6 @@ APlayerCharacter::APlayerCharacter()
 	CharacterMovementComp = GetCharacterMovement();
 	CharacterMovementComp->MaxWalkSpeed = 500.f;
 
-	// プレイヤーのデータセットアップ
 	SetupPlayerData();
 }
 
@@ -76,6 +75,9 @@ void APlayerCharacter::SetupPlayerData()
 
 	// アニメーションアセット設定
 	SetupAnimationAsset();
+
+	// プレイヤーのステータス初期化
+	SetupPlayerStatus();
 }
 
 
@@ -103,6 +105,7 @@ void APlayerCharacter::SetupAnimationAsset()
 
 	PlayerAnimation.TakeDamage = GetAnimationAsset(DamageAnimationAssetPath);
 
+	// 死亡時アニメーションのパス保管
 	TCHAR* DeathAnimationAssetPath = TEXT("/Game/0122/Player/Animation/Montage/Death");
 
 	PlayerAnimation.Death = GetAnimationAsset(DeathAnimationAssetPath);
@@ -116,6 +119,7 @@ void APlayerCharacter::SetupAnimationAsset()
  */
 void APlayerCharacter::SetCollision()
 {
+	// 自身に当たらないようにする
 	FCollisionQueryParams CollisionParams;
 	CollisionParams.AddIgnoredActor(this);
 
@@ -148,11 +152,18 @@ void APlayerCharacter::SetCollision()
 					// ヒットストップ
 					AttackAssistComp->HitStop();
 					Enemy->ApplyDamage(GetDamageAmount());
+					
 				}
 				else if (Oda) {
 					// ヒットストップ
 					AttackAssistComp->HitStop();
 					Oda->ApplyDamage(GetDamageAmount());
+				}
+
+				// コンボのフィニッシュのみカメラを揺らす
+				if (GetComboIndex() == 2)
+				{
+					
 				}
 			}
 		}

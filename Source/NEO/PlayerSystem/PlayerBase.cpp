@@ -19,7 +19,8 @@
 #include "Components/BoxComponent.h"
 #include "NEO/GameSystem/TGS_GameMode.h"
 
-#define DIRECTION (90.f)
+#define DIRECTION_X (25.f)
+#define DIRECTION_Y (90.f)
 
 // Sets default values
 APlayerBase::APlayerBase()
@@ -30,6 +31,8 @@ APlayerBase::APlayerBase()
 	, IsAttacking(false)
 	, CanCombo(false)
 	, ComboIndex(0)
+	, DeadAnimRate(0.01f)
+	, DeadToGameOverTime(3.f)
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -59,6 +62,12 @@ void APlayerBase::BeginPlay()
 			Subsystem->AddMappingContext(MainActionMapping.DefaultMappingContext, 1);
 		}
 	}
+
+
+	// 初期角度に設定
+	const FRotator nowRotate = FRotator(0.f, DIRECTION_Y, -DIRECTION_X);
+
+	SetActorRotation(nowRotate);
 }
 
 
@@ -89,11 +98,11 @@ void APlayerBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	{
 		// 移動
 		EnhancedInputComponent->BindAction(MainActionMapping.MoveAction, ETriggerEvent::Triggered, this, &APlayerBase::Move);
-	
+
 		// 走る							
 		EnhancedInputComponent->BindAction(MainActionMapping.RunAction, ETriggerEvent::Started, this, &APlayerBase::Run);
 		EnhancedInputComponent->BindAction(MainActionMapping.RunAction, ETriggerEvent::Completed, this, &APlayerBase::Run);
-		
+
 		// ジャンプ
 		EnhancedInputComponent->BindAction(MainActionMapping.JumpAction, ETriggerEvent::Started, this, &APlayerBase::JumpStart);
 
@@ -111,9 +120,6 @@ void APlayerBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
  */
 void APlayerBase::SetupPlayerData()
 {
-	// プレイヤーのステータス初期化
-	SetupPlayerStatus();
-
 	// メインアクションのボタンをマッピング
 	SetupMainActionMapping();
 
@@ -125,23 +131,26 @@ void APlayerBase::SetupPlayerData()
 /*
  * 関数名　　　　：SetupPlayerStatus()
  * 処理内容　　　：プレイヤーのステータス初期化
- * 引数１　　　　：float _hp・・・・・・・・・HPの初期値 
- * 引数２		
+ * 引数１　　　　：float _hp・・・・・・・・・HPの初期値
+ * 引数２		 ：int _remainingLife ・・・・復活回数
  * 引数３　　　　：float _damageAmount・・・・攻撃力の初期値
  * 引数４　　　　：float _jumpHeight・・・・・ジャンプ力の初期値
  * 引数５　　　　：float _comboDamageFactor・コンボごとのダメージの倍率
+ * 引数６　　　　：float _walkSpeed・・・・・歩く速度
+ * 引数７　　　　：float _runSpeed ・・・・・走る速度
  * 戻り値　　　　：なし
  */
 void APlayerBase::SetupPlayerStatus(float _hp /*= 100.f*/, int _remainingLife /*= 3.f*/, float _damageAmount /*= 10.f*/,
-									float _jumpHeight /*= 150.f*/, float _comboDamageFactor /*= 1.f*/)
+									float _jumpHeight /*= 150.f*/, float _comboDamageFactor /*= 1.f*/, float _walkSpeed /*= 500.f*/, float _runSpeed /*= 600.f*/)
 {
 	PlayerStatus.HP = _hp;
 	PlayerStatus.RemainingLife = _remainingLife;
 	PlayerStatus.DamageAmount = _damageAmount;
 	PlayerStatus.JumpHeight = _jumpHeight;
 	PlayerStatus.ComboDamageFactor = _comboDamageFactor;
-}
-
+	PlayerStatus.WalkSpeed = _walkSpeed;
+	PlayerStatus.RunSpeed = _runSpeed;
+}	
 
 /*
  * 関数名　　　　：SetupMainActionMapping()
@@ -196,6 +205,64 @@ void APlayerBase::SetupMainActionMapping()
 
 
 /*
+ * 関数名　　　　：SetupWeaponMesh()
+ * 処理内容　　　：プレイヤーのメッシュをセットアップ(引数がStaticMeshの場合)
+ * 引数１　　　　：UStaticMeshComponent*& MeshComp・・・メッシュコンポーネント
+ * 引数２　　　　：TCHAR* WeaponAssetPath ・・・・・・・武器のアセットのパス
+ * 引数３　　　　：FName PublicName ・・・・・・・・・・エディタでの公開名
+ * 戻り値　　　　：なし
+ */
+void APlayerBase::SetupWeaponMesh(UStaticMeshComponent*& MeshComp, TCHAR* WeaponAssetPath, FName PublicName /*= "WeaponMesh"*/)
+{
+	// 武器のコンポーネントを作成
+	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(PublicName);
+
+	if (WeaponAssetPath)
+	{
+		// 武器のアセット設定
+		ConstructorHelpers::FObjectFinder< UStaticMesh > weaponMesh(WeaponAssetPath);
+
+		if (weaponMesh.Succeeded())
+		{
+			MeshComp->SetStaticMesh(weaponMesh.Object);
+		}
+
+		// 体のメッシュに追従
+		MeshComp->SetupAttachment(GetMesh(), "hand_rSocket");
+	}
+}
+
+
+/*
+ * 関数名　　　　：SetupWeaponMesh()
+ * 処理内容　　　：プレイヤーのメッシュをセットアップ(引数がSkeletalMeshの場合)
+ * 引数１　　　　：USkeletalMeshComponent*& MeshComp・・・メッシュコンポーネント
+ * 引数２　　　　：TCHAR* WeaponAssetPath ・・・・・・・・武器のアセットのパス
+ * 引数３　　　　：FName PublicName ・・・・・・・・・・・エディタでの公開名
+ * 戻り値　　　　：なし
+ */
+void APlayerBase::SetupWeaponMesh(USkeletalMeshComponent*& MeshComp, TCHAR* WeaponAssetPath, FName PublicName /*= "WeaponMesh"*/)
+{
+	// 武器のコンポーネントを作成
+	MeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(PublicName);
+
+	if (WeaponAssetPath)
+	{
+		// 武器のアセット設定
+		ConstructorHelpers::FObjectFinder< USkeletalMesh > weaponMesh(WeaponAssetPath);
+
+		if (weaponMesh.Succeeded())
+		{
+			MeshComp->SetSkeletalMeshAsset(weaponMesh.Object);
+		}
+
+		// 体のメッシュに追従
+		MeshComp->SetupAttachment(GetMesh(), "hand_rSocket");
+	}
+}
+
+
+/*
  * 関数名　　　　：GetAnimationAsset()
  * 処理内容　　　：アニメーションアセットを返す
  * 引数１　　　　：TCHAR* _animAssetPath ・・・アニメーションアセットのパス
@@ -204,13 +271,13 @@ void APlayerBase::SetupMainActionMapping()
 UAnimMontage* APlayerBase::GetAnimationAsset(TCHAR* _animAssetPath)
 {
 	// アセットを探してセット
-	ConstructorHelpers::FObjectFinder<UAnimMontage> AnimMontage(_animAssetPath);
+	ConstructorHelpers::FObjectFinder<UAnimMontage> SearchAnimMontage(_animAssetPath);
 
-	if (AnimMontage.Succeeded())
+	if (SearchAnimMontage.Succeeded())
 	{
-		UAnimMontage* tempAnimMontage = AnimMontage.Object;
+		UAnimMontage* FoundAnimMontage = SearchAnimMontage.Object;
 
-		return tempAnimMontage;
+		return FoundAnimMontage;
 	}
 
 	return nullptr;
@@ -267,13 +334,13 @@ void APlayerBase::Run()
 	{
 		// ダッシュオン
 		IsRunning = true;
-		CharacterMovementComp->MaxWalkSpeed = 600.f;
+		CharacterMovementComp->MaxWalkSpeed = PlayerStatus.RunSpeed;
 	}
 	else
 	{
 		// ダッシュオン
 		IsRunning = false;
-		CharacterMovementComp->MaxWalkSpeed = 500.f;
+		CharacterMovementComp->MaxWalkSpeed = PlayerStatus.WalkSpeed;
 	}
 }
 
@@ -429,13 +496,13 @@ void APlayerBase::RotateCharacter(float _nowInput_Y)
 	// 入力の値に応じて前か後ろを向く
 	if (_nowInput_Y == 1.f)
 	{
-		Direction.X = -25.f;
-		Direction.Y = DIRECTION;
+		Direction.X = -DIRECTION_X;
+		Direction.Y = DIRECTION_Y;
 	}
 	else
 	{
-		Direction.X = 25.f;
-		Direction.Y = -DIRECTION;
+		Direction.X = DIRECTION_X;
+		Direction.Y = -DIRECTION_Y;
 	}
 
 	// 新しい方向にセット
@@ -450,25 +517,25 @@ void APlayerBase::RotateCharacter(float _nowInput_Y)
  * 処理内容　　　：死亡時アニメーション引き伸ばし
  * 戻り値　　　　：なし
  */
-void APlayerBase::SlowDawnDeathAnimationRate()
+void APlayerBase::SlowDownDeathAnimationRate()
 {
 	// 遅くする
-	GetMesh()->GlobalAnimRateScale = 0.01;
+	GetMesh()->GlobalAnimRateScale = DeadAnimRate;
 
 
-	//HitStopを停止
+	// プレイヤーを削除
 	FTimerManager& TimerManager = GetWorld()->GetTimerManager();
-	TimerManager.SetTimer(TimerHandle_DeathToGameOver, this, &APlayerBase::CallGameModeFunc_PlayerDeath, 3.f, false);
+	TimerManager.SetTimer(TimerHandle_DeathToGameOver, this, &APlayerBase::CallGameModeFunc_DestroyPlayer, DeadToGameOverTime, false);
 }
 
 
 /*
- * 関数名　　　　：CallGameModeFunc_PlayerDeath()
+ * 関数名　　　　：CallGameModeFunc_DestroyPlayer()
  * 処理内容　　　：死亡時のゲームモード内の関数呼び出し
- * 　　　　　　　　残機が残ってたらリスポーン,なくなったらゲームオーバー
+ * 　　　　　　　　残機が残ってたらリスポーン,なくなったらプレイヤー削除
  * 戻り値　　　　：なし
  */
-void APlayerBase::CallGameModeFunc_PlayerDeath()
+void APlayerBase::CallGameModeFunc_DestroyPlayer()
 {
 	//// ゲームモード作成
 	//ATGS_GameMode* gameMode = Cast<ATGS_GameMode>(GetWorld()->GetAuthGameMode());
@@ -482,7 +549,7 @@ void APlayerBase::CallGameModeFunc_PlayerDeath()
 	//		gameMode->RespawnPlayer();
 
 	//		// 残機-１
-	//		PlayerStatus.RemainingLife -= 1;
+	//		--PlayerStatus.RemainingLife;
 	//	}
 	//	// それ以外はゲームオーバー
 	//	else
@@ -583,7 +650,7 @@ void APlayerBase::TakedDamage(float _damage)
 
 /*
  * 関数名　　　　：PlayAnimation()
- * 処理内容　　　：プレイヤーのステータス初期化
+ * 処理内容　　　：プレイヤーのアニメーション再生(再生中は操作不可)
  * 引数１　　　　：UAnimMontage* _toPlayAnimMontage ・・・再生するアニメーション
  * 引数２　　　　：FName _startSectionName・・・・・・・・コンボの何段目から再生するか
  * 引数３　　　　：float _playRate・・・・・・・・・・・・アニメーションの再生速度
@@ -601,63 +668,5 @@ void APlayerBase::PlayAnimation(UAnimMontage* _toPlayAnimMontage, FName _startSe
 	if (toPlayAnimMontage != nullptr)
 	{
 		PlayAnimMontage(_toPlayAnimMontage, _playRate, _startSectionName);
-	}
-}
-
-
-/*
- * 関数名　　　　：SetupWeaponMesh()
- * 処理内容　　　：プレイヤーのメッシュをセットアップ(引数がStaticMeshの場合)
- * 引数１　　　　：UStaticMeshComponent*& MeshComp・・・メッシュコンポーネント
- * 引数２　　　　：TCHAR* WeaponAssetPath ・・・・・・・武器のアセットのパス
- * 引数３　　　　：FName PublicName ・・・・・・・・・・エディタでの公開名
- * 戻り値　　　　：なし
- */
-void APlayerBase::SetupWeaponMesh(UStaticMeshComponent*& MeshComp, TCHAR* WeaponAssetPath, FName PublicName /*= "WeaponMesh"*/)
-{
-	// 武器のコンポーネントを作成
-	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(PublicName);
-
-	if (WeaponAssetPath)
-	{
-		// 武器のアセット設定
-		ConstructorHelpers::FObjectFinder< UStaticMesh > weaponMesh(WeaponAssetPath);
-
-		if (weaponMesh.Succeeded())
-		{
-			MeshComp->SetStaticMesh(weaponMesh.Object);
-		}
-
-		// 体のメッシュに追従
-		MeshComp->SetupAttachment(GetMesh(), "hand_rSocket");
-	}
-}
-
-
-/*
- * 関数名　　　　：SetupWeaponMesh()
- * 処理内容　　　：プレイヤーのメッシュをセットアップ(引数がSkeletalMeshの場合)
- * 引数１　　　　：USkeletalMeshComponent*& MeshComp・・・メッシュコンポーネント
- * 引数２　　　　：TCHAR* WeaponAssetPath ・・・・・・・・武器のアセットのパス
- * 引数３　　　　：FName PublicName ・・・・・・・・・・・エディタでの公開名
- * 戻り値　　　　：なし
- */
-void APlayerBase::SetupWeaponMesh(USkeletalMeshComponent*& MeshComp, TCHAR* WeaponAssetPath, FName PublicName /*= "WeaponMesh"*/)
-{
-	// 武器のコンポーネントを作成
-	MeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(PublicName);
-
-	if (WeaponAssetPath)
-	{
-		// 武器のアセット設定
-		ConstructorHelpers::FObjectFinder< USkeletalMesh > weaponMesh(WeaponAssetPath);
-
-		if (weaponMesh.Succeeded())
-		{
-			MeshComp->SetSkeletalMeshAsset(weaponMesh.Object);
-		}
-
-		// 体のメッシュに追従
-		MeshComp->SetupAttachment(GetMesh(), "hand_rSocket");
 	}
 }

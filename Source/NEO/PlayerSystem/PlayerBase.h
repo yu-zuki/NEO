@@ -25,7 +25,7 @@ struct FMainAction
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		UInputMappingContext* DefaultMappingContext;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
@@ -45,13 +45,13 @@ struct FMainAction
 };
 //----------------------------------------------------------------------------------------
 
-//-----------------PlayerStatus-----------------------------------------------------------
+//-----------------プレイヤーのステータス-------------------------------------------------
 USTRUCT(BlueprintType)
 struct FPlayerStatus
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		float HP;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
@@ -66,7 +66,11 @@ struct FPlayerStatus
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		float JumpHeight;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		float WalkSpeed;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		float RunSpeed;
 };
 //----------------------------------------------------------------------------------------
 
@@ -76,8 +80,8 @@ struct FPlayerAnimation
 {
 	GENERATED_BODY()
 
-	// コンボ
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Animation)
+		// コンボ
+		UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Animation)
 		TArray<UAnimMontage*> Combo;
 
 	// 被ダメージ
@@ -155,12 +159,15 @@ protected:
 
 	//-----------------AnimBPで呼び出し(攻撃や被ダメージ処理)--------------------------------------------------------------------------------------------
 	// コンボ継続
-	UFUNCTION(BlueprintCallable,Category = "ComboAction")
+	UFUNCTION(BlueprintCallable, Category = "Action")
 		void ContinuationCombo();
 
 	// コンボリセット
 	UFUNCTION(BlueprintCallable, Category = "Action")
 		void ResetCombo();
+
+	UFUNCTION(BlueprintCallable, Category = "Action")
+		int GetComboIndex()const { return ComboIndex; }
 
 	// ダメージを与える処理
 	UFUNCTION(BlueprintCallable, Category = "Action")
@@ -173,17 +180,18 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = "Action")
 		void SetControl(bool _isControl) { IsControl = _isControl; }
 
+	// 死亡時のアニメーションの再生を遅くする
+	UFUNCTION(BlueprintCallable, Category = "Action")
+		void SlowDownDeathAnimationRate();
+
 	// ダメージ量を返す関数
-	UFUNCTION(BlueprintCallable,Category = "GetStatus")
-		float GetDamageAmount()const { return PlayerStatus.DamageAmount * (( (float)ComboIndex + 1.f) * PlayerStatus.ComboDamageFactor); }
+	UFUNCTION(BlueprintCallable, Category = "GetStatus")
+		float GetDamageAmount()const { return PlayerStatus.DamageAmount * (((float)ComboIndex + 1.f) * PlayerStatus.ComboDamageFactor); }
 
 	// 現在のHPを返す
 	UFUNCTION(BlueprintCallable, Category = "GetStatus")
 		float GetHP()const { return PlayerStatus.HP; }
 
-	// 死亡時のアニメーションの再生を遅くする
-	UFUNCTION(BlueprintCallable, Category = "GetState")
-		void SlowDawnDeathAnimationRate();
 	//---------------------------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -196,10 +204,8 @@ private:
 	void RotateCharacter(float _nowInput_Y);
 
 	// 死亡処理呼び出し
-	void CallGameModeFunc_PlayerDeath();
+	void CallGameModeFunc_DestroyPlayer();
 
-	// 死亡してからゲームオーバー画面に遷移するまでの時間
-	FTimerHandle TimerHandle_DeathToGameOver;
 
 public:
 	// Called every frame
@@ -213,19 +219,20 @@ public:
 	// プレイヤーのデータを初期化
 	virtual void SetupPlayerData();
 
-	// プレイヤーのステータスパラメータ初期化
+	// プレイヤーのステータス初期化
 	void SetupPlayerStatus(float _hp = 100.f, int _remainingLife = 3.f, float _damageAmount = 10.f,
-							float _jumpHeight = 150.f, float _comboDamageFactor = 1.f);
+							float _jumpHeight = 150.f, float _comboDamageFactor = 1.f, float _walkSpeed = 500.f, float _runSpeed = 600.f);
 
 	// ボタンの設定
 	void SetupMainActionMapping();
 
-	// アニメーションの設定
-	UAnimMontage* GetAnimationAsset(TCHAR* _animAssetPath);
-
 	// 引数によってスタティックメッシュかスケルタルメッシュのセットアップ
 	void SetupWeaponMesh(UStaticMeshComponent*& MeshComp, TCHAR* WeaponAssetPath, FName PublicName = "WeaponMesh");
 	void SetupWeaponMesh(USkeletalMeshComponent*& MeshComp, TCHAR* WeaponAssetPath, FName PublicName = "WeaponMesh");
+
+	// 指定したパスのアニメーションアセットを返す
+	UAnimMontage* GetAnimationAsset(TCHAR* _animAssetPath);
+
 
 	// ---------コリジョンコンポーネント作成テンプレート
 	/*
@@ -287,4 +294,14 @@ protected:
 	int ComboIndex;							// 何段目のコンボか
 
 	TArray<FName> ComboStartSectionNames;	// コンボの段数(First,Second,Third・・・)
+
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "GameOver")
+		float DeadAnimRate;							// 死亡アニメーションで倒れてからの再生スピード(1で通常スピード)
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "GameOver")
+		float DeadToGameOverTime;					// 死んでからゲームオーバーまでの時間(秒)
+private:
+
+	FTimerHandle TimerHandle_DeathToGameOver;	// ハンドル
 };
