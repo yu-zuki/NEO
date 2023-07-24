@@ -6,6 +6,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "NEO/GameSystem/Enemy_UMG.h"
 #include "Components/WidgetComponent.h"
+#include "DeathTrigger.h"
 #include "Components/CapsuleComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Camera/CameraComponent.h"
@@ -86,7 +87,7 @@ void AEnamyBase::ApplyDamage(float DamageAmount)
 	Health -= DamageAmount;
     if (Health <= 0)
     {
-
+        SpawnDeathTrigger();
         PlayAnimMontage(Death, 1, NAME_None);
         GetWorldTimerManager().SetTimer(TimerHandle_DestroyEnemy, this, &AEnamyBase::AfterDeath, 2.0f, true);
     }
@@ -95,6 +96,30 @@ void AEnamyBase::ApplyDamage(float DamageAmount)
 void AEnamyBase::AfterDeath()
 {
     DestoryEnemy();
+}
+
+void AEnamyBase::SpawnDeathTrigger()
+{
+    UWorld* World = GetWorld();  // 現在のWorldを取得
+    if (World)  // Worldが存在する場合のみスポーンを実行
+    {
+        FActorSpawnParameters SpawnParams;
+        SpawnParams.Owner = this;
+        SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
+
+        // スポーンする位置と向きを取得（この場合、敵キャラクターと同じ位置と向き）
+        FVector SpawnLocation = GetActorLocation();
+        FRotator SpawnRotation = GetActorRotation();
+
+        // DeathTriggerをスポーン
+        ADeathTrigger* DeathTrigger = World->SpawnActor<ADeathTrigger>(ADeathTrigger::StaticClass(), SpawnLocation, SpawnRotation, SpawnParams); 
+
+        // DeathTriggerをEnemyBaseにアタッチ
+        if (DeathTrigger)  // DeathTriggerが正常にスポーンされた場合のみアタッチを実行
+        {
+            DeathTrigger->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
+        }
+    }
 }
 
 

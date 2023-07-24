@@ -1,6 +1,7 @@
 #include "Lancer.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/BoxComponent.h"
 #include "GameFramework/Controller.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -14,7 +15,7 @@ ALancer::ALancer()
     GetCharacterMovement()->bOrientRotationToMovement = true;
     GetCharacterMovement()->RotationRate = FRotator(0.0f, 540.0f, 0.0f);
     GetCharacterMovement()->MaxWalkSpeed = MovementSpeed;
-
+    MyEnemyDamage = nullptr;
 }
 
 
@@ -45,7 +46,23 @@ void ALancer::Tick(float DeltaTime)
         }
     }
     
-
+   
+   UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+    if (AnimInstance && Attack && AnimInstance->Montage_IsPlaying(Attack))
+    {
+        
+        EnableCollisionWhenMontagePlaying();
+    }
+    else
+    {
+       
+        DisableCollisionWhenMontageNotPlaying();
+    }
+   
+   
+   
+   
+    
     
     
 }
@@ -88,6 +105,34 @@ void ALancer::CheckPlayerInFront()
       
     }
 }
+
+
+void ALancer::EnableCollisionWhenMontagePlaying()
+{
+    if (MyEnemyDamage)
+    {
+        UBoxComponent* BoxComponent = Cast<UBoxComponent>(MyEnemyDamage->GetRootComponent());
+        if (BoxComponent)
+        {
+            BoxComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+        }
+    }
+}
+
+
+void ALancer::DisableCollisionWhenMontageNotPlaying()
+{
+    if (MyEnemyDamage)
+    {
+        UBoxComponent* BoxComponent = Cast<UBoxComponent>(MyEnemyDamage->GetRootComponent());
+        if (BoxComponent)
+        {
+            BoxComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+        }
+    }
+}
+
+
 
 
 

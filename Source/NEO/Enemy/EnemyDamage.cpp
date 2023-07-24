@@ -24,7 +24,7 @@ AEnemyDamage::AEnemyDamage()
 	BoxComponent->OnComponentBeginOverlap.AddDynamic(this, &AEnemyDamage::OnOverlapBegin);
 
 	// Set the default damage amount
-	DamageAmount = 5.0f;
+	DamageAmount = 1.0f;
 }
 
 // Called when the game starts or when spawned
