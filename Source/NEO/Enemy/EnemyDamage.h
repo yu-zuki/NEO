@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Lancer.h"
 #include "EnemyDamage.generated.h"
 
 UCLASS()
@@ -29,9 +30,13 @@ public:
 
 	void EnableCollision();
 
+	bool IsLancerAttacking();
+
 	// Damage to be dealt to the player
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage")
 		float DamageAmount;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Collision, meta = (AllowPrivateAccess = "true"))
 		class UBoxComponent* CollisionComponent;
+private:
+	TArray<ALancer*> Lancers;
 };

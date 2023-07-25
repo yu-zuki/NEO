@@ -3,7 +3,6 @@
 #include "GameFramework/Character.h"
 #include "Components/BoxComponent.h"
 #include "EnamyBase.h"
-#include "EnemyDamage.h"
 #include "Lancer.generated.h"
 
 UCLASS()
@@ -18,13 +17,6 @@ public:
 
     UPROPERTY(EditAnywhere, Category = "AI")
         float MovementSpeed = 100.0f; // ˆÚ“®‘¬“x
-   
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Collision")
-        AEnemyDamage* MyEnemyDamage;
-
-    void EnableCollisionWhenMontagePlaying();
-
-    void DisableCollisionWhenMontageNotPlaying();
 protected:
     virtual void BeginPlay() override;
     
