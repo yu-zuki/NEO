@@ -63,24 +63,23 @@ void AEnamyBase::Tick(float DeltaTime)
         // キャラクターの位置と自分の位置を比較してY軸より前にいるかどうかを判定
         bIsRotation = CharacterLocation.Y > MyLocation.Y;
         //bIsRotationがtrueなら
-        if (bIsRotation)
+        if (Health >= 0)
+        {
+            if (bIsRotation)
             {
-            FRotator NewRotation = GetActorRotation();
-            NewRotation.Yaw = -90.0f;
-            SetActorRotation(NewRotation);
+                FRotator NewRotation = GetActorRotation();
+                NewRotation.Yaw = -90.0f;
+                SetActorRotation(NewRotation);
 
             }
             else
             {
                 FRotator NewRotation = GetActorRotation();
                 NewRotation.Yaw = 90.0f;
-               SetActorRotation(NewRotation);
+                SetActorRotation(NewRotation);
             }
-    
-	
 
-
-
+        }
 }
 
 // Called to bind functionality to input
@@ -97,7 +96,7 @@ void AEnamyBase::ApplyDamage(float DamageAmount)
 	Health -= DamageAmount;
     FTimerHandle TimerHandle_ResetDamage;
     bIsNowDamage = true;
-    GetWorldTimerManager().SetTimer(TimerHandle_ResetDamage, this, &AEnamyBase::DamageReac, 0.5f, false);
+    GetWorldTimerManager().SetTimer(TimerHandle_ResetDamage, this, &AEnamyBase::DamageReac, 0.2f, false);
     if (Health <= 0)
     {
         SpawnDeathTrigger();
@@ -106,7 +105,7 @@ void AEnamyBase::ApplyDamage(float DamageAmount)
     }
     else
     {
-        PlayAnimMontage(Damage_Reaction, 0.5, NAME_None);
+        PlayAnimMontage(Damage_Reaction, 0.8, NAME_None);
        
     }
 

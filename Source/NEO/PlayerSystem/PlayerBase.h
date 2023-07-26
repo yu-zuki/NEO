@@ -173,9 +173,6 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = "Action")
 		virtual void SetCollision();
 
-	// ダメージを受ける処理
-	UFUNCTION(BlueprintCallable, Category = "Action")
-		void TakedDamage(float _damage);
 
 	UFUNCTION(BlueprintCallable, Category = "Action")
 		void SetControl(bool _isControl) { IsControl = _isControl; }
@@ -214,6 +211,9 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	// ダメージを受ける処理
+	UFUNCTION(BlueprintCallable, Category = "Action")
+		void TakedDamage(float _damage);
 
 	//------------------プレイヤーのセットアップ---------------------------------------------------------------------------------------------------------
 	// プレイヤーのデータを初期化

@@ -56,7 +56,7 @@ public:
 
 	bool bIsNowDamage;
 
-	
+	bool bIsShoot = false;
 
 	float GetHP() { return Health; }
 	
