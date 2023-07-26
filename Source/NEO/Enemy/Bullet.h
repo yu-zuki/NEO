@@ -15,9 +15,7 @@ class NEO_API ABullet : public AActor
 public:	
 	// Sets default values for this actor's properties
 	ABullet();
-	// Sphere collision component.
-	UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
-		USphereComponent* CollisionComponent;
+	// Sphere collision component
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -29,7 +27,11 @@ private:
 
 	FVector MovementDirection;
 public:	
-	// Called every frame
+	
 	virtual void Tick(float DeltaTime) override;
-
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage")
+		float DamageAmount;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Collision, meta = (AllowPrivateAccess = "true"))
+		class USphereComponent* SphereComponent;
 };
