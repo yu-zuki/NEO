@@ -49,9 +49,14 @@ public:
 		float  MaxHealth;
 	UFUNCTION(BlueprintCallable, Category = "Health")
 		virtual void ApplyDamage(float DamageAmount);
-
+	 
 	void AfterDeath();
 
+	void DamageReac();
+
+	bool bIsNowDamage;
+
+	
 
 	float GetHP() { return Health; }
 	

@@ -33,6 +33,10 @@ void ALancer::BeginPlay()
 
 void ALancer::Tick(float DeltaTime)
 {
+    if (bIsNowDamage)
+    {
+        return;
+    }
     Super::Tick(DeltaTime);
     if (PlayerCharacter)
     {

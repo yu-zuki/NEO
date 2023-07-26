@@ -21,6 +21,7 @@ AEnamyBase::AEnamyBase()
 	//UI Create
 	EnemyWidget = CreateDefaultSubobject<UEnemyBase_WidgetComponent>(TEXT("EnemyWidget"));
 	EnemyWidget->SetupAttachment(RootComponent);
+   
 }
 
 void AEnamyBase::DestoryEnemy()
@@ -44,31 +45,39 @@ void AEnamyBase::BeginPlay()
 
 // Called every frame
 void AEnamyBase::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-    // キャラクターの位置を取得
-    FVector CharacterLocation = GetActorLocation();
-
-    // 自分の座標を取得
-    FVector MyLocation = GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorLocation();
-	//Enemy Hp Set
-	EnemyWidget->SetHPInfo(Health, MaxHealth);
-    // キャラクターの位置と自分の位置を比較してY軸より前にいるかどうかを判定
-    bIsRotation = CharacterLocation.Y > MyLocation.Y;
-    // bIsRotationがtrueなら
-    if (bIsRotation)
+{   
+    if (bIsNowDamage)
     {
-        FRotator NewRotation = GetActorRotation();
-        NewRotation.Yaw = -90.0f;
-        SetActorRotation(NewRotation);
+        return; 
+    }
+    Super::Tick(DeltaTime); 
+    //Enemy Hp Set
+	    EnemyWidget->SetHPInfo(Health, MaxHealth);
+     
+        //キャラクターの位置を取得
+        FVector CharacterLocation = GetActorLocation();
 
-    }
-    else
-    {
-        FRotator NewRotation = GetActorRotation();
-        NewRotation.Yaw = 90.0f;
-        SetActorRotation(NewRotation);
-    }
+        // 自分の座標を取得
+        FVector MyLocation = GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorLocation();
+	   
+        // キャラクターの位置と自分の位置を比較してY軸より前にいるかどうかを判定
+        bIsRotation = CharacterLocation.Y > MyLocation.Y;
+        //bIsRotationがtrueなら
+        if (bIsRotation)
+            {
+            FRotator NewRotation = GetActorRotation();
+            NewRotation.Yaw = -90.0f;
+            SetActorRotation(NewRotation);
+
+            }
+            else
+            {
+                FRotator NewRotation = GetActorRotation();
+                NewRotation.Yaw = 90.0f;
+               SetActorRotation(NewRotation);
+            }
+    
+	
 
 
 
@@ -84,18 +93,32 @@ void AEnamyBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 
 void AEnamyBase::ApplyDamage(float DamageAmount)
 {
+    
 	Health -= DamageAmount;
+    FTimerHandle TimerHandle_ResetDamage;
+    bIsNowDamage = true;
+    GetWorldTimerManager().SetTimer(TimerHandle_ResetDamage, this, &AEnamyBase::DamageReac, 0.5f, false);
     if (Health <= 0)
     {
         SpawnDeathTrigger();
         PlayAnimMontage(Death, 1, NAME_None);
         GetWorldTimerManager().SetTimer(TimerHandle_DestroyEnemy, this, &AEnamyBase::AfterDeath, 2.0f, true);
     }
+    else
+    {
+        PlayAnimMontage(Damage_Reaction, 0.5, NAME_None);
+       
+    }
 
 }
 void AEnamyBase::AfterDeath()
 {
     DestoryEnemy();
+}
+
+void AEnamyBase::DamageReac()
+{
+    bIsNowDamage = false;
 }
 
 void AEnamyBase::SpawnDeathTrigger()
