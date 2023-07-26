@@ -201,7 +201,7 @@ protected:
 private:
 
 	// キャラクターの回転
-	void RotateCharacter(float _nowInput_Y);
+	void RotateCharacter(float _nowInput_X);
 
 	// 死亡処理呼び出し
 	void CallGameModeFunc_DestroyPlayer();

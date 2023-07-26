@@ -40,6 +40,14 @@ APlayerBase::APlayerBase()
 	// プレイヤーの設定
 	AutoPossessPlayer = EAutoReceiveInput::Player0;
 
+	// プレイヤーに回転の制限
+	bUseControllerRotationPitch = true;
+	bUseControllerRotationYaw = false;
+	bUseControllerRotationRoll = false;
+
+	// タグ設定
+	Tags.Add("Player");
+
 	// キャラクターコンポーネント取得
 	CharacterMovementComp = GetCharacterMovement();
 	CharacterMovementComp->MaxWalkSpeed = 500.f;
@@ -63,10 +71,8 @@ void APlayerBase::BeginPlay()
 		}
 	}
 
-
-	// 初期角度に設定
+	// 初期角度設定
 	const FRotator nowRotate = FRotator(0.f, DIRECTION_Y, -DIRECTION_X);
-
 	SetActorRotation(nowRotate);
 }
 
@@ -302,20 +308,19 @@ void APlayerBase::Move(const FInputActionValue& _value)
 	{
 		// find out which way is forward
 		const FRotator Rotation = Controller->GetControlRotation();
-		const FRotator YawRotation(0, Rotation.Yaw, 0);
+		const FRotator YawRotation(0.f, Rotation.Yaw, 0.f);
 
-		// get forward vector
-		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+		// 移動方向取得(X,Y)
+		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 
-		// get right vector 
-		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 
-		// add movement
-		AddMovementInput(ForwardDirection, MovementVector.Y);
+		// 移動
 		AddMovementInput(RightDirection, MovementVector.X);
+		AddMovementInput(ForwardDirection, MovementVector.Y);
 
 		// 移動方向に回転
-		RotateCharacter(MovementVector.Y);
+		RotateCharacter(MovementVector.X);
 	}
 }
 
@@ -482,19 +487,19 @@ void APlayerBase::Combo2()
 /*
  * 関数名　　　　：RotateCharacter()
  * 処理内容　　　：プレイヤーのステータス初期化
- * 引数１　　　　：float _nowInput_Y・・・現在の移動入力値
+ * 引数１　　　　：float _nowInput_X・・・現在の移動入力値
  * 戻り値　　　　：なし
  */
-void APlayerBase::RotateCharacter(float _nowInput_Y)
+void APlayerBase::RotateCharacter(float _nowInput_X)
 {
 	// 入力がない場合は何もしない
-	if (_nowInput_Y == 0) { return; }
+	if (_nowInput_X == 0) { return; }
 
 	// 向く方向
 	FVector2D Direction;
 
 	// 入力の値に応じて前か後ろを向く
-	if (_nowInput_Y == 1.f)
+	if (_nowInput_X == 1.f)
 	{
 		Direction.X = -DIRECTION_X;
 		Direction.Y = DIRECTION_Y;
