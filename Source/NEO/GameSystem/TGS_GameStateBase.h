@@ -190,9 +190,7 @@ public:
 ///////////////////////////////////////////
 ///UI
 
-protected:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI")
-		TSubclassOf<class UIngame_WG> Widget_GameMenuClass;			// ゲームメニューのUI
+protected:			// ゲームメニューのUI
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI")
 		TSubclassOf<class UUserWidget> Widget_PlayerStatusClass;		// プレイヤーのステータスのUI
 
@@ -216,5 +214,4 @@ public:
 		TSubclassOf<class ACharacter> PlayerCharacterClassThree;			// プレイヤー3のキャラクター
 
 public:
-	UIngame_WG* Widget_GameMenu;
 };

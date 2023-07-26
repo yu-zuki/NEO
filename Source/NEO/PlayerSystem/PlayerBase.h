@@ -54,6 +54,9 @@ struct FPlayerStatus
 		UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		float HP;
 
+		UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		float MaxHP;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		int RemainingLife;
 
@@ -304,4 +307,11 @@ protected:
 private:
 
 	FTimerHandle TimerHandle_DeathToGameOver;	// ハンドル
+
+//////////////////////////////////////////////////////////////////////////
+///UI
+public:
+	//プレイヤーのHPの％を返す
+	UFUNCTION(BlueprintCallable, Category = "UI")
+	float GetPlayerHPPercent()const { return PlayerStatus.HP / PlayerStatus.MaxHP; }
 };

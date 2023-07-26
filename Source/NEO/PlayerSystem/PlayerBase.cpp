@@ -18,6 +18,8 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/BoxComponent.h"
 #include "NEO/GameSystem/TGS_GameMode.h"
+#include "Components/WidgetComponent.h"
+
 
 #define DIRECTION_X (25.f)
 #define DIRECTION_Y (90.f)
@@ -150,6 +152,7 @@ void APlayerBase::SetupPlayerStatus(float _hp /*= 100.f*/, int _remainingLife /*
 									float _jumpHeight /*= 150.f*/, float _comboDamageFactor /*= 1.f*/, float _walkSpeed /*= 500.f*/, float _runSpeed /*= 600.f*/)
 {
 	PlayerStatus.HP = _hp;
+	PlayerStatus.MaxHP = _hp;
 	PlayerStatus.RemainingLife = _remainingLife;
 	PlayerStatus.DamageAmount = _damageAmount;
 	PlayerStatus.JumpHeight = _jumpHeight;

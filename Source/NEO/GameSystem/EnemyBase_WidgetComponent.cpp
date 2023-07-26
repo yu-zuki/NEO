@@ -27,11 +27,10 @@ void UEnemyBase_WidgetComponent::LookAtPlayer()
 
 	if (GameMode)
 	{
-	// 计算相机到敌人的向量
+	// Camera To Enemy
 	FVector CameraToEnemy = GetOwner()->GetActorLocation() - GameMode->GetCameraLocation();
 	CameraToEnemy.Y = 0;
-	CameraToEnemy.Z = 0;
-	
+	CameraToEnemy.Z = 0;	
 
 	FRotator LookAtRotation = CameraToEnemy.Rotation();
 	SetWorldRotation(LookAtRotation);

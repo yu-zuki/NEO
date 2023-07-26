@@ -223,7 +223,7 @@ int32 ATGS_GameMode::GetBattleAreaEnemyNum()
 
 void ATGS_GameMode::SetUI_Enemy(FName _ActorName, int32 _NowHp, int32 _MaxHp)
 {
-	GetGameState()->Widget_GameMenu->SetWidgetValue(_ActorName, _NowHp, _MaxHp);
+	//GetGameState()->Widget_GameMenu->SetWidgetValue(_ActorName, _NowHp, _MaxHp);
 }
 
 EPlayerType ATGS_GameMode::GetPlayerType()

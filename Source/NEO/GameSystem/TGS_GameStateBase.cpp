@@ -136,12 +136,16 @@ void ATGS_GameStateBase::InitCurrentState()
 
 	if (ECurrentState == EGameState::EGame_Playing)
 	{
-		if (Widget_GameMenuClass && Widget_PlayerStatusClass) {
-			Widget_GameMenu = CreateWidget<UIngame_WG>(GetWorld(), Widget_GameMenuClass, "GameMenu");
+		if (Widget_PlayerStatusClass) {
 			UUserWidget* Widget_PlayerStatus = CreateWidget<UUserWidget>(GetWorld(), Widget_PlayerStatusClass, "PlayerStatus");
 
 			if (Widget_PlayerStatus) {
-				Widget_PlayerStatus->AddToViewport();		//プレイヤーのステータスを表示する
+				Widget_PlayerStatus->AddToViewport(1);		//プレイヤーのステータスを表示する
+				bool test = Widget_PlayerStatus->IsInViewport();
+				
+				//print test
+				UE_LOG( LogTemp, Warning, TEXT("Widget_PlayerStatus is in viewport: %s"), test ? TEXT("true") : TEXT("false") );
+
 			}
 			else {
 				UE_LOG(LogTemp, Warning, TEXT("Widget_PlayerStatus is not found"));
