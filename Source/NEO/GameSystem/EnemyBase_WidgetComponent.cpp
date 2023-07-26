@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "EnemyBase_WidgetComponent.h"
@@ -7,6 +7,8 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Camera/CameraComponent.h"
 #include "EnemyBase_UMG.h"
+#include "TGS_GameMode.h"
+#include "Kismet/GameplayStatics.h"
 
 void UEnemyBase_WidgetComponent::BeginPlay()
 {
@@ -21,27 +23,19 @@ void UEnemyBase_WidgetComponent::BeginPlay()
 
 void UEnemyBase_WidgetComponent::LookAtPlayer()
 {
-	auto PlayerController = GetWorld()->GetFirstPlayerController();
-	if (PlayerController)
+	ATGS_GameMode* GameMode = Cast<ATGS_GameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+
+	if (GameMode)
 	{
-		//Get camera location
-		APlayerCameraManager* CameraManager = PlayerController->PlayerCameraManager;
-		if (CameraManager == nullptr) return;
-
-		UCameraComponent* CameraComponent = Cast<UCameraComponent>(CameraManager->GetViewTarget()->GetComponentByClass(UCameraComponent::StaticClass()));
-		if (CameraComponent == nullptr) return;
-
-		FVector CameraLocation = CameraComponent->GetComponentLocation();
+	// 计算相机到敌人的向量
+	FVector CameraToEnemy = GetOwner()->GetActorLocation() - GameMode->GetCameraLocation();
+	CameraToEnemy.Y = 0;
+	CameraToEnemy.Z = 0;
 	
-		//Look at camera
-		FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(GetComponentLocation(), CameraLocation);
 
-		//ReSet rotation
-		LookAtRotation.Pitch = 0.0f;
-		LookAtRotation.Roll = 0.0f;
-		LookAtRotation.Yaw = 180.f;
-		//Apply rotation
-		SetWorldRotation(LookAtRotation);
+	FRotator LookAtRotation = CameraToEnemy.Rotation();
+	SetWorldRotation(LookAtRotation);
+	return;		
 	}
 }
 

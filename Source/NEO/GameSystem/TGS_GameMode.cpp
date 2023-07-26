@@ -322,6 +322,15 @@ AActor* ATGS_GameMode::GetPlayStartPoint()
 	return nullptr;
 }
 
+FVector ATGS_GameMode::GetCameraLocation()
+{
+	if (CameraActor) {
+		return CameraActor->GetActorLocation();
+	}
+
+	return FVector();
+}
+
 void ATGS_GameMode::SetViewTargetWithBlend(AActor* NewViewTarget, float BlendTime, EViewTargetBlendFunction BlendFunc, float BlendExp, bool bLockOutgoing)
 {
 	//NULL Check
@@ -339,7 +348,7 @@ void ATGS_GameMode::SetViewTargetWithBlend(AActor* NewViewTarget, float BlendTim
 	}
 
 	//Camera‚ÌÀ•W‚ð‹L˜^
-	CameraLocation = NewViewTarget->GetActorLocation();
+	CameraActor = NewViewTarget;
 
 	PlayerController->SetViewTargetWithBlend(NewViewTarget, BlendTime);
 

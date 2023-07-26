@@ -106,8 +106,8 @@ public:
 ///////////////////////////////////////////////
 ///ƒJƒƒ‰ˆ—
 public:
-FVector CameraLocation;
-FVector GetCameraLocation()	const { return CameraLocation;}
+AActor* CameraActor;
+FVector GetCameraLocation();
 
 //g‚¢•û
 //@ATGS_GameMode* GameMode = Cast<ATGS_GameMode>(UGameplayStatics::GetGameMode(GetWorld()));
