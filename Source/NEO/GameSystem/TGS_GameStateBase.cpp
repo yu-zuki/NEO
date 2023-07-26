@@ -304,12 +304,12 @@ void ATGS_GameStateBase::EnterBattleArea()
 
 	//プレイヤーのカメラを固定カメラに変更
 	if (GetBattleAreaCamera()) {
-		APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
-		if (PlayerController) {
-			PlayerController->SetViewTargetWithBlend(GetBattleAreaCamera(), 0.5f);
+		ATGS_GameMode* GameMode = Cast<ATGS_GameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+		if (GameMode) {
+			GameMode->SetViewTargetWithBlend(GetBattleAreaCamera(), 0.5f);
 		}
 		else {
-			UE_LOG(LogTemp, Warning, TEXT("PlayerController is not found"));
+			UE_LOG(LogTemp, Warning, TEXT("GameMode is not found"));
 		}
 	}
 
@@ -338,14 +338,15 @@ void ATGS_GameStateBase::ExitBattleArea()
 
 	//固定カメラをプレイヤーのカメラに変更
 	if (PlayerCharacter) {
-		APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
-		if (PlayerController) {
+		ATGS_GameMode* GameMode = Cast<ATGS_GameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+		if (GameMode) {
 
 			//Player取得
 			ACharacter* tmp_Character = Cast<ACharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(),0) );
 			AActor* tmp_CameraActor = tmp_Character->GetOwner();
 			if (tmp_CameraActor)			{
-				PlayerController->SetViewTargetWithBlend(tmp_CameraActor, 0.5f);
+				//カメラをプレイヤーのカメラに変更
+				GameMode->SetViewTargetWithBlend(tmp_CameraActor, 0.5f);
 			}
 			else {
 				//Log

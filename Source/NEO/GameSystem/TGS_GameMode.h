@@ -103,6 +103,17 @@ public:
 
 	AActor* GetPlayStartPoint();
 
+///////////////////////////////////////////////
+///カメラ処理
+public:
+FVector CameraLocation;
+FVector GetCameraLocation()	const { return CameraLocation;}
+
+//使い方
+//　ATGS_GameMode* GameMode = Cast<ATGS_GameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+//　GameMode->SetViewTargetWithBlend(Actor, 0.5f);
+void SetViewTargetWithBlend(class AActor* NewViewTarget, float BlendTime = 0, enum EViewTargetBlendFunction BlendFunc = VTBlend_Linear, float BlendExp = 0, bool bLockOutgoing = false);
+
 protected:
 	UFUNCTION(BlueprintCallable, Category = "GameSystem")
 	class ATGS_GameStateBase* GetGameState();
