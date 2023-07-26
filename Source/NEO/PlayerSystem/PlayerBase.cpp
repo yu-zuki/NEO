@@ -311,7 +311,7 @@ void APlayerBase::Move(const FInputActionValue& _value)
 	{
 		// find out which way is forward
 		const FRotator Rotation = Controller->GetControlRotation();
-		const FRotator YawRotation(0.f, Rotation.Yaw, 0.f);
+		const FRotator YawRotation(0.f, Rotation.Yaw + Rotate, 0.f);
 
 		// ˆÚ“®•ûŒüŽæ“¾(X,Y)
 		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);

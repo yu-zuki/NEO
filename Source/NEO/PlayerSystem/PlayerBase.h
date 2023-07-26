@@ -192,6 +192,11 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = "GetStatus")
 		float GetHP()const { return PlayerStatus.HP; }
 
+	// 現在のHPを返す
+	UFUNCTION(BlueprintCallable, Category = "GetStatus")
+		void SetTest(float _Rotate){ Rotate = _Rotate; }
+
+
 	//---------------------------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -297,6 +302,9 @@ protected:
 	int ComboIndex;							// 何段目のコンボか
 
 	TArray<FName> ComboStartSectionNames;	// コンボの段数(First,Second,Third・・・)
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))		
+		float Rotate;
 
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "GameOver")
