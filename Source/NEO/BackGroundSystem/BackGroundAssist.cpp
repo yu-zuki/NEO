@@ -6,6 +6,9 @@
 #include "Kismet/GameplayStatics.h"
 #include "NEO/PlayerSystem/CharacterCamera.h"
 #include "Camera/CameraComponent.h"
+#include "NEO/GameSystem/TGS_GameMode.h"
+
+#define DIRECTION (90.0)
 
 // Sets default values for this component's properties
 UBackGroundAssist::UBackGroundAssist()
@@ -52,14 +55,15 @@ void UBackGroundAssist::ToFaceCamera()
 	UCameraComponent* ActiveCameraComp = Cast<UCameraComponent>(CameraManager->GetViewTarget()->GetComponentByClass(UCameraComponent::StaticClass()));
 	if (!ActiveCameraComp) { return; }
 
-
 	// ƒJƒƒ‰‚ÌŒ»ÝˆÊ’u‚ÆŠp“x‚ðŽæ“¾
-	const FVector CameraLocation = ActiveCameraComp->GetComponentLocation();
-	const FRotator CameraRotation = ActiveCameraComp->GetComponentRotation();
+	ATGS_GameMode* GameMode = Cast<ATGS_GameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	if (GameMode) { return; }
+	const FVector CameraLocation = GameMode->GetCameraLocation();
+
 
 
 	// ƒJƒƒ‰‚ÌˆÊ’u‚âŠp“x‚ª•Ï‚í‚Á‚Ä‚¢‚È‚©‚Á‚½‚çŒvŽZ‚µ‚È‚¢
-	if (BeforeCameraPos == CameraLocation && BeforeCameraRot == CameraRotation)
+	if (BeforeCameraPos == CameraLocation)
 	{
 		return;
 	}
@@ -68,7 +72,6 @@ void UBackGroundAssist::ToFaceCamera()
 	{
 		// ƒJƒƒ‰‚Ì’l•Û‘¶
 		BeforeCameraPos = CameraLocation;
-		BeforeCameraRot = CameraRotation;
 
 		// Ž©g‚ÌŒ»ÝˆÊ’u‚ÆŠp“x‚ðŽæ“¾
 		const FVector nowPos = GetOwner()->GetActorLocation();
@@ -77,9 +80,12 @@ void UBackGroundAssist::ToFaceCamera()
 		const FVector DirectionToCamera = (CameraLocation - nowPos).GetSafeNormal();
 
 		// ‰ñ“]Žæ“¾
-		const FRotator newRot = DirectionToCamera.Rotation();
+		FRotator newRot = DirectionToCamera.Rotation();
+
+		//float newRot = FMath::Atan2(DirectionToCamera.Z, DirectionToCamera.Y);
+
 
 		// V‚µ‚¢Šp“x”½‰f
-		GetOwner()->SetActorRotation(FRotator(newRot.Pitch, newRot.Yaw - 90.f, newRot.Roll));
+		GetOwner()->SetActorRotation(FRotator(0.0,newRot.Yaw - DIRECTION,0.0));
 	}
 }

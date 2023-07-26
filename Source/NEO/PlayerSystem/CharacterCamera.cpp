@@ -6,6 +6,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/Character.h"
+#include "NEO/GameSystem/TGS_GameMode.h"
 
 // Sets default values
 ACharacterCamera::ACharacterCamera()
@@ -33,13 +34,13 @@ void ACharacterCamera::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// APlayerController �̎擾
-	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(this, 0);
+	ATGS_GameMode* GameMode = Cast<ATGS_GameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 
-	if (PlayerController)
+	if (GameMode)
 	{
-		PlayerController->SetViewTargetWithBlend(this);
+		GameMode->SetViewTargetWithBlend(this, 0.5f);
 	}
+
 	PlayerInfo = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
 	PlayerInfo->SetOwner(this);
 
