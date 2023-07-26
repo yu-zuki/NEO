@@ -100,8 +100,8 @@ void AEnamyBase::ApplyDamage(float DamageAmount)
     if (Health <= 0)
     {
         SpawnDeathTrigger();
-        PlayAnimMontage(Death, 1, NAME_None);
-        GetWorldTimerManager().SetTimer(TimerHandle_DestroyEnemy, this, &AEnamyBase::AfterDeath, 2.0f, true);
+        PlayAnimMontage(Death, 0.8, NAME_None);
+        GetWorldTimerManager().SetTimer(TimerHandle_DestroyEnemy, this, &AEnamyBase::AfterDeath, 1.6f, true);
     }
     else
     {
