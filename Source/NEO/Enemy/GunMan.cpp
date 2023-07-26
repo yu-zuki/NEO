@@ -45,7 +45,8 @@ void AGunMan::Tick(float DeltaTime)
  
 	Super::Tick(DeltaTime);
 	
-    
+    if(bIsShoot)
+    { 
         if (PlayerCharacter)
         {
             // プレイヤーとの距離を取得
@@ -65,13 +66,15 @@ void AGunMan::Tick(float DeltaTime)
                 AddMovementInput(-PlayerDirection);
             }
         }
+
+        
+    }
         // キャラクターの位置を取得
         FVector CharacterLocation = GetActorLocation();
 
         // 自分の座標を取得
         FVector MyLocation = GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorLocation();
-
-    
+       
 }
 void AGunMan::SpawnBullet()
 {
@@ -79,11 +82,8 @@ void AGunMan::SpawnBullet()
         FVector SpawnLocation = GetActorLocation() + GetActorForwardVector() * 100.0f; // 100.0fは適宜調整してください
         FRotator SpawnRotation = GetActorRotation();
         GetWorld()->SpawnActor<ABullet>(BulletClass, SpawnLocation, SpawnRotation);
-        MovementSpeed = 200.0f;
-
-    
-    
-    
+        bIsShoot = true;
+        bIsRotation = true;
 }
 
 void AGunMan::BlinkTrajectoryBullet()
@@ -100,13 +100,14 @@ void AGunMan::BlinkTrajectoryBullet()
 
             FTimerHandle TimerHandle_BulletSpawn;
             GetWorldTimerManager().SetTimer(TimerHandle_BulletSpawn, this, &AGunMan::SpawnBullet, 2.0f, false);
-            MovementSpeed = 0.0f;
+           
         }
 
 
         FTimerHandle TimerHandle_NextSequence;
         GetWorldTimerManager().SetTimer(TimerHandle_NextSequence, this, &AGunMan::BlinkTrajectoryBullet, 4.0f, false);
-        MovementSpeed = 200.0f;
+        bIsShoot = false;
+        bIsRotation = false;
     
   
 }
