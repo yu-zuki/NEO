@@ -54,6 +54,9 @@ struct FPlayerStatus
 		UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		float HP;
 
+		UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		float MaxHP;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		int RemainingLife;
 
@@ -173,9 +176,6 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = "Action")
 		virtual void SetCollision();
 
-	// ダメージを受ける処理
-	UFUNCTION(BlueprintCallable, Category = "Action")
-		void TakedDamage(float _damage);
 
 	UFUNCTION(BlueprintCallable, Category = "Action")
 		void SetControl(bool _isControl) { IsControl = _isControl; }
@@ -191,7 +191,6 @@ protected:
 	// 現在のHPを返す
 	UFUNCTION(BlueprintCallable, Category = "GetStatus")
 		float GetHP()const { return PlayerStatus.HP; }
-
 	//---------------------------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -214,6 +213,12 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	// ダメージを受ける処理
+	UFUNCTION(BlueprintCallable, Category = "Action")
+		void TakedDamage(float _damage);
+
+	// プレイヤーの移動方向を変更
+	void OnCurveMode(bool _curveMode) { CurveMode = _curveMode; }
 
 	//------------------プレイヤーのセットアップ---------------------------------------------------------------------------------------------------------
 	// プレイヤーのデータを初期化
@@ -295,6 +300,9 @@ protected:
 
 	TArray<FName> ComboStartSectionNames;	// コンボの段数(First,Second,Third・・・)
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))		
+		bool CurveMode;
+
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "GameOver")
 		float DeadAnimRate;							// 死亡アニメーションで倒れてからの再生スピード(1で通常スピード)
@@ -304,4 +312,11 @@ protected:
 private:
 
 	FTimerHandle TimerHandle_DeathToGameOver;	// ハンドル
+
+//////////////////////////////////////////////////////////////////////////
+///UI
+public:
+	//プレイヤーのHPの％を返す
+	UFUNCTION(BlueprintCallable, Category = "UI")
+	float GetPlayerHPPercent()const { return PlayerStatus.HP / PlayerStatus.MaxHP; }
 };

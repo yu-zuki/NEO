@@ -17,9 +17,6 @@ public:
 
     UPROPERTY(EditAnywhere, Category = "AI")
         float MovementSpeed = 100.0f; // ˆÚ“®‘¬“x
-   
-    
-    
 protected:
     virtual void BeginPlay() override;
     

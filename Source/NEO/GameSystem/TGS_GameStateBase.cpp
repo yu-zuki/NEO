@@ -136,12 +136,16 @@ void ATGS_GameStateBase::InitCurrentState()
 
 	if (ECurrentState == EGameState::EGame_Playing)
 	{
-		if (Widget_GameMenuClass && Widget_PlayerStatusClass) {
-			Widget_GameMenu = CreateWidget<UIngame_WG>(GetWorld(), Widget_GameMenuClass, "GameMenu");
+		if (Widget_PlayerStatusClass) {
 			UUserWidget* Widget_PlayerStatus = CreateWidget<UUserWidget>(GetWorld(), Widget_PlayerStatusClass, "PlayerStatus");
 
 			if (Widget_PlayerStatus) {
-				Widget_PlayerStatus->AddToViewport();		//プレイヤーのステータスを表示する
+				Widget_PlayerStatus->AddToViewport(1);		//プレイヤーのステータスを表示する
+				bool test = Widget_PlayerStatus->IsInViewport();
+				
+				//print test
+				UE_LOG( LogTemp, Warning, TEXT("Widget_PlayerStatus is in viewport: %s"), test ? TEXT("true") : TEXT("false") );
+
 			}
 			else {
 				UE_LOG(LogTemp, Warning, TEXT("Widget_PlayerStatus is not found"));
@@ -304,12 +308,12 @@ void ATGS_GameStateBase::EnterBattleArea()
 
 	//プレイヤーのカメラを固定カメラに変更
 	if (GetBattleAreaCamera()) {
-		APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
-		if (PlayerController) {
-			PlayerController->SetViewTargetWithBlend(GetBattleAreaCamera(), 0.5f);
+		ATGS_GameMode* GameMode = Cast<ATGS_GameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+		if (GameMode) {
+			GameMode->SetViewTargetWithBlend(GetBattleAreaCamera(), 0.5f);
 		}
 		else {
-			UE_LOG(LogTemp, Warning, TEXT("PlayerController is not found"));
+			UE_LOG(LogTemp, Warning, TEXT("GameMode is not found"));
 		}
 	}
 
@@ -338,14 +342,15 @@ void ATGS_GameStateBase::ExitBattleArea()
 
 	//固定カメラをプレイヤーのカメラに変更
 	if (PlayerCharacter) {
-		APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
-		if (PlayerController) {
+		ATGS_GameMode* GameMode = Cast<ATGS_GameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+		if (GameMode) {
 
 			//Player取得
 			ACharacter* tmp_Character = Cast<ACharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(),0) );
 			AActor* tmp_CameraActor = tmp_Character->GetOwner();
 			if (tmp_CameraActor)			{
-				PlayerController->SetViewTargetWithBlend(tmp_CameraActor, 0.5f);
+				//カメラをプレイヤーのカメラに変更
+				GameMode->SetViewTargetWithBlend(tmp_CameraActor, 0.5f);
 			}
 			else {
 				//Log

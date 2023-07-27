@@ -23,7 +23,7 @@ AGunMan::AGunMan()
     GetCharacterMovement()->MaxWalkSpeed = MovementSpeed;
     MaxHealth = 100;
     Health = MaxHealth;
-    
+   
    
 }
 
@@ -42,68 +42,74 @@ void AGunMan::BeginPlay()
 // Called every frame
 void AGunMan::Tick(float DeltaTime)
 {
+ 
 	Super::Tick(DeltaTime);
 	
-   
-    if (PlayerCharacter)
-    {
-        // プレイヤーとの距離を取得
-        float DistanceToPlayer = GetDistanceToPlayer();
+    if(bIsShoot)
+    { 
+        if (PlayerCharacter)
+        {
+            // プレイヤーとの距離を取得
+            float DistanceToPlayer = GetDistanceToPlayer();
 
-        // プレイヤーとの距離が望ましい距離よりも離れている場合、プレイヤーに近づく
-        if (DistanceToPlayer > DesiredDistance)
-        {
-            FVector PlayerDirection = GetPlayerDirection();
-            AddMovementInput(PlayerDirection);
-      
+            // プレイヤーとの距離が望ましい距離よりも離れている場合、プレイヤーに近づく
+            if (DistanceToPlayer > DesiredDistance)
+            {
+                FVector PlayerDirection = GetPlayerDirection();
+                AddMovementInput(PlayerDirection);
+
+            }
+            else if (DistanceToPlayer < DesiredDistance - 100.0f) // プレイヤーが望ましい距離-100以下に入った場合
+            {
+                // プレイヤーから離れる
+                FVector PlayerDirection = GetPlayerDirection();
+                AddMovementInput(-PlayerDirection);
+            }
         }
-        else if (DistanceToPlayer < DesiredDistance - 100.0f) // プレイヤーが望ましい距離-100以下に入った場合
-        {
-            // プレイヤーから離れる
-            FVector PlayerDirection = GetPlayerDirection();
-            AddMovementInput(-PlayerDirection);
-        }
+
+        
     }
-    // キャラクターの位置を取得
-    FVector CharacterLocation = GetActorLocation();
+        // キャラクターの位置を取得
+        FVector CharacterLocation = GetActorLocation();
 
-    // 自分の座標を取得
-    FVector MyLocation = GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorLocation();
-
-   
-
+        // 自分の座標を取得
+        FVector MyLocation = GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorLocation();
+       
 }
 void AGunMan::SpawnBullet()
 {
-    FVector SpawnLocation = GetActorLocation() + GetActorForwardVector() * 100.0f; // 100.0fは適宜調整してください
-    FRotator SpawnRotation = GetActorRotation();
-    GetWorld()->SpawnActor<ABullet>(BulletClass, SpawnLocation, SpawnRotation);
-    MovementSpeed = 200.0f;
-    
+   
+        FVector SpawnLocation = GetActorLocation() + GetActorForwardVector() * 100.0f; // 100.0fは適宜調整してください
+        FRotator SpawnRotation = GetActorRotation();
+        GetWorld()->SpawnActor<ABullet>(BulletClass, SpawnLocation, SpawnRotation);
+        bIsShoot = true;
+        bIsRotation = true;
 }
 
 void AGunMan::BlinkTrajectoryBullet()
 {
-   
-    FVector SpawnLocation = GetActorLocation() + GetActorForwardVector() * 50.0f; 
-    FRotator SpawnRotation = GetActorRotation();
-    ATrajectoryBullet* TrajectoryBullet = GetWorld()->SpawnActor<ATrajectoryBullet>(TrajectoryBulletClass, SpawnLocation, SpawnRotation);
+        FVector SpawnLocation = GetActorLocation() + GetActorForwardVector() * 50.0f;
+        FRotator SpawnRotation = GetActorRotation();
+        ATrajectoryBullet* TrajectoryBullet = GetWorld()->SpawnActor<ATrajectoryBullet>(TrajectoryBulletClass, SpawnLocation, SpawnRotation);
 
-    if (TrajectoryBullet)
-    {
-       
-        TrajectoryBullet->StartBlinking();
+        if (TrajectoryBullet)
+        {
 
-        
-        FTimerHandle TimerHandle_BulletSpawn;
-        GetWorldTimerManager().SetTimer(TimerHandle_BulletSpawn, this, &AGunMan::SpawnBullet, 2.0f, false);
-        MovementSpeed = 0.0f;
-    }
+            TrajectoryBullet->StartBlinking();
 
+
+            FTimerHandle TimerHandle_BulletSpawn;
+            GetWorldTimerManager().SetTimer(TimerHandle_BulletSpawn, this, &AGunMan::SpawnBullet, 2.0f, false);
+           
+        }
+
+
+        FTimerHandle TimerHandle_NextSequence;
+        GetWorldTimerManager().SetTimer(TimerHandle_NextSequence, this, &AGunMan::BlinkTrajectoryBullet, 4.0f, false);
+        bIsShoot = false;
+        bIsRotation = false;
+    
   
-    FTimerHandle TimerHandle_NextSequence;
-    GetWorldTimerManager().SetTimer(TimerHandle_NextSequence, this, &AGunMan::BlinkTrajectoryBullet, 4.0f, false);
-    MovementSpeed = 200.0f;
 }
 
 FVector AGunMan::GetPlayerDirection() const

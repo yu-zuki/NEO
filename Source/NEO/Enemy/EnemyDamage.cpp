@@ -4,6 +4,7 @@
 #include "EnemyDamage.h"
 #include "Components/BoxComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Animation/AnimInstance.h"
 #include "NEO/PlayerSystem/PlayerBase.h"
 
 // Sets default values
@@ -31,7 +32,16 @@ AEnemyDamage::AEnemyDamage()
 void AEnemyDamage::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	TArray<AActor*> FoundActors;
+	UGameplayStatics::GetAllActorsWithTag(GetWorld(), FName("Lancer"), FoundActors);
+	for (AActor* Actor : FoundActors)
+	{
+		ALancer* Lancer = Cast<ALancer>(Actor);
+		if (Lancer != nullptr)
+		{
+			Lancers.Add(Lancer);
+		}
+	}
 }
 
 // Called every frame
@@ -43,17 +53,21 @@ void AEnemyDamage::Tick(float DeltaTime)
 
 void AEnemyDamage::OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (OtherActor && (OtherActor != this) && OtherComp)
+	if (IsLancerAttacking())
 	{
-		//触れたのがキャラクターか
-		ACharacter* MyCharacter = UGameplayStatics::GetPlayerCharacter(this, 0);
-		if (OtherActor == MyCharacter)
+		if (OtherActor && (OtherActor != this) && OtherComp)
 		{
-			// Apply damage to the player
-			UGameplayStatics::ApplyDamage(MyCharacter, DamageAmount, GetInstigatorController(), this, UDamageType::StaticClass());
-			OverlappedComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-			FTimerHandle UnusedHandle;
-			GetWorldTimerManager().SetTimer(UnusedHandle, this, &AEnemyDamage::EnableCollision, 3.0f, false);
+			//触れたのがキャラクターか
+			APlayerBase* PlayerCharacter = Cast<APlayerBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
+			if (OtherActor == PlayerCharacter)
+			{
+				// Apply damage to the player
+				PlayerCharacter->TakedDamage(DamageAmount);
+
+				OverlappedComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+				FTimerHandle UnusedHandle;
+				GetWorldTimerManager().SetTimer(UnusedHandle, this, &AEnemyDamage::EnableCollision, 3.0f, false);
+			}
 		}
 	}
 }
@@ -61,4 +75,21 @@ void AEnemyDamage::EnableCollision()
 {
 	
 	CollisionComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+}
+bool AEnemyDamage::IsLancerAttacking()
+{
+
+	UAnimMontage* Attack = LoadObject<UAnimMontage>(NULL, TEXT("/Game/0102/Enemy/Lancer/Attacking.Attacking"));
+
+
+	for (ALancer* Lancer : Lancers)
+	{
+		UAnimInstance* AnimInstance = Lancer->GetMesh()->GetAnimInstance();
+		if (AnimInstance != nullptr && AnimInstance->Montage_IsPlaying(Attack))
+		{
+			return true;
+		}
+	}
+
+	return false;
 }

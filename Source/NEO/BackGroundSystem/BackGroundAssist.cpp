@@ -6,6 +6,12 @@
 #include "Kismet/GameplayStatics.h"
 #include "NEO/PlayerSystem/CharacterCamera.h"
 #include "Camera/CameraComponent.h"
+<<<<<<< HEAD
+=======
+#include "NEO/GameSystem/TGS_GameMode.h"
+
+#define DIRECTION (90.0)
+>>>>>>> e02e38e10130800fdab63cd0662a1cbaafe1a196
 
 // Sets default values for this component's properties
 UBackGroundAssist::UBackGroundAssist()
@@ -41,6 +47,7 @@ void UBackGroundAssist::ToFaceCamera()
 	// 機能のオン・オフ
 	if (!bUseBillboard) { return; }
 
+<<<<<<< HEAD
 	// プレイヤーコントローラー作成
 	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
 	if (!PlayerController) { return; }
@@ -81,5 +88,19 @@ void UBackGroundAssist::ToFaceCamera()
 
 		// 新しい角度反映
 		GetOwner()->SetActorRotation(FRotator(newRot.Pitch, newRot.Yaw - 90.f, newRot.Roll));
+=======
+	ATGS_GameMode* GameMode = Cast<ATGS_GameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+
+	if (GameMode)
+	{
+		// Camera To Enemy
+		FVector CameraToEnemy = GetOwner()->GetActorLocation() - GameMode->GetCameraLocation();
+		CameraToEnemy.Y = 0;
+		CameraToEnemy.Z = 0;
+
+		FRotator LookAtRotation = CameraToEnemy.Rotation();
+		GetOwner()->SetActorRotation(FRotator(LookAtRotation.Pitch, LookAtRotation.Yaw, LookAtRotation.Roll));
+
+>>>>>>> e02e38e10130800fdab63cd0662a1cbaafe1a196
 	}
 }

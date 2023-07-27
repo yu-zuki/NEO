@@ -33,9 +33,19 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack Assist")
 		bool bUseBillboard;
 
+<<<<<<< HEAD
+=======
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack Assist")
+		FRotator kakunin;
+>>>>>>> e02e38e10130800fdab63cd0662a1cbaafe1a196
 
 		
 private:
 	FVector BeforeCameraPos;
+<<<<<<< HEAD
 	FRotator BeforeCameraRot;
+=======
+
+
+>>>>>>> e02e38e10130800fdab63cd0662a1cbaafe1a196
 };

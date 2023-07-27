@@ -6,6 +6,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/Character.h"
+#include "NEO/GameSystem/TGS_GameMode.h"
 
 // Sets default values
 ACharacterCamera::ACharacterCamera()
@@ -19,7 +20,6 @@ ACharacterCamera::ACharacterCamera()
 	CameraBoom->TargetArmLength = 500.0f; // The camera follows at this distance behind the character	
 	CameraBoom->bUsePawnControlRotation = true; // Rotate the arm based on the controller
 	CameraBoom->bInheritPitch = false;
-	CameraBoom->SetRelativeRotation(FRotator(-12.f, 0.f, 0.f));
 	CameraBoom->bDoCollisionTest = false;
 
 	// Create a follow camera
@@ -33,20 +33,29 @@ void ACharacterCamera::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// APlayerController ‚ÌŽæ“¾
-	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(this, 0);
+	ATGS_GameMode* GameMode = Cast<ATGS_GameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+
+	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(),0);
 
 	if (PlayerController)
 	{
-		PlayerController->SetViewTargetWithBlend(this);
+		PlayerController->SetViewTargetWithBlend(this, 0.f);
 	}
+
+	/*if (GameMode)
+	{
+		GameMode->SetViewTargetWithBlend(this, 0.5f);
+	}*/
+
 	PlayerInfo = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
 	PlayerInfo->SetOwner(this);
 
 	// ‰ŠúˆÊ’uÝ’è
 	StartPos = PlayerInfo->GetActorLocation();
-	PlayerToViewPointDistance = FVector(0.f, 0.f, 0.f);
+	PlayerToViewPointDistance = FVector(100.f,200.f,195.f);
 	SetActorLocation(StartPos);
+
+	SetActorRotation(FRotator(-25.0, 0.0, 0.0));
 }
 
 // Called every frame

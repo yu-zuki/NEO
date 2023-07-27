@@ -2,25 +2,30 @@
 
 
 #include "Bullet.h"
+#include "Kismet/GameplayStatics.h"
+#include "Components/SphereComponent.h"
+#include "NEO/PlayerSystem/PlayerBase.h"
 
 // Sets default values
 ABullet::ABullet()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	if (!RootComponent)
+	if (!SphereComponent)
 	{
 		RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("ProjectileSceneComponent"));
 	}
-	if (!CollisionComponent)
+	if (!SphereComponent)
 	{
 		// Use a sphere as a simple collision representation.
-		CollisionComponent = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComponent"));
+		SphereComponent = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComponent"));
 		// Set the sphere's collision radius.
-		CollisionComponent->InitSphereRadius(15.0f);
-		// Set the root component to be the collision component.
-		RootComponent = CollisionComponent;
+		SphereComponent->InitSphereRadius(15.0f);
+		
 	}
+	
+
+	
 
 }
 

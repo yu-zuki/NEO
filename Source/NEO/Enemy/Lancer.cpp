@@ -1,6 +1,7 @@
 #include "Lancer.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/BoxComponent.h"
 #include "GameFramework/Controller.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -14,7 +15,7 @@ ALancer::ALancer()
     GetCharacterMovement()->bOrientRotationToMovement = true;
     GetCharacterMovement()->RotationRate = FRotator(0.0f, 540.0f, 0.0f);
     GetCharacterMovement()->MaxWalkSpeed = MovementSpeed;
-
+    
 }
 
 
@@ -32,6 +33,10 @@ void ALancer::BeginPlay()
 
 void ALancer::Tick(float DeltaTime)
 {
+    if (bIsNowDamage)
+    {
+        return;
+    }
     Super::Tick(DeltaTime);
     if (PlayerCharacter)
     {
@@ -45,7 +50,11 @@ void ALancer::Tick(float DeltaTime)
         }
     }
     
-
+   
+   
+   
+   
+    
     
     
 }
@@ -88,6 +97,12 @@ void ALancer::CheckPlayerInFront()
       
     }
 }
+
+
+
+
+
+
 
 
 

@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "EnemyBaseAnimInstance.h"
+#include "DeathTrigger.h"
 #include "EnamyBase.generated.h"
 
 UCLASS()
@@ -48,10 +49,14 @@ public:
 		float  MaxHealth;
 	UFUNCTION(BlueprintCallable, Category = "Health")
 		virtual void ApplyDamage(float DamageAmount);
-
+	 
 	void AfterDeath();
 
-	
+	void DamageReac();
+
+	bool bIsNowDamage;
+
+	bool bIsShoot = false;
 
 	float GetHP() { return Health; }
 	
@@ -73,6 +78,7 @@ private:
 	bool bIsReactingToDamage;
 	bool bIsDead;
 	bool bIsAir;
+	void SpawnDeathTrigger();
 	///UI
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")

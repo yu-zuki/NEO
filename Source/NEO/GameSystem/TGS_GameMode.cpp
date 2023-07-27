@@ -223,7 +223,7 @@ int32 ATGS_GameMode::GetBattleAreaEnemyNum()
 
 void ATGS_GameMode::SetUI_Enemy(FName _ActorName, int32 _NowHp, int32 _MaxHp)
 {
-	GetGameState()->Widget_GameMenu->SetWidgetValue(_ActorName, _NowHp, _MaxHp);
+	//GetGameState()->Widget_GameMenu->SetWidgetValue(_ActorName, _NowHp, _MaxHp);
 }
 
 EPlayerType ATGS_GameMode::GetPlayerType()
@@ -320,6 +320,39 @@ AActor* ATGS_GameMode::GetPlayStartPoint()
 		return Actors[0];
 	}
 	return nullptr;
+}
+
+FVector ATGS_GameMode::GetCameraLocation()
+{
+	if (CameraActor) {
+		return CameraActor->GetActorLocation();
+	}
+
+	return FVector();
+}
+
+void ATGS_GameMode::SetViewTargetWithBlend(AActor* NewViewTarget, float BlendTime, EViewTargetBlendFunction BlendFunc, float BlendExp, bool bLockOutgoing)
+{
+	//NULL Check
+	if (!NewViewTarget) {
+		UE_LOG(LogTemp, Error, TEXT("NewViewTarget is not found"));
+		return;
+	}
+
+	//PlayerControllerŽæ“¾
+	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+
+	if (!PlayerController) {
+		UE_LOG(LogTemp, Error, TEXT("PlayerController is not found"));
+		return;
+	}
+
+	//Camera‚ÌÀ•W‚ð‹L˜^
+	CameraActor = NewViewTarget;
+
+	PlayerController->SetViewTargetWithBlend(NewViewTarget, BlendTime);
+
+
 }
 
 ATGS_GameStateBase* ATGS_GameMode::GetGameState()
