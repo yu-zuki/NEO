@@ -46,17 +46,13 @@ public:
 	UPROPERTY()
 		USceneComponent* Parent;
 
-	//ボスキャラクター
-	UPROPERTY()
-	AOdaBase* OdaNobunaga;
-
 	//プレイヤーキャラクター
 	UPROPERTY()
 		AActor* PlayerChara;
 
 	//剣のコリジョン
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "BoxComp", meta = (AllowPrivateAccess = "true"))
-	UBoxComponent* BoxComp;
+	UBoxComponent* BoxComponent;
 
 	//キャラクタームーブメント
 	UPROPERTY()
@@ -100,15 +96,13 @@ public:
 	//ボスのステートでの処理
 	void OdaStay1(int Timer);
 
-	void OdaMove1(int Timer);
-
-	void OdaMove2(int Timer);
-
 	void OdaBack1(int Timer);
 
 	void OdaAttack1(int Timer);
 
 	void OdaAttack2(int Timer);
+
+	void OdaUlt(int Timer);
 
 
 	//通常の移動速度
@@ -138,6 +132,25 @@ public:
 	UPROPERTY(EditAnywhere)
 		TSubclassOf<AActor>ShockWaveSpawn;
 
+	//必殺技の出現タイミングの調整
+	UPROPERTY()
+		bool isUltSpawnTiming;
+
+	//必殺技の出現タイミングの調整するための関数
+	UFUNCTION()
+		void UltSpawnFlagChange();
+
+	//必殺技を出現させる為の変数
+	UPROPERTY(EditAnywhere)
+		TSubclassOf<AActor>UltSpawn;
+
+	//必殺技は一回だけ出したいのでフラグで管理
+	UPROPERTY()
+		bool isUltShot;
+
+	UPROPERTY()
+		int UltTimer;
+
 	//攻撃のフラグ
 	UPROPERTY(BlueprintReadOnly)
 		bool IsAttackNow;
@@ -146,8 +159,15 @@ public:
 	UFUNCTION()
 		void AttackFlagChange();
 
-	//体力
+	//攻撃された回数が一定数超えたら近接攻撃をぱなす為の変数
 	UPROPERTY()
+		bool isNotAttackNow;
+	//一定数の計測
+	UPROPERTY()
+		int NotAttackCount;
+
+	//体力
+	UPROPERTY(EditAnywhere)
 	float Health;
 
 	//HPが連続で減らないようにロック
@@ -174,6 +194,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AniMontage", meta = (AllowPrivateAccess = "true"))
 		class UAnimMontage* AnimMontage_BossAttack2;
 
+	//衝撃波攻撃する仮モーション
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AniMontage", meta = (AllowPrivateAccess = "true"))
+		class UAnimMontage* AnimMontage_BossUltimate;
+
 	//前方移動
 	UFUNCTION()
 		void BossMove(float Speed , FVector MoveSize);
@@ -195,5 +219,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
 		class UEnemyBase_WidgetComponent* EnemyWidget;
 
+	UPROPERTY(EditAnywhere)
 		float MaxHealth;
 };

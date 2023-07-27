@@ -14,5 +14,6 @@ enum class ECPPOdaEnum : uint8
 	Move2,
 	Back1,
 	Attack1,
-	Attack2
+	Attack2,
+	Ultimate
 };
