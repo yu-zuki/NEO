@@ -4,7 +4,6 @@
 #include "PlayerBase.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
-#include "Components/CapsuleComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/InputComponent.h"
@@ -16,7 +15,6 @@
 #include "Engine/AssetManager.h"
 #include "Async/Async.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "Components/BoxComponent.h"
 #include "NEO/GameSystem/TGS_GameMode.h"
 #include "Components/WidgetComponent.h"
 
@@ -311,7 +309,7 @@ void APlayerBase::Move(const FInputActionValue& _value)
 	{
 		// find out which way is forward
 		const FRotator Rotation = Controller->GetControlRotation();
-		const FRotator YawRotation(0.f, Rotation.Yaw + Rotate, 0.f);
+		const FRotator YawRotation(0.f, Rotation.Yaw, 0.f);
 
 		// ˆÚ“®•ûŒüŽæ“¾(X,Y)
 		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);

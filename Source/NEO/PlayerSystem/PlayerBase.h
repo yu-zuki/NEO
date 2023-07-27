@@ -191,12 +191,6 @@ protected:
 	// 現在のHPを返す
 	UFUNCTION(BlueprintCallable, Category = "GetStatus")
 		float GetHP()const { return PlayerStatus.HP; }
-
-	// 現在のHPを返す
-	UFUNCTION(BlueprintCallable, Category = "GetStatus")
-		void SetTest(float _Rotate){ Rotate = _Rotate; }
-
-
 	//---------------------------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -222,6 +216,9 @@ public:
 	// ダメージを受ける処理
 	UFUNCTION(BlueprintCallable, Category = "Action")
 		void TakedDamage(float _damage);
+
+	// プレイヤーの移動方向を変更
+	void OnCurveMode(bool _curveMode) { CurveMode = _curveMode; }
 
 	//------------------プレイヤーのセットアップ---------------------------------------------------------------------------------------------------------
 	// プレイヤーのデータを初期化
@@ -304,7 +301,7 @@ protected:
 	TArray<FName> ComboStartSectionNames;	// コンボの段数(First,Second,Third・・・)
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))		
-		float Rotate;
+		bool CurveMode;
 
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "GameOver")
