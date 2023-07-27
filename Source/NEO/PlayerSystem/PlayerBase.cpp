@@ -308,16 +308,16 @@ void APlayerBase::Move(const FInputActionValue& _value)
 	{
 		// find out which way is forward
 		const FRotator Rotation = Controller->GetControlRotation();
-		const FRotator YawRotation(0, Rotation.Yaw, 0);
+		const FRotator YawRotation(0.f, Rotation.Yaw, 0.f);
 
-		// 入力値取得(X,Y)
-		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+		// 移動方向取得(X,Y)
+		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 
-		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 
 		// 移動
-		AddMovementInput(ForwardDirection, MovementVector.X);
-		AddMovementInput(RightDirection, MovementVector.Y);
+		AddMovementInput(RightDirection, MovementVector.X);
+		AddMovementInput(ForwardDirection, MovementVector.Y);
 
 		// 移動方向に回転
 		RotateCharacter(MovementVector.X);
@@ -487,7 +487,7 @@ void APlayerBase::Combo2()
 /*
  * 関数名　　　　：RotateCharacter()
  * 処理内容　　　：プレイヤーのステータス初期化
- * 引数１　　　　：float _nowInput_Y・・・現在の移動入力値
+ * 引数１　　　　：float _nowInput_X・・・現在の移動入力値
  * 戻り値　　　　：なし
  */
 void APlayerBase::RotateCharacter(float _nowInput_X)

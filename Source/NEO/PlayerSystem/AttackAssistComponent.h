@@ -7,7 +7,7 @@
 #include "AttackAssistComponent.generated.h"
 
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS( ClassGroup=(ActionAssist), meta=(BlueprintSpawnableComponent) )
 class NEO_API UAttackAssistComponent : public UActorComponent
 {
 	GENERATED_BODY()
@@ -46,13 +46,13 @@ protected:
 
 	//-------------各機能のON・OFF---------------------------------------------------
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack Assist")
-		bool bUseCorrectAttackAngle = true;
+		bool bUseCorrectAttackAngle;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack Assist")
-		bool bUseHitStop = true;
+		bool bUseHitStop;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack Assist")
-		bool bUseHitEffect = true;
+		bool bUseHitEffect;
 	//----------------------------------------------------------------------------
 
 	// トレースの長さ
