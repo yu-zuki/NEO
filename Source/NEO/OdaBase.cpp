@@ -436,7 +436,7 @@ void AOdaBase::CheckOverlap()
 void AOdaBase::EnemyOnOverlap(FHitResult& _HitResult)
 {
 	//Cast
-	APlayerCharacter* Player = Cast<APlayerCharacter>(_HitResult.GetActor());
+	APlayerBase* Player = Cast<APlayerBase>(_HitResult.GetActor());
 	if (Player) {
 		//プレイヤーがHPをロックしたらこの処理
 		//if (Player->bIsAttacked) {
@@ -444,7 +444,7 @@ void AOdaBase::EnemyOnOverlap(FHitResult& _HitResult)
 		//}
 
 
-		/*		Player->TakedDamage(fDamage);						//プレイヤーにダメージを与える*/
+		Player->TakedDamage(SwordDamage);						//プレイヤーにダメージを与える
 
 
 		FVector HitLocation = _HitResult.Location;		//ヒットエフェクトの位置

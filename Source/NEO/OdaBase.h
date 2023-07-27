@@ -206,6 +206,10 @@ public:
 	UFUNCTION()
 		void BackMove(float Speed);
 
+	//ダメージ値
+	UPROPERTY(EditAnywhere, Category = "Damage")
+		float SwordDamage;
+
 	UFUNCTION()
 		void CheckOverlap();
 
