@@ -245,14 +245,14 @@ void ATGS_GameMode::SelctorPlayerType()
 		UTGS_GameInstance* GameInstance = GetGameInstance();
 		if (!GameInstance) {
 			DefaultPawnClass = PlayerCharacterClassOne;
-			UE_LOG(LogTemp, Error, TEXT("GameInstance is not found"));
+			UE_LOG(LogTemp, Warning, TEXT("GameInstance is not found"));
 			return;
 		}
 
 		AActor* SpawnPoint = GetPlayStartPoint();
 		if (!SpawnPoint) {
 			DefaultPawnClass = PlayerCharacterClassOne;
-			UE_LOG(LogTemp, Error, TEXT("SpawnPoint is not found"));
+			UE_LOG(LogTemp, Warning, TEXT("SpawnPoint is not found"));
 			return;
 		}
 
@@ -286,7 +286,7 @@ void ATGS_GameMode::SelctorPlayerType()
 		}
 	}
 	else {
-		UE_LOG(LogTemp, Error, TEXT("PlayerCharacterClass is not found"));
+		UE_LOG(LogTemp, Warning, TEXT("PlayerCharacterClass is not found"));
 	}
 }
 
@@ -374,12 +374,15 @@ ATGS_GameStateBase* ATGS_GameMode::GetGameState()
 
 UTGS_GameInstance* ATGS_GameMode::GetGameInstance()
 {
+	UWorld* World = GetWorld();
+	if(!World) return nullptr;
+
 	UTGS_GameInstance* GameInstance = Cast<UTGS_GameInstance>(GetWorld()->GetGameInstance());
 	if (GameInstance) {
 		return GameInstance;
 	}
 	else {
-		UE_LOG(LogTemp, Error, TEXT("GameInstance is not Found"));
+		UE_LOG(LogTemp, Warning, TEXT("GameInstance is not Found"));
 	}
 	return nullptr;
 }
