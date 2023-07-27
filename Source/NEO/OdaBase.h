@@ -206,6 +206,12 @@ public:
 	UFUNCTION()
 		void BackMove(float Speed);
 
+	UFUNCTION()
+		void CheckOverlap();
+
+	UFUNCTION()
+		void EnemyOnOverlap(FHitResult& _HitResult);
+
 //////////////////////////////////////////////////////////////////////////
 //éÄñSèàóù
 public:

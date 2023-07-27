@@ -8,16 +8,25 @@
 
 #include "OdaBase.h"
 
-void UBossAttack1_AN::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
+//void UBossAttack1_AN::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation) 
+//{
+//	// 取得
+//	TObjectPtr< AOdaBase> aOda = Cast< AOdaBase>(MeshComp->GetOwner());
+//	//NULLチェック
+//	if (aOda == nullptr)
+//	{
+//		UE_LOG(LogTemp, Warning, TEXT("RemoveOda is not Found"));
+//		return;
+//	}
+//	// 攻撃フラグを切り替える
+//	aOda->AttackFlagChange();
+//}
+
+void UBossAttack1_AN::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float FrameDeltaTime, const FAnimNotifyEventReference& EventReference)
 {
-	// 取得
-	TObjectPtr< AOdaBase> aOda = Cast< AOdaBase>(MeshComp->GetOwner());
-	//NULLチェック
-	if (aOda == nullptr)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("RemoveOda is not Found"));
-		return;
+	//PlayerGet
+	AOdaBase* Oda = Cast<AOdaBase>(MeshComp->GetOwner());
+	if (Oda) {
+		Oda->CheckOverlap();
 	}
-	// 攻撃フラグを切り替える
-	aOda->AttackFlagChange();
 }

@@ -175,7 +175,7 @@ void AOdaBase::OdaStay1(int Timer)
 	if (FVector::Dist(BossPosX, PlayerPosX) <= 50.f)
 	{
 
-		if(FVector::Dist(BossPosY, PlayerPosY) >= 200.f)
+		if(FVector::Dist(BossPosY, PlayerPosY) >= 300.f)
 		{
 			//遠距離
 			OdaMoveEnum = ECPPOdaEnum::Attack2;
@@ -403,5 +403,67 @@ void AOdaBase::Death()
 	if (GameMode)
 	{
 		GameMode->DestroyEnemy(this, IsAreaEnemy);
+	}
+}
+
+//チェック
+void AOdaBase::CheckOverlap()
+{
+	TArray<FHitResult> HitResults;
+	FCollisionQueryParams CollisionParams;
+	CollisionParams.AddIgnoredActor(this);
+
+	FVector Start = BoxComponent->GetComponentLocation();
+	FVector End = Start;// + GetActorForwardVector() * 100.0f;
+	FQuat Rot = BoxComponent->GetComponentQuat();			// 
+	FCollisionShape CollisionShape = FCollisionShape::MakeBox(BoxComponent->GetUnscaledBoxExtent());
+
+	bool isHit = GetWorld()->SweepMultiByChannel(HitResults, Start, End, Rot, ECollisionChannel::ECC_GameTraceChannel1, CollisionShape, CollisionParams);
+
+	//if (isHit != true) { return; }
+
+	if (false) {
+		DrawDebugCapsule(GetWorld(), (Start + End) / 2,
+			CollisionShape.GetCapsuleHalfHeight(),
+			CollisionShape.GetCapsuleRadius(), Rot, FColor::Red, true, -1.0f, 0, 1.0f);
+	}
+
+	for (FHitResult HitResult : HitResults) {
+		EnemyOnOverlap(HitResult);
+	}
+}
+
+void AOdaBase::EnemyOnOverlap(FHitResult& _HitResult)
+{
+	//Cast
+	APlayerCharacter* Player = Cast<APlayerCharacter>(_HitResult.GetActor());
+	if (Player) {
+		//プレイヤーがHPをロックしたらこの処理
+		//if (Player->bIsAttacked) {
+		//	return;
+		//}
+
+
+		/*		Player->TakedDamage(fDamage);						//プレイヤーにダメージを与える*/
+
+
+		FVector HitLocation = _HitResult.Location;		//ヒットエフェクトの位置
+
+		//AActor* Player = GetOwner();			//プレイヤーのヒットストップ処理
+		//if (Player) {
+		//	ADestinyChangerCharacter* DestinyChangerCharacter = Cast<ADestinyChangerCharacter>(Player);
+		//	if (DestinyChangerCharacter) {
+		//		DestinyChangerCharacter->GetAttackAssistComponent()->HitStop();
+		//		DestinyChangerCharacter->GetAttackAssistComponent()->HitEffect(HitEffect, HitLocation, GetActorForwardVector());
+		//	}
+		//}
+		//Debug
+		FQuat Rotation = FQuat::Identity;
+		FVector Extent = FVector(5, 5, 5);
+
+		//DrawDebugBox(GetWorld(), HitLocation, Extent, Rotation, FColor::Green, false, 5.0f, 0, 1.0f);
+		//Enemyの名前とHPをPrintStringで表示
+		//FString OutputString = FString::Printf(TEXT("Enemy: %s, Health: %f"), *Player->GetName(), Player->GetHP());
+		//UKismetSystemLibrary::PrintString(this, OutputString);
 	}
 }
