@@ -166,9 +166,7 @@ public:
 	UPROPERTY()
 		int NotAttackCount;
 
-	//体力
-	UPROPERTY(EditAnywhere)
-	float Health;
+
 
 	//HPが連続で減らないようにロック
 	UPROPERTY()
@@ -206,11 +204,21 @@ public:
 	UFUNCTION()
 		void BackMove(float Speed);
 
+	//ダメージ値
+	UPROPERTY(EditAnywhere, Category = "Damage")
+		float SwordDamage;
+
 	UFUNCTION()
 		void CheckOverlap();
 
 	UFUNCTION()
 		void EnemyOnOverlap(FHitResult& _HitResult);
+
+	UPROPERTY()
+		bool bIsAttacked;
+
+	UFUNCTION()
+		void toPlayerAttacked();
 
 //////////////////////////////////////////////////////////////////////////
 //死亡処理
@@ -224,6 +232,10 @@ public:
 //UI
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
 		class UEnemyBase_WidgetComponent* EnemyWidget;
+
+	//体力
+	UPROPERTY(EditAnywhere)
+		float Health;
 
 	UPROPERTY(EditAnywhere)
 		float MaxHealth;
