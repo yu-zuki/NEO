@@ -28,9 +28,11 @@ void UEnemyBase_WidgetComponent::LookAtPlayer()
 	if (GameMode)
 	{
 	// Camera To Enemy
-	FVector CameraToEnemy = GetOwner()->GetActorLocation() - GameMode->GetCameraLocation();
+	FVector CameraToEnemy = GameMode->GetCameraLocation() - GetOwner()->GetActorLocation();
+
 	CameraToEnemy.Y = 0;
 	CameraToEnemy.Z = 0;	
+	CameraToEnemy.Normalize();
 
 	FRotator LookAtRotation = CameraToEnemy.Rotation();
 	SetWorldRotation(LookAtRotation);

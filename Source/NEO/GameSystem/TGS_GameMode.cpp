@@ -15,6 +15,7 @@
 #include "TGS_GameInstance.h"
 #include "GameFramework/PlayerStart.h"
 #include "../OdaBase.h"
+#include "Camera/CameraComponent.h"
 
 
 ATGS_GameMode::ATGS_GameMode()
@@ -325,7 +326,11 @@ AActor* ATGS_GameMode::GetPlayStartPoint()
 FVector ATGS_GameMode::GetCameraLocation()
 {
 	if (CameraActor) {
-		return CameraActor->GetActorLocation();
+		//CameraComponent Get
+		UCameraComponent* CameraComponent = CameraActor->FindComponentByClass<UCameraComponent>();
+		if (CameraComponent) {
+			return CameraComponent->GetComponentLocation();
+		}
 	}
 
 	return FVector();
