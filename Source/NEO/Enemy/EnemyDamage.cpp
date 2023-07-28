@@ -10,7 +10,7 @@
 // Sets default values
 AEnemyDamage::AEnemyDamage()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	UBoxComponent* BoxComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("CollisionComponent"));
 	CollisionComponent = BoxComponent;
@@ -73,7 +73,7 @@ void AEnemyDamage::OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, cla
 }
 void AEnemyDamage::EnableCollision()
 {
-	
+
 	CollisionComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 }
 bool AEnemyDamage::IsLancerAttacking()
@@ -81,15 +81,19 @@ bool AEnemyDamage::IsLancerAttacking()
 
 	UAnimMontage* Attack = LoadObject<UAnimMontage>(NULL, TEXT("/Game/0102/Enemy/Lancer/Attacking.Attacking"));
 
-
-	for (ALancer* Lancer : Lancers)
+	if (Attack)
 	{
-		UAnimInstance* AnimInstance = Lancer->GetMesh()->GetAnimInstance();
-		if (AnimInstance != nullptr && AnimInstance->Montage_IsPlaying(Attack))
+		for (ALancer* Lancer : Lancers)
 		{
-			return true;
+			UAnimInstance* AnimInstance = Lancer->GetMesh()->GetAnimInstance();
+			if (AnimInstance != nullptr && AnimInstance->Montage_IsPlaying(Attack))
+			{
+				return true;
+			}
 		}
+
 	}
+
 
 	return false;
 }

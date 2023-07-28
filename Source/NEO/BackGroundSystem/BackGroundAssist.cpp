@@ -44,48 +44,31 @@ void UBackGroundAssist::ToFaceCamera()
 	// 機能のオン・オフ
 	if (!bUseBillboard) { return; }
 
-	// プレイヤーコントローラー作成
-	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
-	if (!PlayerController) { return; }
+	// ゲームモード作成
+	ATGS_GameMode* GameMode = Cast<ATGS_GameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	if (!GameMode) { return; }
 
-	// 現在アクティブなカメラ取得
-	APlayerCameraManager* CameraManager = PlayerController->PlayerCameraManager;
-	if (!CameraManager) { return; }
-
-	UCameraComponent* ActiveCameraComp = Cast<UCameraComponent>(CameraManager->GetViewTarget()->GetComponentByClass(UCameraComponent::StaticClass()));
-	if (!ActiveCameraComp) { return; }
 
 	// カメラの現在位置と角度を取得
-	ATGS_GameMode* GameMode = Cast<ATGS_GameMode>(UGameplayStatics::GetGameMode(GetWorld()));
-	if (GameMode) { return; }
 	const FVector CameraLocation = GameMode->GetCameraLocation();
 
 
-
-	// カメラの位置や角度が変わっていなかったら計算しない
-	if (BeforeCameraPos == CameraLocation)
+	// カメラの位置が変わっていれば新しい方向を計算
+	if (BeforeCameraPos != CameraLocation)
 	{
-		return;
+
+		// Camera To Enemy
+		FVector CameraToEnemy = GetOwner()->GetActorLocation() - GameMode->GetCameraLocation();
+		CameraToEnemy.Y = 0;
+		CameraToEnemy.Z = 0;
+
+		FRotator LookAtRotation = CameraToEnemy.Rotation();
+		GetOwner()->SetActorRotation(FRotator(LookAtRotation.Pitch, LookAtRotation.Yaw, LookAtRotation.Roll));
+
 	}
-	// 変わっていれば新しい方向を計算
+	// 変わっていなかったら計算しない
 	else
 	{
-		// カメラの値保存
-		BeforeCameraPos = CameraLocation;
-
-		// 自身の現在位置と角度を取得
-		const FVector nowPos = GetOwner()->GetActorLocation();
-
-		// カメラへの方向ベクトル計算
-		const FVector DirectionToCamera = (CameraLocation - nowPos).GetSafeNormal();
-
-		// 回転取得
-		FRotator newRot = DirectionToCamera.Rotation();
-
-		//float newRot = FMath::Atan2(DirectionToCamera.Z, DirectionToCamera.Y);
-
-
-		// 新しい角度反映
-		GetOwner()->SetActorRotation(FRotator(0.0,newRot.Yaw - DIRECTION,0.0));
+		return;
 	}
 }
