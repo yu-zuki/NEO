@@ -24,6 +24,8 @@ AOdaBase::AOdaBase() :
 	UltTimer(0),
 	isNotAttackNow(false),
 	NotAttackCount(0),
+	SwordDamage(10),
+	bIsAttacked(false),
 	Health(150),
 	MaxHealth(150.f)
 {
@@ -396,6 +398,16 @@ void AOdaBase::BackMove(float Speed)
 	AddMovementInput(FVector(-1.f,0.f,0.f), -Speed);
 }
 
+
+void AOdaBase::toPlayerAttacked()
+{
+	if (bIsAttacked)
+	{
+		bIsAttacked = false;
+	}
+}
+
+
 void AOdaBase::Death()
 {
 	//ゲームモードにてこのアクタを消す処理
@@ -416,16 +428,16 @@ void AOdaBase::CheckOverlap()
 	FVector Start = BoxComponent->GetComponentLocation();
 	FVector End = Start;// + GetActorForwardVector() * 100.0f;
 	FQuat Rot = BoxComponent->GetComponentQuat();			// 
-	FCollisionShape CollisionShape = FCollisionShape::MakeBox(BoxComponent->GetUnscaledBoxExtent());
+	FCollisionShape CollisionBox = FCollisionShape::MakeBox(BoxComponent->GetUnscaledBoxExtent());
 
-	bool isHit = GetWorld()->SweepMultiByChannel(HitResults, Start, End, Rot, ECollisionChannel::ECC_GameTraceChannel1, CollisionShape, CollisionParams);
+	bool isHit = GetWorld()->SweepMultiByChannel(HitResults, Start, End, Rot, ECollisionChannel::ECC_GameTraceChannel1, CollisionBox, CollisionParams);
 
-	//if (isHit != true) { return; }
+	if (isHit != true) { return; }
 
 	if (false) {
 		DrawDebugCapsule(GetWorld(), (Start + End) / 2,
-			CollisionShape.GetCapsuleHalfHeight(),
-			CollisionShape.GetCapsuleRadius(), Rot, FColor::Red, true, -1.0f, 0, 1.0f);
+			CollisionBox.GetCapsuleHalfHeight(),
+			CollisionBox.GetCapsuleRadius(), Rot, FColor::Red, true, -1.0f, 0, 1.0f);
 	}
 
 	for (FHitResult HitResult : HitResults) {
@@ -438,32 +450,16 @@ void AOdaBase::EnemyOnOverlap(FHitResult& _HitResult)
 	//Cast
 	APlayerBase* Player = Cast<APlayerBase>(_HitResult.GetActor());
 	if (Player) {
-		//プレイヤーがHPをロックしたらこの処理
-		//if (Player->bIsAttacked) {
-		//	return;
-		//}
-
+		//プレイヤーがHPをロックしたらこの処理を通る
+		if (bIsAttacked) {
+			return;
+		}
 
 		Player->TakedDamage(SwordDamage);						//プレイヤーにダメージを与える
 
+		//リセット
+		bIsAttacked = true;
 
 		FVector HitLocation = _HitResult.Location;		//ヒットエフェクトの位置
-
-		//AActor* Player = GetOwner();			//プレイヤーのヒットストップ処理
-		//if (Player) {
-		//	ADestinyChangerCharacter* DestinyChangerCharacter = Cast<ADestinyChangerCharacter>(Player);
-		//	if (DestinyChangerCharacter) {
-		//		DestinyChangerCharacter->GetAttackAssistComponent()->HitStop();
-		//		DestinyChangerCharacter->GetAttackAssistComponent()->HitEffect(HitEffect, HitLocation, GetActorForwardVector());
-		//	}
-		//}
-		//Debug
-		FQuat Rotation = FQuat::Identity;
-		FVector Extent = FVector(5, 5, 5);
-
-		//DrawDebugBox(GetWorld(), HitLocation, Extent, Rotation, FColor::Green, false, 5.0f, 0, 1.0f);
-		//Enemyの名前とHPをPrintStringで表示
-		//FString OutputString = FString::Printf(TEXT("Enemy: %s, Health: %f"), *Player->GetName(), Player->GetHP());
-		//UKismetSystemLibrary::PrintString(this, OutputString);
 	}
 }

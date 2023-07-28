@@ -166,9 +166,7 @@ public:
 	UPROPERTY()
 		int NotAttackCount;
 
-	//‘Ì—Í
-	UPROPERTY(EditAnywhere)
-	float Health;
+
 
 	//HP‚ª˜A‘±‚ÅŒ¸‚ç‚È‚¢‚æ‚¤‚ÉƒƒbƒN
 	UPROPERTY()
@@ -216,6 +214,12 @@ public:
 	UFUNCTION()
 		void EnemyOnOverlap(FHitResult& _HitResult);
 
+	UPROPERTY()
+		bool bIsAttacked;
+
+	UFUNCTION()
+		void toPlayerAttacked();
+
 //////////////////////////////////////////////////////////////////////////
 //€–Sˆ—
 public:
@@ -228,6 +232,10 @@ public:
 //UI
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
 		class UEnemyBase_WidgetComponent* EnemyWidget;
+
+	//‘Ì—Í
+	UPROPERTY(EditAnywhere)
+		float Health;
 
 	UPROPERTY(EditAnywhere)
 		float MaxHealth;
