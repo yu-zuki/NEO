@@ -29,11 +29,11 @@ AOdaBase::AOdaBase() :
 	Health(150),
 	MaxHealth(150.f)
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	BoxComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("SwordComponent"),true);
-	BoxComponent->SetupAttachment(GetMesh(),"weapon_r");
+	BoxComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("SwordComponent"), true);
+	BoxComponent->SetupAttachment(GetMesh(), "weapon_r");
 	BoxComponent->SetRelativeLocation(FVector(0.0f, -80.0f, 0.0f));
 
 	//UI Create
@@ -48,7 +48,7 @@ void AOdaBase::BeginPlay()
 	Super::BeginPlay();
 	SpawnDefaultController();
 
-	NobunagaMovement = (GetCharacterMovement());	
+	NobunagaMovement = (GetCharacterMovement());
 	PlayerChara = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
 }
 
@@ -89,38 +89,38 @@ void AOdaBase::Tick(float DeltaTime)
 	WaitTime++;
 	//UKismetSystemLibrary::PrintString(this, FString::FromInt(WaitTime), true, true, FColor::Cyan, 2.f, TEXT("None"));
 
-	
+
 
 		//状態ごとに動きを切り替える
-		switch (OdaMoveEnum)
-		{
-			//待機
-		case ECPPOdaEnum::Stay1:
-			OdaStay1(WaitTime);
-			break;
+	switch (OdaMoveEnum)
+	{
+		//待機
+	case ECPPOdaEnum::Stay1:
+		OdaStay1(WaitTime);
+		break;
 
-			//退却
-		case ECPPOdaEnum::Back1:
-			OdaBack1(WaitTime);
-			break;
+		//退却
+	case ECPPOdaEnum::Back1:
+		OdaBack1(WaitTime);
+		break;
 
-			//攻撃１
-		case ECPPOdaEnum::Attack1:
-			OdaAttack1(WaitTime);
-			break;
+		//攻撃１
+	case ECPPOdaEnum::Attack1:
+		OdaAttack1(WaitTime);
+		break;
 
-			//攻撃２
-		case ECPPOdaEnum::Attack2:
+		//攻撃２
+	case ECPPOdaEnum::Attack2:
 
-			OdaAttack2(WaitTime);
-		default:
+		OdaAttack2(WaitTime);
+	default:
 
-			//必殺技
-		case ECPPOdaEnum::Ultimate:
-			OdaUlt(WaitTime);
+		//必殺技
+	case ECPPOdaEnum::Ultimate:
+		OdaUlt(WaitTime);
 
-			break;
-		}
+		break;
+	}
 
 }
 //Y軸だけを見てどっち側にいるか
@@ -148,7 +148,7 @@ void AOdaBase::OdaStay1(int Timer)
 	}
 	//HPが50%以下になったら
 
-	if (Health < MaxHealth/2.f)
+	if (Health < MaxHealth / 2.f)
 	{
 		if (isUltShot == false)
 		{
@@ -177,7 +177,7 @@ void AOdaBase::OdaStay1(int Timer)
 	if (FVector::Dist(BossPosX, PlayerPosX) <= 50.f)
 	{
 
-		if(FVector::Dist(BossPosY, PlayerPosY) >= 300.f)
+		if (FVector::Dist(BossPosY, PlayerPosY) >= 300.f)
 		{
 			//遠距離
 			OdaMoveEnum = ECPPOdaEnum::Attack2;
@@ -291,25 +291,24 @@ void AOdaBase::OdaUlt(int Timer)
 {
 	UKismetSystemLibrary::PrintString(this, "Ult", true, true, FColor::Cyan, 2.f, TEXT("None"));
 
-	if (Timer % 80 == 0)
+
+	if (isMotionPlaying == true)
 	{
-		if (isMotionPlaying == true)
-		{
-			//アニメーションを流す(今は仮)
-			PlayAnimMontage(AnimMontage_BossUltimate);
-			//一度だけ流したいのでフラグを切り替える
-			isMotionPlaying = false;
-		}
+		//アニメーションを流す(今は仮)
+		PlayAnimMontage(AnimMontage_BossUltimate);
+		//一度だけ流したいのでフラグを切り替える
+		isMotionPlaying = false;
+	}
 	//アニメーションの最後に必殺技を出したいのでNotifyを使って制御する(UltSpawnFlagChangeにて変数の中身を変更)
 
-		if (isUltSpawnTiming == true)
-		{
-			//アクターのスポーン処理(UltSpawnはブループリント上で設定)
-			GetWorld()->SpawnActor<AActor>(UltSpawn, GetActorTransform());
-			//一度だけスポーンさせたいので切り替えておく
-			isUltSpawnTiming = false;
-		}
+	if (isUltSpawnTiming == true)
+	{
+		//アクターのスポーン処理(UltSpawnはブループリント上で設定)
+		GetWorld()->SpawnActor<AActor>(UltSpawn, GetActorTransform());
+		//一度だけスポーンさせたいので切り替えておく
+		isUltSpawnTiming = false;
 	}
+
 
 
 	//200フレームたったら
@@ -395,7 +394,7 @@ void AOdaBase::BossMove(float Speed, FVector MoveSize)
 
 void AOdaBase::BackMove(float Speed)
 {
-	AddMovementInput(FVector(-1.f,0.f,0.f), -Speed);
+	AddMovementInput(FVector(-1.f, 0.f, 0.f), -Speed);
 }
 
 
