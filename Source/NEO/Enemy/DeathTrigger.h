@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "EnamyBase.h"
 #include "DeathTrigger.generated.h"
 
 UCLASS()

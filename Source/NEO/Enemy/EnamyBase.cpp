@@ -6,7 +6,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "NEO/GameSystem/Enemy_UMG.h"
 #include "Components/WidgetComponent.h"
-#include "DeathTrigger.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Camera/CameraComponent.h"
@@ -21,6 +21,7 @@ AEnamyBase::AEnamyBase()
 	//UI Create
 	EnemyWidget = CreateDefaultSubobject<UEnemyBase_WidgetComponent>(TEXT("EnemyWidget"));
 	EnemyWidget->SetupAttachment(RootComponent);
+    bIsDeath = false;
    
 }
 
@@ -99,9 +100,13 @@ void AEnamyBase::ApplyDamage(float DamageAmount)
     GetWorldTimerManager().SetTimer(TimerHandle_ResetDamage, this, &AEnamyBase::DamageReac, 0.2f, false);
     if (Health <= 0)
     {
-        SpawnDeathTrigger();
+        
         PlayAnimMontage(Death, 0.8, NAME_None);
         GetWorldTimerManager().SetTimer(TimerHandle_DestroyEnemy, this, &AEnamyBase::AfterDeath, 1.6f, true);
+        bIsDeath = true;
+        FVector ForceDirection = -GetActorForwardVector();
+        float ForceStrength = 1000.0f;  // Adjust this value as needed.
+        GetCharacterMovement()->AddForce(ForceDirection * ForceStrength);
     }
     else
     {
@@ -120,29 +125,6 @@ void AEnamyBase::DamageReac()
     bIsNowDamage = false;
 }
 
-void AEnamyBase::SpawnDeathTrigger()
-{
-    UWorld* World = GetWorld();  // 現在のWorldを取得
-    if (World)  // Worldが存在する場合のみスポーンを実行
-    {
-        FActorSpawnParameters SpawnParams;
-        SpawnParams.Owner = this;
-        SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
-
-        // スポーンする位置と向きを取得（この場合、敵キャラクターと同じ位置と向き）
-        FVector SpawnLocation = GetActorLocation();
-        FRotator SpawnRotation = GetActorRotation();
-
-        // DeathTriggerをスポーン
-        ADeathTrigger* DeathTrigger = World->SpawnActor<ADeathTrigger>(ADeathTrigger::StaticClass(), SpawnLocation, SpawnRotation, SpawnParams); 
-
-        // DeathTriggerをEnemyBaseにアタッチ
-        if (DeathTrigger)  // DeathTriggerが正常にスポーンされた場合のみアタッチを実行
-        {
-            DeathTrigger->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
-        }
-    }
-}
 
 
 

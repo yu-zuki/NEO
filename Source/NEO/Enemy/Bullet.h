@@ -4,34 +4,62 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "TrajectoryBullet.h"
 #include "Components/SphereComponent.h"
+
 #include "Bullet.generated.h"
 
 UCLASS()
 class NEO_API ABullet : public AActor
 {
-	GENERATED_BODY()
-	
-public:	
-	// Sets default values for this actor's properties
-	ABullet();
-	// Sphere collision component
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-private:
-	UPROPERTY(EditAnywhere, Category = "Movement")
-		float Speed = 1000.0f; // Adjust the speed as needed
-	UPROPERTY(EditAnywhere, Category = "Movement")
-		float DistanceSpeedDamping = 0.001f;
+    GENERATED_BODY()
 
-	FVector MovementDirection;
-public:	
-	
-	virtual void Tick(float DeltaTime) override;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage")
-		float DamageAmount;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Collision, meta = (AllowPrivateAccess = "true"))
-		class USphereComponent* SphereComponent;
+public:
+    // Sets default values for this actor's properties
+    ABullet();
+
+protected:
+    // Called when the game starts or when spawned
+    virtual void BeginPlay() override;
+
+public:
+    // Called every frame
+    virtual void Tick(float DeltaTime) override;
+
+    void EnableCollision();
+
+    UFUNCTION()
+        void OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+    ATrajectoryBullet* GetTrajectoryBullet() const
+    {
+        return TrajectoryBullet;
+    }
+
+    void SetTrajectoryBullet(ATrajectoryBullet* Bullet)
+    {
+        TrajectoryBullet = Bullet;
+    }
+
+private:
+ 
+
+    // Bullet lifespan
+    UPROPERTY(EditAnywhere)
+        float Lifespan;
+    
+    UPROPERTY(EditAnywhere)
+        float DamageAmount;
+
+    // Movement direction
+    FVector Direction;
+    // Sphere component
+    UPROPERTY(VisibleAnywhere)
+        USphereComponent* SphereComponent;
+
+    // Collision component
+    UPROPERTY(VisibleAnywhere)
+        UPrimitiveComponent* CollisionComponent;
+    ATrajectoryBullet* TrajectoryBullet;
+   
 };
+

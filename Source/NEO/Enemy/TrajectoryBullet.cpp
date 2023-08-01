@@ -31,7 +31,10 @@ void ATrajectoryBullet::BeginPlay()
             BulletMeshComponent->SetMaterial(0, DynamicMaterialInstance);
         }
     }
-    
+    GetWorldTimerManager().SetTimer(LifeSpanTimerHandle, [this]()
+        {
+            Destroy();
+        }, LifeSpan, false);
    
 }
 

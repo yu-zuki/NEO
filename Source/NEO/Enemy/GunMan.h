@@ -28,21 +28,6 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	int32 CallTracker = 5;
-	UFUNCTION()
-	void SpawnBullet();
-	UFUNCTION()
-	void BlinkTrajectoryBullet();
-	
-	UPROPERTY(EditDefaultsOnly, Category = "Spawning")
-		TSubclassOf<class ABullet> BulletClass;
-	UPROPERTY(EditDefaultsOnly, Category = "Spawning")
-		TSubclassOf<class ATrajectoryBullet> TrajectoryBulletClass;
-	UPROPERTY()
-		FTimerHandle TimerHandle_Blink;
-
-	UPROPERTY()
-		FTimerHandle TimerHandle_Destroy;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -53,5 +38,16 @@ private:
 	FVector GetPlayerDirection() const;
 	
 	float GetDistanceToPlayer() const;
-	
+	UPROPERTY(EditAnywhere, Category = "Spawning")
+		TSubclassOf<class ATrajectoryBullet> TrajectoryBulletClass;
+
+	UPROPERTY(EditAnywhere, Category = "Spawning")
+		TSubclassOf<class ABullet> BulletClass;
+
+	FTimerHandle BulletSpawnTimerHandle;
+	FTimerHandle MovementResumeTimerHandle;
+
+	void SpawnTrajectoryBullet();
+	void ReplaceWithBullet();
+	void ResumeMovement();
 };

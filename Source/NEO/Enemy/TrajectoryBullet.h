@@ -19,13 +19,19 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-    UPROPERTY()
-        FTimerHandle TimerHandle_Destroy;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 	UFUNCTION(BlueprintCallable, Category = "Blinking")
 		void StartBlinking();
+    FTimerHandle& GetLifeSpanTimerHandle()
+    {
+        return LifeSpanTimerHandle;
+    };
+    float GetLifeSpan() const
+    {
+        return LifeSpan;
+    }
 private:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
         class UStaticMeshComponent* BulletMeshComponent;
@@ -40,7 +46,8 @@ private:
     float MaxOpacity;
     float BlinkDuration;
     FTimerHandle BlinkTimerHandle;
-
+    FTimerHandle LifeSpanTimerHandle;
+    float LifeSpan = 2.0f;
     void SetBulletOpacity(float Opacity);
     void BlinkBullet();
     void DeleteBullet();

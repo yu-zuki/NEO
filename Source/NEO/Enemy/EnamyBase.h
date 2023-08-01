@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "EnemyBaseAnimInstance.h"
-#include "DeathTrigger.h"
 #include "EnamyBase.generated.h"
 
 UCLASS()
@@ -36,6 +35,7 @@ protected:
 	virtual void BeginPlay() override;
 	UPROPERTY()
 		FTimerHandle TimerHandle_DestroyEnemy;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -60,6 +60,9 @@ public:
 
 	float GetHP() { return Health; }
 	
+	bool bIsRotation;
+
+	bool bIsDeath;
 	
 	bool IsIdol() const { return bIsIdol; }
 	bool IsWalking() const { return bIsWalking; }
@@ -69,7 +72,7 @@ public:
 	bool IsDead() const { return bIsDead; }
 	bool IsAir() const{ return bIsAir; }
 private:
-	bool bIsRotation;
+
 	///////////////////////////////アニメーション///////////////////////////////////////////
 	bool bIsIdol;
 	bool bIsWalking;
@@ -78,7 +81,6 @@ private:
 	bool bIsReactingToDamage;
 	bool bIsDead;
 	bool bIsAir;
-	void SpawnDeathTrigger();
 	///UI
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")

@@ -10,6 +10,7 @@
 #include "TrajectoryBullet.h"
 #include "TimerManager.h"
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 
 
 // Sets default values
@@ -17,6 +18,7 @@ AGunMan::AGunMan()
 {
     // Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
     PrimaryActorTick.bCanEverTick = true;
+
     // キャラクターの移動方式を設定
     GetCharacterMovement()->bOrientRotationToMovement = true;
     GetCharacterMovement()->RotationRate = FRotator(0.0f, 540.0f, 0.0f);
@@ -24,7 +26,7 @@ AGunMan::AGunMan()
     MaxHealth = 100;
     Health = MaxHealth;
    
-   
+    BulletSpawnTimerHandle = FTimerHandle();
 }
 
 // Called when the game starts or when spawned
@@ -34,7 +36,7 @@ void AGunMan::BeginPlay()
     // プレイヤーキャラクターの参照を取得
     PlayerCharacter = UGameplayStatics::GetPlayerCharacter(this, 0);
     
-    GetWorldTimerManager().SetTimer(TimerHandle_Blink, this, &AGunMan::BlinkTrajectoryBullet, 2.0f, false);
+    GetWorldTimerManager().SetTimer(BulletSpawnTimerHandle, this, &AGunMan::SpawnTrajectoryBullet, 3.0f, true);
 }
     
 
@@ -45,8 +47,8 @@ void AGunMan::Tick(float DeltaTime)
  
 	Super::Tick(DeltaTime);
 	
-    if(bIsShoot)
-    { 
+    
+    {
         if (PlayerCharacter)
         {
             // プレイヤーとの距離を取得
@@ -67,50 +69,17 @@ void AGunMan::Tick(float DeltaTime)
             }
         }
 
-        
-    }
+
+
         // キャラクターの位置を取得
         FVector CharacterLocation = GetActorLocation();
 
         // 自分の座標を取得
         FVector MyLocation = GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorLocation();
-       
-}
-void AGunMan::SpawnBullet()
-{
-   
-        FVector SpawnLocation = GetActorLocation() + GetActorForwardVector() * 100.0f; // 100.0fは適宜調整してください
-        FRotator SpawnRotation = GetActorRotation();
-        GetWorld()->SpawnActor<ABullet>(BulletClass, SpawnLocation, SpawnRotation);
-        bIsShoot = true;
-        bIsRotation = true;
+    }
 }
 
-void AGunMan::BlinkTrajectoryBullet()
-{
-        FVector SpawnLocation = GetActorLocation() + GetActorForwardVector() * 50.0f;
-        FRotator SpawnRotation = GetActorRotation();
-        ATrajectoryBullet* TrajectoryBullet = GetWorld()->SpawnActor<ATrajectoryBullet>(TrajectoryBulletClass, SpawnLocation, SpawnRotation);
 
-        if (TrajectoryBullet)
-        {
-
-            TrajectoryBullet->StartBlinking();
-
-
-            FTimerHandle TimerHandle_BulletSpawn;
-            GetWorldTimerManager().SetTimer(TimerHandle_BulletSpawn, this, &AGunMan::SpawnBullet, 2.0f, false);
-           
-        }
-
-
-        FTimerHandle TimerHandle_NextSequence;
-        GetWorldTimerManager().SetTimer(TimerHandle_NextSequence, this, &AGunMan::BlinkTrajectoryBullet, 4.0f, false);
-        bIsShoot = false;
-        bIsRotation = false;
-    
-  
-}
 
 FVector AGunMan::GetPlayerDirection() const
 {
@@ -124,4 +93,46 @@ float AGunMan::GetDistanceToPlayer() const
     FVector PlayerLocation = PlayerCharacter->GetActorLocation();
     FVector GunManLocation = GetActorLocation();
     return FVector::Distance(PlayerLocation, GunManLocation);
+}
+void AGunMan::SpawnTrajectoryBullet()
+{
+    // Spawn a TrajectoryBullet
+    FActorSpawnParameters SpawnParams;
+    FVector SpawnLocation = GetActorLocation();
+    FRotator SpawnRotation = GetActorRotation(); 
+
+    ATrajectoryBullet* Bullet = GetWorld()->SpawnActor<ATrajectoryBullet>(TrajectoryBulletClass, SpawnLocation, SpawnRotation, SpawnParams);
+    if (Bullet)
+    {
+        // Set up timer to replace TrajectoryBullet with Bullet after 2 seconds
+        GetWorldTimerManager().SetTimer(Bullet->GetLifeSpanTimerHandle(), this, &AGunMan::ReplaceWithBullet, 2.0f, false);
+    }
+
+    // Prevent movement for the lifespan of the TrajectoryBullet + 1 second
+    GetCharacterMovement()->Deactivate();
+    GetWorldTimerManager().SetTimer(MovementResumeTimerHandle, this, &AGunMan::ResumeMovement, Bullet->InitialLifeSpan + 1.0f, false);
+}
+
+void AGunMan::ReplaceWithBullet()
+{
+    // Replace TrajectoryBullet with Bullet
+    FActorSpawnParameters SpawnParams;
+    FVector SpawnLocation = GetActorLocation(); // Adjust as necessary
+    FRotator SpawnRotation = GetActorRotation(); // Adjust as necessary
+
+    ABullet* Bullet = GetWorld()->SpawnActor<ABullet>(BulletClass, SpawnLocation, SpawnRotation, SpawnParams);
+    if (Bullet)
+    {
+        // Destroy the TrajectoryBullet if it's valid
+        ATrajectoryBullet* TrajectoryBullet = Bullet->GetTrajectoryBullet();
+        if (IsValid(TrajectoryBullet))
+        {
+            GetWorld()->DestroyActor(TrajectoryBullet);
+        }
+    }
+}
+void AGunMan::ResumeMovement()
+{
+    // Resume movement
+    GetCharacterMovement()->Activate(true);
 }
