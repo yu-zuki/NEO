@@ -315,6 +315,7 @@ void APlayerBase::Move(const FInputActionValue& _value)
 		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 
 		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+		
 
 		// ˆÚ“®
 		AddMovementInput(RightDirection, MovementVector.X);

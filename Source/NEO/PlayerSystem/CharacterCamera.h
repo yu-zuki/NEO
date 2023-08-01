@@ -40,4 +40,24 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	//------------------------スプライン------------------------
+
+public:
+	//SplineActorの初期化設定
+	AActor* SplineActorInitialize(AActor* _pOwnerActor, const FName& _tag);
+
+	//スプライン上の現在の位置を取得
+	void GetCurrentInfo0nSpline(float _length, FVector& _location, FRotator& _rotation);
+	
+	UPROPERTY(EditAnywhere, Category = "SubChara")		//サブキャラを動かしたいスプラインのタグ名
+		FName m_splineTagName;
+
+	AActor* m_pSplineActor;		//スプラインのActor
+	float m_localLength;		//現在スプライン上の位置
+	float m_moveDistance;		//周防ライン上の移動処理
+
+	UPROPERTY(EditAnywhere, Category = "SubChara")		//速度
+		float m_defaultSpeed;		//速度
+
 };
