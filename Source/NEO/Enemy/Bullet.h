@@ -29,7 +29,7 @@ public:
     void EnableCollision();
 
     UFUNCTION()
-        void OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+        void OnOverlap(class UPrimitiveComponent* OverlappedComponent, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
     ATrajectoryBullet* GetTrajectoryBullet() const
     {
         return TrajectoryBullet;

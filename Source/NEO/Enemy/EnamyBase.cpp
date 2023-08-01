@@ -107,6 +107,9 @@ void AEnamyBase::ApplyDamage(float DamageAmount)
         FVector ForceDirection = -GetActorForwardVector();
         float ForceStrength = 1000.0f;  // Adjust this value as needed.
         GetCharacterMovement()->AddForce(ForceDirection * ForceStrength);
+        GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+        GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldStatic, ECollisionResponse::ECR_Block);
+
     }
     else
     {

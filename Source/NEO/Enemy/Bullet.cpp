@@ -40,7 +40,7 @@ void ABullet::EnableCollision()
     CollisionComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 }
 
-void ABullet::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void ABullet::OnOverlap(class UPrimitiveComponent* OverlappedComponent, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
     if (OtherActor && (OtherActor != this) && OtherComp)
     {
