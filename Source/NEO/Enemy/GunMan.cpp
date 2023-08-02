@@ -74,8 +74,7 @@ void AGunMan::Tick(float DeltaTime)
         // キャラクターの位置を取得
         FVector CharacterLocation = GetActorLocation();
 
-        // 自分の座標を取得
-        FVector MyLocation = GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorLocation();
+      
     }
 }
 

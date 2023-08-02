@@ -48,6 +48,12 @@ void ALancer::Tick(float DeltaTime)
             FVector PlayerDirection = GetPlayerDirection();
             AddMovementInput(PlayerDirection);
         }
+        else if (DistanceToPlayer < DesiredDistance - 50.0f) // プレイヤーが望ましい距離-100以下に入った場合
+        {
+            // プレイヤーから離れる
+            FVector PlayerDirection = GetPlayerDirection();
+            AddMovementInput(-PlayerDirection);
+        }
     }
     
    
@@ -80,23 +86,35 @@ void ALancer::CheckPlayerInFront()
     // 自分の位置を取得
     FVector MyLocation = GetActorLocation();
 
-    // 自プレイヤーの位置を取得
-    FVector PlayerLocation = GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorLocation();
-
-    // 自プレイヤーがLancerの目の前にいるかどうかを判定
-    FVector DirectionToPlayer = PlayerLocation - MyLocation;
-    float DotProduct = FVector::DotProduct(DirectionToPlayer.GetSafeNormal(), GetActorForwardVector());
-    bIsPlayerInFront = DotProduct > 0.0f;
-
-    if (bIsPlayerInFront)
+    UWorld* World = GetWorld();
+    if (World)
     {
-        if (FMath::FRand()<0.25f)
+        APlayerController* PlayerController = World->GetFirstPlayerController();
+        if (PlayerController)
         {
-             PlayAnimMontage(Attack, 1, NAME_None);
+            APawn* Pawn = PlayerController->GetPawn();
+            if (Pawn)
+            {
+                FVector PlayerLocation = Pawn->GetActorLocation();
+                // 自プレイヤーがLancerの目の前にいるかどうかを判定
+                FVector DirectionToPlayer = PlayerLocation - MyLocation;
+                float DotProduct = FVector::DotProduct(DirectionToPlayer.GetSafeNormal(), GetActorForwardVector());
+                bIsPlayerInFront = DotProduct > 0.0f;
+
+                if (bIsPlayerInFront)
+                {
+                    if (FMath::FRand() < 0.5f)
+                    {
+                        PlayAnimMontage(Attack, 1, NAME_None);
+                    }
+
+                }
+            }
         }
-      
     }
+    
 }
+
 
 
 
