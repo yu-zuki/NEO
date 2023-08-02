@@ -29,3 +29,13 @@ EPlayerType UTGS_GameInstance::LoadPlayerType() const
 {
 	return BackupPlayerType;
 }
+
+void UTGS_GameInstance::SaveRemainingLife(int _life)
+{
+	RemainingLife = _life;
+}
+
+int UTGS_GameInstance::LoadRemainingLife() const
+{
+	return RemainingLife;
+}

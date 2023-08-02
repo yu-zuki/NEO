@@ -17,7 +17,8 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "NEO/GameSystem/TGS_GameMode.h"
 #include "Components/WidgetComponent.h"
-
+#include "NEO/GameSystem/TGS_GameInstance.h"
+#include "PlayerSpline.h"
 
 #define DIRECTION_X (25.f)
 #define DIRECTION_Y (90.f)
@@ -131,6 +132,15 @@ void APlayerBase::SetupPlayerData()
 
 	// コンボの名前格納
 	ComboStartSectionNames = { "First", "Second", "Third"/*,"Fourth"*/ };
+
+	// スプラインを検索して格納
+	AActor* tempSplineActor = GetSplineActor("PlayerLoad");
+
+	// アクターをスプラインにキャスト
+	if(tempSplineActor)
+	{
+		SplineActor = Cast<APlayerSpline>(tempSplineActor);
+	}
 }
 
 
@@ -304,12 +314,13 @@ void APlayerBase::Move(const FInputActionValue& _value)
 
 	// input is a Vector2D
 	FVector2D MovementVector = _value.Get<FVector2D>();
-
-	if (Controller != nullptr)
+	
+	if (SplineActor)
 	{
 		// find out which way is forward
-		const FRotator Rotation = Controller->GetControlRotation();
-		const FRotator YawRotation(0.f, Rotation.Yaw, 0.f);
+		const FRotator Rotation = SplineActor->GetSplineAngle(DistanceAdvanced);
+		const FRotator YawRotation(0.f, Rotation.Roll, 0.f);
+		kakunin = Rotation;
 
 		// 移動方向取得(X,Y)
 		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
@@ -320,9 +331,27 @@ void APlayerBase::Move(const FInputActionValue& _value)
 		AddMovementInput(RightDirection, MovementVector.X);
 		AddMovementInput(ForwardDirection, MovementVector.Y);
 
-		// 移動方向に回転
-		RotateCharacter(MovementVector.X);
+		DistanceAdvanced += MovementVector.Y;
 	}
+
+	//if (Controller != nullptr)
+	//{
+	//	// find out which way is forward
+	//	const FRotator Rotation = Controller->GetControlRotation();
+	//	const FRotator YawRotation(0.f, Rotation.Yaw, 0.f);
+
+	//	// 移動方向取得(X,Y)
+	//	const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+
+	//	const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+
+	//	// 移動
+	//	AddMovementInput(RightDirection, MovementVector.X);
+	//	AddMovementInput(ForwardDirection, MovementVector.Y);
+
+	//	// 移動方向に回転
+	//	RotateCharacter(MovementVector.X);
+	//}
 }
 
 
@@ -543,32 +572,69 @@ void APlayerBase::SlowDownDeathAnimationRate()
  */
 void APlayerBase::CallGameModeFunc_DestroyPlayer()
 {
-	//// ゲームモード作成
-	//ATGS_GameMode* gameMode = Cast<ATGS_GameMode>(GetWorld()->GetAuthGameMode());
 
-	//if (gameMode)
-	//{
-	//	// 残機があるうちはリスポーン
-	//	if (PlayerStatus.RemainingLife > 0)
-	//	{
-	//		// プレイヤーリスポーン
-	//		gameMode->RespawnPlayer();
+	// ゲームモード作成
+	ATGS_GameMode* gameMode = Cast<ATGS_GameMode>(GetWorld()->GetAuthGameMode());
+	UTGS_GameInstance* GameInstance = GetGameInstance();
 
-	//		// 残機-１
-	//		--PlayerStatus.RemainingLife;
-	//	}
-	//	// それ以外はゲームオーバー
-	//	else
-	//	{
-	//		// ゲームオーバーへ
-	//		gameMode->SetState_GameOver();
+	if (gameMode)
+	{
+		gameMode->DestroyPlayer(this);
 
-	//		// プレイヤー削除
-	//		gameMode->DestroyPlayer(this);
-	//	}
-	//}
+		PlayerStatus.RemainingLife = GameInstance->LoadRemainingLife();
+
+		// 残機があるうちはリスポーン
+		if (PlayerStatus.RemainingLife > 0)
+		{
+			// プレイヤーリスポーン
+			gameMode->RespawnPlayer();
+
+			// 残機-１
+			GameInstance->SaveRemainingLife( --PlayerStatus.RemainingLife );
+		}
+		// それ以外はゲームオーバー
+		else
+		{
+			// ゲームオーバーへ
+			gameMode->SetState_GameOver();
+
+			// プレイヤー削除
+			gameMode->DestroyPlayer(this);
+		}
+	}
 }
 
+//タグからActorを取得
+AActor* APlayerBase::GetSplineActor(const FName _tag)
+{
+	//ゲーム全体に対するActorの検索コストが高いため、一回保存しておくだけにする
+	//検索対象は全てのActor
+	TSubclassOf<AActor> findClass;
+	findClass = AActor::StaticClass();
+	TArray<AActor*> actors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), findClass, actors);
+
+	//検索結果、Actorがあれば
+	if (actors.Num() > 0)
+	{
+		// そのActorの中を順番に検索
+		for (int idx = 0; idx < actors.Num(); idx++)
+		{
+			AActor* pActor = Cast<AActor>(actors[idx]);
+
+			// タグ名で判断
+			if (pActor->ActorHasTag(_tag))
+			{
+
+
+				return pActor;
+			}
+		}
+	}
+
+
+	return NULL;
+}
 
 
 /*
@@ -673,4 +739,19 @@ void APlayerBase::PlayAnimation(UAnimMontage* _toPlayAnimMontage, FName _startSe
 	{
 		PlayAnimMontage(_toPlayAnimMontage, _playRate, _startSectionName);
 	}
+}
+
+UTGS_GameInstance* APlayerBase::GetGameInstance()
+{
+	UWorld* World = GetWorld();
+	if (!World) return nullptr;
+
+	UTGS_GameInstance* GameInstance = Cast<UTGS_GameInstance>(GetWorld()->GetGameInstance());
+	if (GameInstance) {
+		return GameInstance;
+	}
+	else {
+		UE_LOG(LogTemp, Warning, TEXT("GameInstance is not Found"));
+	}
+	return nullptr;
 }

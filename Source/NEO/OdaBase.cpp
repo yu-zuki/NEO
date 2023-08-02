@@ -112,22 +112,22 @@ void AOdaBase::Tick(float DeltaTime)
 		}
 
 		//ó‘Ô‚²‚Æ‚É“®‚«‚ğØ‚è‘Ö‚¦‚é
-		switch (OdaMoveEnum)
-		{
-			//‘Ò‹@
-		case ECPPOdaEnum::Stay1:
-			OdaStay1(WaitTime);
-			break;
+	switch (OdaMoveEnum)
+	{
+		//‘Ò‹@
+	case ECPPOdaEnum::Stay1:
+		OdaStay1(WaitTime);
+		break;
 
-			//‘Ş‹p
-		case ECPPOdaEnum::Back1:
-			OdaBack1(WaitTime);
-			break;
+		//‘Ş‹p
+	case ECPPOdaEnum::Back1:
+		OdaBack1(WaitTime);
+		break;
 
-			//UŒ‚‚P
-		case ECPPOdaEnum::Attack1:
-			OdaAttack1(WaitTime);
-			break;
+		//UŒ‚‚P
+	case ECPPOdaEnum::Attack1:
+		OdaAttack1(WaitTime);
+		break;
 
 			//UŒ‚‚Q
 		case ECPPOdaEnum::Attack2:

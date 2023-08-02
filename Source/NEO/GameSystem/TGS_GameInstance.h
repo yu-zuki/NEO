@@ -27,6 +27,7 @@ protected:
 	//PlayerType‚Ìó‘Ô‚ğ•Û‘¶
 	EPlayerType BackupPlayerType;
 
+	int RemainingLife;
 	////Player‚Ìó‘Ô‚ğ•Û‘¶
 	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "GameState")
 	//EPlayerState BackupPlayerState;
@@ -48,5 +49,8 @@ public:
 	//ƒvƒŒƒCƒ„[‚Ìó‘Ô‚ğæ“¾
 	UFUNCTION(BlueprintCallable, Category = "GameState")
 	EPlayerType LoadPlayerType() const;
+
+	void SaveRemainingLife(int _life);
+	int LoadRemainingLife() const;
 
 };

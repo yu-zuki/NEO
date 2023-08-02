@@ -44,6 +44,10 @@ public:
 		void ChangeNextLevel(ENextLevel NextLevel);					//目標のLevelに遷移する
 
 //---------------------------------------スポーン＆デストロイ---------------------------------------
+public:
+	class APlayerBase* PlayerPtr;
+	FTransform DeathTrans;
+
 	void SpawnPlayer(AActor* _player, FTransform _tranceform);
 	void DestroyPlayer(AActor* _player);
 	void RespawnPlayer();
@@ -87,6 +91,9 @@ public:
 		EPlayerType GetPlayerType();
 
 	uint8 GetCurrentState();
+
+	UFUNCTION(BlueprintCallable, Category = "GamerPlayerUI")
+		float GetPlayerP();
 ///////////////////////////////////////////////////////////
 ///Player選択
 void SelctorPlayerType();
@@ -108,6 +115,7 @@ public:
 public:
 AActor* CameraActor;
 FVector GetCameraLocation();
+AActor* GetCameraActor();
 
 //使い方
 //　ATGS_GameMode* GameMode = Cast<ATGS_GameMode>(UGameplayStatics::GetGameMode(GetWorld()));

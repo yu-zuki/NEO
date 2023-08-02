@@ -80,11 +80,21 @@ void ATGS_GameMode::SpawnPlayer(AActor* _player, FTransform _tranceform)
 
 void ATGS_GameMode::DestroyPlayer(AActor* _player)
 {
-
+	DeathTrans = _player->GetActorTransform();
+	_player->Destroy();
 }
 
 void ATGS_GameMode::RespawnPlayer()
 {
+	//プレイヤーを生成する
+	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+	if (PlayerController) {
+		PlayerPtr = Cast<APlayerBase>(GetWorld()->SpawnActor<APawn>(DefaultPawnClass, DeathTrans));
+		PlayerController->Possess(PlayerPtr);
+
+		SetViewTargetWithBlend(GetCameraActor());
+
+	}
 }
 
 void ATGS_GameMode::SpawnEnemyInBattleArea()
@@ -238,6 +248,11 @@ uint8 ATGS_GameMode::GetCurrentState()
 	return static_cast<uint8>(CurrentState);
 }
 
+float ATGS_GameMode::GetPlayerP()
+{	
+	return PlayerPtr ? PlayerPtr->GetPlayerHPPercent() : 0 ;
+}
+
 void ATGS_GameMode::SelctorPlayerType()
 {
 	//NULL CHECK
@@ -283,7 +298,8 @@ void ATGS_GameMode::SelctorPlayerType()
 		//プレイヤーを生成する
 		APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
 		if (PlayerController) {
-			PlayerController->Possess(GetWorld()->SpawnActor<APawn>(DefaultPawnClass, SpawnPointT));
+			PlayerPtr = Cast<APlayerBase>(GetWorld()->SpawnActor<APawn>(DefaultPawnClass, SpawnPointT));
+			PlayerController->Possess(PlayerPtr);
 		}
 	}
 	else {
@@ -334,6 +350,11 @@ FVector ATGS_GameMode::GetCameraLocation()
 	}
 
 	return FVector();
+}
+
+AActor* ATGS_GameMode::GetCameraActor()
+{
+	return CameraActor;
 }
 
 void ATGS_GameMode::SetViewTargetWithBlend(AActor* NewViewTarget, float BlendTime, EViewTargetBlendFunction BlendFunc, float BlendExp, bool bLockOutgoing)

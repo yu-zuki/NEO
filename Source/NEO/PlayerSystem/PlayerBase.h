@@ -17,6 +17,7 @@ class USphereComponent;
 class UCapsuleComponent;
 class UStaticMeshComponent;
 class USkeletalMeshComponent;
+class USplineComponent;
 
 
 //-----------------inputAction------------------------------------------------------------
@@ -205,6 +206,9 @@ private:
 	// 死亡処理呼び出し
 	void CallGameModeFunc_DestroyPlayer();
 
+	// スプライン検索
+	AActor* GetSplineActor(const FName _tag);
+
 
 public:
 	// Called every frame
@@ -300,23 +304,35 @@ protected:
 
 	TArray<FName> ComboStartSectionNames;	// コンボの段数(First,Second,Third・・・)
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))		
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = "GameOver")
 		bool CurveMode;
 
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "GameOver")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"),Category = "GameOver")
 		float DeadAnimRate;							// 死亡アニメーションで倒れてからの再生スピード(1で通常スピード)
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "GameOver")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		float DeadToGameOverTime;					// 死んでからゲームオーバーまでの時間(秒)
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		float DistanceAdvanced;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		FRotator kakunin;
+
 private:
 
-	FTimerHandle TimerHandle_DeathToGameOver;	// ハンドル
+	FTimerHandle TimerHandle_DeathToGameOver;		// ハンドル
+
+	class APlayerSpline* SplineActor;				// プレイヤーが通るスプライン
+	
 
 //////////////////////////////////////////////////////////////////////////
 ///UI
 public:
 	//プレイヤーのHPの％を返す
 	UFUNCTION(BlueprintCallable, Category = "UI")
-	float GetPlayerHPPercent()const { return PlayerStatus.HP / PlayerStatus.MaxHP; }
+		float GetPlayerHPPercent()const { return PlayerStatus.HP / PlayerStatus.MaxHP; }
+
+	class UTGS_GameInstance* GetGameInstance();
 };
