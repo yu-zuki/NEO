@@ -93,6 +93,8 @@ void APlayerBase::Tick(float DeltaTime)
 	case State_Death:
 		break;
 	}
+
+	delta = DeltaTime;
 }
 
 
@@ -318,8 +320,10 @@ void APlayerBase::Move(const FInputActionValue& _value)
 	if (SplineActor)
 	{
 		// find out which way is forward
-		const FRotator Rotation = SplineActor->GetSplineAngle(DistanceAdvanced);
-		const FRotator YawRotation(0.f, Rotation.Roll, 0.f);
+		const FRotator Rotation = SplineActor->GetSplineAngle(DistanceAdvanced * CharacterMovementComp->MaxWalkSpeed * delta);
+		//const FRotator Rotation = SplineActor->GetSplineAngle(DistanceSpline);
+
+		const FRotator YawRotation(0.f, Rotation.Yaw, 0.f);
 		kakunin = Rotation;
 
 		// 移動方向取得(X,Y)
@@ -331,7 +335,8 @@ void APlayerBase::Move(const FInputActionValue& _value)
 		AddMovementInput(RightDirection, MovementVector.Y);
 		AddMovementInput(ForwardDirection, MovementVector.X);
 
-		DistanceAdvanced += MovementVector.Y;
+		DistanceAdvanced += MovementVector.X;
+		DistanceSpline = DistanceSpline + (CharacterMovementComp->MaxWalkSpeed * delta);
 	}
 
 	//if (Controller != nullptr)
@@ -625,6 +630,9 @@ AActor* APlayerBase::GetSplineActor(const FName _tag)
 			// タグ名で判断
 			if (pActor->ActorHasTag(_tag))
 			{
+				//デバッグ確認
+				FString message = FString("Founded Actor	:") + pActor->GetName();
+				UE_LOG(LogTemp, Warning, TEXT("%s"), *message);
 
 
 				return pActor;

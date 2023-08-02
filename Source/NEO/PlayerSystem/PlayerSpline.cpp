@@ -23,7 +23,6 @@ void APlayerSpline::BeginPlay()
 	Super::BeginPlay();
 	
 	// 全体の距離
-	AllLength = SplineComp->GetSplineLength();
 
 }
 
@@ -41,15 +40,30 @@ void APlayerSpline::Tick(float DeltaTime)
  * 引数１　　　　：float _distance・・・距離
  * 戻り値　　　　：その地点での角度
  */
-FRotator APlayerSpline::GetSplineAngle(float _distance)const
+FRotator APlayerSpline::GetSplineAngle(float _distance)
 {
 	if (SplineComp)
+
+		//AllLength = SplineComp->GetSplineLength();
+
+		//float m_localLength = (float)((int)_distance % (int)AllLength);/*FMath::Fmod(_distance,AllLength);*/
+
+		////現在のスプラインの位置に合わせた回転情報の値を参照で返す
+		//FRotator SplineAngle = SplineComp->GetRotationAtDistanceAlongSpline(m_localLength, ESplineCoordinateSpace::World);
+
+		//rrrrr = SplineAngle;
+		//return SplineAngle;
+
+
 	{
-		float m_localLength = FMath::Fmod(_distance,AllLength);
+		AllLength = SplineComp->GetSplineLength();
+
+		float m_localLength = (float)((int)_distance % (int)AllLength);/*FMath::Fmod(_distance,AllLength);*/
 
 		//現在のスプラインの位置に合わせた回転情報の値を参照で返す
 		FRotator SplineAngle = SplineComp->GetRotationAtDistanceAlongSpline(m_localLength, ESplineCoordinateSpace::World);
 
+		rrrrr = SplineAngle;
 		return SplineAngle;
 	}
 

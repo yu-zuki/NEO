@@ -25,10 +25,14 @@ public:
 
 	// スプラインの角度参照
 	UFUNCTION(BlueprintCallable, Category = "Load")
-		FRotator GetSplineAngle(float _distance)const;
+		FRotator GetSplineAngle(float _distance);
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		float AllLength;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		FRotator rrrrr;
+
 
 private:
 	class USplineComponent* SplineComp;
