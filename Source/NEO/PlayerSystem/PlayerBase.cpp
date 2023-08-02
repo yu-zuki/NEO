@@ -328,8 +328,8 @@ void APlayerBase::Move(const FInputActionValue& _value)
 		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 
 		// ˆÚ“®
-		AddMovementInput(RightDirection, MovementVector.X);
-		AddMovementInput(ForwardDirection, MovementVector.Y);
+		AddMovementInput(RightDirection, MovementVector.Y);
+		AddMovementInput(ForwardDirection, MovementVector.X);
 
 		DistanceAdvanced += MovementVector.Y;
 	}

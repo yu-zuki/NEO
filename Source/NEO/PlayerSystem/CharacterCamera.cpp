@@ -47,8 +47,9 @@ void ACharacterCamera::BeginPlay()
 		GameMode->SetViewTargetWithBlend(this, 0.5f);
 	}*/
 
-	PlayerInfo = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
-	PlayerInfo->SetOwner(this);
+	//PlayerInfo = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
+	//PlayerInfo->SetOwner(this);
+	PlayerInfo = GetPlayer();
 
 	// 初期位置設定
 	StartPos = PlayerInfo->GetActorLocation();
@@ -63,9 +64,23 @@ void ACharacterCamera::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	ACharacter* tmp_PlayerInfo = GetPlayer();
+	if (!tmp_PlayerInfo) return;
+
 	// プレイヤーの現在位置取得
-	FVector PlayerPos = PlayerInfo->GetActorLocation();
+	FVector PlayerPos = tmp_PlayerInfo->GetActorLocation();
 
 	SetActorLocation(FVector(StartPos.X - PlayerToViewPointDistance.Z, PlayerPos.Y + PlayerToViewPointDistance.X,StartPos.Z + PlayerToViewPointDistance.Y));
 }
 
+ACharacter* ACharacterCamera::GetPlayer()
+{
+	if (!PlayerInfo) {
+		PlayerInfo = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
+		PlayerInfo->SetOwner(this);
+		return PlayerInfo;
+	}
+	else {
+		return PlayerInfo;
+	}
+}
