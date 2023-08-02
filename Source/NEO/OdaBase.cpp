@@ -18,6 +18,7 @@ AOdaBase::AOdaBase() :
 	OdaSpeed(1.f),
 	FastOdaSpeed(1.65),
 	Attack1Delay(0),
+	RandomNum(-1),
 	ChangeFlontTimer(20),
 	isMotionPlaying(false),
 	isShockWaveSpawnTiming(false),
@@ -51,7 +52,7 @@ void AOdaBase::BeginPlay()
 	SpawnDefaultController();
 
 	NobunagaMovement = (GetCharacterMovement());
-	PlayerChara = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
+	PlayerChara = nullptr;
 
 	SpawnDelay = true;
 }
@@ -83,20 +84,18 @@ void AOdaBase::Tick(float DeltaTime)
 			ToPlayerRotate();
 		}
 
+		AActor* Player = GetPlayer();
 		//リスポーンした時に中身がなくなってしまうので更新
-		if (PlayerChara == nullptr)
-		{
-			PlayerChara = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
-		}
+		if (Player == nullptr)  return;
 
 		//距離を取る
 		//X軸
 		BossPosX = FVector(GetActorLocation().X, 0.f, 0.f);
-		PlayerPosX = FVector(PlayerChara->GetActorLocation().X, 0.f, 0.f);
+		PlayerPosX = FVector(Player->GetActorLocation().X, 0.f, 0.f);
 
 		//Y軸
 		BossPosY = FVector(0.f, GetActorLocation().Y, 0.f);
-		PlayerPosY = FVector(0.f, PlayerChara->GetActorLocation().Y, 0.f);
+		PlayerPosY = FVector(0.f, Player->GetActorLocation().Y, 0.f);
 
 		//カウンター起動
 		WaitTime++;
@@ -146,13 +145,12 @@ void AOdaBase::Tick(float DeltaTime)
 	}
 	else
 	{
-
 		SpawnTimer++;
-	if (SpawnTimer % 300 == 0)
-	{
+		if (SpawnTimer % 300 == 0)
+		{
 
-		SpawnDelay = false;
-	}
+			SpawnDelay = false;
+		}
 	}
 
 }
@@ -191,6 +189,12 @@ void AOdaBase::OdaStay1(int Timer)
 			OdaMoveEnum = ECPPOdaEnum::Ultimate;
 			isUltShot = true;
 			UltTimer = 0;
+
+			//random固定のリセット
+			if (RandomNum != -1)
+			{
+				RandomNum = -1;
+			}
 		}
 		//プレイヤーとの距離の判定
 		else if (FVector::Dist(BossPosY, PlayerPosY) <= 200.f)
@@ -203,6 +207,12 @@ void AOdaBase::OdaStay1(int Timer)
 			{
 				Attack1Delay = 20;
 			}
+
+			//random固定のリセット
+			if (RandomNum != -1)
+			{
+				RandomNum = -1;
+			}
 		}
 		//離れていたら
 		else if (FVector::Dist(BossPosY, PlayerPosY) >= 300.f)
@@ -210,6 +220,11 @@ void AOdaBase::OdaStay1(int Timer)
 			//遠距離
 			OdaMoveEnum = ECPPOdaEnum::Attack2;
 			WaitTime = 0;
+			//random固定のリセット
+			if ( RandomNum != -1)
+			{
+				RandomNum = -1;
+			}
 		}
 		else
 		{
@@ -251,14 +266,20 @@ void AOdaBase::OdaBack1(int Timer) {
 void AOdaBase::OdaMove1(int DeltaTime, int StopTimer)
 {
 	//軸を合わせに行く
-	if (FMath::RandRange(0, 100) <= 50)
+
+	if (RandomNum == -1)
+	{
+		RandomNum = FMath::RandRange(0, 1);
+	}
+	if (RandomNum == 0)
 	{
 		BossMove(FastOdaSpeed * 2, FVector(0.f, 1.f, 0.f));
 	}
-	else
+	else if (RandomNum == 1)
 	{
 		BossMove(FastOdaSpeed * 2, FVector(0.f, -1.f, 0.f));
 	}
+
 }
 
 
@@ -476,6 +497,17 @@ void AOdaBase::BossMove(float Speed, FVector MoveSize)
 void AOdaBase::BackMove(float Speed)
 {
 	AddMovementInput(FVector(-1.f, 0.f, 0.f), -Speed);
+}
+
+AActor* AOdaBase::GetPlayer()
+{
+	if (!PlayerChara) {
+		PlayerChara = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
+		return PlayerChara;
+	}
+	else {
+		return PlayerChara;
+	}
 }
 
 

@@ -126,7 +126,11 @@ public:
 	UPROPERTY()
 	int Attack1Delay;
 
+	//ボスの動きの処理
 	void OdaMove1(int DeltaTime, int StopTimer);
+
+	UPROPERTY()
+		int RandomNum;
 
 	//行動変更時間設定
 	UPROPERTY(EditAnywhere)
@@ -258,4 +262,7 @@ public:
 
 	UPROPERTY(EditAnywhere)
 		float MaxHealth;
+
+protected:
+	AActor* GetPlayer();
 };
