@@ -58,6 +58,12 @@ public:
 	UPROPERTY()
 		UCharacterMovementComponent* NobunagaMovement;
 
+	UPROPERTY()
+		bool SpawnDelay;
+
+	UPROPERTY()
+		int SpawnTimer;
+
 	//É_ÉÅÅ[ÉWèàóù-----------------------------------------------------
 	UFUNCTION()
 	virtual void ApplyDamage(float Damage);

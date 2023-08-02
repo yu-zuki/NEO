@@ -10,6 +10,7 @@
 // Sets default values
 //コンストラクタ+変数の初期化
 AOdaBase::AOdaBase() :
+	SpawnTimer(0),
 	FlameCounter(0),
 	OdaMoveEnum(ECPPOdaEnum::Stay1),
 	SwitchStayMove(true),
@@ -22,7 +23,7 @@ AOdaBase::AOdaBase() :
 	isShockWaveSpawnTiming(false),
 	isUltShotTiming(false),
 	isUltShot(true),
-	UltTimer(0),
+	UltTimer(550),
 	isNotAttackNow(false),
 	NotAttackCount(0),
 	SwordDamage(10),
@@ -51,6 +52,8 @@ void AOdaBase::BeginPlay()
 
 	NobunagaMovement = (GetCharacterMovement());
 	PlayerChara = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
+
+	SpawnDelay = true;
 }
 
 
@@ -65,104 +68,91 @@ void AOdaBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	//Enemy Hp Set
-	EnemyWidget->SetHPInfo(Health, MaxHealth);
 
-	//フレームごとに加算する
-	FlameCounter++;
-	//向きをプレイヤーの方に向ける(60フレーム毎に更新)
-	if (FlameCounter % 60 == 0)
+	if (SpawnDelay != true)
 	{
-		//プレイヤーの方を向く
-		ToPlayerRotate();
-	}
+		//Enemy Hp Set
+		EnemyWidget->SetHPInfo(Health, MaxHealth);
 
-	//リスポーンした時に中身がなくなってしまうので更新
-	if (PlayerChara == nullptr)
-	{
-		PlayerChara = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
-	}
-
-	//距離を取る
-	//X軸
-	BossPosX = FVector(GetActorLocation().X, 0.f, 0.f);
-	PlayerPosX = FVector(PlayerChara->GetActorLocation().X, 0.f, 0.f);
-
-	//Y軸
-	BossPosY = FVector(0.f, GetActorLocation().Y, 0.f);
-	PlayerPosY = FVector(0.f, PlayerChara->GetActorLocation().Y, 0.f);
-
-	//カウンター起動
-	WaitTime++;
-
-	//FVector::Dist(BossPosX, PlayerPosX)
-
-	//UKismetSystemLibrary::PrintString(this, FString::SanitizeFloat(FVector::Dist(BossPosX, PlayerPosX)), true, true, FColor::Cyan, 2.f, TEXT("None"));
-
-
-	//if (FVector::Dist(BossPosY, PlayerPosY) <= 200.f)
-	//{
-	//	//近接攻撃
-	//	UKismetSystemLibrary::PrintString(this, "chikai", true, true, FColor::Cyan, 2.f, TEXT("None"));
-	//}
-	//else if (FVector::Dist(BossPosX, PlayerPosX) <= 50.f)
-	//{
-
-	//	if (FVector::Dist(BossPosY, PlayerPosY) >= 200.f)
-	//	{
-	//		//遠距離
-	//		UKismetSystemLibrary::PrintString(this, "tooi", true, true, FColor::Cyan, 2.f, TEXT("None"));
-	//	}
-	//	else
-	//	{
-	//		UKismetSystemLibrary::PrintString(this, "2nanndeya", true, true, FColor::Cyan, 2.f, TEXT("None"));
-	//	}
-	//}
-	//else
-	//{
-	//	UKismetSystemLibrary::PrintString(this, "3nanndeya", true, true, FColor::Cyan, 2.f, TEXT("None"));
-	//}
-
-	if (Health < MaxHealth / 2.f)
-	{
-		UKismetSystemLibrary::PrintString(this, FString::FromInt(UltTimer), true, true, FColor::Cyan, 2.f, TEXT("None"));
-		UltTimer++;
-		if (UltTimer % 600 == 0)//600フレーム後に必殺を撃てるようにする
+		//フレームごとに加算する
+		FlameCounter++;
+		//向きをプレイヤーの方に向ける(60フレーム毎に更新)
+		if (FlameCounter % 60 == 0)
 		{
-			isUltShot = false;
+			//プレイヤーの方を向く
+			ToPlayerRotate();
 		}
+
+		//リスポーンした時に中身がなくなってしまうので更新
+		if (PlayerChara == nullptr)
+		{
+			PlayerChara = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
+		}
+
+		//距離を取る
+		//X軸
+		BossPosX = FVector(GetActorLocation().X, 0.f, 0.f);
+		PlayerPosX = FVector(PlayerChara->GetActorLocation().X, 0.f, 0.f);
+
+		//Y軸
+		BossPosY = FVector(0.f, GetActorLocation().Y, 0.f);
+		PlayerPosY = FVector(0.f, PlayerChara->GetActorLocation().Y, 0.f);
+
+		//カウンター起動
+		WaitTime++;
+
+		if (Health < MaxHealth / 2.f)
+		{
+			//UKismetSystemLibrary::PrintString(this, FString::FromInt(UltTimer), true, true, FColor::Cyan, 2.f, TEXT("None"));
+			UltTimer++;
+			if (UltTimer % 600 == 0)//600フレーム後に必殺を撃てるようにする
+			{
+				isUltShot = false;
+			}
+		}
+
+		//状態ごとに動きを切り替える
+		switch (OdaMoveEnum)
+		{
+			//待機
+		case ECPPOdaEnum::Stay1:
+			OdaStay1(WaitTime);
+			break;
+
+			//退却
+		case ECPPOdaEnum::Back1:
+			OdaBack1(WaitTime);
+			break;
+
+			//攻撃１
+		case ECPPOdaEnum::Attack1:
+			OdaAttack1(WaitTime);
+			break;
+
+			//攻撃２
+		case ECPPOdaEnum::Attack2:
+			OdaAttack2(WaitTime);
+			break;
+
+			//必殺技
+		case ECPPOdaEnum::Ultimate:
+			OdaUlt(WaitTime);
+			break;
+
+		default:
+			break;
+		}
+
 	}
-
-	//状態ごとに動きを切り替える
-	switch (OdaMoveEnum)
+	else
 	{
-		//待機
-	case ECPPOdaEnum::Stay1:
-		OdaStay1(WaitTime);
-		break;
 
-		//退却
-	case ECPPOdaEnum::Back1:
-		OdaBack1(WaitTime);
-		break;
+		SpawnTimer++;
+	if (SpawnTimer % 300 == 0)
+	{
 
-		//攻撃１
-	case ECPPOdaEnum::Attack1:
-		OdaAttack1(WaitTime);
-		break;
-
-		//攻撃２
-	case ECPPOdaEnum::Attack2:
-		OdaAttack2(WaitTime);
-		break;
-
-		//必殺技
-	case ECPPOdaEnum::Ultimate:
-		OdaUlt(WaitTime);
-		break;
-
-	default:
-		break;
+		SpawnDelay = false;
+	}
 	}
 
 }
@@ -436,9 +426,10 @@ void AOdaBase::UltSpawnFlagChange()
 	}
 }
 
-
+//ダメージを受けた時の処理
 void AOdaBase::ApplyDamage(float Damage)
 {
+
 	if (isHPLock != true)
 	{
 		if (NotAttackCount < 5)
@@ -450,6 +441,11 @@ void AOdaBase::ApplyDamage(float Damage)
 		else
 		{
 			Attack1Delay = 1;
+		}
+		if (SpawnDelay == true)
+		{
+			SpawnDelay = false;
+			Attack1Delay = 30;
 		}
 
 		//ノックバックのアニメーションを流す
