@@ -10,24 +10,25 @@
 // Sets default values
 //コンストラクタ+変数の初期化
 AOdaBase::AOdaBase() :
-	BoxComponent(NULL),
 	FlameCounter(0),
 	OdaMoveEnum(ECPPOdaEnum::Stay1),
 	SwitchStayMove(true),
 	WaitTime(0),
 	OdaSpeed(1.f),
 	FastOdaSpeed(1.65),
+	Attack1Delay(0),
 	ChangeFlontTimer(20),
 	isMotionPlaying(false),
 	isShockWaveSpawnTiming(false),
-	isUltShot(false),
+	isUltShotTiming(false),
+	isUltShot(true),
 	UltTimer(0),
 	isNotAttackNow(false),
 	NotAttackCount(0),
 	SwordDamage(10),
 	bIsAttacked(false),
-	Health(150),
-	MaxHealth(150.f)
+	Health(600.f),
+	MaxHealth(600.f)
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -76,10 +77,16 @@ void AOdaBase::Tick(float DeltaTime)
 		ToPlayerRotate();
 	}
 
+	//リスポーンした時に中身がなくなってしまうので更新
+	if (PlayerChara == nullptr)
+	{
+		PlayerChara = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
+	}
+
 	//距離を取る
 	//X軸
 	BossPosX = FVector(GetActorLocation().X, 0.f, 0.f);
-	PlayerPosX = FVector(PlayerChara->GetActorLocation().Y, 0.f, 0.f);
+	PlayerPosX = FVector(PlayerChara->GetActorLocation().X, 0.f, 0.f);
 
 	//Y軸
 	BossPosY = FVector(0.f, GetActorLocation().Y, 0.f);
@@ -87,11 +94,46 @@ void AOdaBase::Tick(float DeltaTime)
 
 	//カウンター起動
 	WaitTime++;
-	//UKismetSystemLibrary::PrintString(this, FString::FromInt(WaitTime), true, true, FColor::Cyan, 2.f, TEXT("None"));
+
+	//FVector::Dist(BossPosX, PlayerPosX)
+
+	//UKismetSystemLibrary::PrintString(this, FString::SanitizeFloat(FVector::Dist(BossPosX, PlayerPosX)), true, true, FColor::Cyan, 2.f, TEXT("None"));
 
 
+	//if (FVector::Dist(BossPosY, PlayerPosY) <= 200.f)
+	//{
+	//	//近接攻撃
+	//	UKismetSystemLibrary::PrintString(this, "chikai", true, true, FColor::Cyan, 2.f, TEXT("None"));
+	//}
+	//else if (FVector::Dist(BossPosX, PlayerPosX) <= 50.f)
+	//{
 
-		//状態ごとに動きを切り替える
+	//	if (FVector::Dist(BossPosY, PlayerPosY) >= 200.f)
+	//	{
+	//		//遠距離
+	//		UKismetSystemLibrary::PrintString(this, "tooi", true, true, FColor::Cyan, 2.f, TEXT("None"));
+	//	}
+	//	else
+	//	{
+	//		UKismetSystemLibrary::PrintString(this, "2nanndeya", true, true, FColor::Cyan, 2.f, TEXT("None"));
+	//	}
+	//}
+	//else
+	//{
+	//	UKismetSystemLibrary::PrintString(this, "3nanndeya", true, true, FColor::Cyan, 2.f, TEXT("None"));
+	//}
+
+	if (Health < MaxHealth / 2.f)
+	{
+		UKismetSystemLibrary::PrintString(this, FString::FromInt(UltTimer), true, true, FColor::Cyan, 2.f, TEXT("None"));
+		UltTimer++;
+		if (UltTimer % 600 == 0)//600フレーム後に必殺を撃てるようにする
+		{
+			isUltShot = false;
+		}
+	}
+
+	//状態ごとに動きを切り替える
 	switch (OdaMoveEnum)
 	{
 		//待機
@@ -111,14 +153,15 @@ void AOdaBase::Tick(float DeltaTime)
 
 		//攻撃２
 	case ECPPOdaEnum::Attack2:
-
 		OdaAttack2(WaitTime);
-	default:
+		break;
 
 		//必殺技
 	case ECPPOdaEnum::Ultimate:
 		OdaUlt(WaitTime);
+		break;
 
+	default:
 		break;
 	}
 
@@ -139,7 +182,7 @@ void AOdaBase::ToPlayerRotate()
 }
 void AOdaBase::OdaStay1(int Timer)
 {
-	UKismetSystemLibrary::PrintString(this, "Stay", true, true, FColor::Cyan, 2.f, TEXT("None"));
+	//UKismetSystemLibrary::PrintString(this, "Stay", true, true, FColor::Cyan, 2.f, TEXT("None"));
 
 	//モーションを流す状態かどうか(isMotionPlayingをtrueにする)
 	if (isMotionPlaying != true)
@@ -148,65 +191,62 @@ void AOdaBase::OdaStay1(int Timer)
 	}
 	//HPが50%以下になったら
 
-	if (Health < MaxHealth / 2.f)
+
+	if (FVector::Dist(BossPosX, PlayerPosX) <= 50.f)
 	{
+
 		if (isUltShot == false)
 		{
 			//必殺技
 			OdaMoveEnum = ECPPOdaEnum::Ultimate;
 			isUltShot = true;
+			UltTimer = 0;
 		}
-		else
+		//プレイヤーとの距離の判定
+		else if (FVector::Dist(BossPosY, PlayerPosY) <= 200.f)
 		{
-			UltTimer++;
-			if (UltTimer % 600 == 0)
+			//近接攻撃
+			OdaMoveEnum = ECPPOdaEnum::Attack1;
+			WaitTime = 0;
+			//もし攻撃のディレイの値が入っていなかったら
+			if (Attack1Delay != 0)
 			{
-				isUltShot = false;
+				Attack1Delay = 20;
 			}
 		}
-	}
-
-
-	//プレイヤーとの距離の判定
-	if (FVector::Dist(BossPosY, PlayerPosY) <= 200.f)
-	{
-		//近接攻撃
-		OdaMoveEnum = ECPPOdaEnum::Attack1;
-		WaitTime = 0;
-	}
-	if (FVector::Dist(BossPosX, PlayerPosX) <= 50.f)
-	{
-
-		if (FVector::Dist(BossPosY, PlayerPosY) >= 300.f)
+		//離れていたら
+		else if (FVector::Dist(BossPosY, PlayerPosY) >= 300.f)
 		{
 			//遠距離
 			OdaMoveEnum = ECPPOdaEnum::Attack2;
 			WaitTime = 0;
 		}
+		else
+		{
+			//軸を合わせに行く
+			OdaMove1(Timer, 60);
+			Attack1Delay = 30;
+		}
+
 	}
 	else
 	{
-		//if (Timer % 30 == 0)
+		//軸を合わせに行く
+		if (GetActorLocation().X < UGameplayStatics::GetPlayerPawn(GetWorld(), 0)->GetActorLocation().X)
 		{
-			//if (FMath::RandRange(0, 100) <= 20)
-			{
-				//軸を合わせに行く
-				if (GetActorLocation().X < UGameplayStatics::GetPlayerPawn(GetWorld(), 0)->GetActorLocation().X)
-				{
-					BossMove(FastOdaSpeed * 2, FVector(1.f, 0.f, 0.f));
-				}
-				else
-				{
-					BossMove(FastOdaSpeed * 2, FVector(-1.f, 0.f, 0.f));
-				}
-			}
+			BossMove(FastOdaSpeed * 2, FVector(1.f, 0.f, 0.f));
 		}
+		else
+		{
+			BossMove(FastOdaSpeed * 2, FVector(-1.f, 0.f, 0.f));
+		}
+
 	}
 }
 
 //ちょっと後ろに下がるやつ
 void AOdaBase::OdaBack1(int Timer) {
-	UKismetSystemLibrary::PrintString(this, "Back", true, true, FColor::Cyan, 2.f, TEXT("None"));
+	//UKismetSystemLibrary::PrintString(this, "Back", true, true, FColor::Cyan, 2.f, TEXT("None"));
 	//50フレーム後待機に戻る
 	if (Timer % 50 == 0)
 	{
@@ -218,17 +258,41 @@ void AOdaBase::OdaBack1(int Timer) {
 	BackMove(FastOdaSpeed * 10.f);
 }
 
+void AOdaBase::OdaMove1(int DeltaTime, int StopTimer)
+{
+	//軸を合わせに行く
+	if (FMath::RandRange(0, 100) <= 50)
+	{
+		BossMove(FastOdaSpeed * 2, FVector(0.f, 1.f, 0.f));
+	}
+	else
+	{
+		BossMove(FastOdaSpeed * 2, FVector(0.f, -1.f, 0.f));
+	}
+}
+
+
 //攻撃１
 void AOdaBase::OdaAttack1(int Timer) {
-	UKismetSystemLibrary::PrintString(this, "Attack1", true, true, FColor::Cyan, 2.f, TEXT("None"));
-
-
-	if (isMotionPlaying == true)
+	//UKismetSystemLibrary::PrintString(this, "Attack1", true, true, FColor::Cyan, 2.f, TEXT("None"));
+	if (Attack1Delay == 0)
 	{
-		//アニメーションを流す(今は仮)
-		PlayAnimMontage(AnimMontage_BossAttack1);
-		//一度だけ流したいのでフラグを切り替える
-		isMotionPlaying = false;
+		//0だと割り切れないので1を代入しておく
+		Attack1Delay = 1;
+	}
+
+	//設定した時間を超えたか
+	if (Timer % Attack1Delay == 0)
+	{
+		if (isMotionPlaying == true)
+		{
+			//アニメーションを流す(今は仮)
+			PlayAnimMontage(AnimMontage_BossAttack1);
+			//一度だけ流したいのでフラグを切り替える
+			isMotionPlaying = false;
+			//ディレイをリセットする
+			Attack1Delay = 0;
+		}
 	}
 
 	//150フレームたったら
@@ -241,7 +305,7 @@ void AOdaBase::OdaAttack1(int Timer) {
 		WaitTime = 0;
 		//リセット
 		NotAttackCount = 0;
-		//ノックバック中に攻撃モーションに入るとHPロックが作動し続けてしまうのでここで切り替える
+		//ノックバック中に攻撃モーションに入るとHPロックが作動し続けてしまうのでここで切り替える(応急処置)
 		if (isHPLock == true)
 		{
 			HPLock();
@@ -251,7 +315,7 @@ void AOdaBase::OdaAttack1(int Timer) {
 
 //攻撃２
 void AOdaBase::OdaAttack2(int Timer) {
-	UKismetSystemLibrary::PrintString(this, "Attack2", true, true, FColor::Cyan, 2.f, TEXT("None"));
+	//UKismetSystemLibrary::PrintString(this, "Attack2", true, true, FColor::Cyan, 2.f, TEXT("None"));
 	if (isMotionPlaying == true)
 	{
 		//アニメーションを流す(今は仮)
@@ -289,10 +353,26 @@ void AOdaBase::OdaAttack2(int Timer) {
 }
 void AOdaBase::OdaUlt(int Timer)
 {
-	UKismetSystemLibrary::PrintString(this, "Ult", true, true, FColor::Cyan, 2.f, TEXT("None"));
+	//UKismetSystemLibrary::PrintString(this, "Ult", true, true, FColor::Cyan, 2.f, TEXT("None"));
+	if (Timer % 50 == 0 && isUltShotTiming != true)
+	{
+		isUltShotTiming = true;
+	}
+	//軸を合わせに行く
+	if (isUltShotTiming != true)
+	{
+		if (GetActorLocation().Y > UGameplayStatics::GetPlayerPawn(GetWorld(), 0)->GetActorLocation().Y)
+		{
+			BossMove(FastOdaSpeed * 2, FVector(0.f, 1.f, 0.f));
+		}
+		else
+		{
+			BossMove(FastOdaSpeed * 2, FVector(0.f, -1.f, 0.f));
+		}
+	}
 
 
-	if (isMotionPlaying == true)
+	else if (isMotionPlaying == true)
 	{
 		//アニメーションを流す(今は仮)
 		PlayAnimMontage(AnimMontage_BossUltimate);
@@ -319,6 +399,7 @@ void AOdaBase::OdaUlt(int Timer)
 		//切り替えるにあたって変数を初期化する
 		SwitchStayMove = false;
 		WaitTime = 0;
+		isUltShotTiming = false;
 	}
 }
 
@@ -365,6 +446,10 @@ void AOdaBase::ApplyDamage(float Damage)
 			//タイマーをリセット
 			WaitTime = 0;
 			NotAttackCount++;
+		}
+		else
+		{
+			Attack1Delay = 1;
 		}
 
 		//ノックバックのアニメーションを流す

@@ -58,13 +58,14 @@ public:
 	UPROPERTY()
 		UCharacterMovementComponent* NobunagaMovement;
 
-	//ダメージ処理
+	//ダメージ処理-----------------------------------------------------
 	UFUNCTION()
 	virtual void ApplyDamage(float Damage);
 
 	//ダメージタイプクラス
 	UPROPERTY()
 		TSubclassOf < class UDamageType > DamageTypeClass;
+	//----------------------------------------------------------------
 
 	//時間の取得
 	int FlameCounter;
@@ -79,7 +80,7 @@ public:
 	//int型のカウンター
 	int WaitTime;
 
-	//ボスとプレイヤーとの距離
+	//ボスとプレイヤーとの距離----------------------------
 	//X軸
 	//ボス
 	FVector BossPosX;
@@ -90,10 +91,10 @@ public:
 	FVector BossPosY;
 	//プレイヤー
 	FVector PlayerPosY;
+	//---------------------------------------------------
 
 
-
-	//ボスのステートでの処理
+	//ボスのステートでの処理----------------
 	void OdaStay1(int Timer);
 
 	void OdaBack1(int Timer);
@@ -103,8 +104,9 @@ public:
 	void OdaAttack2(int Timer);
 
 	void OdaUlt(int Timer);
+	//------------------------------------
 
-
+	//速度----------------------------------
 	//通常の移動速度
 	UPROPERTY(EditAnywhere)
 		float OdaSpeed;
@@ -112,7 +114,14 @@ public:
 	//急な速度
 	UPROPERTY(EditAnywhere)
 		float FastOdaSpeed;
-	
+	//--------------------------------------
+
+	//近接攻撃が早すぎてプレイヤーがよけれないので少し遅延させる
+	UPROPERTY()
+	int Attack1Delay;
+
+	void OdaMove1(int DeltaTime, int StopTimer);
+
 	//行動変更時間設定
 	UPROPERTY(EditAnywhere)
 		int ChangeFlontTimer;
@@ -135,6 +144,10 @@ public:
 	//必殺技の出現タイミングの調整
 	UPROPERTY()
 		bool isUltSpawnTiming;
+
+	//必殺技を打つタイミングの調整
+	UPROPERTY()
+		bool isUltShotTiming;
 
 	//必殺技の出現タイミングの調整するための関数
 	UFUNCTION()

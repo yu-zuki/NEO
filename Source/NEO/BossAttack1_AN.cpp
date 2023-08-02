@@ -24,7 +24,7 @@
 
 void UBossAttack1_AN::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float FrameDeltaTime, const FAnimNotifyEventReference& EventReference)
 {
-	//PlayerGet
+	//BossGet
 	AOdaBase* Oda = Cast<AOdaBase>(MeshComp->GetOwner());
 	if (Oda) {
 		Oda->CheckOverlap();
