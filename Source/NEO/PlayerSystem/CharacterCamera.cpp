@@ -61,7 +61,7 @@ void ACharacterCamera::BeginPlay()
 	PlayerToViewPointDistance = FVector(100.f,200.f,195.f);
 	SetActorLocation(StartPos);
 
-	SetActorRotation(FRotator(-25.0, 90.0, 0.0));
+	SetActorRotation(FRotator(-25.0, 0.0, 0.0));
 
 	//------------------------スプライン------------------------
 	m_pSplineActor = SplineActorInitialize(this, m_splineTagName);
@@ -82,12 +82,19 @@ void ACharacterCamera::Tick(float DeltaTime)
 	if (m_pSplineActor != NULL)
 	{
 		//移動距離の更新
-		if (PlayerPos.Y == GetActorLocation().Y - 600.0f && PlayerPos.Y == GetActorLocation().Y - 400.0f)
-			return;
-		else if(PlayerPos.Y >= GetActorLocation().Y - 500.0f)			//プレイヤーの方が右にいる場合
+		if(PlayerPos.Y >= GetActorLocation().Y - 520.0f)			//プレイヤーの方が右にいる場合
 			m_moveDistance = m_moveDistance + (m_defaultSpeed * DeltaTime);
-		else if (PlayerPos.Y < GetActorLocation().Y - 500.0f)	//プレイヤーの方が左にいる場合
+		else if (PlayerPos.Y < GetActorLocation().Y - 480.0f)	//プレイヤーの方が左にいる場合
 			m_moveDistance = m_moveDistance - (m_defaultSpeed * DeltaTime);
+
+		////移動距離の更新
+		//if (PlayerPos.Y > GetActorLocation().Y - 520.0f && PlayerPos.Y < GetActorLocation().Y - 480.0f)
+		//	return;
+		//else if (PlayerPos.Y > GetActorLocation().Y - 520.0f)	//プレイヤーの方が右にいる場合
+		//	m_moveDistance = m_moveDistance + (m_defaultSpeed * DeltaTime);
+		//else if (PlayerPos.Y < GetActorLocation().Y - 480.0f)	//プレイヤーの方が左にいる場合
+		//	m_moveDistance = m_moveDistance - (m_defaultSpeed * DeltaTime);
+
 
 		//更新後の新しい座標・回転情報を入れるローカル変数
 		FVector newLocation;
@@ -178,5 +185,5 @@ void ACharacterCamera::GetCurrentInfo0nSpline(float _length, FVector& _location,
 		ESplineCoordinateSpace::World);
 	_rotation = pSplineComp->GetRotationAtDistanceAlongSpline(m_localLength,
 		ESplineCoordinateSpace::World);
-
+	m_defaultRRRRRRRRRR = _rotation;
 }

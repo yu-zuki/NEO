@@ -55,9 +55,15 @@ public:
 
 	AActor* m_pSplineActor;		//スプラインのActor
 	float m_localLength;		//現在スプライン上の位置
-	float m_moveDistance;		//周防ライン上の移動処理
 
 	UPROPERTY(EditAnywhere, Category = "SubChara")		//速度
 		float m_defaultSpeed;		//速度
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly,Category = "SubChara")		//速度
+		float m_moveDistance;		//速度
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly,Category = "SubChara")		//速度
+		FRotator m_defaultRRRRRRRRRR;		//速度
+
 
 };
