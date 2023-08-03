@@ -42,6 +42,7 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	//コンポーネント-----------------------------------------------------------------------------------------------------
 	//シーンコンポーネント
 	UPROPERTY()
 		USceneComponent* Parent;
@@ -57,12 +58,17 @@ public:
 	//キャラクタームーブメント
 	UPROPERTY()
 		UCharacterMovementComponent* NobunagaMovement;
+	//--------------------------------------------------------------------------------------------------------------------
 
+	//スポーン時処理--------------------------------------------------------------------------
+	//スポーン中の止まるときか
 	UPROPERTY()
 		bool SpawnDelay;
-
+	
+	//スポーン中止まる時間
 	UPROPERTY()
 		int SpawnTimer;
+	//----------------------------------------------------------------------------------------
 
 	//ダメージ処理-----------------------------------------------------
 	UFUNCTION()
@@ -73,18 +79,16 @@ public:
 		TSubclassOf < class UDamageType > DamageTypeClass;
 	//----------------------------------------------------------------
 
+	//カウンター------------------------------------------------------------
 	//時間の取得
 	int FlameCounter;
 
-	//列挙型
-	ECPPOdaEnum OdaMoveEnum;
-
-	//待機関数
-	UPROPERTY()
-	bool SwitchStayMove;
-
 	//int型のカウンター
 	int WaitTime;
+	//---------------------------------------------------------------------
+	
+	//列挙型
+	ECPPOdaEnum OdaMoveEnum;
 
 	//ボスとプレイヤーとの距離----------------------------
 	//X軸
@@ -103,8 +107,6 @@ public:
 	//ボスのステートでの処理----------------
 	void OdaStay1(int Timer);
 
-	void OdaBack1(int Timer);
-
 	void OdaAttack1(int Timer);
 
 	void OdaAttack2(int Timer);
@@ -116,10 +118,6 @@ public:
 	//通常の移動速度
 	UPROPERTY(EditAnywhere)
 		float OdaSpeed;
-
-	//急な速度
-	UPROPERTY(EditAnywhere)
-		float FastOdaSpeed;
 	//--------------------------------------
 
 	//近接攻撃が早すぎてプレイヤーがよけれないので少し遅延させる
@@ -131,6 +129,10 @@ public:
 
 	UPROPERTY()
 		int RandomNum;
+
+	//もう一回衝撃波を出すための変数
+	UPROPERTY()
+		bool OneMoreShockWave;
 
 	//行動変更時間設定
 	UPROPERTY(EditAnywhere)
@@ -151,6 +153,7 @@ public:
 	UPROPERTY(EditAnywhere)
 		TSubclassOf<AActor>ShockWaveSpawn;
 
+	//必殺技---------------------------------------------------------------------------
 	//必殺技の出現タイミングの調整
 	UPROPERTY()
 		bool isUltSpawnTiming;
@@ -171,6 +174,7 @@ public:
 	UPROPERTY()
 		bool isUltShot;
 
+	//必殺技をもう一回打つためのカウンター
 	UPROPERTY()
 		int UltTimer;
 
@@ -223,23 +227,23 @@ public:
 	UFUNCTION()
 		void BossMove(float Speed , FVector MoveSize);
 
-	//後方移動
-	UFUNCTION()
-		void BackMove(float Speed);
-
 	//ダメージ値
 	UPROPERTY(EditAnywhere, Category = "Damage")
 		float SwordDamage;
 
+	//ボックスコンポーネントのオーバーラップ処理
 	UFUNCTION()
 		void CheckOverlap();
 
+	//プレイヤーに当たったら
 	UFUNCTION()
-		void EnemyOnOverlap(FHitResult& _HitResult);
+		void PlayerOnOverlap(FHitResult& _HitResult);
 
+	//プレイヤーに対してのHPロック
 	UPROPERTY()
 		bool bIsAttacked;
 
+	//プレイヤーに対してのHPロックするための関数
 	UFUNCTION()
 		void toPlayerAttacked();
 

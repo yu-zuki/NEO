@@ -2,7 +2,6 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "EnamyBase.h"
 #include "DeathTrigger.generated.h"
 
 UCLASS()
@@ -18,9 +17,8 @@ public:
     UPROPERTY(VisibleAnywhere, Category = "Trigger")
         class USphereComponent* TriggerSphere;
 
-    // Reference to an AnimMontage
-    UPROPERTY(EditAnywhere, Category = "Animation")
-        class UAnimMontage* MyAnimMontage;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
+        UAnimMontage* MyAnimMontage;
 
 protected:
     // Called when the game starts or when spawned

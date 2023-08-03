@@ -59,28 +59,41 @@ void AEnamyBase::Tick(float DeltaTime)
         FVector CharacterLocation = GetActorLocation();
 
         // 自分の座標を取得
-        FVector MyLocation = GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorLocation();
-	   
-        // キャラクターの位置と自分の位置を比較してY軸より前にいるかどうかを判定
-        bIsRotation = CharacterLocation.Y > MyLocation.Y;
-        //bIsRotationがtrueなら
-        if (Health >= 0)
+        UWorld* World = GetWorld();
+        if (World)
         {
-            if (bIsRotation)
+            APlayerController* PlayerController = World->GetFirstPlayerController();
+            if (PlayerController)
             {
-                FRotator NewRotation = GetActorRotation();
-                NewRotation.Yaw = -90.0f;
-                SetActorRotation(NewRotation);
+                APawn* Pawn = PlayerController->GetPawn();
+                if (Pawn)
+                {
+                    FVector MyLocation = Pawn->GetActorLocation();
+                    // キャラクターの位置と自分の位置を比較してY軸より前にいるかどうかを判定
+                    bIsRotation = CharacterLocation.Y > MyLocation.Y;
+                    //bIsRotationがtrueなら
+                    if (Health >= 0)
+                    {
+                        if (bIsRotation)
+                        {
+                            FRotator NewRotation = GetActorRotation();
+                            NewRotation.Yaw = -90.0f;
+                            SetActorRotation(NewRotation);
 
-            }
-            else
-            {
-                FRotator NewRotation = GetActorRotation();
-                NewRotation.Yaw = 90.0f;
-                SetActorRotation(NewRotation);
-            }
+                        }
+                        else
+                        {
+                            FRotator NewRotation = GetActorRotation();
+                            NewRotation.Yaw = 90.0f;
+                            SetActorRotation(NewRotation);
+                        }
 
+                    }
+                }
+            }
         }
+       
+        CheckHeakth();
 }
 
 // Called to bind functionality to input
@@ -126,6 +139,27 @@ void AEnamyBase::AfterDeath()
 void AEnamyBase::DamageReac()
 {
     bIsNowDamage = false;
+}
+
+void AEnamyBase::CheckHeakth()
+{
+    if (Health <= 0)
+    {
+        SpawnDeathTrigger();
+    }
+}
+
+void AEnamyBase::SpawnDeathTrigger()
+{
+    if (DeathTriggerClass = nullptr)
+    {
+        FTransform SpawnTransform = GetActorTransform();
+        ADeathTrigger* DeathTrigger = GetWorld()->SpawnActor<ADeathTrigger>(DeathTriggerClass, SpawnTransform);
+        if (DeathTriggerClass != nullptr)
+        {
+            DeathTrigger->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
+        }
+    }
 }
 
 
