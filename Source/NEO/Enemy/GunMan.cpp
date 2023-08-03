@@ -46,7 +46,7 @@ void AGunMan::Tick(float DeltaTime)
 {
  
 	Super::Tick(DeltaTime);
-	
+    PlayerCharacter = Cast<ACharacter>(GetPlayer());
     
     {
         if (PlayerCharacter)
@@ -61,7 +61,7 @@ void AGunMan::Tick(float DeltaTime)
                 AddMovementInput(PlayerDirection);
 
             }
-            else if (DistanceToPlayer < DesiredDistance - 100.0f) // プレイヤーが望ましい距離-100以下に入った場合
+            else if (DistanceToPlayer < DesiredDistance - 150.0f) // プレイヤーが望ましい距離-100以下に入った場合
             {
                 // プレイヤーから離れる
                 FVector PlayerDirection = GetPlayerDirection();

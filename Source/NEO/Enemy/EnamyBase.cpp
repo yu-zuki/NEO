@@ -44,6 +44,12 @@ void AEnamyBase::BeginPlay()
 
 }
 
+AActor* AEnamyBase::GetPlayer()
+{
+    APawn* PlayerChara = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
+    return PlayerChara;
+}
+
 // Called every frame
 void AEnamyBase::Tick(float DeltaTime)
 {   

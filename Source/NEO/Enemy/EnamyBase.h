@@ -36,7 +36,7 @@ protected:
 	virtual void BeginPlay() override;
 	UPROPERTY()
 		FTimerHandle TimerHandle_DestroyEnemy;
-
+	AActor* GetPlayer();
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
