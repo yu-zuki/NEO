@@ -333,11 +333,14 @@ void APlayerBase::Move(const FInputActionValue& _value)
 		
 
 		// ˆÚ“®
-		AddMovementInput(RightDirection, MovementVector.Y);
-		AddMovementInput(ForwardDirection, MovementVector.X);
+		AddMovementInput(RightDirection, MovementVector.X);
+		AddMovementInput(ForwardDirection, MovementVector.Y);
 
 		DistanceAdvanced += MovementVector.X;
 		DistanceSpline = DistanceSpline + (CharacterMovementComp->MaxWalkSpeed * delta);
+
+		// ˆÚ“®•ûŒü‚É‰ñ“]
+		RotateCharacter(MovementVector.X);
 	}
 
 	//if (Controller != nullptr)
