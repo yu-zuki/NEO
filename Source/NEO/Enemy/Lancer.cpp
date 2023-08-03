@@ -38,6 +38,7 @@ void ALancer::Tick(float DeltaTime)
         return;
     }
     Super::Tick(DeltaTime);
+    PlayerCharacter = Cast<ACharacter>(GetPlayer());
     if (PlayerCharacter)
     {
         // ƒvƒŒƒCƒ„[‚Æ‚Ì‹——£‚ğæ“¾
