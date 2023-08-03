@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "DeathTrigger.h"
 #include "EnemyBaseAnimInstance.h"
 #include "EnamyBase.generated.h"
 
@@ -47,14 +48,24 @@ public:
 		float  Health;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
 		float  MaxHealth;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Death")
+		TSubclassOf<ADeathTrigger>DeathTriggerClass;
+	
 	UFUNCTION(BlueprintCallable, Category = "Health")
 		virtual void ApplyDamage(float DamageAmount);
 	 
+
+
 	void AfterDeath();
 
 	void DamageReac();
 
 	bool bIsNowDamage;
+
+	void CheckHeakth();
+
+	void SpawnDeathTrigger();
 
 	bool bIsShoot = false;
 

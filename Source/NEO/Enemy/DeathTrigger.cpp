@@ -1,6 +1,6 @@
 #include "DeathTrigger.h"
-#include "EnamyBase.h"
 #include "Components/SphereComponent.h"
+
 #include "GameFramework/Character.h"
 
 // Sets default values
@@ -34,18 +34,13 @@ void ADeathTrigger::Tick(float DeltaTime)
 
 void ADeathTrigger::OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+    if (OtherActor && OtherActor != this && OtherActor->ActorHasTag("Enemy"))
+    {
+        // Assuming the other actor is a character
+        ACharacter* OtherCharacter = Cast<ACharacter>(OtherActor);
+        if (OtherCharacter && OtherCharacter->GetMesh() && MyAnimMontage)
         {
-
-            if (OtherActor && OtherActor != this && OtherActor->ActorHasTag("Enemy"))
-            {
-               
-                    // Assuming the other actor is a character
-                    ACharacter* OtherCharacter = Cast<ACharacter>(OtherActor);
-                    if (OtherCharacter && OtherCharacter->GetMesh() && MyAnimMontage)
-                    {
-                        OtherCharacter->PlayAnimMontage(MyAnimMontage);
-                    }
-                
-            }
+            OtherCharacter->PlayAnimMontage(MyAnimMontage);
         }
+    }
 }
