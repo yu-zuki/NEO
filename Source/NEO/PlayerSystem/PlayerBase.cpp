@@ -332,11 +332,14 @@ void APlayerBase::Move(const FInputActionValue& _value)
 		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 
 		// ˆÚ“®
-		AddMovementInput(RightDirection, MovementVector.Y);
-		AddMovementInput(ForwardDirection, MovementVector.X);
+		AddMovementInput(RightDirection, MovementVector.X);
+		AddMovementInput(ForwardDirection, MovementVector.Y);
 
 		DistanceAdvanced += MovementVector.X;
 		DistanceSpline = DistanceSpline + (CharacterMovementComp->MaxWalkSpeed * delta);
+
+		// ˆÚ“®•ûŒü‚É‰ñ“]
+		RotateCharacter(MovementVector.X);
 	}
 
 	//if (Controller != nullptr)
