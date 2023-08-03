@@ -177,7 +177,7 @@ void ATGS_GameStateBase::OnGameTitle()
 		GetGameInstance()->SaveGameStateData(ECurrentState);		//インスタンスにゲームの状態を保存
 		GetGameInstance()->SavePlayerType(ECurrentPlayerType);		//インスタンスにPlayerTypeを保存
 
-		GetGameInstance()->SaveRemainingLife(2);					//PlayerLifeReset
+		GetGameInstance()->SaveRemainingLife(Life);					//PlayerLifeReset
 
 		ChangeNextLevel(ENextLevel::ENextLevel_Playing);			//レベルを変更
 	}

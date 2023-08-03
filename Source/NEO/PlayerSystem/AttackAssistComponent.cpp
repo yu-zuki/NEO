@@ -168,3 +168,14 @@ void UAttackAssistComponent::EndHitStop()
 	//HitStopを停止
 	Character->GetMesh()->GlobalAnimRateScale = 1.f;
 }
+
+/*
+ * 関数名　　　　：FaceCamera()
+ * 引数         ：bool _lookRight・・・現在右を向いているか
+ * 処理内容　　　：オーナーをカメラに向ける
+ * 戻り値　　　　：なし
+ */
+void UAttackAssistComponent::FaceCamera(bool _lookRight)
+{
+
+}

@@ -33,6 +33,9 @@ public:
 	// エフェクトスポーン
 	void SpawnHitEffect();
 
+	// オーナーをカメラに向ける
+	void FaceCamera(bool _lookRight);
+
 private:
 
 	// 前方にいるActorを返す
