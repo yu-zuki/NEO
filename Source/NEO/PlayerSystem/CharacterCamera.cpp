@@ -75,12 +75,12 @@ void ACharacterCamera::Tick(float DeltaTime)
 
 ACharacter* ACharacterCamera::GetPlayer()
 {
-	if (!PlayerInfo) {
-		PlayerInfo = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
-		PlayerInfo->SetOwner(this);
+	ACharacter*  tmp_PlayerInfo = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
+	if (tmp_PlayerInfo == PlayerInfo) {
 		return PlayerInfo;
 	}
 	else {
-		return PlayerInfo;
+		tmp_PlayerInfo->SetOwner(this);
+		return tmp_PlayerInfo;
 	}
 }
