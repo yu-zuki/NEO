@@ -282,7 +282,7 @@ public:
 	UCharacterMovementComponent* CharacterMovementComp;
 	//-------------------------------------------------------------------------------------------------------------
 
-protected:
+public:
 
 	bool IsControl;					// “ü—Í‰Â”\‚©‚Ç‚¤‚©
 

@@ -7,6 +7,8 @@
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/Character.h"
 #include "Components/SplineComponent.h"
+#include "PlayerBase.h"
+
 #include "NEO/GameSystem/TGS_GameMode.h"
 
 // Sets default values
@@ -47,6 +49,9 @@ void ACharacterCamera::BeginPlay()
 	{
 		PlayerController->SetViewTargetWithBlend(this, 0.f);
 	}
+
+	//// プレイヤーの取得
+	//m_pCharaOwner = Cast<APlayerBase>(PawnOwner);
 
 	/*if (GameMode)
 	{
@@ -99,6 +104,7 @@ void ACharacterCamera::Tick(float DeltaTime)
 		//else if (PlayerPos.Y < GetActorLocation().Y - 480.0f)	//プレイヤーの方が左にいる場合
 		//	m_moveDistance = m_moveDistance - (m_defaultSpeed * DeltaTime);
 
+		
 
 		//更新後の新しい座標・回転情報を入れるローカル変数
 		FVector newLocation;
@@ -107,7 +113,7 @@ void ACharacterCamera::Tick(float DeltaTime)
 		//現在のスプライン上の距離から座標、回転を算出
 		GetCurrentInfo0nSpline(m_moveDistance, newLocation, newRotation);
 
-
+		
 		//更新後の座標・回転情報を反映
 		SetActorLocationAndRotation(newLocation, newRotation);
 	}
@@ -202,3 +208,9 @@ ACharacter* ACharacterCamera::GetPlayer()
 		return PlayerInfo;
 	}
 }
+
+//// キャラクターをセットする関数
+//void ACharacterCamera::GetCharacterOwner(APlayerBase* Chara)
+//{
+//	m_pCharaOwner = Chara;
+//}

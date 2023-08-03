@@ -4,7 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "GameFramework/PawnMovementComponent.h"
+
 #include "CharacterCamera.generated.h"
+
+class APlayerBase;
+
 
 UCLASS()
 class NEO_API ACharacterCamera : public AActor
@@ -65,6 +70,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly,Category = "SubChara")		//速度
 		FRotator m_defaultRRRRRRRRRR;		//速度
 
+	//// キャラクター情報
+	//APlayerBase* m_pCharaOwner;
+	//// キャラクターのセット
+	//void GetCharacterOwner(APlayerBase* Chara);
 
 
 protected:
