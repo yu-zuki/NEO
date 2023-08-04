@@ -17,6 +17,7 @@ public:
 
     UPROPERTY(EditAnywhere, Category = "AI")
         float MovementSpeed = 100.0f; // ˆÚ“®‘¬“x
+  
 protected:
     virtual void BeginPlay() override;
     
@@ -33,5 +34,7 @@ private:
     FTimerHandle TimerHandle_CheckPlayerInFront;
     bool bIsPlayerInFront;
     void CheckPlayerInFront();
-   
+    FVector RoundDirectionT45Degrees(FVector direction) const;
+    bool bShouldSkipNextMovement;
+    
 };

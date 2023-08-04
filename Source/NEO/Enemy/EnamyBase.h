@@ -31,6 +31,10 @@ public:
 	UPROPERTY()
 		class ACharacter* PlayerCharacter; // プレイヤーキャラクターの参照
 	
+	// 攻撃のアシスト用コンポーネント
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = AttackAssist, meta = (AllowPrivateAccess = "true"))
+		class UAttackAssistComponent* AttackAssistComp;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

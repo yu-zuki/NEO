@@ -8,34 +8,31 @@
 #include "Bullet.h"
 #include "TrajectoryBullet.h"
 #include "EnamyBase.h"
-#include "GunMan.generated.h"
+#include "FenceOfGunMan.generated.h"
 
 UCLASS()
-class NEO_API AGunMan : public AEnamyBase
+class NEO_API AFenceOfGunMan : public AEnamyBase
 {
 	GENERATED_BODY()
 
 public:
 	// Sets default values for this character's properties
-	AGunMan();
+	AFenceOfGunMan();
 
 	UPROPERTY(EditAnywhere, Category = "AI")
 		float MovementSpeed = 100.0f; // ˆÚ“®‘¬“x
 
-	
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-public:	
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-	
+
 private:
 	UPROPERTY(EditAnywhere, Category = "Rotation")
 		bool bIsRotation;
-	FVector GetPlayerDirection() const;
-	
-	float GetDistanceToPlayer() const;
 	UPROPERTY(EditAnywhere, Category = "Spawning")
 		TSubclassOf<class ATrajectoryBullet> TrajectoryBulletClass;
 
@@ -48,4 +45,5 @@ private:
 	void SpawnTrajectoryBullet();
 	void ReplaceWithBullet();
 	void ResumeMovement();
+	AActor* TargetActor;
 };

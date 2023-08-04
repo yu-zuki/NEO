@@ -76,6 +76,7 @@ void AEnemyDamage::EnableCollision()
 
 	CollisionComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 }
+FCriticalSection MyMutex;
 bool AEnemyDamage::IsLancerAttacking()
 {
 
@@ -86,14 +87,72 @@ bool AEnemyDamage::IsLancerAttacking()
 		for (ALancer* Lancer : Lancers)
 		{
 			UAnimInstance* AnimInstance = Lancer->GetMesh()->GetAnimInstance();
-			if (AnimInstance != nullptr && AnimInstance->Montage_IsPlaying(Attack))
+			if (AnimInstance != nullptr)
 			{
-				return true;
+				// Mutexをロック
+				MyMutex.Lock();
+
+				bool isPlaying = AnimInstance->Montage_IsPlaying(Attack);
+
+				// Mutexをアンロック
+				MyMutex.Unlock();
+
+				if (isPlaying)
+				{
+					return true;
+				}
 			}
 		}
-
 	}
 
+	return false;
+	
+	if (!Attack)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Attack is not loaded correctly."));
+		return false;
+	}
+
+	for (ALancer* Lancer : Lancers)
+	{
+		if (!Lancer)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Lancer is nullptr."));
+			continue;
+		}
+
+		USkeletalMeshComponent* Mesh = Lancer->GetMesh();
+		if (!Mesh)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Lancer's mesh is nullptr."));
+			continue;
+		}
+
+		UAnimInstance* AnimInstance = Mesh->GetAnimInstance();
+		if (!AnimInstance)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("AnimInstance is nullptr."));
+			continue;
+		}
+
+		// Mutexをロック
+		MyMutex.Lock();
+
+		bool isPlaying = AnimInstance->Montage_IsPlaying(Attack);
+
+		// Mutexをアンロック
+		MyMutex.Unlock();
+
+		if (!isPlaying)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Montage is not playing."));
+		}
+		else
+		{
+			return true;
+		}
+	}
 
 	return false;
+
 }

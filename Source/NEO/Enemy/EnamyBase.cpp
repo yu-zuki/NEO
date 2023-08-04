@@ -11,6 +11,8 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Camera/CameraComponent.h"
 #include "NEO/GameSystem/EnemyBase_WidgetComponent.h"
+#include "NEO/PlayerSystem/AttackAssistComponent.h"
+
 
 // Sets default values
 AEnamyBase::AEnamyBase()
@@ -23,6 +25,8 @@ AEnamyBase::AEnamyBase()
 	EnemyWidget->SetupAttachment(RootComponent);
     bIsDeath = false;
    
+    // アタックアシストコンポーネント作成
+    AttackAssistComp = CreateDefaultSubobject<UAttackAssistComponent>(TEXT("AttackAssist"));
 }
 
 void AEnamyBase::DestoryEnemy()
@@ -53,6 +57,7 @@ AActor* AEnamyBase::GetPlayer()
 // Called every frame
 void AEnamyBase::Tick(float DeltaTime)
 {   
+
     if (bIsNowDamage)
     {
         return; 
@@ -80,19 +85,26 @@ void AEnamyBase::Tick(float DeltaTime)
                     //bIsRotationがtrueなら
                     if (Health >= 0)
                     {
-                        if (bIsRotation)
-                        {
-                            FRotator NewRotation = GetActorRotation();
-                            NewRotation.Yaw = -90.0f;
-                            SetActorRotation(NewRotation);
+                        //if (bIsRotation)
+                        //{
+                        //    FRotator NewRotation = GetActorRotation();
+                        //    NewRotation.Yaw = -90.0f;
+                        //    SetActorRotation(NewRotation);
 
-                        }
-                        else
-                        {
-                            FRotator NewRotation = GetActorRotation();
-                            NewRotation.Yaw = 90.0f;
-                            SetActorRotation(NewRotation);
-                        }
+                        //    
+
+                        //}
+                        //else
+                        //{
+                        //    FRotator NewRotation = GetActorRotation();
+                        //    NewRotation.Yaw = 90.0f;
+                        //    SetActorRotation(NewRotation);
+                        //}
+
+                        bool LookRight = (bIsRotation) ? (true) : (false);
+
+
+                        AttackAssistComp->OwnerParallelToCamera(LookRight);
 
                     }
                 }

@@ -4,6 +4,7 @@
 #include "Components/BoxComponent.h"
 #include "GameFramework/Controller.h"
 #include "Kismet/GameplayStatics.h"
+#include "NEO/PlayerSystem/AttackAssistComponent.h"
 
 ALancer::ALancer()
 {
@@ -33,8 +34,9 @@ void ALancer::BeginPlay()
 
 void ALancer::Tick(float DeltaTime)
 {
-    if (bIsNowDamage)
+    if (bIsNowDamage || bShouldSkipNextMovement)
     {
+        bShouldSkipNextMovement = false;
         return;
     }
     Super::Tick(DeltaTime);
@@ -47,13 +49,17 @@ void ALancer::Tick(float DeltaTime)
         if (DistanceToPlayer > DesiredDistance)
         {
             FVector PlayerDirection = GetPlayerDirection();
+            PlayerDirection = RoundDirectionT45Degrees(PlayerDirection);
             AddMovementInput(PlayerDirection);
+           
         }
         else if (DistanceToPlayer < DesiredDistance - 50.0f) // プレイヤーが望ましい距離-100以下に入った場合
         {
             // プレイヤーから離れる
             FVector PlayerDirection = GetPlayerDirection();
-            AddMovementInput(-PlayerDirection);
+            PlayerDirection = RoundDirectionT45Degrees(PlayerDirection);
+            AddMovementInput(PlayerDirection);
+           
         }
     }
     
@@ -86,34 +92,57 @@ void ALancer::CheckPlayerInFront()
 {
     // 自分の位置を取得
     FVector MyLocation = GetActorLocation();
-
-    UWorld* World = GetWorld();
-    if (World)
-    {
-        APlayerController* PlayerController = World->GetFirstPlayerController();
-        if (PlayerController)
+    
+    
+        UWorld* World = GetWorld();
+        if (World)
         {
-            APawn* Pawn = PlayerController->GetPawn();
-            if (Pawn)
+            APlayerController* PlayerController = World->GetFirstPlayerController();
+            if (PlayerController)
             {
-                FVector PlayerLocation = Pawn->GetActorLocation();
-                // 自プレイヤーがLancerの目の前にいるかどうかを判定
-                FVector DirectionToPlayer = PlayerLocation - MyLocation;
-                float DotProduct = FVector::DotProduct(DirectionToPlayer.GetSafeNormal(), GetActorForwardVector());
-                bIsPlayerInFront = DotProduct > 0.0f;
-
-                if (bIsPlayerInFront)
+                APawn* Pawn = PlayerController->GetPawn();
+                if (Pawn)
                 {
-                    if (FMath::FRand() < 0.5f)
-                    {
-                        PlayAnimMontage(Attack, 1, NAME_None);
-                    }
+                    FVector PlayerLocation = Pawn->GetActorLocation();
+                    // 自プレイヤーがLancerの目の前にいるかどうかを判定
+                    FVector DirectionToPlayer = PlayerLocation - MyLocation;
+                    float DotProduct = FVector::DotProduct(DirectionToPlayer.GetSafeNormal(), GetActorForwardVector());
+                    bIsPlayerInFront = DotProduct > 0.0f;
 
+                    if (bIsPlayerInFront&& Health > 0)
+                    {
+                        if (FMath::FRand() < 0.5f)
+                        {
+                            PlayAnimMontage(Attack, 1, NAME_None);
+                        }
+
+                    }
                 }
             }
         }
-    }
     
+   
+    
+}
+
+FVector ALancer::RoundDirectionT45Degrees(FVector direction) const
+{
+   
+    float angle = FMath::Atan2(direction.Y, direction.X);
+
+  
+    float angleDegrees = FMath::RadiansToDegrees(angle);
+
+   
+    float roundedAngleDegrees = FMath::RoundToFloat(angleDegrees / 45.0f) * 45.0f;
+
+   
+    float roundedAngle = FMath::DegreesToRadians(roundedAngleDegrees);
+
+   
+    FVector roundedDirection(FMath::Cos(roundedAngle), FMath::Sin(roundedAngle), 0.0f);
+
+    return roundedDirection;
 }
 
 

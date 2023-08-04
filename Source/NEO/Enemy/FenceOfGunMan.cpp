@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "GunMan.h"
+#include "FenceOfGunMan.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "NEO/PlayerSystem\PlayerCharacter.h"
 #include "Camera/PlayerCameraManager.h"
@@ -18,7 +18,7 @@
 
 
 // Sets default values
-AGunMan::AGunMan()
+AFenceOfGunMan::AFenceOfGunMan()
 {
     // Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
     PrimaryActorTick.bCanEverTick = true;
@@ -29,82 +29,66 @@ AGunMan::AGunMan()
     GetCharacterMovement()->MaxWalkSpeed = MovementSpeed;
     MaxHealth = 100;
     Health = MaxHealth;
-   
+
     BulletSpawnTimerHandle = FTimerHandle();
 }
 
 
 // Called when the game starts or when spawned
-void AGunMan::BeginPlay()
+void AFenceOfGunMan::BeginPlay()
 {
-	Super::BeginPlay();
+    Super::BeginPlay();
     // プレイヤーキャラクターの参照を取得
     PlayerCharacter = UGameplayStatics::GetPlayerCharacter(this, 0);
-    
-    GetWorldTimerManager().SetTimer(BulletSpawnTimerHandle, this, &AGunMan::SpawnTrajectoryBullet, 3.0f, true);
-}
-    
+    TArray<AActor*> FoundActors;
+    UGameplayStatics::GetAllActorsWithTag(GetWorld(), TEXT("Fence"), FoundActors);
 
-
-// Called every frame
-void AGunMan::Tick(float DeltaTime)
-{
- 
-	Super::Tick(DeltaTime);
-   /* PlayerCharacter = Cast<ACharacter>(GetPlayer());
-    
+    if (FoundActors.Num() > 0)
     {
-        if (PlayerCharacter)
+        AActor* NearestActor = FoundActors[0];
+        float MinDistance = FVector::Dist(NearestActor->GetActorLocation(), GetActorLocation());
+
+        // Loop through the rest of the found Actors
+        for (int32 i = 1; i < FoundActors.Num(); i++)
         {
-            // プレイヤーとの距離を取得
-            float DistanceToPlayer = GetDistanceToPlayer();
+            float Distance = FVector::Dist(FoundActors[i]->GetActorLocation(), GetActorLocation());
 
-            // プレイヤーとの距離が望ましい距離よりも離れている場合、プレイヤーに近づく
-            if (DistanceToPlayer > DesiredDistance)
+            // If this Actor is closer than the current closest, update our 'nearest' Actor
+            if (Distance < MinDistance)
             {
-                FVector PlayerDirection = GetPlayerDirection();
-                AddMovementInput(PlayerDirection);
-
-            }
-            else if (DistanceToPlayer < DesiredDistance - 150.0f) // プレイヤーが望ましい距離-100以下に入った場合
-            {
-                // プレイヤーから離れる
-                FVector PlayerDirection = GetPlayerDirection();
-                AddMovementInput(-PlayerDirection);
+                MinDistance = Distance;
+                NearestActor = FoundActors[i];
             }
         }
 
+        // Set the nearest Actor as the target
+        TargetActor = NearestActor;
+    } 
+    GetWorldTimerManager().SetTimer(BulletSpawnTimerHandle, this, &AFenceOfGunMan::SpawnTrajectoryBullet, 3.0f, true);
+}
+   
 
 
-        // キャラクターの位置を取得
-        FVector CharacterLocation = GetActorLocation();
 
-      
+
+// Called every frame
+void AFenceOfGunMan::Tick(float DeltaTime)
+{
+
+    Super::Tick(DeltaTime);
+    if (TargetActor)
+    {
+        FVector Direction = (TargetActor->GetActorLocation() - GetActorLocation()).GetSafeNormal();
+        AddMovementInput(Direction);
     }
-*/
 }
 
-
-
-FVector AGunMan::GetPlayerDirection() const
-{
-    FVector PlayerLocation = PlayerCharacter->GetActorLocation();
-    FVector GunManLocation = GetActorLocation();
-    return FVector(PlayerLocation.X - GunManLocation.X, PlayerLocation.Y - GunManLocation.Y, 0.0f).GetSafeNormal();
-}
-
-float AGunMan::GetDistanceToPlayer() const
-{
-    FVector PlayerLocation = PlayerCharacter->GetActorLocation();
-    FVector GunManLocation = GetActorLocation();
-    return FVector::Distance(PlayerLocation, GunManLocation);
-}
-void AGunMan::SpawnTrajectoryBullet()
+void AFenceOfGunMan::SpawnTrajectoryBullet()
 {
     // Spawn a TrajectoryBullet
     FActorSpawnParameters SpawnParams;
     FVector SpawnLocation = GetActorLocation();
-    FRotator SpawnRotation = GetActorRotation(); 
+    FRotator SpawnRotation = GetActorRotation();
 
     ATrajectoryBullet* Bullet = GetWorld()->SpawnActor<ATrajectoryBullet>(TrajectoryBulletClass, SpawnLocation, SpawnRotation, SpawnParams);
     if (Health > 0)
@@ -112,18 +96,18 @@ void AGunMan::SpawnTrajectoryBullet()
         if (Bullet)
         {
             // Set up timer to replace TrajectoryBullet with Bullet after 2 seconds
-            GetWorldTimerManager().SetTimer(Bullet->GetLifeSpanTimerHandle(), this, &AGunMan::ReplaceWithBullet, 2.0f, false);
+            GetWorldTimerManager().SetTimer(Bullet->GetLifeSpanTimerHandle(), this, &AFenceOfGunMan::ReplaceWithBullet, 2.0f, false);
         }
 
     }
-    
+
 
     // Prevent movement for the lifespan of the TrajectoryBullet + 1 second
     GetCharacterMovement()->Deactivate();
-    GetWorldTimerManager().SetTimer(MovementResumeTimerHandle, this, &AGunMan::ResumeMovement, Bullet->InitialLifeSpan + 1.0f, false);
+    
 }
 
-void AGunMan::ReplaceWithBullet()
+void AFenceOfGunMan::ReplaceWithBullet()
 {
     // Replace TrajectoryBullet with Bullet
     FActorSpawnParameters SpawnParams;
@@ -141,7 +125,7 @@ void AGunMan::ReplaceWithBullet()
         }
     }
 }
-void AGunMan::ResumeMovement()
+void AFenceOfGunMan::ResumeMovement()
 {
     // Resume movement
     GetCharacterMovement()->Activate(true);

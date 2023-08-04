@@ -19,6 +19,8 @@
 #include "Components/WidgetComponent.h"
 #include "NEO/GameSystem/TGS_GameInstance.h"
 #include "PlayerSpline.h"
+#include "AttackAssistComponent.h"
+
 
 // Sets default values
 APlayerBase::APlayerBase()

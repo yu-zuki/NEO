@@ -16,12 +16,12 @@ public:
 	AObjectBase();
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh")
 		UStaticMeshComponent* Mesh;
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "LOD")
-		//int32 
+	UPROPERTY()
+		class ACharacter* PlayerCharacter; // プレイヤーキャラクターの参照
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
+	AActor* GetPlayer();
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
