@@ -8,6 +8,8 @@
 #include "NEO/PlayerSystem/CharacterCamera.h"
 #include "Camera/CameraComponent.h"
 #include "NEO/GameSystem/TGS_GameMode.h"
+#include "Camera/PlayerCameraManager.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 #define DIRECTION_Y (90.f)
 
@@ -108,6 +110,57 @@ void UAttackAssistComponent::SpawnHitEffect()
 
 
 }
+
+
+/*
+ * 関数名　　　　：CameraShake()
+ * 引数１　　　　：TSubclassOf<UCameraShakeBase> _shakePattern・・・揺らすパターン
+ * 引数２　　　　：float _scale・・・・・・・・・・・・・・・・・・・・強さ
+ * 処理内容　　　：カメラシェイク
+ * 戻り値　　　　：なし
+ */
+void UAttackAssistComponent::CameraShake(TSubclassOf<UCameraShakeBase> _shakePattern, float _scale /*= 1.f*/)
+{
+	// プレイヤー取得
+	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+	if (!PlayerController) { return; }
+
+	// マネージャー取得
+	APlayerCameraManager* CameraManager = PlayerController->PlayerCameraManager;
+	if (!CameraManager) { return; }
+
+	// カメラシェイク開始
+	CameraManager->StartCameraShake(_shakePattern,_scale);
+}
+
+
+/*
+ * 関数名　　　　：PlayAnimation()
+ * 処理内容　　　：プレイヤーのアニメーション再生(再生中は操作不可)
+ * 引数１　　　　：UAnimMontage* _toPlayAnimMontage ・・・再生するアニメーション
+ * 引数２　　　　：FName _startSectionName・・・・・・・・コンボの何段目から再生するか
+ * 引数３　　　　：float _playRate・・・・・・・・・・・・アニメーションの再生速度
+ * 戻り値　　　　：なし
+ */
+void UAttackAssistComponent::PlayAnimation(UAnimMontage* _toPlayAnimMontage, FName _startSectionName /*= "None"*/, float _playRate /*= 1.f*/)
+{
+	// キャラクタークラスにキャスト
+	ACharacter* Owner = Cast<ACharacter>(GetOwner());
+	if (!Owner) { return; }
+
+	// 移動不能へ
+	//Owner->GetCharacterMovement()->DisableMovement();
+
+	// 再生するアニメーションを格納
+	UAnimMontage* toPlayAnimMontage = _toPlayAnimMontage;
+
+	// アニメーション再生
+	if (toPlayAnimMontage != nullptr)
+	{
+		Owner->PlayAnimMontage(_toPlayAnimMontage, _playRate, _startSectionName);
+	}
+}
+
 
 /*
  * 関数名　　　　：GetFrontActor()

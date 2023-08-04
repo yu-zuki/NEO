@@ -36,6 +36,12 @@ public:
 	// オーナーをカメラに向ける
 	void OwnerParallelToCamera(bool _lookRight);
 
+	// カメラシェイク
+	void CameraShake(TSubclassOf<UCameraShakeBase> _shakePattern, float _scale = 1.f);
+
+	// アニメーション再生
+	void PlayAnimation(UAnimMontage* _toPlayAnimMontage, FName _startSectionName = "None", float _playRate = 1.f);
+
 private:
 
 	// 前方にいるActorを返す
@@ -76,4 +82,6 @@ protected:
 
 private:
 	FTimerHandle TimerHandle_HitStop;
+
+	bool IsAnimationPlaying;
 };

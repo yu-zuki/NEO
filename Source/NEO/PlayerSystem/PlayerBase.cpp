@@ -54,6 +54,7 @@ APlayerBase::APlayerBase()
 
 	// アタックアシストコンポーネント作成
 	AttackAssistComp = CreateDefaultSubobject<UAttackAssistComponent>(TEXT("AttackAssist"));
+
 }
 
 
@@ -155,7 +156,7 @@ void APlayerBase::SetupPlayerData()
  * 戻り値　　　　：なし
  */
 void APlayerBase::SetupPlayerStatus(float _hp /*= 100.f*/, int _remainingLife /*= 3.f*/, float _damageAmount /*= 10.f*/,
-									float _jumpHeight /*= 150.f*/, float _comboDamageFactor /*= 1.f*/, float _walkSpeed /*= 500.f*/, float _runSpeed /*= 600.f*/)
+									float _jumpHeight /*= 150.f*/, float _comboDamageFactor /*= 1.f*/, float _walkSpeed /*= 100.f*/, float _runSpeed /*= 300.f*/)
 {
 	PlayerStatus.HP = _hp;
 	PlayerStatus.MaxHP = _hp;
@@ -165,6 +166,7 @@ void APlayerBase::SetupPlayerStatus(float _hp /*= 100.f*/, int _remainingLife /*
 	PlayerStatus.ComboDamageFactor = _comboDamageFactor;
 	PlayerStatus.WalkSpeed = _walkSpeed;
 	PlayerStatus.RunSpeed = _runSpeed;
+	PlayerStatus.NowMoveSpeed = PlayerStatus.WalkSpeed;
 }	
 
 /*
@@ -322,7 +324,6 @@ void APlayerBase::Move(const FInputActionValue& _value)
 
 		// 移動方向取得(X,Y)
 		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-
 		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 		
 
@@ -332,6 +333,10 @@ void APlayerBase::Move(const FInputActionValue& _value)
 
 		// 移動量保存
 		DistanceAdvanced += MovementVector.X;
+
+		kakuninDirection1 = RightDirection;
+		kakuninDirection2 = ForwardDirection;
+
 
 		// 移動方向に回転
 		RotateCharacter(MovementVector.X);
@@ -354,13 +359,13 @@ void APlayerBase::Run()
 	{
 		// ダッシュオン
 		IsRunning = true;
-		CharacterMovementComp->MaxWalkSpeed = PlayerStatus.RunSpeed;
+		PlayerStatus.NowMoveSpeed = PlayerStatus.RunSpeed;
 	}
 	else
 	{
 		// ダッシュオン
 		IsRunning = false;
-		CharacterMovementComp->MaxWalkSpeed = PlayerStatus.WalkSpeed;
+		PlayerStatus.NowMoveSpeed = PlayerStatus.WalkSpeed;
 	}
 }
 
@@ -673,6 +678,7 @@ void APlayerBase::TakedDamage(float _damage)
 			IsControl = false;
 
 			// 死亡アニメーション再生
+			SetActorEnableCollision(true);
 			PlayAnimation(PlayerAnimation.Death);
 		}
 		else
@@ -696,9 +702,6 @@ void APlayerBase::TakedDamage(float _damage)
 /*
  * 関数名　　　　：PlayAnimation()
  * 処理内容　　　：プレイヤーのアニメーション再生(再生中は操作不可)
- * 引数１　　　　：UAnimMontage* _toPlayAnimMontage ・・・再生するアニメーション
- * 引数２　　　　：FName _startSectionName・・・・・・・・コンボの何段目から再生するか
- * 引数３　　　　：float _playRate・・・・・・・・・・・・アニメーションの再生速度
  * 戻り値　　　　：なし
  */
 void APlayerBase::PlayAnimation(UAnimMontage* _toPlayAnimMontage, FName _startSectionName /*= "None"*/, float _playRate /*= 1.f*/)
@@ -712,7 +715,7 @@ void APlayerBase::PlayAnimation(UAnimMontage* _toPlayAnimMontage, FName _startSe
 	// アニメーション再生
 	if (toPlayAnimMontage != nullptr)
 	{
-		PlayAnimMontage(_toPlayAnimMontage, _playRate, _startSectionName);
+		AttackAssistComp->PlayAnimation(_toPlayAnimMontage, _startSectionName, _playRate);
 	}
 }
 

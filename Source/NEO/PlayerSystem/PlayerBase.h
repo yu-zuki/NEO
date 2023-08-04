@@ -74,6 +74,9 @@ struct FPlayerStatus
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		float RunSpeed;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		float NowMoveSpeed;
 };
 //----------------------------------------------------------------------------------------
 
@@ -123,6 +126,8 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		FPlayerAnimation PlayerAnimation;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		TSubclassOf<UCameraShakeBase> ShakePattern;
 
 public:
 	// Sets default values for this character's properties
@@ -229,7 +234,7 @@ public:
 
 	// プレイヤーのステータス初期化
 	void SetupPlayerStatus(float _hp = 100.f, int _remainingLife = 3.f, float _damageAmount = 10.f,
-							float _jumpHeight = 150.f, float _comboDamageFactor = 1.f, float _walkSpeed = 500.f, float _runSpeed = 600.f);
+							float _jumpHeight = 150.f, float _comboDamageFactor = 1.f, float _walkSpeed = 10.f, float _runSpeed = 30.f);
 
 	// ボタンの設定
 	void SetupMainActionMapping();
@@ -316,11 +321,14 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		float DistanceAdvanced;
 
-	float delta;
-
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		FVector kakuninDirection1;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		FRotator kakunin;
+		FVector kakuninDirection2;
+
+
+	float delta;
 
 private:
 
