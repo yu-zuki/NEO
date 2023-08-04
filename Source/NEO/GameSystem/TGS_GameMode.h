@@ -115,6 +115,7 @@ public:
 public:
 AActor* CameraActor;
 FVector GetCameraLocation();
+FRotator GetCameraRotation();
 AActor* GetCameraActor();
 
 //Žg‚¢•û

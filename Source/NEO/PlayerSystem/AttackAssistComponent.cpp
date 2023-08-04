@@ -3,12 +3,20 @@
 
 #include "AttackAssistComponent.h"
 #include "GameFramework/Character.h"
+#include "Kismet/KismetMathLibrary.h"
+#include "Kismet/GameplayStatics.h"
+#include "NEO/PlayerSystem/CharacterCamera.h"
+#include "Camera/CameraComponent.h"
+#include "NEO/GameSystem/TGS_GameMode.h"
+
+#define DIRECTION_Y (90.f)
 
 // Sets default values for this component's properties
 UAttackAssistComponent::UAttackAssistComponent()
 	: bUseCorrectAttackAngle(true)
 	, bUseHitStop(true)
 	, bUseHitEffect(true)
+	, bUseFaceCamera(true)
 {
 	PrimaryComponentTick.bCanEverTick = false;
 
@@ -167,4 +175,48 @@ void UAttackAssistComponent::EndHitStop()
 
 	//HitStopを停止
 	Character->GetMesh()->GlobalAnimRateScale = 1.f;
+}
+
+
+/*
+ * 関数名　　　　：OwnerParallelToCamera()
+ * 引数         ：bool _lookRight・・・現在右を向いているか
+ * 処理内容　　　：オーナーをカメラに向ける
+ * 戻り値　　　　：なし
+ */
+void UAttackAssistComponent::OwnerParallelToCamera(bool _lookRight)
+{
+	// 機能のオン・オフ
+	if (!bUseFaceCamera) { return; }
+
+	// ゲームモード作成
+	ATGS_GameMode* GameMode = Cast<ATGS_GameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	if (!GameMode) { return; }
+
+
+	// カメラの角度を取得
+	const FRotator CameraRotation = GameMode->GetCameraRotation();
+
+
+	// カメラのピッチとヨー
+	double CameraPitch = CameraRotation.Pitch;
+	double CameraYaw = CameraRotation.Yaw;
+
+	// 角度補正
+	if (!_lookRight)
+	{
+		CameraYaw += DIRECTION_Y;
+
+	}
+	else
+	{
+		CameraPitch = -CameraPitch;
+		CameraYaw -= DIRECTION_Y;
+	}
+
+	// 新しい角度
+	FRotator OwnerAngle = FRotator(0.0, CameraYaw, CameraPitch);
+
+	// 回転
+	GetOwner()->SetActorRotation(OwnerAngle);
 }

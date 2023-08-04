@@ -33,6 +33,9 @@ public:
 	// エフェクトスポーン
 	void SpawnHitEffect();
 
+	// オーナーをカメラに向ける
+	void OwnerParallelToCamera(bool _lookRight);
+
 private:
 
 	// 前方にいるActorを返す
@@ -53,6 +56,10 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack Assist")
 		bool bUseHitEffect;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack Assist")
+		bool bUseFaceCamera;
+
 	//----------------------------------------------------------------------------
 
 	// トレースの長さ
@@ -66,6 +73,9 @@ protected:
 	// HitStopで止まる時間
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack Assist")
 		float HitStopTime;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack Assist")
+		FRotator kakunin;
 
 
 private:

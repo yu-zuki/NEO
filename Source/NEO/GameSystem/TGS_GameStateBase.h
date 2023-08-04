@@ -212,6 +212,8 @@ public:
 		TSubclassOf<class ACharacter> PlayerCharacterClassTwo;			// プレイヤー2のキャラクター
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Player")
 		TSubclassOf<class ACharacter> PlayerCharacterClassThree;			// プレイヤー3のキャラクター
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Player")
+		int32 Life = 2;
 
 public:
 };
