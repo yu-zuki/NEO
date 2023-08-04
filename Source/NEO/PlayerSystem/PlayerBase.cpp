@@ -511,7 +511,7 @@ void APlayerBase::RotateCharacter(float _nowInput_X)
 	bool LookRight = (_nowInput_X != 1.f) ? (true) : (false);
 
 	// ‰ñ“]
-	AttackAssistComp->FaceCamera(LookRight);
+	AttackAssistComp->OwnerParallelToCamera(LookRight);
 
 }
 

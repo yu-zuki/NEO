@@ -53,10 +53,8 @@ void ACharacterCamera::BeginPlay()
 
 	// ‰ŠúˆÊ’uÝ’è
 	StartPos = PlayerInfo->GetActorLocation();
-	PlayerToViewPointDistance = FVector(100.f,200.f,195.f);
+	PlayerToViewPointDistance = FVector(200.f,400.f,200.f);
 	SetActorLocation(StartPos);
-
-	SetActorRotation(FRotator(-25.0, 0.0, 0.0));
 }
 
 // Called every frame

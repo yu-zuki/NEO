@@ -179,12 +179,12 @@ void UAttackAssistComponent::EndHitStop()
 
 
 /*
- * 関数名　　　　：FaceCamera()
+ * 関数名　　　　：OwnerParallelToCamera()
  * 引数         ：bool _lookRight・・・現在右を向いているか
  * 処理内容　　　：オーナーをカメラに向ける
  * 戻り値　　　　：なし
  */
-void UAttackAssistComponent::FaceCamera(bool _lookRight)
+void UAttackAssistComponent::OwnerParallelToCamera(bool _lookRight)
 {
 	// 機能のオン・オフ
 	if (!bUseFaceCamera) { return; }
@@ -194,47 +194,29 @@ void UAttackAssistComponent::FaceCamera(bool _lookRight)
 	if (!GameMode) { return; }
 
 
-	// カメラの現在位置と角度を取得
-	const FVector CameraLocation = GameMode->GetCameraLocation();
-
-
-
-	// カメラの位置が変わっていれば新しい方向を計算
-	if (BeforeCameraPos == CameraLocation) { return; }
-
-
-	// オーナーをカメラに向ける
-	FVector CameraAngle = GetOwner()->GetActorLocation() - GameMode->GetCameraLocation();
-	CameraAngle.Y = 0;
-	CameraAngle.Z = 0;
-
-	// 回転取得
-	FRotator LookAtRotation = CameraAngle.Rotation();
-
-	// カメラの回転取得
+	// カメラの角度を取得
 	const FRotator CameraRotation = GameMode->GetCameraRotation();
 
-	// オーナーをカメラと平行にする
+
+	// カメラのピッチとヨー
 	double CameraPitch = CameraRotation.Pitch;
 	double CameraYaw = CameraRotation.Yaw;
 
 	// 角度補正
 	if (!_lookRight)
 	{
-		LookAtRotation.Roll = CameraPitch;
-		LookAtRotation.Yaw = CameraYaw + DIRECTION_Y;
+		CameraYaw += DIRECTION_Y;
 
 	}
 	else
 	{
-		LookAtRotation.Roll = -CameraPitch;
-		LookAtRotation.Yaw = CameraYaw - DIRECTION_Y;
-
+		CameraPitch = -CameraPitch;
+		CameraYaw -= DIRECTION_Y;
 	}
 
-	// 回転
-	GetOwner()->SetActorRotation(LookAtRotation);
+	// 新しい角度
+	FRotator OwnerAngle = FRotator(0.0, CameraYaw, CameraPitch);
 
-	// カメラの場所を保存
-	BeforeCameraPos = CameraLocation;
+	// 回転
+	GetOwner()->SetActorRotation(OwnerAngle);
 }

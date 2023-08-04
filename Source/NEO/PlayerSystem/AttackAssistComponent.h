@@ -34,7 +34,7 @@ public:
 	void SpawnHitEffect();
 
 	// オーナーをカメラに向ける
-	void FaceCamera(bool _lookRight);
+	void OwnerParallelToCamera(bool _lookRight);
 
 private:
 
@@ -74,10 +74,10 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack Assist")
 		float HitStopTime;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack Assist")
+		FRotator kakunin;
 
 
 private:
 	FTimerHandle TimerHandle_HitStop;
-
-	FVector BeforeCameraPos;
 };
