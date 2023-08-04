@@ -18,6 +18,7 @@ ACharacterCamera::ACharacterCamera()
 	, m_localLength(0.0f)
 	, m_moveDistance(0.0f)
 	, m_defaultSpeed(100.0f)
+	, m_pPlayer(NULL)
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -78,11 +79,36 @@ void ACharacterCamera::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+
+
+	// プレイヤーを取得していない時
+	if (m_pPlayer == NULL)
+	{
+		// プレイヤーキャラクターの取得
+		TSubclassOf<APlayerBase> findClass1;
+		findClass1 = APlayerBase::StaticClass();
+		UGameplayStatics::GetAllActorsOfClass(GetWorld(), findClass1, Actors);
+
+		if (Actors.Num())
+		{
+			m_pPlayer = Cast<APlayerBase>(Actors[0]);
+
+		}
+
+	}
+
 	ACharacter* tmp_PlayerInfo = GetPlayer();
 	if (!tmp_PlayerInfo) return;
 
 	// プレイヤーの現在位置取得
 	FVector PlayerPos = tmp_PlayerInfo->GetActorLocation();
+
+	// 現在座標を取得する
+	FVector nowpos = GetActorLocation();
+	FVector newpos = nowpos;
+
+	// 新しい座標を算出する
+	newpos = FMath::VInterpTo(nowpos, PlayerPos, DeltaTime, m_defaultSpeed);
 
 	//SetActorLocation(FVector(StartPos.X - PlayerToViewPointDistance.Z, PlayerPos.Y + PlayerToViewPointDistance.X,StartPos.Z + PlayerToViewPointDistance.Y));
 
@@ -90,11 +116,11 @@ void ACharacterCamera::Tick(float DeltaTime)
 	//SplineActorが存在する場合
 	if (m_pSplineActor != NULL)
 	{
-		//移動距離の更新
-		if(PlayerPos.Y >= GetActorLocation().Y - 520.0f)			//プレイヤーの方が右にいる場合
-			m_moveDistance = m_moveDistance + (m_defaultSpeed * DeltaTime);
-		else if (PlayerPos.Y < GetActorLocation().Y - 480.0f)	//プレイヤーの方が左にいる場合
-			m_moveDistance = m_moveDistance - (m_defaultSpeed * DeltaTime);
+		////移動距離の更新
+		//if(PlayerPos.Y >= GetActorLocation().Y - 520.0f)			//プレイヤーの方が右にいる場合
+		//	m_moveDistance = m_moveDistance + (m_defaultSpeed * DeltaTime);
+		//else if (PlayerPos.Y < GetActorLocation().Y - 480.0f)	//プレイヤーの方が左にいる場合
+		//	m_moveDistance = m_moveDistance - (m_defaultSpeed * DeltaTime);
 
 		////移動距離の更新
 		//if (PlayerPos.Y > GetActorLocation().Y - 520.0f && PlayerPos.Y < GetActorLocation().Y - 480.0f)
@@ -105,13 +131,14 @@ void ACharacterCamera::Tick(float DeltaTime)
 		//	m_moveDistance = m_moveDistance - (m_defaultSpeed * DeltaTime);
 
 		
+		
 
 		//更新後の新しい座標・回転情報を入れるローカル変数
 		FVector newLocation;
 		FRotator newRotation;
 
 		//現在のスプライン上の距離から座標、回転を算出
-		GetCurrentInfo0nSpline(m_moveDistance, newLocation, newRotation);
+		GetCurrentInfo0nSpline(m_pPlayer->DistanceAdvanced * m_defaultSpeed, newLocation, newRotation);
 
 		
 		//更新後の座標・回転情報を反映

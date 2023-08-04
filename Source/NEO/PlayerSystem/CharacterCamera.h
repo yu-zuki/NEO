@@ -27,6 +27,12 @@ class NEO_API ACharacterCamera : public AActor
 	// プレイヤーの情報
 	ACharacter* PlayerInfo;
 
+	// プレイヤーの情報を保存するための変数
+	TArray<AActor*> Actors;
+	APlayerBase* m_pPlayer;
+	FVector m_PlayerPos;
+
+
 	// 初期位置
 	FVector StartPos;
 
