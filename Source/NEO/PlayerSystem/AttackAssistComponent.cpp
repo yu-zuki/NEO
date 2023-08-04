@@ -3,12 +3,20 @@
 
 #include "AttackAssistComponent.h"
 #include "GameFramework/Character.h"
+#include "Kismet/KismetMathLibrary.h"
+#include "Kismet/GameplayStatics.h"
+#include "NEO/PlayerSystem/CharacterCamera.h"
+#include "Camera/CameraComponent.h"
+#include "NEO/GameSystem/TGS_GameMode.h"
+
+#define DIRECTION_Y (90.f)
 
 // Sets default values for this component's properties
 UAttackAssistComponent::UAttackAssistComponent()
 	: bUseCorrectAttackAngle(true)
 	, bUseHitStop(true)
 	, bUseHitEffect(true)
+	, bUseFaceCamera(true)
 {
 	PrimaryComponentTick.bCanEverTick = false;
 
@@ -169,6 +177,7 @@ void UAttackAssistComponent::EndHitStop()
 	Character->GetMesh()->GlobalAnimRateScale = 1.f;
 }
 
+
 /*
  * 関数名　　　　：FaceCamera()
  * 引数         ：bool _lookRight・・・現在右を向いているか
@@ -177,5 +186,55 @@ void UAttackAssistComponent::EndHitStop()
  */
 void UAttackAssistComponent::FaceCamera(bool _lookRight)
 {
+	// 機能のオン・オフ
+	if (!bUseFaceCamera) { return; }
 
+	// ゲームモード作成
+	ATGS_GameMode* GameMode = Cast<ATGS_GameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	if (!GameMode) { return; }
+
+
+	// カメラの現在位置と角度を取得
+	const FVector CameraLocation = GameMode->GetCameraLocation();
+
+
+
+	// カメラの位置が変わっていれば新しい方向を計算
+	if (BeforeCameraPos == CameraLocation) { return; }
+
+
+	// オーナーをカメラに向ける
+	FVector CameraAngle = GetOwner()->GetActorLocation() - GameMode->GetCameraLocation();
+	CameraAngle.Y = 0;
+	CameraAngle.Z = 0;
+
+	// 回転取得
+	FRotator LookAtRotation = CameraAngle.Rotation();
+
+	// カメラの回転取得
+	const FRotator CameraRotation = GameMode->GetCameraRotation();
+
+	// オーナーをカメラと平行にする
+	double CameraPitch = CameraRotation.Pitch;
+	double CameraYaw = CameraRotation.Yaw;
+
+	// 角度補正
+	if (!_lookRight)
+	{
+		LookAtRotation.Roll = CameraPitch;
+		LookAtRotation.Yaw = CameraYaw + DIRECTION_Y;
+
+	}
+	else
+	{
+		LookAtRotation.Roll = -CameraPitch;
+		LookAtRotation.Yaw = CameraYaw - DIRECTION_Y;
+
+	}
+
+	// 回転
+	GetOwner()->SetActorRotation(LookAtRotation);
+
+	// カメラの場所を保存
+	BeforeCameraPos = CameraLocation;
 }

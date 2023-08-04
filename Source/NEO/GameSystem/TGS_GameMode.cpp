@@ -352,6 +352,20 @@ FVector ATGS_GameMode::GetCameraLocation()
 	return FVector();
 }
 
+FRotator ATGS_GameMode::GetCameraRotation()
+{
+	if (CameraActor) {
+		//CameraComponent Get
+		UCameraComponent* CameraComponent = CameraActor->FindComponentByClass<UCameraComponent>();
+		if (CameraComponent) {
+			return CameraComponent->GetComponentRotation();
+		}
+	}
+
+	return FRotator();
+}
+
+
 AActor* ATGS_GameMode::GetCameraActor()
 {
 	return CameraActor;

@@ -56,6 +56,10 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack Assist")
 		bool bUseHitEffect;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack Assist")
+		bool bUseFaceCamera;
+
 	//----------------------------------------------------------------------------
 
 	// ÉgÉåÅ[ÉXÇÃí∑Ç≥
@@ -71,6 +75,9 @@ protected:
 		float HitStopTime;
 
 
+
 private:
 	FTimerHandle TimerHandle_HitStop;
+
+	FVector BeforeCameraPos;
 };

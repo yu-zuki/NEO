@@ -20,9 +20,6 @@
 #include "NEO/GameSystem/TGS_GameInstance.h"
 #include "PlayerSpline.h"
 
-#define DIRECTION_X (25.f)
-#define DIRECTION_Y (90.f)
-
 // Sets default values
 APlayerBase::APlayerBase()
 	: IsControl(true)
@@ -72,9 +69,6 @@ void APlayerBase::BeginPlay()
 		}
 	}
 
-	// 初期角度設定
-	const FRotator nowRotate = FRotator(0.f, DIRECTION_Y, -DIRECTION_X);
-	SetActorRotation(nowRotate);
 }
 
 
@@ -319,12 +313,10 @@ void APlayerBase::Move(const FInputActionValue& _value)
 	
 	if (SplineActor)
 	{
-		// find out which way is forward
+		// スプラインの角度取得
 		const FRotator Rotation = SplineActor->GetSplineAngle(DistanceAdvanced * CharacterMovementComp->MaxWalkSpeed * delta);
-		//const FRotator Rotation = SplineActor->GetSplineAngle(DistanceSpline);
 
 		const FRotator YawRotation(0.f, Rotation.Yaw, 0.f);
-		kakunin = Rotation;
 
 		// 移動方向取得(X,Y)
 		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
@@ -335,31 +327,13 @@ void APlayerBase::Move(const FInputActionValue& _value)
 		AddMovementInput(RightDirection, MovementVector.X);
 		AddMovementInput(ForwardDirection, MovementVector.Y);
 
+		// 移動量保存
 		DistanceAdvanced += MovementVector.X;
-		DistanceSpline = DistanceSpline + (CharacterMovementComp->MaxWalkSpeed * delta);
 
 		// 移動方向に回転
 		RotateCharacter(MovementVector.X);
 	}
 
-	//if (Controller != nullptr)
-	//{
-	//	// find out which way is forward
-	//	const FRotator Rotation = Controller->GetControlRotation();
-	//	const FRotator YawRotation(0.f, Rotation.Yaw, 0.f);
-
-	//	// 移動方向取得(X,Y)
-	//	const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-
-	//	const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
-
-	//	// 移動
-	//	AddMovementInput(RightDirection, MovementVector.X);
-	//	AddMovementInput(ForwardDirection, MovementVector.Y);
-
-	//	// 移動方向に回転
-	//	RotateCharacter(MovementVector.X);
-	//}
 }
 
 
@@ -533,25 +507,12 @@ void APlayerBase::RotateCharacter(float _nowInput_X)
 	// 入力がない場合は何もしない
 	if (_nowInput_X == 0) { return; }
 
-	// 向く方向
-	FVector2D Direction;
+	// 右を向いているか確認
+	bool LookRight = (_nowInput_X != 1.f) ? (true) : (false);
 
-	// 入力の値に応じて前か後ろを向く
-	if (_nowInput_X == 1.f)
-	{
-		Direction.X = -DIRECTION_X;
-		Direction.Y = DIRECTION_Y;
-	}
-	else
-	{
-		Direction.X = DIRECTION_X;
-		Direction.Y = -DIRECTION_Y;
-	}
+	// 回転
+	AttackAssistComp->FaceCamera(LookRight);
 
-	// 新しい方向にセット
-	const FRotator nowRotate = FRotator(0.f, Direction.Y, Direction.X);
-
-	SetActorRotation(nowRotate);
 }
 
 
