@@ -9,6 +9,8 @@
 #include <unordered_map>
 #include <type_traits>
 #include "AttackAssistComponent.h"
+#include <Runtime/Engine/Classes/Components/CapsuleComponent.h>
+
 #include "PlayerBase.generated.h"
 
 // 前方宣言
@@ -338,4 +340,9 @@ public:
 		float GetPlayerHPPercent()const { return PlayerStatus.HP / PlayerStatus.MaxHP; }
 
 	class UTGS_GameInstance* GetGameInstance();
+
+/////////////////////////////////////////////////////////////////////////
+	// 壁とのレイキャストを行う関数
+	void WallChack();
+
 };

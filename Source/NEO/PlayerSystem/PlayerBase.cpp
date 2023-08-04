@@ -728,3 +728,88 @@ UTGS_GameInstance* APlayerBase::GetGameInstance()
 	}
 	return nullptr;
 }
+
+// 壁とのレイキャストを行う関数
+void APlayerBase::WallChack()
+{
+
+	// カプセルコンポーネントを取得する
+	UCapsuleComponent* Capsule = GetCapsuleComponent();
+
+	// レイキャストを実行する際のパラメータを設定する
+	// レイキャストの開始位置はキャラクターの現在位置
+	FVector StartLocation = GetActorLocation();
+	FVector EndLocation = FVector::ZeroVector;
+	//if (m_TargetRote.Yaw == 0.0f)
+	//{
+	//	// レイキャストの終了位置はキャラクターの向いている方向に一定量オフセットした位置
+	//	EndLocation = StartLocation - FVector(0.0f, -m_GroundDistance, 0.0f);
+	//}
+	//else if (m_TargetRote.Yaw == 180.0f)
+	//{
+	//	// レイキャストの終了位置はキャラクターの向いている方向に一定量オフセットした位置
+	//	EndLocation = StartLocation - FVector(0.0f, m_GroundDistance, 0.0f);
+	//}
+
+	// レイキャストの終了位置はキャラクターの向いている方向に一定量オフセットした位置
+	EndLocation = StartLocation - FVector(0.0f, DistanceAdvanced, 0.0f);
+
+
+	//UE_LOG(LogTemp, Warning, TEXT("capsuleHeigth : %f"), Capsule->GetScaledCapsuleHalfHeight());
+	//UE_LOG(LogTemp, Warning, TEXT("capsuleHeigth / 2 : %f"), Capsule->GetScaledCapsuleHalfHeight() / 2.0f);
+
+	//UE_LOG(LogTemp, Warning, TEXT("StartLocation : %f"), StartLocation.Z);
+	//UE_LOG(LogTemp, Warning, TEXT("EndLocation : %f"), EndLocation.Z);
+
+	FCollisionQueryParams TraceParams(FName(TEXT("GroundTrace")), true, GetOwner());
+	// レイキャストの命中判定は簡易的に行う
+	TraceParams.bTraceComplex = false;
+	// 物理マテリアルの情報は不要
+	TraceParams.bReturnPhysicalMaterial = false;
+
+
+	// カプセルの大きさを取得する
+	FCollisionShape CapsuleShape = FCollisionShape::MakeCapsule
+	(Capsule->GetScaledCapsuleRadius(), Capsule->GetScaledCapsuleHalfHeight());
+
+	FHitResult HitResult;
+	// レイトレースを行う
+	bool bhit = GetWorld()->SweepSingleByChannel(HitResult, StartLocation, EndLocation, FQuat::Identity, ECC_Visibility, CapsuleShape, TraceParams);
+
+	// 当たり判定を無視するActorをセット
+	//TArray<AActor*> act;
+	//act.Add(Cast<AActor>(m_pCharaOwner));
+
+	//float capsuleRadius = Capsule->GetScaledCapsuleRadius() - 5.0f;
+	//float CapsuleHalfHeight = Capsule->GetScaledCapsuleHalfHeight() - 5.0f;
+
+	//bool bhit = UKismetSystemLibrary::CapsuleTraceSingle(m_pCharaOwner, StartLocation, EndLocation, capsuleRadius, CapsuleHalfHeight, ETraceTypeQuery::TraceTypeQuery1, false, act, EDrawDebugTrace::ForDuration, HitResult, false, FLinearColor::Red);
+
+	// 何かに当たった場合
+	if (bhit)
+	{
+		//UE_LOG(LogTemp, Warning, TEXT("bhit : TRUE"), );
+		// 当たったものを取得する
+		AActor* hitActor = HitResult.GetActor();
+
+		//// 当たったものが敵でない場合
+		//if (!hitActor->ActorHasTag("Enemy"))
+		//{
+		//	if (m_TargetRote.Yaw == 0.0f && m_Velocity.Y > 0.0f)
+		//	{
+		//		// 移動量をゼロにする
+		//		m_Velocity.Y = 0.0f;
+		//	}
+		//	else if (m_TargetRote.Yaw == 180.0f && m_Velocity.Y < 0.0f)
+		// 
+		//	{
+		//		// 移動量をゼロにする
+		//		m_Velocity.Y = 0.0f;
+		//	}
+		//	
+		//}
+
+		DistanceAdvanced = 0.0f;
+	}
+}
+
