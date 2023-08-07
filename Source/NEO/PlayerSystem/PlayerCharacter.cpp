@@ -156,14 +156,14 @@ void APlayerCharacter::SetCollision()
 				if (Enemy)
 				{
 					// ヒットストップ
-					ActionAssistComp->HitStop();
+					ActionAssistComp->HitStop(HitStopTime);
 					Enemy->ApplyDamage(GetDamageAmount());
 					
 				}
 				else if (Oda) 
 				{
 					// ヒットストップ
-					ActionAssistComp->HitStop();
+					ActionAssistComp->HitStop(HitStopTime);
 					Oda->ApplyDamage(GetDamageAmount());
 
 					if (GetComboIndex() == 2)

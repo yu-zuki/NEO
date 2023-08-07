@@ -286,7 +286,7 @@ public:
 	UCharacterMovementComponent* CharacterMovementComp;
 	//-------------------------------------------------------------------------------------------------------------
 
-public:
+protected:
 
 	bool IsControl;					// 入力可能かどうか
 
@@ -308,6 +308,9 @@ public:
 
 	TArray<FName> ComboStartSectionNames;	// コンボの段数(First,Second,Third・・・)
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = "Attack")
+		float HitStopTime = 0.2f;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = "GameOver")
 		bool CurveMode;
 
@@ -318,17 +321,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		float DeadToGameOverTime;					// 死んでからゲームオーバーまでの時間(秒)
 
+
+	float deltaTime;
+
+public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		float DistanceAdvanced;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		FVector kakuninDirection1;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		FVector kakuninDirection2;
-
-
-	float delta;
 
 private:
 

@@ -28,7 +28,7 @@ public:
 	void CorrectAttackAngle();
 
 	// ヒットストップ処理
-	void HitStop();
+	void HitStop(float _stopTime);
 
 	// エフェクトスポーン
 	void SpawnHitEffect(class UNiagaraSystem* _hitParticle, FVector _spawnPos);
@@ -76,10 +76,6 @@ protected:
 	// HitStopで止まる時間
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack Assist")
 		float SpeedDuringHitStop;
-
-	// HitStopで止まる時間
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack Assist")
-		float HitStopTime;
 
 private:
 	FTimerHandle TimerHandle_HitStop;

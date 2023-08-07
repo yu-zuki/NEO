@@ -26,7 +26,6 @@ UActionAssistComponent::UActionAssistComponent()
 
 	LineLength = 300.f;
 	SpeedDuringHitStop = 0.1f;
-	HitStopTime = 0.2f;
 }
 
 
@@ -76,10 +75,11 @@ void UActionAssistComponent::CorrectAttackAngle()
 
 /*
  * 関数名　　　　：HitStop()
+ * 引数１　　　　：float _stopTime・・・止める時間
  * 処理内容　　　：ヒットストップを起こす
  * 戻り値　　　　：なし
  */
-void UActionAssistComponent::HitStop()
+void UActionAssistComponent::HitStop(float _stopTime)
 {
 	// 機能のオン・オフ
 	if (!bUseHitStop) { return; }
@@ -96,7 +96,7 @@ void UActionAssistComponent::HitStop()
 
 	//HitStopを停止
 	FTimerManager& TimerManager = GetWorld()->GetTimerManager();
-	TimerManager.SetTimer(TimerHandle_HitStop, this, &UActionAssistComponent::EndHitStop, HitStopTime, false);
+	TimerManager.SetTimer(TimerHandle_HitStop, this, &UActionAssistComponent::EndHitStop, _stopTime, false);
 }
 
 
@@ -116,7 +116,7 @@ void UActionAssistComponent::SpawnHitEffect(UNiagaraSystem* _hitParticle, FVecto
 	if (!_hitParticle) { return; }
 
 	//エフェクトを出す
-	UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), _hitParticle, _spawnPos);
+	UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetOwner()->GetWorld(), _hitParticle, _spawnPos);
 }
 
 

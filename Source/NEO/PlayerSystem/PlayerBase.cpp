@@ -91,7 +91,7 @@ void APlayerBase::Tick(float DeltaTime)
 		break;
 	}
 
-	delta = DeltaTime;
+	deltaTime = DeltaTime;
 }
 
 
@@ -318,7 +318,7 @@ void APlayerBase::Move(const FInputActionValue& _value)
 	if (SplineActor)
 	{
 		// ƒXƒvƒ‰ƒCƒ“‚ÌŠp“xŽæ“¾
-		const FRotator Rotation = SplineActor->GetSplineAngle(DistanceAdvanced * CharacterMovementComp->MaxWalkSpeed * delta);
+		const FRotator Rotation = SplineActor->GetSplineAngle(DistanceAdvanced * CharacterMovementComp->MaxWalkSpeed * deltaTime);
 
 		const FRotator YawRotation(0.f, Rotation.Yaw, 0.f);
 
@@ -333,10 +333,6 @@ void APlayerBase::Move(const FInputActionValue& _value)
 
 		// ˆÚ“®—Ê•Û‘¶
 		DistanceAdvanced += MovementVector.X;
-
-		kakuninDirection1 = RightDirection;
-		kakuninDirection2 = ForwardDirection;
-
 
 		// ˆÚ“®•ûŒü‚É‰ñ“]
 		RotateCharacter(MovementVector.X);
