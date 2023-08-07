@@ -68,7 +68,7 @@ void ACharacterCamera::BeginPlay()
 	PlayerToViewPointDistance = FVector(200.f,400.f,200.f);
 	SetActorLocation(StartPos);
 
-	SetActorRotation(FRotator(-25.0, 0.0, 0.0));
+	//SetActorRotation(FRotator(-25.0, 0.0, 0.0));
 
 	//------------------------スプライン------------------------
 	m_pSplineActor = SplineActorInitialize(this, m_splineTagName);
@@ -140,6 +140,7 @@ void ACharacterCamera::Tick(float DeltaTime)
 		//現在のスプライン上の距離から座標、回転を算出
 		GetCurrentInfo0nSpline(m_pPlayer->DistanceAdvanced * m_defaultSpeed, newLocation, newRotation);
 
+		newRotation.Roll = -25.0;
 		
 		//更新後の座標・回転情報を反映
 		SetActorLocationAndRotation(newLocation, newRotation);
