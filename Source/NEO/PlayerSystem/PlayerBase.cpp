@@ -331,11 +331,20 @@ void APlayerBase::Move(const FInputActionValue& _value)
 		AddMovementInput(RightDirection, MovementVector.X);
 		AddMovementInput(ForwardDirection, MovementVector.Y);
 
+		// 移動方向に回転
+		RotateCharacter(MovementVector.X);
+
+		// 現在の座標取得
+		const float NowPos_Y = GetActorLocation().Y;
+
+		// 前と同じ場所にいたらスキップ
+		if (BeforePos_Y == NowPos_Y) { return; }
+
 		// 移動量保存
 		DistanceAdvanced += MovementVector.X;
 
-		// 移動方向に回転
-		RotateCharacter(MovementVector.X);
+		// 今の座標を格納
+		BeforePos_Y = NowPos_Y;
 	}
 
 }

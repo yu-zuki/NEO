@@ -21,19 +21,18 @@ void UCharacterAnimInstance::NativeBeginPlay()
 //
 void UCharacterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
-    //Superの呼び出し
     Super::NativeUpdateAnimation(DeltaSeconds);
 
-    //OwnerCharacterにまつわる処理
+    // OwnerCharacterにまつわる処理
     if (OwnerCharacter)
     {
-        //速度を取得する
+        // 速度を取得する
         Velocity = OwnerCharacter->GetVelocity();
 
         // 移動スピード取得
         GroundSpeed = Velocity.Size();
 
-        //空中にいるかどうかを取得する
+        // 空中にいるかどうかを取得する
         IsFall = CharacterMovementComp->IsFalling();
     }
 }

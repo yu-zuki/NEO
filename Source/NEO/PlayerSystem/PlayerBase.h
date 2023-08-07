@@ -333,6 +333,8 @@ private:
 	FTimerHandle TimerHandle_DeathToGameOver;		// ハンドル
 
 	class APlayerSpline* SplineActor;				// プレイヤーが通るスプライン
+
+	float BeforePos_Y;
 	
 
 //////////////////////////////////////////////////////////////////////////
