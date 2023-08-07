@@ -113,7 +113,7 @@ void UActionAssistComponent::SpawnHitEffect(UNiagaraSystem* _hitParticle, FVecto
 	if (!bUseHitEffect) { return; }
 
 	// エフェクトの情報が取得できなければリターン
-	if (_hitParticle) { return; }
+	if (!_hitParticle) { return; }
 
 	//エフェクトを出す
 	UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), _hitParticle, _spawnPos);

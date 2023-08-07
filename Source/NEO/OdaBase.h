@@ -16,6 +16,7 @@
 #include "PlayerSystem/PlayerCharacter.h"						//プレイヤーキャラを取得するために必要なヘッダー
 #include "NiagaraComponent.h"									//ナイアガラエフェクトを呼ぶために必要なヘッダー
 #include "NiagaraFunctionLibrary.h"								//ナイアガラエフェクトを呼ぶために必要なヘッダー
+#include "NEO/PlayerSystem/ActionAssistComponent.h"
 
 #include "OdaBase.generated.h"
 
@@ -57,6 +58,9 @@ public:
 	//キャラクタームーブメント
 	UPROPERTY()
 		UCharacterMovementComponent* NobunagaMovement;
+
+	UPROPERTY()
+		class UActionAssistComponent* ActionAssistComp;
 	//--------------------------------------------------------------------------------------------------------------------
 
 	//スポーン時処理--------------------------------------------------------------------------
