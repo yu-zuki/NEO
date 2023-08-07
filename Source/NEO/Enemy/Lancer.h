@@ -17,9 +17,11 @@ public:
 
     UPROPERTY(EditAnywhere, Category = "AI")
         float MovementSpeed = 100.0f; // ˆÚ“®‘¬“x
-  
+    float MoveSpeed = 100.0f;
 protected:
     virtual void BeginPlay() override;
+
+    FVector GetSnappedDirection(const FVector& Direction) const;
     
     
     virtual void Tick(float DeltaTime) override;
@@ -34,7 +36,7 @@ private:
     FTimerHandle TimerHandle_CheckPlayerInFront;
     bool bIsPlayerInFront;
     void CheckPlayerInFront();
-    FVector RoundDirectionT45Degrees(FVector direction) const;
+    //FVector RoundDirectionT45Degrees(FVector direction) const;
     bool bShouldSkipNextMovement;
     
 };

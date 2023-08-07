@@ -2,6 +2,7 @@
 
 
 #include "EnamyBase.h"
+#include "EngineUtils.h"
 #include "NEO/GameSystem/TGS_GameMode.h"
 #include "Kismet/GameplayStatics.h"
 #include "NEO/GameSystem/Enemy_UMG.h"
@@ -149,6 +150,24 @@ void AEnamyBase::ApplyDamage(float DamageAmount)
     }
 
 }
+void AEnamyBase::MaintainDistanceFromEnemy()
+{
+    for (TActorIterator<AActor> It(GetWorld()); It; ++It)
+    {
+        AActor* CurrentActor = *It;
+        if (CurrentActor && CurrentActor->ActorHasTag(FName("Enemy")))
+        {
+            FVector Direction = CurrentActor->GetActorLocation() - GetActorLocation();
+            float Distance = Direction.Size();
+
+            if (Distance < DesiredDistanceFromEnemy)
+            {
+                FVector MoveDirection = -Direction.GetSafeNormal() * (DesiredDistanceFromEnemy - Distance);
+                AddMovementInput(MoveDirection);
+            }
+        }
+    }
+}
 void AEnamyBase::AfterDeath()
 {
     DestoryEnemy();
@@ -178,6 +197,19 @@ void AEnamyBase::SpawnDeathTrigger()
             DeathTrigger->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
         }
     }
+}
+
+AActor* AEnamyBase::GetEnemyActor() const
+{
+    for (TActorIterator<AActor> It(GetWorld()); It; ++It)
+    {
+        AActor* Actor = *It;
+        if (Actor && Actor->ActorHasTag(FName("Enemy")))
+        {
+            return Actor; // Enemyタグを持つ最初のアクターを返す
+        }
+    }
+    return nullptr; // Enemyタグを持つアクターが見つからない場合
 }
 
 

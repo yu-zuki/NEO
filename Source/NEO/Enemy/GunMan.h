@@ -18,14 +18,17 @@ class NEO_API AGunMan : public AEnamyBase
 public:
 	// Sets default values for this character's properties
 	AGunMan();
+	UPROPERTY(EditAnywhere, Category = "AI")
+		float DesiredDistance = 100.0f; // プレイヤーからの望ましい距離（3m）
 
 	UPROPERTY(EditAnywhere, Category = "AI")
 		float MovementSpeed = 100.0f; // 移動速度
 
-	
+	float MoveSpeed = 100.0f;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	FVector GetSnappedDirection(const FVector& Direction) const;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

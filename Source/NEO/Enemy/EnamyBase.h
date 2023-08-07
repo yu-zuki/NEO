@@ -58,7 +58,11 @@ public:
 	
 	UFUNCTION(BlueprintCallable, Category = "Health")
 		virtual void ApplyDamage(float DamageAmount);
+
+	void MaintainDistanceFromEnemy();
 	 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Enemy", meta = (AllowPrivateAccess = "true"))
+		float DesiredDistanceFromEnemy = 300.0f;
 
 
 	void AfterDeath();
@@ -100,5 +104,5 @@ private:
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
 		class UEnemyBase_WidgetComponent* EnemyWidget;
-
+	AActor* GetEnemyActor() const;
 };

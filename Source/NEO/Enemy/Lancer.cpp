@@ -29,6 +29,21 @@ void ALancer::BeginPlay()
     // 5秒ごとにCheckPlayerInFront関数を実行するタイマーをセット
     GetWorldTimerManager().SetTimer(TimerHandle_CheckPlayerInFront, this, &ALancer::CheckPlayerInFront, 3.0f, true);
 }
+FVector ALancer::GetSnappedDirection(const FVector& Direction) const
+{
+    FVector SnappedDirection = Direction;
+
+    if (FMath::Abs(SnappedDirection.X) > FMath::Abs(SnappedDirection.Y))
+    {
+        SnappedDirection.Y = 0.0f;
+    }
+    else
+    {
+        SnappedDirection.X = 0.0f;
+    }
+
+    return SnappedDirection.GetSafeNormal();
+}
 
 
 void ALancer::Tick(float DeltaTime)
@@ -40,35 +55,31 @@ void ALancer::Tick(float DeltaTime)
     }
     Super::Tick(DeltaTime);
     PlayerCharacter = Cast<ACharacter>(GetPlayer());
-    if (PlayerCharacter)
+    if (!PlayerCharacter) return;
+
+    float CurrentDistance = GetDistanceToPlayer();
+    FVector DirectionToPlayer = GetPlayerDirection();
+    FVector SnappedDirection;
+    FVector MoveVector;
+
+
+    if (CurrentDistance > DesiredDistance)
     {
-        // プレイヤーとの距離を取得
-        float DistanceToPlayer = GetDistanceToPlayer();
-        // プレイヤーとの距離が望ましい距離よりも離れている場合、プレイヤーに近づく
-        if (DistanceToPlayer > DesiredDistance)
-        {
-            FVector PlayerDirection = GetPlayerDirection();
-            PlayerDirection = RoundDirectionT45Degrees(PlayerDirection);
-            AddMovementInput(PlayerDirection);
-           
-        }
-        else if (DistanceToPlayer < DesiredDistance - 50.0f) // プレイヤーが望ましい距離-100以下に入った場合
-        {
-            // プレイヤーから離れる
-            FVector PlayerDirection = GetPlayerDirection();
-            PlayerDirection = RoundDirectionT45Degrees(PlayerDirection);
-            AddMovementInput(PlayerDirection);
-           
-        }
+        SnappedDirection = GetSnappedDirection(DirectionToPlayer);
+        MoveVector = SnappedDirection * MoveSpeed * DeltaTime;
     }
-    
-   
-   
-   
-   
-    
-    
-    
+    else if (CurrentDistance < DesiredDistance - 150)
+
+    {
+        SnappedDirection = GetSnappedDirection(-DirectionToPlayer);
+        MoveVector = SnappedDirection * MoveSpeed * DeltaTime;
+    }
+    else
+    {
+        return; // その他の場合は移動しない
+    }
+
+    SetActorLocation(GetActorLocation() + MoveVector);
 }
 void ALancer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -76,12 +87,16 @@ void ALancer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 }
 FVector ALancer::GetPlayerDirection() const
 {
+    if (!PlayerCharacter) return FVector::ZeroVector;
+
     FVector PlayerLocation = PlayerCharacter->GetActorLocation();
     FVector LancerLocation = GetActorLocation();
     return FVector(PlayerLocation.X - LancerLocation.X, PlayerLocation.Y - LancerLocation.Y, 0.0f).GetSafeNormal();
 }
 float ALancer::GetDistanceToPlayer() const
 {
+    if (!PlayerCharacter) return 0.0f;
+
     FVector PlayerLocation = PlayerCharacter->GetActorLocation();
     FVector LancerLocation = GetActorLocation();
     return FVector::Distance(PlayerLocation, LancerLocation);
@@ -124,25 +139,25 @@ void ALancer::CheckPlayerInFront()
     
 }
 
-FVector ALancer::RoundDirectionT45Degrees(FVector direction) const
-{
-   
-    float angle = FMath::Atan2(direction.Y, direction.X);
-
-  
-    float angleDegrees = FMath::RadiansToDegrees(angle);
-
-   
-    float roundedAngleDegrees = FMath::RoundToFloat(angleDegrees / 45.0f) * 45.0f;
-
-   
-    float roundedAngle = FMath::DegreesToRadians(roundedAngleDegrees);
-
-   
-    FVector roundedDirection(FMath::Cos(roundedAngle), FMath::Sin(roundedAngle), 0.0f);
-
-    return roundedDirection;
-}
+//FVector ALancer::RoundDirectionT45Degrees(FVector direction) const
+//{
+//   
+//    float angle = FMath::Atan2(direction.Y, direction.X);
+//
+//  
+//    float angleDegrees = FMath::RadiansToDegrees(angle);
+//
+//   
+//    float roundedAngleDegrees = FMath::RoundToFloat(angleDegrees / 45.0f) * 45.0f;
+//
+//   
+//    float roundedAngle = FMath::DegreesToRadians(roundedAngleDegrees);
+//
+//   
+//    FVector roundedDirection(FMath::Cos(roundedAngle), FMath::Sin(roundedAngle), 0.0f);
+//
+//    return roundedDirection;
+//}
 
 
 

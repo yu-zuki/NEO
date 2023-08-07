@@ -43,6 +43,22 @@ void AGunMan::BeginPlay()
     
     GetWorldTimerManager().SetTimer(BulletSpawnTimerHandle, this, &AGunMan::SpawnTrajectoryBullet, 3.0f, true);
 }
+
+FVector AGunMan::GetSnappedDirection(const FVector& Direction) const
+{
+    FVector SnappedDirection = Direction;
+
+    if (FMath::Abs(SnappedDirection.X) > FMath::Abs(SnappedDirection.Y))
+    {
+        SnappedDirection.Y = 0.0f;
+    }
+    else
+    {
+        SnappedDirection.X = 0.0f;
+    }
+
+    return SnappedDirection.GetSafeNormal();
+}
     
 
 
@@ -82,6 +98,37 @@ void AGunMan::Tick(float DeltaTime)
       
     }
 */
+    if(bIsNowDamage )
+    {
+        return;
+    }
+    Super::Tick(DeltaTime);
+    PlayerCharacter = Cast<ACharacter>(GetPlayer());
+    if (!PlayerCharacter) return;
+
+    float CurrentDistance = GetDistanceToPlayer();
+    FVector DirectionToPlayer = GetPlayerDirection();
+    FVector SnappedDirection;
+    FVector MoveVector;
+    
+
+    if (CurrentDistance > DesiredDistance)
+    {
+        SnappedDirection = GetSnappedDirection(DirectionToPlayer);
+        MoveVector = SnappedDirection * MoveSpeed * DeltaTime;
+    }
+    else if (CurrentDistance < DesiredDistance - 150)
+
+    {
+        SnappedDirection = GetSnappedDirection(-DirectionToPlayer);
+        MoveVector = SnappedDirection * MoveSpeed * DeltaTime;
+    }
+    else
+    {
+        return; // ‚»‚Ì‘¼‚Ìê‡‚ÍˆÚ“®‚µ‚È‚¢
+    }
+
+    SetActorLocation(GetActorLocation() + MoveVector);
 }
 
 
