@@ -11,7 +11,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Camera/CameraComponent.h"
 #include "NEO/GameSystem/EnemyBase_WidgetComponent.h"
-#include "NEO/PlayerSystem/AttackAssistComponent.h"
+#include "NEO/PlayerSystem/ActionAssistComponent.h"
 
 
 // Sets default values
@@ -26,7 +26,7 @@ AEnamyBase::AEnamyBase()
     bIsDeath = false;
    
     // アタックアシストコンポーネント作成
-    AttackAssistComp = CreateDefaultSubobject<UAttackAssistComponent>(TEXT("AttackAssist"));
+    ActionAssistComp = CreateDefaultSubobject<UActionAssistComponent>(TEXT("AttackAssist"));
 }
 
 void AEnamyBase::DestoryEnemy()
@@ -104,7 +104,7 @@ void AEnamyBase::Tick(float DeltaTime)
                         bool LookRight = (bIsRotation) ? (true) : (false);
 
 
-                        AttackAssistComp->OwnerParallelToCamera(LookRight);
+                        ActionAssistComp->OwnerParallelToCamera(LookRight);
 
                     }
                 }

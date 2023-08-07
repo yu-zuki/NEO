@@ -19,7 +19,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "NEO/Enemy/EnamyBase.h"
 #include "../OdaBase.h"
-#include "AttackAssistComponent.h"
+#include "ActionAssistComponent.h"
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -156,20 +156,28 @@ void APlayerCharacter::SetCollision()
 				if (Enemy)
 				{
 					// ヒットストップ
-					AttackAssistComp->HitStop();
+					ActionAssistComp->HitStop();
 					Enemy->ApplyDamage(GetDamageAmount());
 					
 				}
-				else if (Oda) {
+				else if (Oda) 
+				{
 					// ヒットストップ
-					AttackAssistComp->HitStop();
+					ActionAssistComp->HitStop();
 					Oda->ApplyDamage(GetDamageAmount());
+
+					if (GetComboIndex() == 2)
+					{
+						Oda->BossKnockback();
+					}
+
 				}
 
 				// コンボのフィニッシュのみカメラを揺らす
 				if (GetComboIndex() == 2)
 				{
-					AttackAssistComp->CameraShake(ShakePattern);
+					ActionAssistComp->CameraShake(ShakePattern);
+
 				}
 			}
 		}

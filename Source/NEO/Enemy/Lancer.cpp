@@ -4,7 +4,6 @@
 #include "Components/BoxComponent.h"
 #include "GameFramework/Controller.h"
 #include "Kismet/GameplayStatics.h"
-#include "NEO/PlayerSystem/AttackAssistComponent.h"
 
 ALancer::ALancer()
 {

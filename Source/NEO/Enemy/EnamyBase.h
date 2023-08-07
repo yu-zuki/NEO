@@ -33,7 +33,7 @@ public:
 	
 	// 攻撃のアシスト用コンポーネント
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = AttackAssist, meta = (AllowPrivateAccess = "true"))
-		class UAttackAssistComponent* AttackAssistComp;
+		class UActionAssistComponent* ActionAssistComp;
 
 protected:
 	// Called when the game starts or when spawned

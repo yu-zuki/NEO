@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "AttackAssistComponent.h"
+#include "ActionAssistComponent.h"
 #include "GameFramework/Character.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/GameplayStatics.h"
@@ -10,11 +10,13 @@
 #include "NEO/GameSystem/TGS_GameMode.h"
 #include "Camera/PlayerCameraManager.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "NiagaraComponent.h"									
+#include "NiagaraFunctionLibrary.h"								
 
 #define DIRECTION_Y (90.f)
 
 // Sets default values for this component's properties
-UAttackAssistComponent::UAttackAssistComponent()
+UActionAssistComponent::UActionAssistComponent()
 	: bUseCorrectAttackAngle(true)
 	, bUseHitStop(true)
 	, bUseHitEffect(true)
@@ -29,7 +31,7 @@ UAttackAssistComponent::UAttackAssistComponent()
 
 
 // Called when the game starts
-void UAttackAssistComponent::BeginPlay()
+void UActionAssistComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
@@ -37,7 +39,7 @@ void UAttackAssistComponent::BeginPlay()
 
 
 // Called every frame
-void UAttackAssistComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+void UActionAssistComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
@@ -48,7 +50,7 @@ void UAttackAssistComponent::TickComponent(float DeltaTime, ELevelTick TickType,
  * 処理内容　　　：角度を補正して攻撃を当たりやすくする(直線状にいる敵)
  * 戻り値　　　　：なし
  */
-void UAttackAssistComponent::CorrectAttackAngle()
+void UActionAssistComponent::CorrectAttackAngle()
 {
 	// 機能のオン・オフ
 	if (!bUseCorrectAttackAngle) { return; }
@@ -77,7 +79,7 @@ void UAttackAssistComponent::CorrectAttackAngle()
  * 処理内容　　　：ヒットストップを起こす
  * 戻り値　　　　：なし
  */
-void UAttackAssistComponent::HitStop()
+void UActionAssistComponent::HitStop()
 {
 	// 機能のオン・オフ
 	if (!bUseHitStop) { return; }
@@ -94,21 +96,27 @@ void UAttackAssistComponent::HitStop()
 
 	//HitStopを停止
 	FTimerManager& TimerManager = GetWorld()->GetTimerManager();
-	TimerManager.SetTimer(TimerHandle_HitStop, this, &UAttackAssistComponent::EndHitStop, HitStopTime, false);
+	TimerManager.SetTimer(TimerHandle_HitStop, this, &UActionAssistComponent::EndHitStop, HitStopTime, false);
 }
 
 
 /*
  * 関数名　　　　：SpawnHitEffect()
+ * 引数１　　　　：UNiagaraSystem* _hitParticle・・・出現させるエフェクト
+ * 引数２　　　　：FVector _spawnPos・・・・・・・・・出現させる場所
  * 処理内容　　　：ヒットエフェクトをスポーン
  * 戻り値　　　　：なし
  */
-void UAttackAssistComponent::SpawnHitEffect()
+void UActionAssistComponent::SpawnHitEffect(UNiagaraSystem* _hitParticle, FVector _spawnPos)
 {
 	// 機能のオン・オフ
 	if (!bUseHitEffect) { return; }
 
+	// エフェクトの情報が取得できなければリターン
+	if (_hitParticle) { return; }
 
+	//エフェクトを出す
+	UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), _hitParticle, _spawnPos);
 }
 
 
@@ -119,7 +127,7 @@ void UAttackAssistComponent::SpawnHitEffect()
  * 処理内容　　　：カメラシェイク
  * 戻り値　　　　：なし
  */
-void UAttackAssistComponent::CameraShake(TSubclassOf<UCameraShakeBase> _shakePattern, float _scale /*= 1.f*/)
+void UActionAssistComponent::CameraShake(TSubclassOf<UCameraShakeBase> _shakePattern, float _scale /*= 1.f*/)
 {
 	// プレイヤー取得
 	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
@@ -130,7 +138,7 @@ void UAttackAssistComponent::CameraShake(TSubclassOf<UCameraShakeBase> _shakePat
 	if (!CameraManager) { return; }
 
 	// カメラシェイク開始
-	CameraManager->StartCameraShake(_shakePattern,_scale);
+	CameraManager->StartCameraShake(_shakePattern, _scale);
 }
 
 
@@ -142,7 +150,7 @@ void UAttackAssistComponent::CameraShake(TSubclassOf<UCameraShakeBase> _shakePat
  * 引数３　　　　：float _playRate・・・・・・・・・・・・アニメーションの再生速度
  * 戻り値　　　　：なし
  */
-void UAttackAssistComponent::PlayAnimation(UAnimMontage* _toPlayAnimMontage, FName _startSectionName /*= "None"*/, float _playRate /*= 1.f*/)
+void UActionAssistComponent::PlayAnimation(UAnimMontage* _toPlayAnimMontage, FName _startSectionName /*= "None"*/, float _playRate /*= 1.f*/)
 {
 	// キャラクタークラスにキャスト
 	ACharacter* Owner = Cast<ACharacter>(GetOwner());
@@ -167,7 +175,7 @@ void UAttackAssistComponent::PlayAnimation(UAnimMontage* _toPlayAnimMontage, FNa
  * 処理内容　　　：敵が直線状にいるか判定
  * 戻り値　　　　：見つけた敵の情報を返す
  */
-AActor* UAttackAssistComponent::GetFrontActor()
+AActor* UActionAssistComponent::GetFrontActor()
 {
 	// 所有者の情報取得
 	AActor* pOwner = GetOwner();
@@ -217,7 +225,7 @@ AActor* UAttackAssistComponent::GetFrontActor()
  * 処理内容　　　：ヒットストップ終了
  * 戻り値　　　　：なし
  */
-void UAttackAssistComponent::EndHitStop()
+void UActionAssistComponent::EndHitStop()
 {
 	//CharacterGet
 	ACharacter* Character = Cast<ACharacter>(GetOwner());
@@ -237,7 +245,7 @@ void UAttackAssistComponent::EndHitStop()
  * 処理内容　　　：オーナーをカメラに向ける
  * 戻り値　　　　：なし
  */
-void UAttackAssistComponent::OwnerParallelToCamera(bool _lookRight)
+void UActionAssistComponent::OwnerParallelToCamera(bool _lookRight)
 {
 	// 機能のオン・オフ
 	if (!bUseFaceCamera) { return; }

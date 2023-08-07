@@ -19,7 +19,7 @@
 #include "Components/WidgetComponent.h"
 #include "NEO/GameSystem/TGS_GameInstance.h"
 #include "PlayerSpline.h"
-#include "AttackAssistComponent.h"
+#include "ActionAssistComponent.h"
 
 
 // Sets default values
@@ -53,7 +53,7 @@ APlayerBase::APlayerBase()
 	CharacterMovementComp->MaxWalkSpeed = 500.f;
 
 	// アタックアシストコンポーネント作成
-	AttackAssistComp = CreateDefaultSubobject<UAttackAssistComponent>(TEXT("AttackAssist"));
+	ActionAssistComp = CreateDefaultSubobject<UActionAssistComponent>(TEXT("AttackAssist"));
 
 }
 
@@ -450,7 +450,7 @@ bool APlayerBase::IsPlayerGrounded() const
 void APlayerBase::Attack(int _attackNum /*= 0*/)
 {
 	// プレイヤーの角度修正
-	AttackAssistComp->CorrectAttackAngle();
+	ActionAssistComp->CorrectAttackAngle();
 
 	if (!IsAttacking)
 	{
@@ -519,7 +519,7 @@ void APlayerBase::RotateCharacter(float _nowInput_X)
 	bool LookRight = (_nowInput_X != 1.f) ? (true) : (false);
 
 	// 回転
-	AttackAssistComp->OwnerParallelToCamera(LookRight);
+	ActionAssistComp->OwnerParallelToCamera(LookRight);
 
 }
 
@@ -715,7 +715,7 @@ void APlayerBase::PlayAnimation(UAnimMontage* _toPlayAnimMontage, FName _startSe
 	// アニメーション再生
 	if (toPlayAnimMontage != nullptr)
 	{
-		AttackAssistComp->PlayAnimation(_toPlayAnimMontage, _startSectionName, _playRate);
+		ActionAssistComp->PlayAnimation(_toPlayAnimMontage, _startSectionName, _playRate);
 	}
 }
 

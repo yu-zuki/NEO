@@ -280,7 +280,7 @@ public:
 
 	// 攻撃のアシスト用コンポーネント
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = AttackAssist, meta = (AllowPrivateAccess = "true"))
-		class UAttackAssistComponent* AttackAssistComp;
+		class UActionAssistComponent* ActionAssistComp;
 
 	// キャラクターの動き
 	UCharacterMovementComponent* CharacterMovementComp;

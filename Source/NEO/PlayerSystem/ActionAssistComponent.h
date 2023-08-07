@@ -4,17 +4,17 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "AttackAssistComponent.generated.h"
+#include "ActionAssistComponent.generated.h"
 
 
-UCLASS( ClassGroup=(ActionAssist), meta=(BlueprintSpawnableComponent) )
-class NEO_API UAttackAssistComponent : public UActorComponent
+UCLASS(ClassGroup = (ActionAssist), meta = (BlueprintSpawnableComponent))
+class NEO_API UActionAssistComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
-public:	
+public:
 	// Sets default values for this component's properties
-	UAttackAssistComponent();
+	UActionAssistComponent();
 
 protected:
 	// Called when the game starts
@@ -31,7 +31,7 @@ public:
 	void HitStop();
 
 	// エフェクトスポーン
-	void SpawnHitEffect();
+	void SpawnHitEffect(class UNiagaraSystem* _hitParticle, FVector _spawnPos);
 
 	// オーナーをカメラに向ける
 	void OwnerParallelToCamera(bool _lookRight);
@@ -49,6 +49,7 @@ private:
 
 	// ヒットストップ終了
 	void EndHitStop();
+
 
 
 protected:
@@ -71,7 +72,7 @@ protected:
 	// トレースの長さ
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack Assist")
 		float LineLength;
-		
+
 	// HitStopで止まる時間
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack Assist")
 		float SpeedDuringHitStop;
