@@ -53,6 +53,7 @@ void AOdaBase::BeginPlay()
 	NobunagaMovement = (GetCharacterMovement());
 	PlayerChara = nullptr;
 
+	//ƒfƒBƒŒƒC‚ğˆê’èŠÔ‚©UŒ‚‚ğó‚¯‚½‚çˆ—‚ğØ‚è‘Ö‚¦‚é
 	SpawnDelay = true;
 }
 
@@ -501,6 +502,11 @@ void AOdaBase::ApplyDamage(float Damage)
 			Death();
 		}
 	}
+}
+
+void AOdaBase::BossKnockback()
+{
+	PlayAnimMontage(AnimMontage_BossBlowAway);
 }
 
 void AOdaBase::HPLock()

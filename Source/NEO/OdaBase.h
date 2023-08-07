@@ -209,7 +209,7 @@ public:
 	UFUNCTION()
 		void ToPlayerRotate();
 
-	//ノックバックするモーション
+	//のけぞるモーション
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AniMontage", meta = (AllowPrivateAccess = "true"))
 		class UAnimMontage* AnimMontage_BossKnockMontage;		//メモ：変数を作る際AnimMontage_は必須らしい
 
@@ -224,6 +224,15 @@ public:
 	//衝撃波攻撃する仮モーション
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AniMontage", meta = (AllowPrivateAccess = "true"))
 		class UAnimMontage* AnimMontage_BossUltimate;
+
+	//ふっとぶモーション
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AniMontage", meta = (AllowPrivateAccess = "true"))
+		class UAnimMontage* AnimMontage_BossBlowAway;
+
+
+	//ノックバックしてふっとぶ関数
+	UFUNCTION()
+		void BossKnockback();
 
 	//前方移動
 	UFUNCTION()
