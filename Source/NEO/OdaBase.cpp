@@ -488,6 +488,8 @@ void AOdaBase::ApplyDamage(float Damage)
 			//攻撃のディレイをセット
 			Attack1Delay = 30;
 		}
+		//エフェクトを出す
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), HitParticles, GetActorLocation());
 
 		//ノックバックのアニメーションを流す
 		PlayAnimMontage(AnimMontage_BossKnockMontage);
