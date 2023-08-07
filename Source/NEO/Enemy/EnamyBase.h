@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "DeathTrigger.h"
+#include "NiagaraComponent.h"
 #include "EnemyBaseAnimInstance.h"
 #include "EnamyBase.generated.h"
 
@@ -41,6 +42,9 @@ protected:
 	UPROPERTY()
 		FTimerHandle TimerHandle_DestroyEnemy;
 	AActor* GetPlayer();
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Effects", meta = (AllowPrivateAccess = "true"))
+		UNiagaraSystem* NiagaraEffect;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -71,7 +75,7 @@ public:
 
 	bool bIsNowDamage;
 
-	void CheckHeakth();
+	void CheckHealth();
 
 	void SpawnDeathTrigger();
 

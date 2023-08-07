@@ -112,7 +112,7 @@ void AEnamyBase::Tick(float DeltaTime)
             }
         }
        
-        CheckHeakth();
+        CheckHealth();
 }
 
 // Called to bind functionality to input
@@ -147,6 +147,8 @@ void AEnamyBase::ApplyDamage(float DamageAmount)
     {
         PlayAnimMontage(Damage_Reaction, 0.8, NAME_None);
        
+        ActionAssistComp->SpawnHitEffect(NiagaraEffect, GetActorLocation());
+       
     }
 
 }
@@ -178,7 +180,7 @@ void AEnamyBase::DamageReac()
     bIsNowDamage = false;
 }
 
-void AEnamyBase::CheckHeakth()
+void AEnamyBase::CheckHealth()
 {
     if (Health <= 0)
     {
