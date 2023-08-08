@@ -162,7 +162,7 @@ public:
 		bool isUltSpawnTiming;
 
 	//必殺技を打つタイミングの調整
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 		bool isUltShotTiming;
 
 	//必殺技の出現タイミングの調整するための関数

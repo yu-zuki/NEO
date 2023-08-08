@@ -356,7 +356,7 @@ void AOdaBase::OdaAttack2(int Timer) {
 	if (isShockWaveSpawnTiming == true)
 	{
 		//アクターのスポーン処理(ShockWaveSpawnはブループリント上で設定)
-		GetWorld()->SpawnActor<AActor>(ShockWaveSpawn, GetActorTransform());
+		GetWorld()->SpawnActor<AActor>(ShockWaveSpawn,GetActorTransform());
 		//一度だけスポーンさせたいので切り替えておく
 		isShockWaveSpawnTiming = false;
 	}
@@ -440,7 +440,6 @@ void AOdaBase::OdaUlt(int Timer)
 		isUltShotTiming = false;
 	}
 }
-
 //AnimNotifyにて変更、攻撃のフラグのon,off
 void AOdaBase::AttackFlagChange()
 {
@@ -599,10 +598,9 @@ void AOdaBase::PlayerOnOverlap(FHitResult& _HitResult)
 		}
 
 		Player->TakedDamage(SwordDamage);						//プレイヤーにダメージを与える
+		ActionAssistComp->HitStop(.2f);
 
 		//リセット
 		bIsAttacked = true;
-
-		FVector HitLocation = _HitResult.Location;		//ヒットエフェクトの位置
 	}
 }
