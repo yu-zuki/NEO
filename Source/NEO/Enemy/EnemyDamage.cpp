@@ -93,7 +93,12 @@ bool AEnemyDamage::IsLancerAttacking()
 	{
 		for (ALancer* Lancer : Lancers)
 		{
-			UAnimInstance* AnimInstance = Lancer->GetMesh()->GetAnimInstance();
+			UAnimInstance* AnimInstance = nullptr;
+
+			if (Lancer && Lancer->GetMesh())
+			{
+				AnimInstance = Lancer->GetMesh()->GetAnimInstance();
+			}
 			if (AnimInstance != nullptr)
 			{
 				// Mutex‚ğƒƒbƒN

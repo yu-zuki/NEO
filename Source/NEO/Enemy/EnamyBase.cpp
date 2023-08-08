@@ -66,6 +66,7 @@ void AEnamyBase::Tick(float DeltaTime)
     {
         return; 
     }
+    
     Super::Tick(DeltaTime); 
     //Enemy Hp Set
 	    EnemyWidget->SetHPInfo(Health, MaxHealth);

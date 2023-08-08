@@ -24,6 +24,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
 		UAnimMontage* Attack;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
+		UAnimMontage* Attack2;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
+		UAnimMontage* Attack3;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
 		UAnimMontage* Death;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
 		UAnimMontage* Damage_Reaction;

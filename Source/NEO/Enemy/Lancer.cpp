@@ -62,8 +62,9 @@ void ALancer::Tick(float DeltaTime)
     FVector SnappedDirection;
     FVector MoveVector;
 
-
-    if (CurrentDistance > DesiredDistance)
+    if (Health > 0)
+    {
+         if (CurrentDistance > DesiredDistance)
     {
         SnappedDirection = GetSnappedDirection(DirectionToPlayer);
         MoveVector = SnappedDirection * MoveSpeed * DeltaTime;
@@ -78,6 +79,8 @@ void ALancer::Tick(float DeltaTime)
     {
         return; // その他の場合は移動しない
     }
+    }
+   
     //移動中アニメーション再生
     if (MoveVector.Size() > 0 && MovingAnimation && AnimInstance)
     {
@@ -139,6 +142,7 @@ void ALancer::CheckPlayerInFront()
                         if (FMath::FRand() < 0.5f)
                         {
                             PlayAnimMontage(Attack, 1, NAME_None);
+                              
                         }
 
                     }
