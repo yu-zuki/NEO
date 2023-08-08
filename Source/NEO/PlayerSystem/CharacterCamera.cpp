@@ -122,13 +122,13 @@ void ACharacterCamera::Tick(float DeltaTime)
 		//else if (PlayerPos.Y < GetActorLocation().Y - 480.0f)	//プレイヤーの方が左にいる場合
 		//	m_moveDistance = m_moveDistance - (m_defaultSpeed * DeltaTime);
 
-		////移動距離の更新
-		//if (PlayerPos.Y > GetActorLocation().Y - 520.0f && PlayerPos.Y < GetActorLocation().Y - 480.0f)
-		//	return;
-		//else if (PlayerPos.Y > GetActorLocation().Y - 520.0f)	//プレイヤーの方が右にいる場合
-		//	m_moveDistance = m_moveDistance + (m_defaultSpeed * DeltaTime);
-		//else if (PlayerPos.Y < GetActorLocation().Y - 480.0f)	//プレイヤーの方が左にいる場合
-		//	m_moveDistance = m_moveDistance - (m_defaultSpeed * DeltaTime);
+		//移動距離の更新
+		if (PlayerPos.Y > GetActorLocation().Y - 520.0f && PlayerPos.Y < GetActorLocation().Y - 480.0f)
+			return;
+		else if (PlayerPos.Y > GetActorLocation().Y - 520.0f)	//プレイヤーの方が右にいる場合
+			m_moveDistance = m_moveDistance + (m_defaultSpeed * DeltaTime);
+		else if (PlayerPos.Y < GetActorLocation().Y - 480.0f)	//プレイヤーの方が左にいる場合
+			m_moveDistance = m_moveDistance - (m_defaultSpeed * DeltaTime);
 
 		
 		

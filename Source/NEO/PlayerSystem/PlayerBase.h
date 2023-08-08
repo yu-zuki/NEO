@@ -345,4 +345,11 @@ public:
 	// 壁とのレイキャストを行う関数
 	void WallChack();
 
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Camera)
+		bool WallHit;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Camera)
+		float RayDistance;
+
 };

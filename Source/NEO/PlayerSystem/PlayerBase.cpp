@@ -31,6 +31,7 @@ APlayerBase::APlayerBase()
 	, ComboIndex(0)
 	, DeadAnimRate(0.01f)
 	, DeadToGameOverTime(3.f)
+	, RayDistance(100.0f)
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -311,6 +312,8 @@ void APlayerBase::Move(const FInputActionValue& _value)
 	// input is a Vector2D
 	FVector2D MovementVector = _value.Get<FVector2D>();
 	
+	WallChack();
+
 	if (SplineActor)
 	{
 		// スプラインの角度取得
@@ -329,7 +332,11 @@ void APlayerBase::Move(const FInputActionValue& _value)
 		AddMovementInput(ForwardDirection, MovementVector.Y);
 
 		// 移動量保存
-		DistanceAdvanced += MovementVector.X;
+		if (!WallHit)
+		{
+			DistanceAdvanced += MovementVector.X;
+
+		}
 
 		// 移動方向に回転
 		RotateCharacter(MovementVector.X);
@@ -752,8 +759,11 @@ void APlayerBase::WallChack()
 	//}
 
 	// レイキャストの終了位置はキャラクターの向いている方向に一定量オフセットした位置
-	EndLocation = StartLocation - FVector(0.0f, DistanceAdvanced, 0.0f);
+	//EndLocation = StartLocation - FVector(0.0f, DistanceAdvanced, 0.0f);
 
+	EndLocation = StartLocation + GetActorForwardVector() * RayDistance;
+
+	
 
 	//UE_LOG(LogTemp, Warning, TEXT("capsuleHeigth : %f"), Capsule->GetScaledCapsuleHalfHeight());
 	//UE_LOG(LogTemp, Warning, TEXT("capsuleHeigth / 2 : %f"), Capsule->GetScaledCapsuleHalfHeight() / 2.0f);
@@ -809,7 +819,13 @@ void APlayerBase::WallChack()
 		//	
 		//}
 
-		DistanceAdvanced = 0.0f;
+		//壁に当たっている
+		WallHit = true;
+	}
+	else
+	{
+		//壁に当たっていない
+		WallHit = false;
 	}
 }
 
