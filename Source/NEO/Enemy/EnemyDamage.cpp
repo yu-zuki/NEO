@@ -21,9 +21,11 @@ AEnemyDamage::AEnemyDamage()
 	// Set the size of the sphere
 	BoxComponent->InitBoxExtent(FVector(50.0f, 50.0f, 50.0f));
 
-	// Set the function to be called when a collision begins
-	BoxComponent->OnComponentBeginOverlap.AddDynamic(this, &AEnemyDamage::OnOverlapBegin);
-
+	if (BoxComponent)
+	{
+		// Set the function to be called when a collision begins
+		BoxComponent->OnComponentBeginOverlap.AddDynamic(this, &AEnemyDamage::OnOverlapBegin);
+	}
 	// Set the default damage amount
 	DamageAmount = 5.0f;
 }
@@ -32,14 +34,17 @@ AEnemyDamage::AEnemyDamage()
 void AEnemyDamage::BeginPlay()
 {
 	Super::BeginPlay();
-	TArray<AActor*> FoundActors;
-	UGameplayStatics::GetAllActorsWithTag(GetWorld(), FName("Lancer"), FoundActors);
-	for (AActor* Actor : FoundActors)
+	if (GetWorld())
 	{
-		ALancer* Lancer = Cast<ALancer>(Actor);
-		if (Lancer != nullptr)
+		TArray<AActor*> FoundActors;
+		UGameplayStatics::GetAllActorsWithTag(GetWorld(), FName("Lancer"), FoundActors);
+		for (AActor* Actor : FoundActors)
 		{
-			Lancers.Add(Lancer);
+			ALancer* Lancer = Cast<ALancer>(Actor);
+			if (Lancer)
+			{
+				Lancers.Add(Lancer);
+			}
 		}
 	}
 }
@@ -53,20 +58,22 @@ void AEnemyDamage::Tick(float DeltaTime)
 
 void AEnemyDamage::OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (IsLancerAttacking())
+	if (IsLancerAttacking() && OtherActor && OtherComp && OtherActor != this)
 	{
-		if (OtherActor && (OtherActor != this) && OtherComp)
+		APlayerBase* PlayerCharacter = Cast<APlayerBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
+		if (PlayerCharacter && OtherActor == PlayerCharacter)
 		{
-			//触れたのがキャラクターか
-			APlayerBase* PlayerCharacter = Cast<APlayerBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
-			if (OtherActor == PlayerCharacter)
-			{
-				// Apply damage to the player
-				PlayerCharacter->TakedDamage(DamageAmount);
+			// Apply damage to the player
+			PlayerCharacter->TakedDamage(DamageAmount);
 
+			if (OverlappedComp)
+			{
 				OverlappedComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 				FTimerHandle UnusedHandle;
-				GetWorldTimerManager().SetTimer(UnusedHandle, this, &AEnemyDamage::EnableCollision, 3.0f, false);
+				if (GetWorld())
+				{
+					GetWorldTimerManager().SetTimer(UnusedHandle, this, &AEnemyDamage::EnableCollision, 3.0f, false);
+				}
 			}
 		}
 	}
@@ -106,7 +113,7 @@ bool AEnemyDamage::IsLancerAttacking()
 	}
 
 	return false;
-	
+	/*
 	if (!Attack)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Attack is not loaded correctly."));
@@ -154,5 +161,5 @@ bool AEnemyDamage::IsLancerAttacking()
 	}
 
 	return false;
-
+	*/
 }

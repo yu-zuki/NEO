@@ -46,7 +46,10 @@ void AEnamyBase::BeginPlay()
 
 	SpawnDefaultController();
 
-
+    if (GetMesh())
+    {
+        AnimInstance = GetMesh()->GetAnimInstance();
+    }
 }
 
 AActor* AEnamyBase::GetPlayer()

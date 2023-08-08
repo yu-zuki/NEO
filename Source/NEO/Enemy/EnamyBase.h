@@ -27,6 +27,10 @@ public:
 		UAnimMontage* Death;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
 		UAnimMontage* Damage_Reaction;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
+		UAnimMontage* MovingAnimation;
+	UPROPERTY()
+		UAnimInstance* AnimInstance;
 	UFUNCTION(BlueprintCallable, Category = "Area")
 	virtual void DestoryEnemy();
 	UPROPERTY()

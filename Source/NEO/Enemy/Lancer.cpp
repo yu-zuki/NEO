@@ -78,7 +78,18 @@ void ALancer::Tick(float DeltaTime)
     {
         return; // その他の場合は移動しない
     }
-
+    //移動中アニメーション再生
+    if (MoveVector.Size() > 0 && MovingAnimation && AnimInstance)
+    {
+        if (!AnimInstance->Montage_IsPlaying(MovingAnimation))
+        {
+            AnimInstance->Montage_Play(MovingAnimation);
+        }
+        else if (MovingAnimation && AnimInstance)
+        {
+            AnimInstance->Montage_Stop(0.2f, MovingAnimation);
+        }
+    }
     SetActorLocation(GetActorLocation() + MoveVector);
 }
 void ALancer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
