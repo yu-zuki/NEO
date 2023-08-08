@@ -27,16 +27,41 @@ void UEnemyBase_WidgetComponent::LookAtPlayer()
 
 	if (GameMode)
 	{
-	// Camera To Enemy
-	FVector CameraToEnemy = GameMode->GetCameraLocation() - GetOwner()->GetActorLocation();
+		//Test
+		FVector PLayerViewLocation;
+		FRotator PlayerViewRotation;
 
-	CameraToEnemy.Y = 0;
-	CameraToEnemy.Z = 0;	
-	CameraToEnemy.Normalize();
+		UGameplayStatics::GetPlayerController(GetWorld(),0)->GetPlayerViewPoint(PLayerViewLocation, PlayerViewRotation);
 
-	FRotator LookAtRotation = CameraToEnemy.Rotation();
-	SetWorldRotation(LookAtRotation);
-	return;		
+		SetWorldRotation( FRotator(0, PlayerViewRotation.Yaw + 180, 0) );
+
+		return;
+
+		//FVector LookAtDirection = PLayerViewLocation - GetOwner()->GetActorLocation();
+		//FRotator LookAtRotation = LookAtDirection.Rotation();
+
+
+		////-----------------------------------------------------------------------
+
+		//FVector CameraPos = GameMode->GetCameraLocation();
+		//FVector EnemyPos = GetOwner()->GetActorLocation();
+
+		//FVector tmpPos = CameraPos;
+		//tmpPos.Normalize();
+
+		////EnemyPos.X = tmpPos.X;
+		////EnemyPos.Y = tmpPos.Y;
+
+		//// Camera To Enemy
+		//FVector CameraToEnemy = CameraPos - EnemyPos;
+
+		//CameraToEnemy.Z = 0;
+
+		////CameraPos.Normalize();
+		//LookAtRotation = CameraToEnemy.Rotation();
+		//SetWorldRotation(LookAtRotation);
+
+		return;
 	}
 }
 
