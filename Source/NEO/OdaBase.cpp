@@ -42,6 +42,8 @@ AOdaBase::AOdaBase() :
 	EnemyWidget = CreateDefaultSubobject<UEnemyBase_WidgetComponent>(TEXT("EnemyWidget"));
 	EnemyWidget->SetupAttachment(RootComponent);
 
+	ActionAssistComp = CreateDefaultSubobject<UActionAssistComponent>(TEXT("ActionAssist"));
+
 }
 
 // Called when the game starts or when spawned
@@ -53,6 +55,7 @@ void AOdaBase::BeginPlay()
 	NobunagaMovement = (GetCharacterMovement());
 	PlayerChara = nullptr;
 
+	//ディレイを一定時間か攻撃を受けたら処理を切り替える
 	SpawnDelay = true;
 }
 
@@ -153,17 +156,25 @@ void AOdaBase::Tick(float DeltaTime)
 //Y軸だけを見てどっち側にいるか
 void AOdaBase::ToPlayerRotate()
 {
+	bool LookRight;
+
 	//ボスがプレイヤーより多いとき
 	if (GetActorLocation().Y > UGameplayStatics::GetPlayerPawn(GetWorld(), 0)->GetActorLocation().Y)
 	{
+		LookRight = true;
+		
 		//yを270に向ける(左)
-		SetActorRotation(FRotator(0.f, 270.f, 0.f));
+		//SetActorRotation(FRotator(0.f, 270.f, 0.f));
 	}
 	else
 	{
+		LookRight = false;
+
 		//yを90に向ける(右)
-		SetActorRotation(FRotator(0.f, 90.f, 0.f));
+		//SetActorRotation(FRotator(0.f, 90.f, 0.f));
 	}
+
+	ActionAssistComp->OwnerParallelToCamera(LookRight);
 }
 
 //待機関数
@@ -488,6 +499,9 @@ void AOdaBase::ApplyDamage(float Damage)
 			//攻撃のディレイをセット
 			Attack1Delay = 30;
 		}
+		//エフェクトを出す
+		//UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), HitParticles, GetActorLocation());
+		ActionAssistComp->SpawnHitEffect(HitParticles, GetActorLocation());
 
 		//ノックバックのアニメーションを流す
 		PlayAnimMontage(AnimMontage_BossKnockMontage);
@@ -500,6 +514,12 @@ void AOdaBase::ApplyDamage(float Damage)
 		}
 	}
 }
+
+void AOdaBase::BossKnockback()
+{
+	PlayAnimMontage(AnimMontage_BossBlowAway);
+}
+
 
 void AOdaBase::HPLock()
 {

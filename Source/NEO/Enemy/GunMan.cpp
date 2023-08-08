@@ -6,10 +6,14 @@
 #include "NEO/PlayerSystem\PlayerCharacter.h"
 #include "Camera/PlayerCameraManager.h"
 #include "Engine/World.h"
+#include "EngineUtils.h"
 #include "Bullet.h"
 #include "TrajectoryBullet.h"
 #include "TimerManager.h"
 #include "Kismet/GameplayStatics.h"
+#include "NavigationSystem.h"
+#include "NEO/BackGroundSystem/GunFence.h"
+#include "NavigationPath.h"
 #include "Kismet/KismetMathLibrary.h"
 
 
@@ -29,6 +33,7 @@ AGunMan::AGunMan()
     BulletSpawnTimerHandle = FTimerHandle();
 }
 
+
 // Called when the game starts or when spawned
 void AGunMan::BeginPlay()
 {
@@ -38,6 +43,22 @@ void AGunMan::BeginPlay()
     
     GetWorldTimerManager().SetTimer(BulletSpawnTimerHandle, this, &AGunMan::SpawnTrajectoryBullet, 3.0f, true);
 }
+
+FVector AGunMan::GetSnappedDirection(const FVector& Direction) const
+{
+    FVector SnappedDirection = Direction;
+
+    if (FMath::Abs(SnappedDirection.X) > FMath::Abs(SnappedDirection.Y))
+    {
+        SnappedDirection.Y = 0.0f;
+    }
+    else
+    {
+        SnappedDirection.X = 0.0f;
+    }
+
+    return SnappedDirection.GetSafeNormal();
+}
     
 
 
@@ -46,7 +67,7 @@ void AGunMan::Tick(float DeltaTime)
 {
  
 	Super::Tick(DeltaTime);
-    PlayerCharacter = Cast<ACharacter>(GetPlayer());
+   /* PlayerCharacter = Cast<ACharacter>(GetPlayer());
     
     {
         if (PlayerCharacter)
@@ -76,6 +97,38 @@ void AGunMan::Tick(float DeltaTime)
 
       
     }
+*/
+    if(bIsNowDamage )
+    {
+        return;
+    }
+    Super::Tick(DeltaTime);
+    PlayerCharacter = Cast<ACharacter>(GetPlayer());
+    if (!PlayerCharacter) return;
+
+    float CurrentDistance = GetDistanceToPlayer();
+    FVector DirectionToPlayer = GetPlayerDirection();
+    FVector SnappedDirection;
+    FVector MoveVector;
+    
+
+    if (CurrentDistance > DesiredDistance)
+    {
+        SnappedDirection = GetSnappedDirection(DirectionToPlayer);
+        MoveVector = SnappedDirection * MoveSpeed * DeltaTime;
+    }
+    else if (CurrentDistance < DesiredDistance - 150)
+
+    {
+        SnappedDirection = GetSnappedDirection(-DirectionToPlayer);
+        MoveVector = SnappedDirection * MoveSpeed * DeltaTime;
+    }
+    else
+    {
+        return; // ‚»‚Ì‘¼‚Ìê‡‚ÍˆÚ“®‚µ‚È‚¢
+    }
+
+    SetActorLocation(GetActorLocation() + MoveVector);
 }
 
 
@@ -101,11 +154,16 @@ void AGunMan::SpawnTrajectoryBullet()
     FRotator SpawnRotation = GetActorRotation(); 
 
     ATrajectoryBullet* Bullet = GetWorld()->SpawnActor<ATrajectoryBullet>(TrajectoryBulletClass, SpawnLocation, SpawnRotation, SpawnParams);
-    if (Bullet)
+    if (Health > 0)
     {
-        // Set up timer to replace TrajectoryBullet with Bullet after 2 seconds
-        GetWorldTimerManager().SetTimer(Bullet->GetLifeSpanTimerHandle(), this, &AGunMan::ReplaceWithBullet, 2.0f, false);
+        if (Bullet)
+        {
+            // Set up timer to replace TrajectoryBullet with Bullet after 2 seconds
+            GetWorldTimerManager().SetTimer(Bullet->GetLifeSpanTimerHandle(), this, &AGunMan::ReplaceWithBullet, 2.0f, false);
+        }
+
     }
+    
 
     // Prevent movement for the lifespan of the TrajectoryBullet + 1 second
     GetCharacterMovement()->Deactivate();

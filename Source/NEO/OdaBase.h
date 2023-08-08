@@ -5,18 +5,18 @@
 #include "CoreMinimal.h"
 #include "CPPOdaEnum.h"
 #include "GameFramework/Character.h"
-#include "GameFramework/CharacterMovementComponent.h"
-#include "Kismet/GameplayStatics.h"
-#include "Kismet/KismetSystemLibrary.h"
-#include "Animation/AnimMontage.h"
-#include "Runtime/Engine/Classes/Kismet/KismetMathLibrary.h"
-#include "Math/UnrealMathUtility.h"		//RandRangeを使うために必要なヘッダー
-#include "Math/Vector.h"				//Dist(距離)を使うために必要なヘッダー
-#include "Components/BoxComponent.h"
-#include "Engine/EngineTypes.h"
-#include "Components/StaticMeshComponent.h"
-#include "Templates/SubclassOf.h"
-#include "PlayerSystem/PlayerCharacter.h"
+#include "GameFramework/CharacterMovementComponent.h"			//キャラクタームーブメントを使うために必要なヘッダー
+#include "Kismet/GameplayStatics.h"								//getplayerpawn等を使うために必要なヘッダー
+#include "Kismet/KismetSystemLibrary.h"							//printStringを使うために必要なヘッダー
+#include "Animation/AnimMontage.h"								//アニメーションを流すために必要なヘッダー
+#include "Math/UnrealMathUtility.h"								//RandRangeを使うために必要なヘッダー
+#include "Math/Vector.h"										//Dist(距離)を使うために必要なヘッダー
+#include "Components/BoxComponent.h"							//ボックスコンポーネントを使うため
+#include "Templates/SubclassOf.h"								//TSubclassOfを使うために必要なヘッダー
+#include "PlayerSystem/PlayerCharacter.h"						//プレイヤーキャラを取得するために必要なヘッダー
+#include "NiagaraComponent.h"									//ナイアガラエフェクトを呼ぶために必要なヘッダー
+#include "NiagaraFunctionLibrary.h"								//ナイアガラエフェクトを呼ぶために必要なヘッダー
+#include "NEO/PlayerSystem/ActionAssistComponent.h"
 
 #include "OdaBase.generated.h"
 
@@ -58,6 +58,9 @@ public:
 	//キャラクタームーブメント
 	UPROPERTY()
 		UCharacterMovementComponent* NobunagaMovement;
+
+	UPROPERTY()
+		class UActionAssistComponent* ActionAssistComp;
 	//--------------------------------------------------------------------------------------------------------------------
 
 	//スポーン時処理--------------------------------------------------------------------------
@@ -189,11 +192,14 @@ public:
 	//攻撃された回数が一定数超えたら近接攻撃をぱなす為の変数
 	UPROPERTY()
 		bool isNotAttackNow;
+
 	//一定数の計測
 	UPROPERTY()
 		int NotAttackCount;
 
-
+	//ヒットエフェクト変数
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Effect")
+		UNiagaraSystem* HitParticles;
 
 	//HPが連続で減らないようにロック
 	UPROPERTY()
@@ -207,7 +213,7 @@ public:
 	UFUNCTION()
 		void ToPlayerRotate();
 
-	//ノックバックするモーション
+	//のけぞるモーション
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AniMontage", meta = (AllowPrivateAccess = "true"))
 		class UAnimMontage* AnimMontage_BossKnockMontage;		//メモ：変数を作る際AnimMontage_は必須らしい
 
@@ -222,6 +228,15 @@ public:
 	//衝撃波攻撃する仮モーション
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AniMontage", meta = (AllowPrivateAccess = "true"))
 		class UAnimMontage* AnimMontage_BossUltimate;
+
+	//ふっとぶモーション
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AniMontage", meta = (AllowPrivateAccess = "true"))
+		class UAnimMontage* AnimMontage_BossBlowAway;
+
+
+	//ノックバックしてふっとぶ関数
+	UFUNCTION()
+		void BossKnockback();
 
 	//前方移動
 	UFUNCTION()

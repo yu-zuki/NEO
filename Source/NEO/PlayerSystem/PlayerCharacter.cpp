@@ -19,6 +19,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "NEO/Enemy/EnamyBase.h"
 #include "../OdaBase.h"
+#include "ActionAssistComponent.h"
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -138,7 +139,12 @@ void APlayerCharacter::SetCollision()
 	{
 		for (const FHitResult HitResult : HitResults)
 		{
+			// 当たったキャラクターを格納
 			AActor* tempActor = HitResult.GetActor();
+
+			// 先にオブジェクトに当たったら処理しない
+			if (tempActor && tempActor->ActorHasTag("Object")) { break; }
+
 			// ヒットしたアクターが"Enemy"タグを持っていたら
 			if (tempActor && tempActor->ActorHasTag("Enemy"))
 			{
@@ -150,20 +156,28 @@ void APlayerCharacter::SetCollision()
 				if (Enemy)
 				{
 					// ヒットストップ
-					AttackAssistComp->HitStop();
+					ActionAssistComp->HitStop(HitStopTime);
 					Enemy->ApplyDamage(GetDamageAmount());
 					
 				}
-				else if (Oda) {
+				else if (Oda) 
+				{
 					// ヒットストップ
-					AttackAssistComp->HitStop();
+					ActionAssistComp->HitStop(HitStopTime);
 					Oda->ApplyDamage(GetDamageAmount());
+
+					if (GetComboIndex() == 2)
+					{
+						Oda->BossKnockback();
+					}
+
 				}
 
 				// コンボのフィニッシュのみカメラを揺らす
 				if (GetComboIndex() == 2)
 				{
-					
+					ActionAssistComp->CameraShake(ShakePattern);
+
 				}
 			}
 		}

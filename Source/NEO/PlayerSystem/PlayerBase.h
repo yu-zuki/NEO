@@ -77,6 +77,9 @@ struct FPlayerStatus
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		float RunSpeed;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		float NowMoveSpeed;
 };
 //----------------------------------------------------------------------------------------
 
@@ -126,6 +129,8 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		FPlayerAnimation PlayerAnimation;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		TSubclassOf<UCameraShakeBase> ShakePattern;
 
 public:
 	// Sets default values for this character's properties
@@ -232,7 +237,7 @@ public:
 
 	// プレイヤーのステータス初期化
 	void SetupPlayerStatus(float _hp = 100.f, int _remainingLife = 3.f, float _damageAmount = 10.f,
-							float _jumpHeight = 150.f, float _comboDamageFactor = 1.f, float _walkSpeed = 500.f, float _runSpeed = 600.f);
+							float _jumpHeight = 150.f, float _comboDamageFactor = 1.f, float _walkSpeed = 10.f, float _runSpeed = 30.f);
 
 	// ボタンの設定
 	void SetupMainActionMapping();
@@ -278,13 +283,13 @@ public:
 
 	// 攻撃のアシスト用コンポーネント
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = AttackAssist, meta = (AllowPrivateAccess = "true"))
-		class UAttackAssistComponent* AttackAssistComp;
+		class UActionAssistComponent* ActionAssistComp;
 
 	// キャラクターの動き
 	UCharacterMovementComponent* CharacterMovementComp;
 	//-------------------------------------------------------------------------------------------------------------
 
-public:
+protected:
 
 	bool IsControl;					// 入力可能かどうか
 
@@ -306,6 +311,9 @@ public:
 
 	TArray<FName> ComboStartSectionNames;	// コンボの段数(First,Second,Third・・・)
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = "Attack")
+		float HitStopTime = 0.2f;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = "GameOver")
 		bool CurveMode;
 
@@ -316,20 +324,20 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		float DeadToGameOverTime;					// 死んでからゲームオーバーまでの時間(秒)
 
+
+	float deltaTime;
+
+public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		float DistanceAdvanced;
-
-	float delta;
-
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		FRotator kakunin;
 
 private:
 
 	FTimerHandle TimerHandle_DeathToGameOver;		// ハンドル
 
 	class APlayerSpline* SplineActor;				// プレイヤーが通るスプライン
+
+	float BeforePos_Y;
 	
 
 //////////////////////////////////////////////////////////////////////////

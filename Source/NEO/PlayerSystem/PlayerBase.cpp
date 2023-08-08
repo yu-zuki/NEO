@@ -19,6 +19,8 @@
 #include "Components/WidgetComponent.h"
 #include "NEO/GameSystem/TGS_GameInstance.h"
 #include "PlayerSpline.h"
+#include "ActionAssistComponent.h"
+
 
 // Sets default values
 APlayerBase::APlayerBase()
@@ -52,7 +54,8 @@ APlayerBase::APlayerBase()
 	CharacterMovementComp->MaxWalkSpeed = 500.f;
 
 	// アタックアシストコンポーネント作成
-	AttackAssistComp = CreateDefaultSubobject<UAttackAssistComponent>(TEXT("AttackAssist"));
+	ActionAssistComp = CreateDefaultSubobject<UActionAssistComponent>(TEXT("AttackAssist"));
+
 }
 
 
@@ -89,7 +92,7 @@ void APlayerBase::Tick(float DeltaTime)
 		break;
 	}
 
-	delta = DeltaTime;
+	deltaTime = DeltaTime;
 }
 
 
@@ -154,7 +157,7 @@ void APlayerBase::SetupPlayerData()
  * 戻り値　　　　：なし
  */
 void APlayerBase::SetupPlayerStatus(float _hp /*= 100.f*/, int _remainingLife /*= 3.f*/, float _damageAmount /*= 10.f*/,
-									float _jumpHeight /*= 150.f*/, float _comboDamageFactor /*= 1.f*/, float _walkSpeed /*= 500.f*/, float _runSpeed /*= 600.f*/)
+									float _jumpHeight /*= 150.f*/, float _comboDamageFactor /*= 1.f*/, float _walkSpeed /*= 100.f*/, float _runSpeed /*= 300.f*/)
 {
 	PlayerStatus.HP = _hp;
 	PlayerStatus.MaxHP = _hp;
@@ -164,6 +167,7 @@ void APlayerBase::SetupPlayerStatus(float _hp /*= 100.f*/, int _remainingLife /*
 	PlayerStatus.ComboDamageFactor = _comboDamageFactor;
 	PlayerStatus.WalkSpeed = _walkSpeed;
 	PlayerStatus.RunSpeed = _runSpeed;
+	PlayerStatus.NowMoveSpeed = PlayerStatus.WalkSpeed;
 }	
 
 /*
@@ -317,19 +321,27 @@ void APlayerBase::Move(const FInputActionValue& _value)
 	if (SplineActor)
 	{
 		// スプラインの角度取得
-		const FRotator Rotation = SplineActor->GetSplineAngle(DistanceAdvanced * CharacterMovementComp->MaxWalkSpeed * delta);
+		const FRotator Rotation = SplineActor->GetSplineAngle(DistanceAdvanced * CharacterMovementComp->MaxWalkSpeed * deltaTime);
 
 		const FRotator YawRotation(0.f, Rotation.Yaw, 0.f);
 
 		// 移動方向取得(X,Y)
 		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-
 		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 		
 
 		// 移動
 		AddMovementInput(RightDirection, MovementVector.X);
 		AddMovementInput(ForwardDirection, MovementVector.Y);
+
+		// 移動方向に回転
+		RotateCharacter(MovementVector.X);
+
+		// 現在の座標取得
+		const float NowPos_Y = GetActorLocation().Y;
+
+		// 前と同じ場所にいたらスキップ
+		if (BeforePos_Y == NowPos_Y) { return; }
 
 		// 移動量保存
 		if (!WallHit)
@@ -338,8 +350,8 @@ void APlayerBase::Move(const FInputActionValue& _value)
 
 		}
 
-		// 移動方向に回転
-		RotateCharacter(MovementVector.X);
+		// 今の座標を格納
+		BeforePos_Y = NowPos_Y;
 	}
 
 }
@@ -359,13 +371,13 @@ void APlayerBase::Run()
 	{
 		// ダッシュオン
 		IsRunning = true;
-		CharacterMovementComp->MaxWalkSpeed = PlayerStatus.RunSpeed;
+		PlayerStatus.NowMoveSpeed = PlayerStatus.RunSpeed;
 	}
 	else
 	{
 		// ダッシュオン
 		IsRunning = false;
-		CharacterMovementComp->MaxWalkSpeed = PlayerStatus.WalkSpeed;
+		PlayerStatus.NowMoveSpeed = PlayerStatus.WalkSpeed;
 	}
 }
 
@@ -450,7 +462,7 @@ bool APlayerBase::IsPlayerGrounded() const
 void APlayerBase::Attack(int _attackNum /*= 0*/)
 {
 	// プレイヤーの角度修正
-	AttackAssistComp->CorrectAttackAngle();
+	ActionAssistComp->CorrectAttackAngle();
 
 	if (!IsAttacking)
 	{
@@ -519,7 +531,7 @@ void APlayerBase::RotateCharacter(float _nowInput_X)
 	bool LookRight = (_nowInput_X != 1.f) ? (true) : (false);
 
 	// 回転
-	AttackAssistComp->OwnerParallelToCamera(LookRight);
+	ActionAssistComp->OwnerParallelToCamera(LookRight);
 
 }
 
@@ -678,6 +690,7 @@ void APlayerBase::TakedDamage(float _damage)
 			IsControl = false;
 
 			// 死亡アニメーション再生
+			SetActorEnableCollision(true);
 			PlayAnimation(PlayerAnimation.Death);
 		}
 		else
@@ -701,9 +714,6 @@ void APlayerBase::TakedDamage(float _damage)
 /*
  * 関数名　　　　：PlayAnimation()
  * 処理内容　　　：プレイヤーのアニメーション再生(再生中は操作不可)
- * 引数１　　　　：UAnimMontage* _toPlayAnimMontage ・・・再生するアニメーション
- * 引数２　　　　：FName _startSectionName・・・・・・・・コンボの何段目から再生するか
- * 引数３　　　　：float _playRate・・・・・・・・・・・・アニメーションの再生速度
  * 戻り値　　　　：なし
  */
 void APlayerBase::PlayAnimation(UAnimMontage* _toPlayAnimMontage, FName _startSectionName /*= "None"*/, float _playRate /*= 1.f*/)
@@ -717,7 +727,7 @@ void APlayerBase::PlayAnimation(UAnimMontage* _toPlayAnimMontage, FName _startSe
 	// アニメーション再生
 	if (toPlayAnimMontage != nullptr)
 	{
-		PlayAnimMontage(_toPlayAnimMontage, _playRate, _startSectionName);
+		ActionAssistComp->PlayAnimation(_toPlayAnimMontage, _startSectionName, _playRate);
 	}
 }
 

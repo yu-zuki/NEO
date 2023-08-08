@@ -2,6 +2,7 @@
 
 
 #include "EnamyBase.h"
+#include "EngineUtils.h"
 #include "NEO/GameSystem/TGS_GameMode.h"
 #include "Kismet/GameplayStatics.h"
 #include "NEO/GameSystem/Enemy_UMG.h"
@@ -11,6 +12,8 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Camera/CameraComponent.h"
 #include "NEO/GameSystem/EnemyBase_WidgetComponent.h"
+#include "NEO/PlayerSystem/ActionAssistComponent.h"
+
 
 // Sets default values
 AEnamyBase::AEnamyBase()
@@ -23,6 +26,8 @@ AEnamyBase::AEnamyBase()
 	EnemyWidget->SetupAttachment(RootComponent);
     bIsDeath = false;
    
+    // アタックアシストコンポーネント作成
+    ActionAssistComp = CreateDefaultSubobject<UActionAssistComponent>(TEXT("AttackAssist"));
 }
 
 void AEnamyBase::DestoryEnemy()
@@ -53,6 +58,7 @@ AActor* AEnamyBase::GetPlayer()
 // Called every frame
 void AEnamyBase::Tick(float DeltaTime)
 {   
+
     if (bIsNowDamage)
     {
         return; 
@@ -80,26 +86,33 @@ void AEnamyBase::Tick(float DeltaTime)
                     //bIsRotationがtrueなら
                     if (Health >= 0)
                     {
-                        if (bIsRotation)
-                        {
-                            FRotator NewRotation = GetActorRotation();
-                            NewRotation.Yaw = -90.0f;
-                            SetActorRotation(NewRotation);
+                        //if (bIsRotation)
+                        //{
+                        //    FRotator NewRotation = GetActorRotation();
+                        //    NewRotation.Yaw = -90.0f;
+                        //    SetActorRotation(NewRotation);
 
-                        }
-                        else
-                        {
-                            FRotator NewRotation = GetActorRotation();
-                            NewRotation.Yaw = 90.0f;
-                            SetActorRotation(NewRotation);
-                        }
+                        //    
+
+                        //}
+                        //else
+                        //{
+                        //    FRotator NewRotation = GetActorRotation();
+                        //    NewRotation.Yaw = 90.0f;
+                        //    SetActorRotation(NewRotation);
+                        //}
+
+                        bool LookRight = (bIsRotation) ? (true) : (false);
+
+
+                        ActionAssistComp->OwnerParallelToCamera(LookRight);
 
                     }
                 }
             }
         }
        
-        CheckHeakth();
+        CheckHealth();
 }
 
 // Called to bind functionality to input
@@ -134,8 +147,28 @@ void AEnamyBase::ApplyDamage(float DamageAmount)
     {
         PlayAnimMontage(Damage_Reaction, 0.8, NAME_None);
        
+        ActionAssistComp->SpawnHitEffect(NiagaraEffect, GetActorLocation());
+       
     }
 
+}
+void AEnamyBase::MaintainDistanceFromEnemy()
+{
+    for (TActorIterator<AActor> It(GetWorld()); It; ++It)
+    {
+        AActor* CurrentActor = *It;
+        if (CurrentActor && CurrentActor->ActorHasTag(FName("Enemy")))
+        {
+            FVector Direction = CurrentActor->GetActorLocation() - GetActorLocation();
+            float Distance = Direction.Size();
+
+            if (Distance < DesiredDistanceFromEnemy)
+            {
+                FVector MoveDirection = -Direction.GetSafeNormal() * (DesiredDistanceFromEnemy - Distance);
+                AddMovementInput(MoveDirection);
+            }
+        }
+    }
 }
 void AEnamyBase::AfterDeath()
 {
@@ -147,7 +180,7 @@ void AEnamyBase::DamageReac()
     bIsNowDamage = false;
 }
 
-void AEnamyBase::CheckHeakth()
+void AEnamyBase::CheckHealth()
 {
     if (Health <= 0)
     {
@@ -166,6 +199,19 @@ void AEnamyBase::SpawnDeathTrigger()
             DeathTrigger->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
         }
     }
+}
+
+AActor* AEnamyBase::GetEnemyActor() const
+{
+    for (TActorIterator<AActor> It(GetWorld()); It; ++It)
+    {
+        AActor* Actor = *It;
+        if (Actor && Actor->ActorHasTag(FName("Enemy")))
+        {
+            return Actor; // Enemyタグを持つ最初のアクターを返す
+        }
+    }
+    return nullptr; // Enemyタグを持つアクターが見つからない場合
 }
 
 

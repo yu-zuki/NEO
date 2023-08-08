@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "DeathTrigger.h"
+#include "NiagaraComponent.h"
 #include "EnemyBaseAnimInstance.h"
 #include "EnamyBase.generated.h"
 
@@ -31,12 +32,19 @@ public:
 	UPROPERTY()
 		class ACharacter* PlayerCharacter; // プレイヤーキャラクターの参照
 	
+	// 攻撃のアシスト用コンポーネント
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = AttackAssist, meta = (AllowPrivateAccess = "true"))
+		class UActionAssistComponent* ActionAssistComp;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 	UPROPERTY()
 		FTimerHandle TimerHandle_DestroyEnemy;
 	AActor* GetPlayer();
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Effects", meta = (AllowPrivateAccess = "true"))
+		UNiagaraSystem* NiagaraEffect;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -54,7 +62,11 @@ public:
 	
 	UFUNCTION(BlueprintCallable, Category = "Health")
 		virtual void ApplyDamage(float DamageAmount);
+
+	void MaintainDistanceFromEnemy();
 	 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Enemy", meta = (AllowPrivateAccess = "true"))
+		float DesiredDistanceFromEnemy = 300.0f;
 
 
 	void AfterDeath();
@@ -63,7 +75,7 @@ public:
 
 	bool bIsNowDamage;
 
-	void CheckHeakth();
+	void CheckHealth();
 
 	void SpawnDeathTrigger();
 
@@ -96,5 +108,5 @@ private:
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
 		class UEnemyBase_WidgetComponent* EnemyWidget;
-
+	AActor* GetEnemyActor() const;
 };
