@@ -10,6 +10,7 @@
 #include "NEO/GameSystem/TGS_GameMode.h"
 #include "Camera/PlayerCameraManager.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include <Runtime/Engine/Classes/Components/CapsuleComponent.h>
 #include "NiagaraComponent.h"									
 #include "NiagaraFunctionLibrary.h"								
 
@@ -21,6 +22,7 @@ UActionAssistComponent::UActionAssistComponent()
 	, bUseHitStop(true)
 	, bUseHitEffect(true)
 	, bUseFaceCamera(true)
+	, RayDistance(100.0f)
 {
 	PrimaryComponentTick.bCanEverTick = false;
 
@@ -280,4 +282,104 @@ void UActionAssistComponent::OwnerParallelToCamera(bool _lookRight)
 
 	// 回転
 	GetOwner()->SetActorRotation(OwnerAngle);
+}
+
+
+// 壁とのレイキャストを行う関数
+bool UActionAssistComponent::WallCheck()
+{
+
+	ACharacter* pOwner = Cast<ACharacter>(GetOwner());
+	if (!pOwner) { return false; }
+
+	// カプセルコンポーネントを取得する
+	UCapsuleComponent* Capsule = pOwner->GetCapsuleComponent();
+
+
+	// レイキャストを実行する際のパラメータを設定する
+	// レイキャストの開始位置はキャラクターの現在位置
+	FVector StartLocation = GetOwner()->GetActorLocation();
+	FVector EndLocation = FVector::ZeroVector;
+	//if (m_TargetRote.Yaw == 0.0f)
+	//{
+	//	// レイキャストの終了位置はキャラクターの向いている方向に一定量オフセットした位置
+	//	EndLocation = StartLocation - FVector(0.0f, -m_GroundDistance, 0.0f);
+	//}
+	//else if (m_TargetRote.Yaw == 180.0f)
+	//{
+	//	// レイキャストの終了位置はキャラクターの向いている方向に一定量オフセットした位置
+	//	EndLocation = StartLocation - FVector(0.0f, m_GroundDistance, 0.0f);
+	//}
+
+	// レイキャストの終了位置はキャラクターの向いている方向に一定量オフセットした位置
+	//EndLocation = StartLocation - FVector(0.0f, DistanceAdvanced, 0.0f);
+
+	EndLocation = StartLocation + pOwner->GetActorForwardVector() * RayDistance;
+
+
+
+	//UE_LOG(LogTemp, Warning, TEXT("capsuleHeigth : %f"), Capsule->GetScaledCapsuleHalfHeight());
+	//UE_LOG(LogTemp, Warning, TEXT("capsuleHeigth / 2 : %f"), Capsule->GetScaledCapsuleHalfHeight() / 2.0f);
+
+	//UE_LOG(LogTemp, Warning, TEXT("StartLocation : %f"), StartLocation.Z);
+	//UE_LOG(LogTemp, Warning, TEXT("EndLocation : %f"), EndLocation.Z);
+
+	FCollisionQueryParams TraceParams(FName(TEXT("GroundTrace")), true, GetOwner());
+	// レイキャストの命中判定は簡易的に行う
+	TraceParams.bTraceComplex = false;
+	// 物理マテリアルの情報は不要
+	TraceParams.bReturnPhysicalMaterial = false;
+
+
+	// カプセルの大きさを取得する
+	FCollisionShape CapsuleShape = FCollisionShape::MakeCapsule
+	(Capsule->GetScaledCapsuleRadius(), Capsule->GetScaledCapsuleHalfHeight());
+
+	FHitResult HitResult;
+	// レイトレースを行う
+	bool bhit = GetWorld()->SweepSingleByChannel(HitResult, StartLocation, EndLocation, FQuat::Identity, ECC_Visibility, CapsuleShape, TraceParams);
+
+	// 当たり判定を無視するActorをセット
+	//TArray<AActor*> act;
+	//act.Add(Cast<AActor>(m_pCharaOwner));
+
+	//float capsuleRadius = Capsule->GetScaledCapsuleRadius() - 5.0f;
+	//float CapsuleHalfHeight = Capsule->GetScaledCapsuleHalfHeight() - 5.0f;
+
+	//bool bhit = UKismetSystemLibrary::CapsuleTraceSingle(m_pCharaOwner, StartLocation, EndLocation, capsuleRadius, CapsuleHalfHeight, ETraceTypeQuery::TraceTypeQuery1, false, act, EDrawDebugTrace::ForDuration, HitResult, false, FLinearColor::Red);
+
+	// 何かに当たった場合
+	if (bhit)
+	{
+		//UE_LOG(LogTemp, Warning, TEXT("bhit : TRUE"), );
+		// 当たったものを取得する
+		AActor* hitActor = HitResult.GetActor();
+
+		//// 当たったものが敵でない場合
+		//if (!hitActor->ActorHasTag("Enemy"))
+		//{
+		//	if (m_TargetRote.Yaw == 0.0f && m_Velocity.Y > 0.0f)
+		//	{
+		//		// 移動量をゼロにする
+		//		m_Velocity.Y = 0.0f;
+		//	}
+		//	else if (m_TargetRote.Yaw == 180.0f && m_Velocity.Y < 0.0f)
+		// 
+		//	{
+		//		// 移動量をゼロにする
+		//		m_Velocity.Y = 0.0f;
+		//	}
+		//	
+		//}
+
+		//壁に当たっている
+		WallHit = true;
+	}
+	else
+	{
+		//壁に当たっていない
+		WallHit = false;
+	}
+
+	return WallHit;
 }

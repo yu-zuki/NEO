@@ -220,6 +220,7 @@ void ATGS_GameMode::SetIsOnBattleArea(bool bIsOnArea, TArray<class ASpawnPoint*>
 	}
 
 	GetGameState()->bIsOnBattleArea = bIsOnArea; 
+
 }
 
 bool ATGS_GameMode::GetIsOnBattleArea()

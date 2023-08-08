@@ -36,6 +36,7 @@ void AEnamyBase::DestoryEnemy()
 	if (GameMode)
 	{
 		GameMode->DestroyEnemy(this,IsAreaEnemy);
+        
 	}
 }
 

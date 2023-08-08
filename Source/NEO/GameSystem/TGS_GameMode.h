@@ -128,5 +128,11 @@ protected:
 	class ATGS_GameStateBase* GetGameState();
 
 	ATGS_GameStateBase* GameState = nullptr;		//ƒLƒƒƒVƒ…[
+
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Area)
+		bool NowBattleArea;
+
 		
 };

@@ -77,8 +77,23 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack Assist")
 		float SpeedDuringHitStop;
 
+
+public:
+	/////////////////////////////////////////////////////////////////////////
+	// 壁とのレイキャストを行う関数
+	bool WallCheck();
+
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Camera)
+		bool WallHit;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Camera)
+		float RayDistance;
+
 private:
 	FTimerHandle TimerHandle_HitStop;
 
 	bool IsAnimationPlaying;
+
+
 };
