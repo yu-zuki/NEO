@@ -69,7 +69,7 @@ void ALancer::Tick(float DeltaTime)
         SnappedDirection = GetSnappedDirection(DirectionToPlayer);
         MoveVector = SnappedDirection * MoveSpeed * DeltaTime;
     }
-    else if (CurrentDistance < DesiredDistance - 150)
+    else if (CurrentDistance < DesiredDistance - 300)
 
     {
         SnappedDirection = GetSnappedDirection(-DirectionToPlayer);
@@ -110,7 +110,11 @@ void ALancer::CheckPlayerInFront()
     // Ž©•ª‚ÌˆÊ’u‚ðŽæ“¾
     FVector MyLocation = GetActorLocation();
     
-    
+    if (bIsNowDamage || bShouldSkipNextMovement)
+    {
+        bShouldSkipNextMovement = false;
+        return;
+    }
         UWorld* World = GetWorld();
         if (World)
         {

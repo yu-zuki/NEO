@@ -58,6 +58,11 @@ void ASoldier::ResetCombo()
 }
 void ASoldier::Tick(float DeltaTime)
 {
+    if (bIsNowDamage )
+    {
+       
+        return;
+    }
     Super::Tick(DeltaTime);
     if (PlayerCharacter)
     {
