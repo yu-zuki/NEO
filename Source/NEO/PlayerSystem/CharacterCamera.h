@@ -9,6 +9,7 @@
 #include "CharacterCamera.generated.h"
 
 class APlayerBase;
+class AGameSystem_BattleArea;
 
 
 UCLASS()

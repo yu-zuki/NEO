@@ -316,7 +316,7 @@ void ATGS_GameStateBase::EnterBattleArea()
 	if (GetBattleAreaCamera()) {
 		ATGS_GameMode* GameMode = Cast<ATGS_GameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 		if (GameMode) {
-			GameMode->SetViewTargetWithBlend(GetBattleAreaCamera(), 0.5f);
+			//GameMode->SetViewTargetWithBlend(GetBattleAreaCamera(), 0.5f);
 		}
 		else {
 			UE_LOG(LogTemp, Warning, TEXT("GameMode is not found"));

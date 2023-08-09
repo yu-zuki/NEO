@@ -8,6 +8,7 @@
 #include "GameFramework/Character.h"
 #include "Components/SplineComponent.h"
 #include "PlayerBase.h"
+#include "NEO/GameSystem/GameSystem_BattleArea.h"
 
 #include "NEO/GameSystem/TGS_GameMode.h"
 
@@ -43,9 +44,12 @@ void ACharacterCamera::BeginPlay()
 	Super::BeginPlay();
 
 	ATGS_GameMode* GameMode = Cast<ATGS_GameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	//AGameSystem_BattleArea BattleArea;
 
+	
 	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(),0);
 
+	
 	if (PlayerController)
 	{
 		PlayerController->SetViewTargetWithBlend(this, 0.f);
@@ -103,7 +107,7 @@ void ACharacterCamera::Tick(float DeltaTime)
 
 	// プレイヤーの現在位置取得
 	FVector PlayerPos = m_pPlayer->GetActorLocation();
-
+	
 	// 現在座標を取得する
 	FVector nowpos = GetActorLocation();
 	FVector newpos = nowpos;
@@ -139,7 +143,11 @@ void ACharacterCamera::Tick(float DeltaTime)
 		FRotator newRotation;
 
 		//現在のスプライン上の距離から座標、回転を算出
-		GetCurrentInfo0nSpline(m_pPlayer->DistanceAdvanced * m_defaultSpeed, newLocation, newRotation);
+		GetCurrentInfo0nSpline(m_pPlayer->DistanceAdvanced * m_defaultSpeed * m_pPlayer->deltaTime, newLocation, newRotation);
+
+		////現在のスプライン上の距離から座標、回転を算出
+		//GetCurrentInfo0nSpline(m_moveDistance * m_defaultSpeed, newLocation, newRotation);
+
 
 		newRotation.Roll = -25.0;
 		

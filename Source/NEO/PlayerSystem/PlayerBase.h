@@ -322,11 +322,13 @@ protected:
 		float DeadToGameOverTime;					// 死んでからゲームオーバーまでの時間(秒)
 
 
-	float deltaTime;
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		float DistanceAdvanced;
+
+	float deltaTime;
+
 
 private:
 
