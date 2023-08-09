@@ -12,6 +12,10 @@ ASoldier::ASoldier()
     PrimaryActorTick.bCanEverTick = true;
 
     ComboCounter = 0;
+    AttackCooldown = 1.0f;
+    LastAttackTime = -AttackCooldown;
+    bIsAttacking = false;
+    bIsOnCooldown = false;
 }
 
 void ASoldier::BeginPlay()
@@ -23,6 +27,7 @@ void ASoldier::BeginPlay()
 
 void ASoldier::AttackCombo()
 {
+    if (bIsOnCooldown) return;
     ComboCounter++;
     if (ComboCounter == 1)
     {
@@ -32,15 +37,24 @@ void ASoldier::AttackCombo()
     {
         PlayAnimMontage(Attack2, 1, NAME_None);
     }
-    else if (ComboCounter == 3)
+    else if (ComboCounter >= 3)
     {
         PlayAnimMontage(Attack3, 1, NAME_None);
+        bIsOnCooldown = true;
+        GetWorld()->GetTimerManager().SetTimer(ComboCooldownTimer, this, &ASoldier::EndComboCooldown, 3.0f, false);
+        ComboCounter = 0;
     }
-    GetWorld()->GetTimerManager().SetTimer(ComboRestTimer, this, &ASoldier::ResetCombo, 2.0f, false);
+
+    GetWorld()->GetTimerManager().ClearTimer(ComboResetTimer);
+
+    GetWorld()->GetTimerManager().SetTimer(ComboResetTimer, this, &ASoldier::ResetCombo, 2.0f, false);
+
+    bIsAttacking = true;
 }
 void ASoldier::ResetCombo()
 {
     ComboCounter = 0;
+    bIsAttacking = false;
 }
 void ASoldier::Tick(float DeltaTime)
 {
@@ -50,9 +64,10 @@ void ASoldier::Tick(float DeltaTime)
         FVector PlayerLocation = PlayerCharacter->GetActorLocation();
         FVector EnemyLocation = GetActorLocation();
         float DistanceOnY = FMath::Abs(PlayerLocation.Y - EnemyLocation.Y);
-        if(DistanceOnY <= 200.0f)
+        if(DistanceOnY <= 200.0f && GetWorld()->GetTimeSeconds() - LastAttackTime >= AttackCooldown)
         {
             AttackCombo();
+            LastAttackTime = GetWorld()->GetTimeSeconds();
         }
     }
     PlayerCharacter = Cast<ACharacter>(GetPlayer());
@@ -63,7 +78,7 @@ void ASoldier::Tick(float DeltaTime)
     FVector SnappedDirection;
     FVector MoveVector;
 
-    if (Health > 0)
+    if (Health > 0 && bIsAttacking == false)
     {
         if (CurrentDistance > DesiredDistance)
         {
@@ -118,5 +133,15 @@ float ASoldier::GetDistanceToPlayer() const
     FVector LancerLocation = GetActorLocation();
     return FVector::Distance(PlayerLocation, LancerLocation);
 }
+
+
+void ASoldier::EndComboCooldown()
+{
+    bIsOnCooldown = false;
+   
+}
+
+
+
 
 

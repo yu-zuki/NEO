@@ -9,10 +9,12 @@
 #include "Components/WidgetComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/BoxComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Camera/CameraComponent.h"
 #include "NEO/GameSystem/EnemyBase_WidgetComponent.h"
 #include "NEO/PlayerSystem/ActionAssistComponent.h"
+#include "NEO/PlayerSystem/PlayerBase.h"
 
 
 // Sets default values
@@ -20,14 +22,22 @@ AEnamyBase::AEnamyBase()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
+    
 	//UI Create
 	EnemyWidget = CreateDefaultSubobject<UEnemyBase_WidgetComponent>(TEXT("EnemyWidget"));
 	EnemyWidget->SetupAttachment(RootComponent);
     bIsDeath = false;
-   
+    DamageCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("DamageCollision"));
+    if (DamageCollision)  
+    {
+        DamageCollision->SetupAttachment(GetMesh(), TEXT("FX_weapon_base"));
+        DamageCollision->OnComponentBeginOverlap.AddDynamic(this, &AEnamyBase::OnOverlapBegin);
+        
+    }
     // アタックアシストコンポーネント作成
     ActionAssistComp = CreateDefaultSubobject<UActionAssistComponent>(TEXT("AttackAssist"));
+    Damage = 5.0f;
+    DamageCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 void AEnamyBase::DestoryEnemy()
@@ -38,6 +48,10 @@ void AEnamyBase::DestoryEnemy()
 		GameMode->DestroyEnemy(this,IsAreaEnemy);
         
 	}
+    if (DamageCollision && GetMesh())
+    {
+        DamageCollision->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, TEXT("FX_weapon_base"));
+    }
 }
 
 // Called when the game starts or when spawned
@@ -51,6 +65,13 @@ void AEnamyBase::BeginPlay()
     {
         AnimInstance = GetMesh()->GetAnimInstance();
     }
+    /*TArray<AActor*> FoundPlayers;
+    UGameplayStatics::GetAllActorsWithTag(GetWorld(), TEXT("Player"), FoundPlayers);
+
+    if (FoundPlayers.Num() > 0)
+    {
+        PlayerCharacter = Cast<ACharacter>(FoundPlayers[0]);
+    }*/
 }
 
 AActor* AEnamyBase::GetPlayer()
@@ -116,7 +137,17 @@ void AEnamyBase::Tick(float DeltaTime)
                 }
             }
         }
-       
+        if (DamageCollision && GetMesh())
+        {
+            if (IsAnimationAttacking())
+            {
+                DamageCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+            }
+            else
+            {
+                DamageCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+            }
+        }
         CheckHealth();
 }
 
@@ -155,6 +186,7 @@ void AEnamyBase::ApplyDamage(float DamageAmount)
         ActionAssistComp->SpawnHitEffect(NiagaraEffect, GetActorLocation());
        
     }
+   
 
 }
 void AEnamyBase::MaintainDistanceFromEnemy()
@@ -206,6 +238,20 @@ void AEnamyBase::SpawnDeathTrigger()
     }
 }
 
+bool AEnamyBase::IsAnimationAttacking() const
+{
+    UAnimInstance* AnimAttack = GetMesh() ? GetMesh()->GetAnimInstance() : nullptr; 
+    if (AnimAttack)
+    {
+        if (AnimAttack->Montage_IsPlaying(Attack) || AnimAttack->Montage_IsPlaying(Attack2) || AnimAttack->Montage_IsPlaying(Attack3))
+        {
+
+            return true;
+        }
+    }
+    return false;
+}
+
 AActor* AEnamyBase::GetEnemyActor() const
 {
     for (TActorIterator<AActor> It(GetWorld()); It; ++It)
@@ -219,6 +265,18 @@ AActor* AEnamyBase::GetEnemyActor() const
     return nullptr; // Enemyタグを持つアクターが見つからない場合
 }
 
+void AEnamyBase::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
 
+    if (Health > 0 && OtherActor == PlayerCharacter && PlayerCharacter)
+    {
+        APlayerBase* CastedPlayer = Cast<APlayerBase>(PlayerCharacter);
+        if (CastedPlayer)
+        {
+            // Apply damage to the player
+            CastedPlayer->TakedDamage(Damage);
+        }
+    }
+}
 
 
