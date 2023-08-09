@@ -6,9 +6,6 @@
 #include "Animation/AnimInstance.h"
 #include "CharacterAnimInstance.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class NEO_API UCharacterAnimInstance : public UAnimInstance
 {
