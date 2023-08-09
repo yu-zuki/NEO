@@ -137,7 +137,7 @@ void AEnamyBase::Tick(float DeltaTime)
                 }
             }
         }
-        if (DamageCollision && GetMesh())
+       /* if (DamageCollision && GetMesh())
         {
             if (IsAnimationAttacking())
             {
@@ -147,10 +147,30 @@ void AEnamyBase::Tick(float DeltaTime)
             {
                 DamageCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
             }
-        }
+        }*/
+        
         CheckHealth();
 }
 
+void AEnamyBase::CheckCollisonOn()
+{
+ if (DamageCollision && GetMesh())
+        {
+            
+                DamageCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+            
+            
+        }
+}
+void AEnamyBase::CheckCollisonOff()
+{
+    if (DamageCollision && GetMesh())
+        {
+
+        DamageCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+        }
+}
 // Called to bind functionality to input
 void AEnamyBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {

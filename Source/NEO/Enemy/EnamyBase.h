@@ -93,6 +93,10 @@ public:
 
 	void SpawnDeathTrigger();
 
+	void CheckCollisonOn();
+
+	void CheckCollisonOff();
+
 	bool bIsShoot = false;
 
 	float GetHP() { return Health; }
