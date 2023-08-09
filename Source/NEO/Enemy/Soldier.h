@@ -33,12 +33,16 @@ public:
 
 private:
     int32 ComboCounter;
-    FTimerHandle ComboRestTimer;
+    FTimerHandle ComboResetTimer;
     void ResetCombo();
     FVector GetPlayerDirection() const;
     float GetDistanceToPlayer() const;
-      
-
+    float AttackCooldown;
+    float LastAttackTime;
+    bool bIsAttacking;
+    bool bIsOnCooldown;
+    FTimerHandle ComboCooldownTimer;
+    void EndComboCooldown();
 };
 
     

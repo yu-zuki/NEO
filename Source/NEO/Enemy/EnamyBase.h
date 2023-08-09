@@ -39,11 +39,17 @@ public:
 	virtual void DestoryEnemy();
 	UPROPERTY()
 		class ACharacter* PlayerCharacter; // プレイヤーキャラクターの参照
+	UFUNCTION()
+		void OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	UPROPERTY(VisibleAnywhere, Category = "Collision")
+		class UBoxComponent* DamageCollision;
 	
 	// 攻撃のアシスト用コンポーネント
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = AttackAssist, meta = (AllowPrivateAccess = "true"))
 		class UActionAssistComponent* ActionAssistComp;
-
+	// Damage to be dealt to the player
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage")
+		float Damage;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -95,6 +101,8 @@ public:
 
 	bool bIsDeath;
 	
+	bool IsAnimationAttacking() const;
+
 	bool IsIdol() const { return bIsIdol; }
 	bool IsWalking() const { return bIsWalking; }
 	bool IsRunning ()const { return bIsRunning; }
@@ -117,4 +125,5 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
 		class UEnemyBase_WidgetComponent* EnemyWidget;
 	AActor* GetEnemyActor() const;
+
 };
