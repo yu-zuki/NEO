@@ -32,6 +32,9 @@ void UCharacterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
         // 移動スピード取得
         GroundSpeed = Velocity.Size();
 
+        // 
+        ShouldMove = (CharacterMovementComp->GetCurrentAcceleration() != FVector::ZeroVector) && (GroundSpeed > 3.f);
+        
         // 空中にいるかどうかを取得する
         IsFall = CharacterMovementComp->IsFalling();
     }
