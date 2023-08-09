@@ -86,17 +86,17 @@ void UActionAssistComponent::HitStop(float _stopTime)
 	// 機能のオン・オフ
 	if (!bUseHitStop) { return; }
 
-	//処理内容
+	// 処理内容
 	ACharacter* Character = Cast<ACharacter>(GetOwner());		//CharacterGet
 	if (Character == nullptr) {
 		UE_LOG(LogTemp, Error, TEXT("AttackAssitComponent: Character is nullptr"));
 		return;
 	}
 
-	//HitStopを開始
+	// HitStopを開始
 	Character->GetMesh()->GlobalAnimRateScale = SpeedDuringHitStop;
 
-	//HitStopを停止
+	// HitStopを停止
 	FTimerManager& TimerManager = GetWorld()->GetTimerManager();
 	TimerManager.SetTimer(TimerHandle_HitStop, this, &UActionAssistComponent::EndHitStop, _stopTime, false);
 }
