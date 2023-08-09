@@ -19,7 +19,7 @@
 
 // Sets default values
 AGameSystem_BattleArea::AGameSystem_BattleArea()
-	:NowBattleArea(false)
+	//:NowBattleArea(false)
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -256,7 +256,7 @@ void AGameSystem_BattleArea::BeginOverlap(UPrimitiveComponent* OverlappedCompone
 			StaticMeshComponent->DestroyComponent();	// コンポーネントを破壊
 
 			EnterBattleArea();
-			NowBattleArea = true;
+			//NowBattleArea = true;
 		}
 	}
 }

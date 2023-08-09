@@ -14,6 +14,7 @@
 
 ATGS_GameStateBase::ATGS_GameStateBase()
 	:ECurrentState(EGameState::EGame_None), EchangeLevel(EChangeLevel::EChangeLevel_None), ECurrentPlayerType(EPlayerType::EPlayerType_None)
+	,NowBattleArea(false)
 {
 
 }
@@ -302,6 +303,9 @@ void ATGS_GameStateBase::EnterBattleArea()
 	for (auto Mesh : BattleAreaMeshs)	{
 		if (Mesh)		{
 			Mesh->SetCollisionEnabled(ECollisionEnabled::QueryOnly);;
+			//-------------------コリジョンを有効化----------------------
+			NowBattleArea = true;
+
 		}
 		else {
 			UE_LOG(LogTemp, Warning, TEXT("MeshWall is not found"));
@@ -336,6 +340,9 @@ void ATGS_GameStateBase::ExitBattleArea()
 	for (auto Mesh : BattleAreaMeshs) {
 		if (Mesh) {
 			Mesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+			//-------------------コリジョンを無効か----------------------
+			NowBattleArea = false;
 		}
 		else {
 			UE_LOG(LogTemp, Warning, TEXT("MeshWall is not found"));

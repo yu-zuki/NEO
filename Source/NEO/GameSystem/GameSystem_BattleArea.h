@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "GameSystem_BattleArea.generated.h"
 
+class ATGS_GameMode;
+
 struct SFrustumVertices
 {
 	FVector TopLeftNear;
@@ -114,8 +116,6 @@ public:
 
 
 	//////////////////////////////////ï«ÇÃìñÇΩÇËîªíËÇê∂ê¨//////////////////////////////////////////////////
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Area)
-		bool NowBattleArea;
 
 
 };

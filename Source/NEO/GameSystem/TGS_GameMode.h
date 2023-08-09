@@ -131,8 +131,6 @@ protected:
 
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Area)
-		bool NowBattleArea;
 
 		
 };
