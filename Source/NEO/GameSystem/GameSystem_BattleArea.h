@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "GameSystem_BattleArea.generated.h"
 
+class ATGS_GameMode;
+
 struct SFrustumVertices
 {
 	FVector TopLeftNear;
@@ -111,5 +113,9 @@ public:
 
 	//SpawnActor‚ğæ“¾‚·‚é
 	void GetSpawnPoints();
+
+
+	//////////////////////////////////•Ç‚Ì“–‚½‚è”»’è‚ğ¶¬//////////////////////////////////////////////////
+
 
 };

@@ -128,5 +128,9 @@ protected:
 	class ATGS_GameStateBase* GetGameState();
 
 	ATGS_GameStateBase* GameState = nullptr;		//ƒLƒƒƒVƒ…[
+
+
+public:
+
 		
 };

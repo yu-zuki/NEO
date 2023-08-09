@@ -19,6 +19,7 @@
 
 // Sets default values
 AGameSystem_BattleArea::AGameSystem_BattleArea()
+	//:NowBattleArea(false)
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -130,14 +131,38 @@ SFrustumVertices AGameSystem_BattleArea::GetFrustumVertices(FMinimalViewInfo Cam
 	
 	//最適化してない
 	SFrustumVertices FrustumVertices;
-	FrustumVertices.BottomLeftNear = BottomLeftNear;
-	FrustumVertices.TopRightNear = TopRightNear;
-	FrustumVertices.BottomRightNear = BottomRightNear;
-	FrustumVertices.TopLeftNear = TopLeftNear;
-	FrustumVertices.BottomLeftFar = BottomLeftFar;
-	FrustumVertices.TopRightFar = TopRightFar;
-	FrustumVertices.BottomRightFar = BottomRightFar;
-	FrustumVertices.TopLeftFar = TopLeftFar;
+	//FrustumVertices.BottomLeftNear = BottomLeftNear;
+	//FrustumVertices.TopRightNear = TopRightNear;
+	//FrustumVertices.BottomRightNear = BottomRightNear;
+	//FrustumVertices.TopLeftNear = TopLeftNear;
+	//FrustumVertices.BottomLeftFar = BottomLeftFar;
+	//FrustumVertices.TopRightFar = TopRightFar;
+	//FrustumVertices.BottomRightFar = BottomRightFar;
+	//FrustumVertices.TopLeftFar = TopLeftFar;
+
+
+	//FrustumVertices.BottomLeftNear = TopLeftNear;
+	//FrustumVertices.BottomRightNear = TopRightNear;
+	//FrustumVertices.BottomLeftFar = TopLeftFar;
+	//FrustumVertices.BottomRightFar = TopRightFar;
+
+	//FrustumVertices.TopRightNear = TopRightNear;
+	//FrustumVertices.TopLeftNear = TopLeftNear;
+	//FrustumVertices.TopRightFar = TopRightFar;
+	//FrustumVertices.TopLeftFar = TopLeftFar;
+
+
+	//FrustumVertices.BottomLeftNear = TopLeftNear;
+	//FrustumVertices.BottomRightNear = TopRightNear;
+	//FrustumVertices.BottomLeftFar = TopLeftFar;
+	//FrustumVertices.BottomRightFar = TopRightFar;
+
+	//FrustumVertices.TopRightNear = TopRightNear;
+	//FrustumVertices.TopLeftNear = TopLeftNear;
+	//FrustumVertices.TopRightFar = TopRightFar;
+	//FrustumVertices.TopLeftFar = TopLeftFar;
+
+
 
 	return FrustumVertices;
 }
@@ -176,10 +201,16 @@ void AGameSystem_BattleArea::CreateAreaMesh(SFrustumVertices FrustumVertices)
 
 	//　右側の平面の頂点を追加
 	Vertices.Reset();
+	//Vertices.Add(FrustumVertices.BottomRightNear);
+	//Vertices.Add(FrustumVertices.TopRightNear);
+	//Vertices.Add(FrustumVertices.TopRightFar);
+	//Vertices.Add(FrustumVertices.BottomRightFar);
+
 	Vertices.Add(FrustumVertices.BottomRightNear);
 	Vertices.Add(FrustumVertices.TopRightNear);
 	Vertices.Add(FrustumVertices.TopRightFar);
 	Vertices.Add(FrustumVertices.BottomRightFar);
+
 
 	//
 	RightMesh->CreateMeshSection_LinearColor(0, Vertices, Triangles, TArray<FVector>(), TArray<FVector2D>(), TArray<FLinearColor>(), TArray<FProcMeshTangent>(), true);
@@ -204,11 +235,17 @@ void AGameSystem_BattleArea::CreateAreaMesh(SFrustumVertices FrustumVertices)
 	LeftMesh->SetVisibility(false);
 	RightMesh->SetVisibility(false);
 	NearMesh->SetVisibility(false);
+
+	//LeftMesh->SetVisibility(true);
+	//RightMesh->SetVisibility(true);
+	//NearMesh->SetVisibility(true);
+
 }
 
 void AGameSystem_BattleArea::AreaDebugDraw(SFrustumVertices FrustumVertices)
 {
 	//視錐台の頂点を描画する
+	
 }
 
 void AGameSystem_BattleArea::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -219,6 +256,7 @@ void AGameSystem_BattleArea::BeginOverlap(UPrimitiveComponent* OverlappedCompone
 			StaticMeshComponent->DestroyComponent();	// コンポーネントを破壊
 
 			EnterBattleArea();
+			//NowBattleArea = true;
 		}
 	}
 }
@@ -239,11 +277,13 @@ void AGameSystem_BattleArea::EnterBattleArea()
 		}
 
 		GameMode->SetIsOnBattleArea(bIsInBattleArea, SpawnPoints, this, LeftMesh, RightMesh, NearMesh);
+
 	}
 }
 
 void AGameSystem_BattleArea::ExitBattleArea()
 {
+
 }
 
 void AGameSystem_BattleArea::GetSpawnPoints()

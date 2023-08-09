@@ -135,6 +135,12 @@ protected:
 	//バトルエリアから出る
 	void ExitBattleArea();
 
+	//-----------------------------------コリジョンの当たり判定の切り替え--------------------------------------
+		UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Area)
+		bool NowBattleArea;
+
+
+
 	//バトルエリアの壁Actors
 	TArray<class AActor*> BattleAreaWalls;
 	//バトルエリアの壁Actorsのタグ

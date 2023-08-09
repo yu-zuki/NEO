@@ -8,6 +8,9 @@
 #include "NEO/GameSystem/InputCharacter.h"
 #include <unordered_map>
 #include <type_traits>
+#include "ActionAssistComponent.h"
+#include <Runtime/Engine/Classes/Components/CapsuleComponent.h>
+
 #include "PlayerBase.generated.h"
 
 // 前方宣言
@@ -225,9 +228,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Action")
 		void TakedDamage(float _damage);
 
-	// プレイヤーの移動方向を変更
-	void OnCurveMode(bool _curveMode) { CurveMode = _curveMode; }
-
 	//------------------プレイヤーのセットアップ---------------------------------------------------------------------------------------------------------
 	// プレイヤーのデータを初期化
 	virtual void SetupPlayerData();
@@ -334,9 +334,6 @@ private:
 
 	class APlayerSpline* SplineActor;				// プレイヤーが通るスプライン
 
-	float BeforePos_Y;
-	
-
 //////////////////////////////////////////////////////////////////////////
 ///UI
 public:
@@ -345,4 +342,5 @@ public:
 		float GetPlayerHPPercent()const { return PlayerStatus.HP / PlayerStatus.MaxHP; }
 
 	class UTGS_GameInstance* GetGameInstance();
+
 };

@@ -97,16 +97,17 @@ void ACharacterCamera::Tick(float DeltaTime)
 
 	}
 
-	ACharacter* tmp_PlayerInfo = GetPlayer();
-	if (!tmp_PlayerInfo) return;
+	//ACharacter* tmp_PlayerInfo = NULL;
+	//if (tmp_PlayerInfo) return;
+	//tmp_PlayerInfo = GetPlayer();
 
 	// プレイヤーの現在位置取得
-	FVector PlayerPos = tmp_PlayerInfo->GetActorLocation();
+	FVector PlayerPos = m_pPlayer->GetActorLocation();
 
 	// 現在座標を取得する
 	FVector nowpos = GetActorLocation();
 	FVector newpos = nowpos;
-
+	
 	// 新しい座標を算出する
 	newpos = FMath::VInterpTo(nowpos, PlayerPos, DeltaTime, m_defaultSpeed);
 
@@ -122,13 +123,13 @@ void ACharacterCamera::Tick(float DeltaTime)
 		//else if (PlayerPos.Y < GetActorLocation().Y - 480.0f)	//プレイヤーの方が左にいる場合
 		//	m_moveDistance = m_moveDistance - (m_defaultSpeed * DeltaTime);
 
-		////移動距離の更新
-		//if (PlayerPos.Y > GetActorLocation().Y - 520.0f && PlayerPos.Y < GetActorLocation().Y - 480.0f)
-		//	return;
-		//else if (PlayerPos.Y > GetActorLocation().Y - 520.0f)	//プレイヤーの方が右にいる場合
-		//	m_moveDistance = m_moveDistance + (m_defaultSpeed * DeltaTime);
-		//else if (PlayerPos.Y < GetActorLocation().Y - 480.0f)	//プレイヤーの方が左にいる場合
-		//	m_moveDistance = m_moveDistance - (m_defaultSpeed * DeltaTime);
+		//移動距離の更新
+		if (PlayerPos.Y > GetActorLocation().Y - 520.0f && PlayerPos.Y < GetActorLocation().Y - 480.0f)
+			return;
+		else if (PlayerPos.Y > GetActorLocation().Y - 520.0f)	//プレイヤーの方が右にいる場合
+			m_moveDistance = m_moveDistance + (m_defaultSpeed * DeltaTime);
+		else if (PlayerPos.Y < GetActorLocation().Y - 480.0f)	//プレイヤーの方が左にいる場合
+			m_moveDistance = m_moveDistance - (m_defaultSpeed * DeltaTime);
 
 		
 		
