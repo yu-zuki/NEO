@@ -9,10 +9,19 @@
 void UCharacterAnimNotify::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
 {
 	// 通知が来た時の処理
-	NotifyAction(MeshComp);
+	NotifyAction(GetOwnerActor(MeshComp));
 }
 
-void UCharacterAnimNotify::NotifyAction(USkeletalMeshComponent* MeshComp)
+AActor* UCharacterAnimNotify::GetOwnerActor(USkeletalMeshComponent* MeshComp)
+{
+	// プレイヤーのベースクラス取得
+	AActor* pOwner = Cast<AActor>(MeshComp->GetOwner());
+	if (!pOwner) { return nullptr; }
+
+	return pOwner;
+}
+
+void UCharacterAnimNotify::NotifyAction(AActor* _Owner)
 {
 	return;
 }

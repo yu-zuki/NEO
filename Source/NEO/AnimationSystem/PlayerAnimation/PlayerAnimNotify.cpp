@@ -7,10 +7,10 @@
 #include "Animation/AnimInstance.h"
 #include "NEO/PlayerSystem/PlayerBase.h"
 
-void UPlayerAnimNotify::NotifyAction(USkeletalMeshComponent* MeshComp)
+void UPlayerAnimNotify::NotifyAction(AActor* _Owner)
 {
     // プレイヤーのベースクラス取得
-    APlayerBase* pPlayer = Cast<APlayerBase>(MeshComp->GetOwner());
+    APlayerBase* pPlayer = Cast<APlayerBase>(_Owner);
 
 
     if (pPlayer)

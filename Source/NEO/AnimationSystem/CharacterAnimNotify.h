@@ -21,6 +21,8 @@ public:
 
 
 protected:
-    virtual void NotifyAction(USkeletalMeshComponent* MeshComp);
+
+    AActor* GetOwnerActor(USkeletalMeshComponent* MeshComp);
+    virtual void NotifyAction(AActor* _Owner);
 };
 

@@ -19,7 +19,7 @@ public:
 
 protected:
 
-    virtual void NotifyAction(USkeletalMeshComponent* MeshComp);
+    virtual void NotifyAction(AActor* _Owner);
 };
 
 
