@@ -8,8 +8,13 @@
 
 void UCharacterAnimNotify::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
 {
+	// オーナー取得
+	AActor* OwnerActor = GetOwnerActor(MeshComp);
+	if (!OwnerActor) { return; }
+
+
 	// 通知が来た時の処理
-	NotifyAction(GetOwnerActor(MeshComp));
+	NotifyAction(OwnerActor);
 }
 
 AActor* UCharacterAnimNotify::GetOwnerActor(USkeletalMeshComponent* MeshComp)
@@ -19,9 +24,4 @@ AActor* UCharacterAnimNotify::GetOwnerActor(USkeletalMeshComponent* MeshComp)
 	if (!pOwner) { return nullptr; }
 
 	return pOwner;
-}
-
-void UCharacterAnimNotify::NotifyAction(AActor* _Owner)
-{
-	return;
 }

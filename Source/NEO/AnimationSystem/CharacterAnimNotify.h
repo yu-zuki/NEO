@@ -16,13 +16,18 @@ public:
 
     virtual void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation) override;
 
-    // このクラスはエディタに出さない
+    // 通知をエディタに公開するかどうか
     virtual bool CanBePlaced(UAnimSequenceBase* Animation) const { return false; }
 
 
 protected:
 
+    // 通知が来た時に行う処理(派生先のクラスでオーバーライド)
+    virtual void NotifyAction(AActor* _Owner) { return; }
+
+private:
+
+    // オーナーのアクターを取得
     AActor* GetOwnerActor(USkeletalMeshComponent* MeshComp);
-    virtual void NotifyAction(AActor* _Owner);
 };
 

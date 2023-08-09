@@ -7,6 +7,7 @@
 #include "Animation/AnimInstance.h"
 #include "NEO/PlayerSystem/PlayerBase.h"
 
+
 void UPlayerAnimNotify::NotifyAction(AActor* _Owner)
 {
     // プレイヤーのベースクラス取得
@@ -18,23 +19,28 @@ void UPlayerAnimNotify::NotifyAction(AActor* _Owner)
         // ブランチの名前取得
         FString NotifyName = GetNotifyName_Implementation();
 
+        // コンボ継続の通知が来た時
         if (NotifyName == "SaveCombo")
         {
             pPlayer->ContinuationCombo();
         }
+        // コンボリセットの通知が来た時
         else if (NotifyName == "ResetCombo")
         {
             pPlayer->ResetCombo();
         }
+        // コントロール可能になる通知が来た時
         else if (NotifyName == "CanControl")
         {
             pPlayer->SetControl(true);
         }
+        // アニメーションを遅くする通知が来た時
         else if (NotifyName == "SlowDown")
         {
             pPlayer->SlowDownDeathAnimationRate();
         }
-        else if (NotifyName == "Collision")
+        // 当たり判定開始の処理が来た時
+        else if (NotifyName == "SetCollision")
         {
             pPlayer->SetCollision();
         }

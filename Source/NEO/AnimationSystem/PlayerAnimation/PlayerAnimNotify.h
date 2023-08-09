@@ -15,6 +15,7 @@ class NEO_API UPlayerAnimNotify : public UCharacterAnimNotify
 
 public:
 
+    // 通知をエディタに公開するかどうか
     virtual bool CanBePlaced(UAnimSequenceBase* Animation) const { return false; }
 
 protected:
@@ -23,21 +24,27 @@ protected:
 };
 
 
+//--------当たり判定通知-----------------------------
 UCLASS()
-class NEO_API UCollision : public UPlayerAnimNotify
+class NEO_API USetCollision : public UPlayerAnimNotify
 {
     GENERATED_BODY()
 
 
 public:
 
+    // 通知をエディタに公開するかどうか
     virtual bool CanBePlaced(UAnimSequenceBase* Animation) const
     {
-        return true;
+        // モンタージュのエディタでのみ公開
+        if (Animation->IsA(UAnimMontage::StaticClass())) { return true; }
+
+        return false;
     }
 };
 
 
+//--------コンボ継続通知------------------------------
 UCLASS()
 class NEO_API USaveCombo : public UPlayerAnimNotify
 {
@@ -46,12 +53,18 @@ class NEO_API USaveCombo : public UPlayerAnimNotify
 
 public:
 
+    // 通知をエディタに公開するかどうか
     virtual bool CanBePlaced(UAnimSequenceBase* Animation) const
     {
-        return true;
+        // モンタージュのエディタでのみ公開
+        if (Animation->IsA(UAnimMontage::StaticClass())) { return true; }
+
+        return false;
     }
 };
 
+
+//--------コンボ終了通知------------------------------
 UCLASS()
 class NEO_API UResetCombo : public UPlayerAnimNotify
 {
@@ -60,12 +73,18 @@ class NEO_API UResetCombo : public UPlayerAnimNotify
 
 public:
 
+    // 通知をエディタに公開するかどうか
     virtual bool CanBePlaced(UAnimSequenceBase* Animation) const
     {
-        return true;
+        // モンタージュのエディタでのみ公開
+        if (Animation->IsA(UAnimMontage::StaticClass())) { return true; }
+
+        return false;
     }
 };
 
+
+//--------操作可能になる通知------------------------------
 UCLASS()
 class NEO_API UCanControl : public UPlayerAnimNotify
 {
@@ -74,12 +93,17 @@ class NEO_API UCanControl : public UPlayerAnimNotify
 
 public:
 
+    // 通知をエディタに公開するかどうか
     virtual bool CanBePlaced(UAnimSequenceBase* Animation) const
     {
-        return true;
+        // モンタージュのエディタでのみ公開
+        if (Animation->IsA(UAnimMontage::StaticClass())) { return true; }
+
+        return false;
     }
 };
 
+//--------アニメーションを遅くする通知----------------------
 UCLASS()
 class NEO_API USlowDown : public UPlayerAnimNotify
 {
@@ -88,8 +112,12 @@ class NEO_API USlowDown : public UPlayerAnimNotify
 
 public:
 
+    // 通知をエディタに公開するかどうか
     virtual bool CanBePlaced(UAnimSequenceBase* Animation) const
     {
-        return true;
+        // モンタージュのエディタでのみ公開
+        if (Animation->IsA(UAnimMontage::StaticClass())) { return true; }
+
+        return false;
     }
 };

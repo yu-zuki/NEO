@@ -160,6 +160,8 @@ void AEnamyBase::CheckCollisonOff()
 
 	}
 }
+        }
+}
 // Called to bind functionality to input
 void AEnamyBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
