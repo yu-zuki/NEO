@@ -648,17 +648,6 @@ void APlayerBase::ResetCombo()
 }
 
 /*
- * 関数名　　　　：SetCollision()
- * 処理内容　　　：プレイヤーのコリジョン判定(オーバーライド用)
- * 戻り値　　　　：なし
- */
-void APlayerBase::SetCollision()
-{
-	return;
-}
-
-
-/*
  * 関数名　　　　：TakedDamage()
  * 処理内容　　　：プレイヤーの被ダメージ処理
  * 引数１　　　　：float _damage・・・被ダメージ量

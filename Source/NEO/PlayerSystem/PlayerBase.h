@@ -168,33 +168,25 @@ public:
 
 public:
 
-	//-----------------AnimBPで呼び出し(攻撃や被ダメージ処理)--------------------------------------------------------------------------------------------
+	//-----------------AnimNotifyで呼び出し(攻撃や被ダメージ処理)--------------------------------------------------------------------------------------------
 	// コンボ継続
-	UFUNCTION(BlueprintCallable, Category = "Action")
-		void ContinuationCombo();
+	void ContinuationCombo();
 
 	// コンボリセット
-	UFUNCTION(BlueprintCallable, Category = "Action")
-		void ResetCombo();
+	void ResetCombo();
 
-	UFUNCTION(BlueprintCallable, Category = "Action")
-		int GetComboIndex()const { return ComboIndex; }
+	int GetComboIndex()const { return ComboIndex; }
 
 	// ダメージを与える処理
-	UFUNCTION(BlueprintCallable, Category = "Action")
-		virtual void SetCollision();
+	virtual void SetCollision() { return; }
 
-
-	UFUNCTION(BlueprintCallable, Category = "Action")
-		void SetControl(bool _isControl) { IsControl = _isControl; }
+	void SetControl(bool _isControl) { IsControl = _isControl; }
 
 	// 死亡時のアニメーションの再生を遅くする
-	UFUNCTION(BlueprintCallable, Category = "Action")
-		void SlowDownDeathAnimationRate();
+	void SlowDownDeathAnimationRate();
 
 	// ダメージ量を返す関数
-	UFUNCTION(BlueprintCallable, Category = "GetStatus")
-		float GetDamageAmount()const { return PlayerStatus.DamageAmount * (((float)ComboIndex + 1.f) * PlayerStatus.ComboDamageFactor); }
+	float GetDamageAmount()const { return PlayerStatus.DamageAmount * (((float)ComboIndex + 1.f) * PlayerStatus.ComboDamageFactor); }
 
 	// 現在のHPを返す
 	UFUNCTION(BlueprintCallable, Category = "GetStatus")
