@@ -14,11 +14,11 @@ AOdaBase::AOdaBase() :
 	FlameCounter(0),
 	WaitTime(0),
 	OdaMoveEnum(ECPPOdaEnum::Stay1),
-	OdaSpeed(1.f),
 	Attack1Delay(0),
-	RandomNum(-1),
+	RandomNum(-1),	
+	OdaSpeed(1.f),
 	OneMoreShockWave(false),
-	ChangeFlontTimer(20),
+	ChangeFlontTimer(200),
 	isMotionPlaying(false),
 	isShockWaveSpawnTiming(false),
 	isUltShotTiming(false),
@@ -26,7 +26,11 @@ AOdaBase::AOdaBase() :
 	UltTimer(550),
 	isNotAttackNow(false),
 	NotAttackCount(0),
-	SwordDamage(10),
+	Attack1WaitTimer(0),
+	Attack1WaitingTime(60),
+	SwordFirstDamage(5),
+	SwordAddDamage(5),
+	HoldDamageAdd(0),
 	bIsAttacked(false),
 	Health(600.f),
 	MaxHealth(600.f)
@@ -99,10 +103,12 @@ void AOdaBase::Tick(float DeltaTime)
 		BossPosY = FVector(0.f, GetActorLocation().Y, 0.f);
 		PlayerPosY = FVector(0.f, Player->GetActorLocation().Y, 0.f);
 
-		//UKismetSystemLibrary::PrintString(this, FString::SanitizeFloat(FVector::Dist(BossPosY, PlayerPosY)), true, true, FColor::Cyan, 2.f, TEXT("None"));
-
 		//カウンター起動
 		WaitTime++;
+		if (isAttack1Waiting)
+		{
+			Attack1Wait();
+		}
 
 		if (Health < MaxHealth / 2.f)
 		{
@@ -123,12 +129,20 @@ void AOdaBase::Tick(float DeltaTime)
 
 			//攻撃１
 		case ECPPOdaEnum::Attack1:
-			OdaAttack1(WaitTime);
+			if (Attack1WaitTimer % Attack1WaitingTime == 0)
+			{
+				OdaAttack1(WaitTime);
+			}
+			else if (WaitTime % Attack1WaitingTime == 0)
+			{
+				OdaAttack1(WaitTime);
+			}
 			break;
 
 			//攻撃２
 		case ECPPOdaEnum::Attack2:
 			OdaAttack2(WaitTime);
+
 			break;
 
 			//必殺技
@@ -177,31 +191,20 @@ void AOdaBase::ToPlayerRotate()
 	ActionAssistComp->OwnerParallelToCamera(LookRight);
 }
 
+//近接攻撃をした後待機するカウンターを起動
+void AOdaBase::Attack1Wait()
+{
+	Attack1WaitTimer++;
+}
+
 //待機関数
 void AOdaBase::OdaStay1(int Timer)
 {
-	//UKismetSystemLibrary::PrintString(this, "Stay", true, true, FColor::Cyan, 2.f, TEXT("None"));
-
 	//モーションを流す状態かどうか(isMotionPlayingをtrueにする)
 	if (isMotionPlaying != true)
 	{
 		isMotionPlaying = true;
 	}
-	//攻撃選択処理----------------------------------------------------------------------------------------------------------------------------------------------
-
-	////もう一度遠距離攻撃が選択されたら
-	//if (OneMoreShockWave)
-	//{
-	//	//遠距離攻撃
-	//	OdaMoveEnum = ECPPOdaEnum::Attack2;
-	//	WaitTime = 0;
-	//	//random固定のリセット
-	//	if (RandomNum != -1)
-	//	{
-	//		RandomNum = -1;
-	//	}
-
-	//}
 
 	else if (FVector::Dist(BossPosX, PlayerPosX) <= 50.f)
 	{
@@ -276,6 +279,11 @@ void AOdaBase::OdaStay1(int Timer)
 
 void AOdaBase::OdaMove1(int DeltaTime, int StopTimer)
 {
+	if (isAttack1Waiting)
+	{
+		isAttack1Waiting = false;
+	}
+
 	//軸を合わせに行く
 	//randomの中に値が入っているか(-1が入っていない状態)
 	if (RandomNum == -1)
@@ -321,8 +329,8 @@ void AOdaBase::OdaAttack1(int Timer) {
 		}
 	}
 
-	//150フレームたったら
-	if (Timer % 150 == 0)
+	//300フレームたったら
+	if (Timer % 100 == 0)
 	{
 		//ステートを切り替える
 		OdaMoveEnum = ECPPOdaEnum::Stay1;
@@ -418,8 +426,17 @@ void AOdaBase::OdaUlt(int Timer)
 		//一度だけ流したいのでフラグを切り替える
 		isMotionPlaying = false;
 	}
-	//アニメーションの最後に必殺技を出したいのでNotifyを使って制御する(UltSpawnFlagChangeにて変数の中身を変更)
 
+	//衝撃波を出したいのでNotifyを使って制御する(ShockWaveSpawnFlagChangeにて変数の中身を変更)
+	if (isShockWaveSpawnTiming == true)
+	{
+		//アクターのスポーン処理(ShockWaveSpawnはブループリント上で設定)
+		GetWorld()->SpawnActor<AActor>(ShockWaveSpawn, GetActorTransform());
+		//一度だけスポーンさせたいので切り替えておく
+		isShockWaveSpawnTiming = false;
+	}
+
+	//アニメーションの最後に必殺技を出したいのでNotifyを使って制御する(UltSpawnFlagChangeにて変数の中身を変更)
 	if (isUltSpawnTiming == true)
 	{
 		//アクターのスポーン処理(UltSpawnはブループリント上で設定)
@@ -431,7 +448,7 @@ void AOdaBase::OdaUlt(int Timer)
 
 
 	//200フレームたったら
-	if (Timer % 200 == 0)
+	if (Timer % 400 == 0)
 	{
 		//ステートを切り替える
 		OdaMoveEnum = ECPPOdaEnum::Stay1;
@@ -549,6 +566,63 @@ void AOdaBase::toPlayerAttacked()
 	}
 }
 
+void AOdaBase::Is1Combo()
+{
+	if (!bIsAttacked || Combo1Counter >= 3)
+	{
+		//アニメーションを止める
+		GetMesh()->GetAnimInstance()->StopSlotAnimation();
+		//変数をリセット
+		isAttack1Waiting = true;
+		Combo1Counter = 0;
+		HoldDamageAdd = 0;
+	}
+	else
+	{
+		Combo1Counter++;
+	}
+}
+void AOdaBase::Is2Combo()
+{
+	if (Combo2Counter == 0)
+	{
+		//HPが2/3以下じゃなかったら以下の処理
+		if (Health > MaxHealth * (2.f / 3.f))
+		{
+			//アニメーションを止める
+			GetMesh()->GetAnimInstance()->StopSlotAnimation();
+			//変数をリセット
+			Combo2Counter = 0;
+
+		}
+		else
+		{
+			Combo2Counter++;
+		}
+	}
+	else if (Combo2Counter == 1)
+	{
+		//HPが1/3以下じゃなかったら以下の処理
+		if (Health > MaxHealth * (1.f / 3.f))
+		{
+			//アニメーションを止める
+			GetMesh()->GetAnimInstance()->StopSlotAnimation();
+			//変数をリセット
+			Combo2Counter = 0;
+		}
+		else
+		{
+			Combo2Counter++;
+		}
+	}
+	else if (Combo2Counter)
+	{
+		//変数をリセット
+		Combo2Counter = 0;
+
+	}
+}
+
 
 void AOdaBase::Death()
 {
@@ -597,7 +671,21 @@ void AOdaBase::PlayerOnOverlap(FHitResult& _HitResult)
 			return;
 		}
 
-		Player->TakedDamage(SwordDamage);						//プレイヤーにダメージを与える
+
+
+		if (Combo1Counter == 0)
+		{
+			Player->TakedDamage(SwordFirstDamage);						//プレイヤーにダメージを与える
+		}
+		else
+		{		
+			//倍率を加算していく
+			HoldDamageAdd += FMath::RandRange(1, int(SwordAddDamage*2/3));
+
+			UKismetSystemLibrary::PrintString(this, FString::FromInt(SwordFirstDamage + (SwordAddDamage + HoldDamageAdd)), true, true, FColor::Cyan, 2.f, TEXT("None"));
+
+			Player->TakedDamage(SwordFirstDamage + (SwordAddDamage + HoldDamageAdd));						//プレイヤーにダメージを与える(後半の処理はコンボ時の追加ダメージ)
+		}
 		ActionAssistComp->HitStop(.2f);
 
 		//リセット

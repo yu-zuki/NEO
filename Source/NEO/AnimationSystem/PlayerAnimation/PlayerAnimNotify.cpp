@@ -8,11 +8,36 @@
 #include "NEO/PlayerSystem/PlayerBase.h"
 
 
-void UPlayerAnimNotify::NotifyAction(AActor* _Owner)
+/*
+ * 関数名　　　　：CanBePlaced()
+ * 処理内容　　　：エディタ上に公開するかどうか
+ * 引数１　　　　：UAnimSequenceBase* Animation・・・再生するアニメーション
+ * 戻り値　　　　：true・falseで公開判定
+ */
+bool UPlayerAnimNotify::CanBePlaced(UAnimSequenceBase* Animation) const
+{
+    // モンタージュのみに公開
+    if (Animation->IsA(UAnimMontage::StaticClass()))
+    {
+        return true;
+    }
+
+
+    return false;
+}
+
+
+/*
+ * 関数名　　　　：NotifyAction()
+ * 処理内容　　　：通知時に行う処理
+ * 引数１　　　　：AActor* _Owner・・・オーナー
+ * 引数２　　　　：UAnimSequenceBase* Animation・・・再生するアニメーション
+ * 戻り値　　　　：なし
+ */
+void UPlayerAnimNotify::NotifyAction(AActor* _Owner, UAnimSequenceBase* Animation)
 {
     // プレイヤーのベースクラス取得
     APlayerBase* pPlayer = Cast<APlayerBase>(_Owner);
-
 
     if (pPlayer)
     {      

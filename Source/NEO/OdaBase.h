@@ -34,6 +34,64 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	//関数-------------------------------------------------------------------------------------------------------------------
+
+	//ボスのステートでの処理----------------
+	void OdaStay1(int Timer);
+
+	void OdaAttack1(int Timer);
+
+	void OdaAttack2(int Timer);
+
+	void OdaUlt(int Timer);
+	//------------------------------------
+
+	//ボスの動きの処理
+	void OdaMove1(int DeltaTime, int StopTimer);
+
+
+	//スポーン時処理--------------------------------------------------------------------------
+	//スポーン中の止まるときか
+	UPROPERTY()
+		bool SpawnDelay;
+
+	//スポーン中止まる時間
+	UPROPERTY()
+		int SpawnTimer;
+	//----------------------------------------------------------------------------------------
+
+	//カウンター------------------------------------------------------------
+	//時間の取得
+	int FlameCounter;
+
+	//int型のカウンター
+	int WaitTime;
+	//---------------------------------------------------------------------
+	
+	//ボスとプレイヤーとの距離----------------------------
+	//X軸
+	//ボス
+	FVector BossPosX;
+	//プレイヤー
+	FVector PlayerPosX;
+	//Y軸
+	//ボス
+	FVector BossPosY;
+	//プレイヤー
+	FVector PlayerPosY;
+	//---------------------------------------------------
+	
+	//列挙型
+	ECPPOdaEnum OdaMoveEnum;
+
+	//近接攻撃が早すぎてプレイヤーがよけれないので少し遅延させる
+	UPROPERTY()
+		int Attack1Delay;
+
+	//randomの値を入れる為の変数
+	UPROPERTY()
+		int RandomNum;
+
 public:	
 
 	// Called every frame
@@ -63,15 +121,6 @@ public:
 		class UActionAssistComponent* ActionAssistComp;
 	//--------------------------------------------------------------------------------------------------------------------
 
-	//スポーン時処理--------------------------------------------------------------------------
-	//スポーン中の止まるときか
-	UPROPERTY()
-		bool SpawnDelay;
-	
-	//スポーン中止まる時間
-	UPROPERTY()
-		int SpawnTimer;
-	//----------------------------------------------------------------------------------------
 
 	//ダメージ処理-----------------------------------------------------
 	UFUNCTION()
@@ -82,40 +131,8 @@ public:
 		TSubclassOf < class UDamageType > DamageTypeClass;
 	//----------------------------------------------------------------
 
-	//カウンター------------------------------------------------------------
-	//時間の取得
-	int FlameCounter;
-
-	//int型のカウンター
-	int WaitTime;
-	//---------------------------------------------------------------------
 	
-	//列挙型
-	ECPPOdaEnum OdaMoveEnum;
 
-	//ボスとプレイヤーとの距離----------------------------
-	//X軸
-	//ボス
-	FVector BossPosX;
-	//プレイヤー
-	FVector PlayerPosX;
-	//Y軸
-	//ボス
-	FVector BossPosY;
-	//プレイヤー
-	FVector PlayerPosY;
-	//---------------------------------------------------
-
-
-	//ボスのステートでの処理----------------
-	void OdaStay1(int Timer);
-
-	void OdaAttack1(int Timer);
-
-	void OdaAttack2(int Timer);
-
-	void OdaUlt(int Timer);
-	//------------------------------------
 
 	//速度----------------------------------
 	//通常の移動速度
@@ -123,16 +140,9 @@ public:
 		float OdaSpeed;
 	//--------------------------------------
 
-	//近接攻撃が早すぎてプレイヤーがよけれないので少し遅延させる
-	UPROPERTY()
-	int Attack1Delay;
 
-	//ボスの動きの処理
-	void OdaMove1(int DeltaTime, int StopTimer);
 
-	UPROPERTY()
-		int RandomNum;
-
+	//衝撃波-----------------------------------------------------------------------------
 	//もう一回衝撃波を出すための変数
 	UPROPERTY()
 		bool OneMoreShockWave;
@@ -155,6 +165,7 @@ public:
 	//衝撃波を出現させる為の変数
 	UPROPERTY(EditAnywhere)
 		TSubclassOf<AActor>ShockWaveSpawn;
+	//-----------------------------------------------------------------------------------
 
 	//必殺技---------------------------------------------------------------------------
 	//必殺技の出現タイミングの調整
@@ -180,6 +191,8 @@ public:
 	//必殺技をもう一回打つためのカウンター
 	UPROPERTY()
 		int UltTimer;
+
+	//------------------------------------------------------------------------------
 
 	//攻撃のフラグ
 	UPROPERTY(BlueprintReadOnly)
@@ -213,6 +226,41 @@ public:
 	UFUNCTION()
 		void ToPlayerRotate();
 
+	//近距離攻撃のコンボ
+	UFUNCTION()
+	void Is1Combo();
+
+	//遠距離攻撃のコンボ
+	UFUNCTION()
+		void Is2Combo();
+
+	//コンボしたかどうかで待機時間が変わるのでタイマーを用意
+	UPROPERTY()
+		int Attack1WaitTimer;
+
+	//近接の待機時間
+	UPROPERTY(EditAnywhere)
+		int Attack1WaitingTime;
+
+	//待機するかどうか
+	bool isAttack1Waiting;
+
+	//待機するための関数
+	UFUNCTION()
+		void Attack1Wait();
+
+	//近接コンボが何段目か
+	UPROPERTY()
+		int Combo1Counter;
+
+	//遠距離コンボが何段目か
+	UPROPERTY()
+		int Combo2Counter;
+
+	//ダメージ加算した値を保存しておく変数
+	float HoldDamageAdd;
+
+	//モーション--------------------------------------------------------------------------------------------------
 	//のけぞるモーション
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AniMontage", meta = (AllowPrivateAccess = "true"))
 		class UAnimMontage* AnimMontage_BossKnockMontage;		//メモ：変数を作る際AnimMontage_は必須らしい
@@ -232,7 +280,7 @@ public:
 	//ふっとぶモーション
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AniMontage", meta = (AllowPrivateAccess = "true"))
 		class UAnimMontage* AnimMontage_BossBlowAway;
-
+	//-------------------------------------------------------------------------------------------------------------
 
 	//ノックバックしてふっとぶ関数
 	UFUNCTION()
@@ -244,12 +292,17 @@ public:
 
 	//ダメージ値
 	UPROPERTY(EditAnywhere, Category = "Damage")
-		float SwordDamage;
+		float SwordFirstDamage;
+
+	UPROPERTY(EditAnywhere, Category = "Damage")
+		float SwordAddDamage;
+
 
 	//ボックスコンポーネントのオーバーラップ処理
 	UFUNCTION()
 		void CheckOverlap();
 
+	//プレイヤー----------------------------------------------------------------------
 	//プレイヤーに当たったら
 	UFUNCTION()
 		void PlayerOnOverlap(FHitResult& _HitResult);
@@ -261,6 +314,8 @@ public:
 	//プレイヤーに対してのHPロックするための関数
 	UFUNCTION()
 		void toPlayerAttacked();
+	//-----------------------------------------------------------------------------------
+
 
 //////////////////////////////////////////////////////////////////////////
 //死亡処理

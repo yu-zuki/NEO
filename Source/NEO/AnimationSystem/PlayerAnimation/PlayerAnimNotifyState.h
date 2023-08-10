@@ -4,28 +4,27 @@
 
 #include "CoreMinimal.h"
 #include "NEO/AnimationSystem/CharacterAnimNotifyState.h"
-#include "EnemyAnimNotifyState.generated.h"
+#include "PlayerAnimNotifyState.generated.h"
 
 
 UENUM(BlueprintType)
-enum class EEnemyNotifyType2 :uint8
+enum class EPlayerNotifyStateType :uint8
 {
-    NotifyType1 UMETA(DisplayName = "SwitchEnemyCollision"),
-    NotifyType2 UMETA(DisplayName = "SpawnEffect"),
+	NotifyType_Combo UMETA(DisplayName = "ComboBranch"),
 };
 
 UCLASS()
-class NEO_API UEnemyAnimNotifyState : public UCharacterAnimNotifyState
+class NEO_API UPlayerAnimNotifyState : public UCharacterAnimNotifyState
 {
 	GENERATED_BODY()
 	
-    // 通知をエディタに公開するかどうか
-    virtual bool CanBePlaced(UAnimSequenceBase* Animation) const { return true; }
+        // 通知をエディタに公開するかどうか
+        virtual bool CanBePlaced(UAnimSequenceBase* Animation) const { return true; }
 
 
 protected:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AnimNotify")
-        EEnemyNotifyType2 NotifyType;
+        EPlayerNotifyStateType NotifyType;
 
     // 通知開始時に行う処理
     virtual void NotifyBeginAction(AActor* _Owner, UAnimSequenceBase* Animation, float TotalDuration);
