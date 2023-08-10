@@ -401,7 +401,7 @@ void AOdaBase::OdaAttack2(int Timer) {
 void AOdaBase::OdaUlt(int Timer)
 {
 	//UKismetSystemLibrary::PrintString(this, "Ult", true, true, FColor::Cyan, 2.f, TEXT("None"));
-	if (Timer % 50 == 0 && isUltShotTiming != true)
+	if (Timer % 30 == 0 && isUltShotTiming != true)
 	{
 		isUltShotTiming = true;
 	}
