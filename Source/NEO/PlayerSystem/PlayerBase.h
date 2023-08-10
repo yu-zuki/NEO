@@ -275,15 +275,15 @@ public:
 
 	//-----------------コンポーネント変数--------------------------------------------------------------------------
 	// 武器のメッシュ
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Mesh, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "WeaponMesh", meta = (AllowPrivateAccess = "true"))
 		USkeletalMeshComponent* WeaponMesh;
 
 	// 攻撃のアシスト用コンポーネント
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = AttackAssist, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AttackAssist", meta = (AllowPrivateAccess = "true"))
 		class UActionAssistComponent* ActionAssistComp;
 
 	// 被ダメージ時のエフェクト
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Effect, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Effect", meta = (AllowPrivateAccess = "true"))
 		class UNiagaraSystem* HitEffect;
 
 	// キャラクターの動き
