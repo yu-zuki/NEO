@@ -7,17 +7,7 @@
 #include "Animation/AnimNotifies/AnimNotifyState.h"
 #include "BossAttack1_AN.generated.h"
 
-/**
- * 
- */
-//UCLASS()
-//class NEO_API UBossAttack1_AN : public UAnimNotify
-//{
-//	GENERATED_BODY()
-//
-//public:
-//	virtual void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation) override;
-//};
+
 UCLASS()
 class NEO_API UBossAttack1_AN : public UAnimNotifyState
 {
