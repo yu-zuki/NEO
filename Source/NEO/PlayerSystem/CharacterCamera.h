@@ -77,6 +77,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly,Category = "SubChara")		//速度
 		FRotator m_defaultRRRRRRRRRR;		//速度
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SubChara")		//速度
+		bool m_CanMove;		//速度
+
+
 	//// キャラクター情報
 	//APlayerBase* m_pCharaOwner;
 	//// キャラクターのセット
