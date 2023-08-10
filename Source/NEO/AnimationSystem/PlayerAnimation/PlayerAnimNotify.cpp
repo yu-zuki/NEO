@@ -15,32 +15,29 @@ void UPlayerAnimNotify::NotifyAction(AActor* _Owner)
 
 
     if (pPlayer)
-    {
-        // ブランチの名前取得
-        FString NotifyName = GetNotifyName_Implementation();
-
+    {      
         // コンボ継続の通知が来た時
-        if (NotifyName == "SaveCombo")
+        if (NotifyType == EPlayerNotifyType::NotifyType_SaveCombo)
         {
             pPlayer->ContinuationCombo();
         }
         // コンボリセットの通知が来た時
-        else if (NotifyName == "ResetCombo")
+        else if (NotifyType == EPlayerNotifyType::NotifyType_ResetCombo)
         {
             pPlayer->ResetCombo();
         }
         // コントロール可能になる通知が来た時
-        else if (NotifyName == "CanControl")
+        else if (NotifyType == EPlayerNotifyType::NotifyType_CanControl)
         {
             pPlayer->SetControl(true);
         }
         // アニメーションを遅くする通知が来た時
-        else if (NotifyName == "SlowDown")
+        else if (NotifyType == EPlayerNotifyType::NotifyType_SlowDown)
         {
             pPlayer->SlowDownDeathAnimationRate();
         }
         // 当たり判定開始の処理が来た時
-        else if (NotifyName == "SetCollision")
+        else if (NotifyType == EPlayerNotifyType::NotifyType_SetCollision)
         {
             pPlayer->SetCollision();
         }

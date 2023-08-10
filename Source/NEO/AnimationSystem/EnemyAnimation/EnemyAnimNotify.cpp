@@ -14,14 +14,11 @@ void UEnemyAnimNotify::NotifyAction(AActor* _Owner)
 
     if (pEnemy)
     {
-        // ƒuƒ‰ƒ“ƒ`‚Ì–¼‘OŽæ“¾
-        FString NotifyName = GetNotifyName_Implementation();
-
-        if (NotifyName == "EnemyCollisionOn")
+        if (NotifyType == EEnemyNotifyType::NotifyType1)
         {
             pEnemy->CheckCollisonOn();
         }
-        else if (NotifyName == "EnemyCollisionOff")
+        else if (NotifyType == EEnemyNotifyType::NotifyType2)
         {
             pEnemy->CheckCollisonOff();
         }

@@ -14,10 +14,7 @@ void UEnemyAnimNotifyState::NotifyBeginAction(AActor* _Owner)
 
     if (pEnemy)
     {
-        // ブランチの名前取得
-        FString NotifyName = GetNotifyName_Implementation();
-
-        if (NotifyName == "SwitchEnemyCollision")
+        if (NotifyType == EEnemyNotifyType2::NotifyType1)
         {
             pEnemy->CheckCollisonOn();
         }
@@ -31,10 +28,7 @@ void UEnemyAnimNotifyState::NotifyEndAction(AActor* _Owner)
 
     if (pEnemy)
     {
-        // ブランチの名前取得
-        FString NotifyName = GetNotifyName_Implementation();
-
-        if (NotifyName == "SwitchEnemyCollision")
+        if (NotifyType == EEnemyNotifyType2::NotifyType1)
         {
             pEnemy->CheckCollisonOff();
         }

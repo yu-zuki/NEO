@@ -6,9 +6,14 @@
 #include "NEO/AnimationSystem/CharacterAnimNotify.h"
 #include "EnemyAnimNotify.generated.h"
 
-/**
- * 
- */
+
+UENUM(BlueprintType)
+enum class EEnemyNotifyType :uint8
+{
+	NotifyType1 UMETA(DisplayName = "EnemyCollisionOn"),
+	NotifyType2 UMETA(DisplayName = "EnemyCollisionOff")
+};
+
 UCLASS()
 class NEO_API UEnemyAnimNotify : public UCharacterAnimNotify
 {
@@ -16,29 +21,12 @@ class NEO_API UEnemyAnimNotify : public UCharacterAnimNotify
 	
 public:
 
-	virtual bool CanBePlaced(UAnimSequenceBase* Animation) const { return false; }
+	virtual bool CanBePlaced(UAnimSequenceBase* Animation) const { return true; }
 
 protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AnimNotify")
+		EEnemyNotifyType NotifyType;
 
 	virtual void NotifyAction(AActor* _Owner);
 };
 
-UCLASS()
-class NEO_API UEnemyCollisionOn : public UEnemyAnimNotify
-{
-	GENERATED_BODY()
-
-public:
-
-	virtual bool CanBePlaced(UAnimSequenceBase* Animation) const { return true; }
-};
-
-UCLASS()
-class NEO_API UEnemyCollisionOff : public UEnemyAnimNotify
-{
-	GENERATED_BODY()
-
-public:
-
-	virtual bool CanBePlaced(UAnimSequenceBase* Animation) const { return true; }
-};

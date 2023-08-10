@@ -7,6 +7,17 @@
 #include "NEO/AnimationSystem/CharacterAnimNotify.h"
 #include "PlayerAnimNotify.generated.h"
 
+UENUM(BlueprintType)
+enum class EPlayerNotifyType :uint8
+{
+    NotifyType_SetCollision UMETA(DisplayName = "SetCollision"),
+    NotifyType_SaveCombo UMETA(DisplayName = "SaveCombo"),
+    NotifyType_ResetCombo UMETA(DisplayName = "ResetCombo"),
+    NotifyType_CanControl UMETA(DisplayName = "CanControl"),
+    NotifyType_SlowDown UMETA(DisplayName = "SlowDown")
+};
+
+
 UCLASS()
 class NEO_API UPlayerAnimNotify : public UCharacterAnimNotify
 {
@@ -16,108 +27,11 @@ class NEO_API UPlayerAnimNotify : public UCharacterAnimNotify
 public:
 
     // 通知をエディタに公開するかどうか
-    virtual bool CanBePlaced(UAnimSequenceBase* Animation) const { return false; }
+    virtual bool CanBePlaced(UAnimSequenceBase* Animation) const { return true; }
 
 protected:
+    UPROPERTY(EditAnywhere,BlueprintReadWrite,Category = "AnimNotify")
+        EPlayerNotifyType NotifyType;
 
     virtual void NotifyAction(AActor* _Owner);
-};
-
-
-//--------当たり判定通知-----------------------------
-UCLASS()
-class NEO_API USetCollision : public UPlayerAnimNotify
-{
-    GENERATED_BODY()
-
-
-public:
-
-    // 通知をエディタに公開するかどうか
-    virtual bool CanBePlaced(UAnimSequenceBase* Animation) const
-    {
-        // モンタージュのエディタでのみ公開
-        if (Animation->IsA(UAnimMontage::StaticClass())) { return true; }
-
-        return false;
-    }
-};
-
-
-//--------コンボ継続通知------------------------------
-UCLASS()
-class NEO_API USaveCombo : public UPlayerAnimNotify
-{
-    GENERATED_BODY()
-
-
-public:
-
-    // 通知をエディタに公開するかどうか
-    virtual bool CanBePlaced(UAnimSequenceBase* Animation) const
-    {
-        // モンタージュのエディタでのみ公開
-        if (Animation->IsA(UAnimMontage::StaticClass())) { return true; }
-
-        return false;
-    }
-};
-
-
-//--------コンボ終了通知------------------------------
-UCLASS()
-class NEO_API UResetCombo : public UPlayerAnimNotify
-{
-    GENERATED_BODY()
-
-
-public:
-
-    // 通知をエディタに公開するかどうか
-    virtual bool CanBePlaced(UAnimSequenceBase* Animation) const
-    {
-        // モンタージュのエディタでのみ公開
-        if (Animation->IsA(UAnimMontage::StaticClass())) { return true; }
-
-        return false;
-    }
-};
-
-
-//--------操作可能になる通知------------------------------
-UCLASS()
-class NEO_API UCanControl : public UPlayerAnimNotify
-{
-    GENERATED_BODY()
-
-
-public:
-
-    // 通知をエディタに公開するかどうか
-    virtual bool CanBePlaced(UAnimSequenceBase* Animation) const
-    {
-        // モンタージュのエディタでのみ公開
-        if (Animation->IsA(UAnimMontage::StaticClass())) { return true; }
-
-        return false;
-    }
-};
-
-//--------アニメーションを遅くする通知----------------------
-UCLASS()
-class NEO_API USlowDown : public UPlayerAnimNotify
-{
-    GENERATED_BODY()
-
-
-public:
-
-    // 通知をエディタに公開するかどうか
-    virtual bool CanBePlaced(UAnimSequenceBase* Animation) const
-    {
-        // モンタージュのエディタでのみ公開
-        if (Animation->IsA(UAnimMontage::StaticClass())) { return true; }
-
-        return false;
-    }
 };
