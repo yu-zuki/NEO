@@ -102,6 +102,10 @@ void ACharacterCamera::Tick(float DeltaTime)
 	//tmp_PlayerInfo = GetPlayer();
 
 	// プレイヤーの現在位置取得
+	if (m_pPlayer ==nullptr)
+	{
+		return;
+	}
 	FVector PlayerPos = m_pPlayer->GetActorLocation();
 
 	// 現在座標を取得する

@@ -369,8 +369,8 @@ void AOdaBase::OdaAttack2(int Timer) {
 		isShockWaveSpawnTiming = false;
 	}
 
-	//150フレームたったら
-	if (Timer % 150 == 0)
+	//200フレームたったら
+	if (Timer % 200 == 0)
 	{
 		////いったんfalseにする
 		//OneMoreShockWave = false;
