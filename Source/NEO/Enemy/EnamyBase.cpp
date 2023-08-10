@@ -285,7 +285,9 @@ void AEnamyBase::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* Oth
 		{
 			// Apply damage to the player
 			CastedPlayer->TakedDamage(Damage);
-			ActionAssistComp->HitStop(1.f);
+			ActionAssistComp->HitStop(0.2f);
+
+			DamageCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		}
 	}
 }

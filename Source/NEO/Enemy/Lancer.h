@@ -13,7 +13,7 @@ class NEO_API ALancer : public AEnamyBase
 public:
     ALancer();
     UPROPERTY(EditAnywhere, Category = "AI")
-        float DesiredDistance = 300.0f; // プレイヤーからの望ましい距離（3m）
+        float DesiredDistance = -100.0f; // プレイヤーからの望ましい距離（3m）
 
     UPROPERTY(EditAnywhere, Category = "AI")
         float MovementSpeed = 100.0f; // 移動速度
@@ -38,5 +38,10 @@ private:
     void CheckPlayerInFront();
     //FVector RoundDirectionT45Degrees(FVector direction) const;
     bool bShouldSkipNextMovement;
-    
+    float TimeUntilNextRandomMove = 0.0f;
+    UPROPERTY(EditAnywhere, Category = "Movement")
+        float MinWaitTime = 1.0f;
+
+    UPROPERTY(EditAnywhere, Category = "Movement")
+        float MaxWaitTime = 3.0f;
 };
