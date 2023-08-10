@@ -8,6 +8,7 @@
 #include "GameFramework/Character.h"
 #include "Components/SplineComponent.h"
 #include "PlayerBase.h"
+#include "NEO/GameSystem/GameSystem_BattleArea.h"
 
 #include "NEO/GameSystem/TGS_GameMode.h"
 
@@ -19,6 +20,7 @@ ACharacterCamera::ACharacterCamera()
 	, m_moveDistance(0.0f)
 	, m_defaultSpeed(100.0f)
 	, m_pPlayer(NULL)
+	, m_CanMove(false)
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -43,9 +45,12 @@ void ACharacterCamera::BeginPlay()
 	Super::BeginPlay();
 
 	ATGS_GameMode* GameMode = Cast<ATGS_GameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	//AGameSystem_BattleArea BattleArea;
 
+	
 	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(),0);
 
+	
 	if (PlayerController)
 	{
 		PlayerController->SetViewTargetWithBlend(this, 0.f);
@@ -107,7 +112,7 @@ void ACharacterCamera::Tick(float DeltaTime)
 		return;
 	}
 	FVector PlayerPos = m_pPlayer->GetActorLocation();
-
+	
 	// 現在座標を取得する
 	FVector nowpos = GetActorLocation();
 	FVector newpos = nowpos;
@@ -143,10 +148,23 @@ void ACharacterCamera::Tick(float DeltaTime)
 		FRotator newRotation;
 
 		//現在のスプライン上の距離から座標、回転を算出
-		GetCurrentInfo0nSpline(m_pPlayer->DistanceAdvanced * m_defaultSpeed, newLocation, newRotation);
+		GetCurrentInfo0nSpline(m_pPlayer->DistanceAdvanced * m_defaultSpeed * m_pPlayer->deltaTime, newLocation, newRotation);
+
+		//if (m_CanMove)
+		//	GetCurrentInfo0nSpline(m_pPlayer->DistanceAdvanced * m_defaultSpeed * m_pPlayer->deltaTime, newLocation, newRotation);
+		//else
+		//	GetCurrentInfo0nSpline(m_pPlayer->DistanceAdvanced, newLocation, newRotation);
+		//	SetActorLocation(newLocation);
+
+		////現在のスプライン上の距離から座標、回転を算出
+		//GetCurrentInfo0nSpline(m_moveDistance * m_defaultSpeed, newLocation, newRotation);
+
 
 		newRotation.Roll = -25.0;
 		
+		if (!m_CanMove)
+			return;
+
 		//更新後の座標・回転情報を反映
 		SetActorLocationAndRotation(newLocation, newRotation);
 	}
@@ -222,6 +240,7 @@ void ACharacterCamera::GetCurrentInfo0nSpline(float _length, FVector& _location,
 	//スプライン全体の長さに合わせた比率を求め、位置を更新させる
 	float overallLength = pSplineComp->GetSplineLength();
 	m_localLength = (float)((int)_length % (int)overallLength);
+
 
 	//現在のスプラインの位置に合わせた座標・回転情報の値を参照で返す
 	_location = pSplineComp->GetLocationAtDistanceAlongSpline(m_localLength,
