@@ -666,7 +666,7 @@ void APlayerBase::SetCollision()
  */
 void APlayerBase::TakedDamage(float _damage)
 {
-	if (PlayerStatus.HP)
+	if (PlayerStatus.HP >= 0.f)
 	{
 		// HPŒvZ
 		PlayerStatus.HP -= _damage;
