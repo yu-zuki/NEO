@@ -6,9 +6,6 @@
 #include "Animation/AnimNotifies/AnimNotifyState.h"
 #include "CharacterAnimNotifyState.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class NEO_API UCharacterAnimNotifyState : public UAnimNotifyState
 {
@@ -16,10 +13,13 @@ class NEO_API UCharacterAnimNotifyState : public UAnimNotifyState
 
 public:
 
+    // 通知開始時の処理
     virtual void NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration);
 
+    // 通知中常に処理
     virtual void NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float FrameDeltaTime);
 
+    // 通知終了時の処理
     virtual void NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation);
 
     // 通知をエディタに公開するかどうか
@@ -29,13 +29,13 @@ public:
 protected:
 
     // 通知開始時に行う処理(派生先のクラスでオーバーライド)
-    virtual void NotifyBeginAction(AActor* _Owner) { return; }
+    virtual void NotifyBeginAction(AActor* _Owner, UAnimSequenceBase* Animation, float TotalDuration) { return; }
 
     // 通知中常に行う処理(派生先のクラスでオーバーライド)
-    virtual void NotifyTickAction(AActor* _Owner) { return; }
+    virtual void NotifyTickAction(AActor* _Owner,UAnimSequenceBase* Animation, float FrameDeltaTime) { return; }
 
     // 通知終了時に行う処理(派生先のクラスでオーバーライド)
-    virtual void NotifyEndAction(AActor* _Owner) { return; }
+    virtual void NotifyEndAction(AActor* _Owner,UAnimSequenceBase* Animation) { return; }
 
 private:
 

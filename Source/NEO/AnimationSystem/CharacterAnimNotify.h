@@ -23,7 +23,7 @@ public:
 protected:
 
     // 通知が来た時に行う処理(派生先のクラスでオーバーライド)
-    virtual void NotifyAction(AActor* _Owner) { return; }
+    virtual void NotifyAction(AActor* _Owner, UAnimSequenceBase* Animation) { return; }
 
 private:
 

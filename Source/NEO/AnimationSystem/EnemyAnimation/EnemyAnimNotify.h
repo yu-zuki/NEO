@@ -27,6 +27,6 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AnimNotify")
 		EEnemyNotifyType NotifyType;
 
-	virtual void NotifyAction(AActor* _Owner);
+	virtual void NotifyAction(AActor* _Owner, UAnimSequenceBase* Animation);
 };
 

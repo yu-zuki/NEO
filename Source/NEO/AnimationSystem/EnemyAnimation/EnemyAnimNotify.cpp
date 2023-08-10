@@ -7,7 +7,7 @@
 #include "Animation/AnimInstance.h"
 #include "NEO/Enemy/EnamyBase.h"
 
-void UEnemyAnimNotify::NotifyAction(AActor* _Owner)
+void UEnemyAnimNotify::NotifyAction(AActor* _Owner, UAnimSequenceBase* Animation)
 {
     AEnamyBase* pEnemy = Cast<AEnamyBase>(_Owner);
 

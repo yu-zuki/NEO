@@ -27,8 +27,8 @@ protected:
         EEnemyNotifyType2 NotifyType;
 
     // 通知開始時に行う処理
-    virtual void NotifyBeginAction(AActor* _Owner);
+    virtual void NotifyBeginAction(AActor* _Owner, UAnimSequenceBase* Animation, float TotalDuration);
 
     // 通知終了時に行う処理
-    virtual void NotifyEndAction(AActor* _Owner);
+    virtual void NotifyEndAction(AActor* _Owner, UAnimSequenceBase* Animation);
 };
