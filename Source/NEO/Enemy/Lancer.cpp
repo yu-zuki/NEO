@@ -10,7 +10,7 @@ ALancer::ALancer()
     // キャラクターの移動方式を設
     MaxHealth = 100;
     Health = MaxHealth;
-   
+    bIsRandMove = false;
     // キャラクターの移動方式を設定
     GetCharacterMovement()->bOrientRotationToMovement = true;
     GetCharacterMovement()->RotationRate = FRotator(0.0f, 540.0f, 0.0f);
@@ -28,6 +28,7 @@ void ALancer::BeginPlay()
     PlayerCharacter = UGameplayStatics::GetPlayerCharacter(this, 0);
     // 5秒ごとにCheckPlayerInFront関数を実行するタイマーをセット
     GetWorldTimerManager().SetTimer(TimerHandle_CheckPlayerInFront, this, &ALancer::CheckPlayerInFront, 3.0f, true);
+    GetWorld()->GetTimerManager().SetTimer(MoveToTargetTimer, this, &ALancer::ChooseNewTarget, 4.0f, true);
 }
 FVector ALancer::GetSnappedDirection(const FVector& Direction) const
 {
@@ -53,6 +54,7 @@ void ALancer::Tick(float DeltaTime)
         bShouldSkipNextMovement = false;
         return;
     }
+   
     Super::Tick(DeltaTime);
     PlayerCharacter = Cast<ACharacter>(GetPlayer());
     if (!PlayerCharacter) return;
@@ -61,33 +63,66 @@ void ALancer::Tick(float DeltaTime)
     FVector DirectionToPlayer = GetPlayerDirection();
     FVector SnappedDirection;
     FVector MoveVector;
-
-    if (Health > 0)
+    if (CurrentDistance < DesiredDistance + 400)
     {
-        if (CurrentDistance > DesiredDistance +10) // DesiredDistanceより400m以上離れている場合
-        {
-            // ランダムに動く方向を決定
-            FVector RandomDirection = FVector(FMath::RandRange(-1.0f, 1.0f), FMath::RandRange(-1.0f, 1.0f), 0.0f).GetSafeNormal();
-            MoveVector = RandomDirection * MoveSpeed * DeltaTime;
-        }
-        else if (CurrentDistance > DesiredDistance)
+        bIsRandMove = true;
+    }
+    else if(CurrentDistance > DesiredDistance - 100)
+    {
+        bIsRandMove = false;
+    }
+    if (Health > 0&& IsAnimationAttacking()==false)
+    {
+
+        //if (CurrentDistance < DesiredDistance + 400 && TimeUntilNextRandomMove <= 0) // DesiredDistanceより400m以上離れている場合
+        //{
+        //    // ランダムに動く方向を決定
+        //    FVector RandomDirection = FVector(FMath::RandRange(-1.0f, 1.0f), FMath::RandRange(-1.0f, 1.0f), 0.0f).GetSafeNormal();
+        //    MoveVector = RandomDirection * MoveSpeed * DeltaTime;
+
+        //    // 次のランダムな移動までの待機時間を設定する
+        //    TimeUntilNextRandomMove = FMath::RandRange(MinWaitTime, MaxWaitTime);
+        //}
+       /* else */if (CurrentDistance > DesiredDistance&& bIsRandMove==false)
         {
             SnappedDirection = GetSnappedDirection(DirectionToPlayer);
             MoveVector = SnappedDirection * MoveSpeed * DeltaTime;
         }
-        else if (CurrentDistance < DesiredDistance - 150)
+       else if(CurrentDistance < DesiredDistance + 400 && CurrentTarget&& bIsRandMove==true) // DesiredDistanceより400m遠い場合
+       {
+           FVector DirectionToTarget = (CurrentTarget->GetActorLocation() - GetActorLocation()).GetSafeNormal();
+           MoveVector = DirectionToTarget * MoveSpeed * DeltaTime;
+       }
+
+       /* else if (CurrentDistance < DesiredDistance +400)
         {
             SnappedDirection = GetSnappedDirection(-DirectionToPlayer);
-            MoveVector = SnappedDirection * MoveSpeed * DeltaTime;
-        }
+            MoveVector = SnappedDirection * MoveSpeed/2 * DeltaTime;
+        }*/
     else
     {
-        return; // その他の場合は移動しない
+            /*FVector RandomDirection = FVector(FMath::RandRange(-1.0f, 1.0f), FMath::RandRange(-1.0f, 1.0f), 0.0f).GetSafeNormal();
+            MoveVector = RandomDirection * MoveSpeed * DeltaTime+10;*/
+
+            // 次のランダムな移動までの待機時間を設定する
+          ///* ///* TimeUntilNextRandomMove = FMath::RandRange(MinWaitTime, MaxWaitTime*/);*/
+            return; // その他の場合は移動しない
     }
     }
    
  
     SetActorLocation(GetActorLocation() + MoveVector);
+}
+void ALancer::ChooseNewTarget()
+{
+    TArray<AActor*> FoundTargetPoints;
+    UGameplayStatics::GetAllActorsWithTag(GetWorld(), FName("Random"), FoundTargetPoints);
+
+    if (FoundTargetPoints.Num() > 0)
+    {
+        // ランダムなTargetPointを選択する
+        CurrentTarget = Cast<ATargetPoint>(FoundTargetPoints[FMath::RandRange(0, FoundTargetPoints.Num() - 1)]);
+    }
 }
 void ALancer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {

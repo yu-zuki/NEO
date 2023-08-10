@@ -117,11 +117,10 @@ void AGunMan::Tick(float DeltaTime)
         SnappedDirection = GetSnappedDirection(DirectionToPlayer);
         MoveVector = SnappedDirection * MoveSpeed * DeltaTime;
     }
-    else if (CurrentDistance < DesiredDistance - 150)
-
+    else if (CurrentDistance < DesiredDistance + 400)
     {
         SnappedDirection = GetSnappedDirection(-DirectionToPlayer);
-        MoveVector = SnappedDirection * MoveSpeed * DeltaTime;
+        MoveVector = SnappedDirection * MoveSpeed/3 * DeltaTime;
     }
     else
     {
