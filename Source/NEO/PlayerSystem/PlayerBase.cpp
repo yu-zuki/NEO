@@ -19,6 +19,7 @@
 #include "Components/WidgetComponent.h"
 #include "NEO/GameSystem/TGS_GameInstance.h"
 #include "PlayerSpline.h"
+#include "NiagaraComponent.h"
 #include "ActionAssistComponent.h"
 
 
@@ -680,6 +681,10 @@ void APlayerBase::TakedDamage(float _damage)
 
 			// 死亡アニメーション再生
 			SetActorEnableCollision(true);
+
+			// ヒットエフェクト発生
+			ActionAssistComp->SpawnHitEffect(HitEffect, GetActorLocation());
+
 			PlayAnimation(PlayerAnimation.Death);
 		}
 		else
@@ -692,6 +697,9 @@ void APlayerBase::TakedDamage(float _damage)
 				IsControl = true;
 				ComboIndex = 0;
 			}
+
+			// ヒットエフェクト発生
+			ActionAssistComp->SpawnHitEffect(HitEffect,GetActorLocation());
 
 			// 被ダメージアニメーション再生
 			PlayAnimation(PlayerAnimation.TakeDamage);

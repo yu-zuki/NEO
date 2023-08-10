@@ -282,6 +282,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = AttackAssist, meta = (AllowPrivateAccess = "true"))
 		class UActionAssistComponent* ActionAssistComp;
 
+	// 被ダメージ時のエフェクト
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Effect, meta = (AllowPrivateAccess = "true"))
+		class UNiagaraSystem* HitEffect;
+
 	// キャラクターの動き
 	UCharacterMovementComponent* CharacterMovementComp;
 	//-------------------------------------------------------------------------------------------------------------
