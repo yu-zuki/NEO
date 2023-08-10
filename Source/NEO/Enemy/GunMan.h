@@ -19,7 +19,7 @@ public:
 	// Sets default values for this character's properties
 	AGunMan();
 	UPROPERTY(EditAnywhere, Category = "AI")
-		float DesiredDistance = 100.0f; // プレイヤーからの望ましい距離（3m）
+		float DesiredDistance = 300.0f; // プレイヤーからの望ましい距離（3m）
 
 	UPROPERTY(EditAnywhere, Category = "AI")
 		float MovementSpeed = 100.0f; // 移動速度
