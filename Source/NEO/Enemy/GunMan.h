@@ -47,8 +47,11 @@ private:
 
 	FTimerHandle BulletSpawnTimerHandle;
 	FTimerHandle MovementResumeTimerHandle;
-
+	FTimerHandle RotationLockTimerHandle;
+	bool bIsSpawningBullet;
+	FRotator LockedRotation;
 	void SpawnTrajectoryBullet();
 	void ReplaceWithBullet();
 	void ResumeMovement();
+	void UnlockRotation();
 };

@@ -97,7 +97,11 @@ void AGunMan::Tick(float DeltaTime)
 
       
     }
-*/
+*/  
+    if (bIsSpawningBullet)
+    {
+        SetActorRotation(LockedRotation); // 角度を固定
+    }
     if(bIsNowDamage )
     {
         return;
@@ -147,6 +151,13 @@ float AGunMan::GetDistanceToPlayer() const
 }
 void AGunMan::SpawnTrajectoryBullet()
 {
+    
+    bIsSpawningBullet = true; // フラグをセット
+    LockedRotation = GetActorRotation(); // 現在の角度を保存
+    GetWorldTimerManager().SetTimer(RotationLockTimerHandle, this, &AGunMan::UnlockRotation, 6.0f, false);
+   
+   
+
     // Spawn a TrajectoryBullet
     FActorSpawnParameters SpawnParams;
     FVector SpawnLocation = GetActorLocation();
@@ -171,6 +182,7 @@ void AGunMan::SpawnTrajectoryBullet()
 
 void AGunMan::ReplaceWithBullet()
 {
+    bIsSpawningBullet = false;
     // Replace TrajectoryBullet with Bullet
     FActorSpawnParameters SpawnParams;
     FVector SpawnLocation = GetActorLocation(); // Adjust as necessary
@@ -191,4 +203,9 @@ void AGunMan::ResumeMovement()
 {
     // Resume movement
     GetCharacterMovement()->Activate(true);
+   
+}
+void AGunMan::UnlockRotation()
+{
+    bIsSpawningBullet = false;
 }
