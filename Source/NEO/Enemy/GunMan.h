@@ -49,9 +49,12 @@ private:
 	FTimerHandle MovementResumeTimerHandle;
 	FTimerHandle RotationLockTimerHandle;
 	bool bIsSpawningBullet;
+	bool bIsBulletAlive;
 	FRotator LockedRotation;
 	void SpawnTrajectoryBullet();
 	void ReplaceWithBullet();
 	void ResumeMovement();
 	void UnlockRotation();
+	TOptional<FRotator> SavedRotation;
+
 };
