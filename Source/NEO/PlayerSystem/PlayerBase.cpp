@@ -454,26 +454,34 @@ void APlayerBase::Attack(int _attackNum /*= 0*/)
 	// プレイヤーの角度修正
 	ActionAssistComp->CorrectAttackAngle();
 
-	if (!IsAttacking)
+	if (IsPlayerGrounded())
 	{
-		// 攻撃中フラグオン
-		IsAttacking = true;
+		if (!IsAttacking)
+		{
+			// 攻撃中フラグオン
+			IsAttacking = true;
+		}
+		else
+		{
+			// コンボ可能な時,継続
+			if (CanCombo)
+			{
+				// ラストアタックまでコンボ継続
+				if (ComboStartSectionNames[ComboIndex] != ComboStartSectionNames.Last())
+				{
+					++ComboIndex;
+				}
+			}
+		}
+
+		// 攻撃のアニメーション再生
+		PlayAnimation(PlayerAnimation.Combo[_attackNum], ComboStartSectionNames[ComboIndex]);
 	}
 	else
 	{
-		// コンボ可能な時,継続
-		if (CanCombo)
-		{
-			// ラストアタックまでコンボ継続
-			if (ComboStartSectionNames[ComboIndex] != ComboStartSectionNames.Last())
-			{
-				++ComboIndex;
-			}
-		}
+		// 攻撃のアニメーション再生
+		PlayAnimation(PlayerAnimation.AirAttack);
 	}
-
-	// 攻撃のアニメーション再生
-	PlayAnimation(PlayerAnimation.Combo[_attackNum],ComboStartSectionNames[ComboIndex]);
 }
 
 
@@ -689,6 +697,9 @@ void APlayerBase::TakedDamage(float _damage)
 
 			// ヒットエフェクト発生
 			ActionAssistComp->SpawnHitEffect(HitEffect,GetActorLocation());
+
+			// ノックバック
+			
 
 			// 被ダメージアニメーション再生
 			PlayAnimation(PlayerAnimation.TakeDamage);

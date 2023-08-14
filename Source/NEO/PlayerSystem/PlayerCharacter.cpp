@@ -90,26 +90,39 @@ void APlayerCharacter::SetupPlayerData()
 void APlayerCharacter::SetupAnimationAsset()
 {
 	// コンボアニメーションのパス保管用
-	TCHAR* ComboAnimationAssetPaths[2];
-
-	// アニメーションアセットのパス
-	ComboAnimationAssetPaths[0] = TEXT("/Game/0122/Player/Animation/Montage/Combo/SwordCombo");
-	ComboAnimationAssetPaths[1] = TEXT("/Game/0122/Player/Animation/Montage/Combo/SwordCombo2");
-
-	for (int i = 0; i < 2; ++i)
 	{
-		(PlayerAnimation.Combo).Add(GetAnimationAsset(ComboAnimationAssetPaths[i]));
+		TCHAR* ComboAnimationAssetPaths[2];
+
+		// アニメーションアセットのパス
+		ComboAnimationAssetPaths[0] = TEXT("/Game/0122/Player/Animation/Montage/Combo/SwordCombo");
+		ComboAnimationAssetPaths[1] = TEXT("/Game/0122/Player/Animation/Montage/Combo/SwordCombo2");
+
+		for (int i = 0; i < 2; ++i)
+		{
+			(PlayerAnimation.Combo).Add(GetAnimationAsset(ComboAnimationAssetPaths[i]));
+		}
+	}
+	
+	{
+		// 空中での攻撃アニメーション
+		TCHAR* AirAttackAnimationAssetPath = TEXT("/Game/0122/Player/Animation/Montage/Combo/AirAttack");
+
+		PlayerAnimation.AirAttack = GetAnimationAsset(AirAttackAnimationAssetPath);
 	}
 
-	// 被ダメージアニメーションのパス保管用
-	TCHAR* DamageAnimationAssetPath = TEXT("/Game/0122/Player/Animation/Montage/Damaged");
+	{
+		// 被ダメージアニメーションのパス保管用
+		TCHAR* DamageAnimationAssetPath = TEXT("/Game/0122/Player/Animation/Montage/Damaged");
 
-	PlayerAnimation.TakeDamage = GetAnimationAsset(DamageAnimationAssetPath);
+		PlayerAnimation.TakeDamage = GetAnimationAsset(DamageAnimationAssetPath);
+	}
 
-	// 死亡時アニメーションのパス保管
-	TCHAR* DeathAnimationAssetPath = TEXT("/Game/0122/Player/Animation/Montage/Death");
+	{
+		// 死亡時アニメーションのパス保管
+		TCHAR* DeathAnimationAssetPath = TEXT("/Game/0122/Player/Animation/Montage/Death");
 
-	PlayerAnimation.Death = GetAnimationAsset(DeathAnimationAssetPath);
+		PlayerAnimation.Death = GetAnimationAsset(DeathAnimationAssetPath);
+	}
 }
 
 
