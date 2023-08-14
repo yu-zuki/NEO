@@ -89,16 +89,20 @@ struct FPlayerAnimation
 {
 	GENERATED_BODY()
 
-		// コンボ
-		UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Animation)
+	// コンボ
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Animation")
 		TArray<UAnimMontage*> Combo;
 
+	// 空中にいるときの攻撃
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Animation")
+		UAnimMontage* AirAttack;
+
 	// 被ダメージ
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Animation)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Animation")
 		UAnimMontage* TakeDamage;
 
 	// 死亡時
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Animation)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Animation")
 		UAnimMontage* Death;
 };
 //----------------------------------------------------------------------------------------
