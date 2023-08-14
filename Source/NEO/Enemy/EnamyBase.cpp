@@ -112,21 +112,21 @@ void AEnamyBase::Tick(float DeltaTime)
 				//bIsRotation‚ªtrue‚È‚ç
 				if (Health >= 0)
 				{
-					//if (bIsRotation)
-					//{
-					//    FRotator NewRotation = GetActorRotation();
-					//    NewRotation.Yaw = -90.0f;
-					//    SetActorRotation(NewRotation);
+					/*if (bIsRotation)
+					{
+					    FRotator NewRotation = GetActorRotation();
+					    NewRotation.Yaw = -90.0f;
+					    SetActorRotation(NewRotation);
 
-					//    
+					    
 
-					//}
-					//else
-					//{
-					//    FRotator NewRotation = GetActorRotation();
-					//    NewRotation.Yaw = 90.0f;
-					//    SetActorRotation(NewRotation);
-					//}
+					}
+					else
+					{
+					    FRotator NewRotation = GetActorRotation();
+					    NewRotation.Yaw = 90.0f;
+					    SetActorRotation(NewRotation);
+					}*/
 
 					bool LookRight = (bIsRotation) ? (true) : (false);
 

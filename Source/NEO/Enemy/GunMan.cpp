@@ -29,7 +29,7 @@ AGunMan::AGunMan()
     GetCharacterMovement()->MaxWalkSpeed = MovementSpeed;
     MaxHealth = 100;
     Health = MaxHealth;
-   
+    bIsBulletAlive = false;
     BulletSpawnTimerHandle = FTimerHandle();
 }
 
@@ -67,6 +67,31 @@ void AGunMan::Tick(float DeltaTime)
 {
  
 	Super::Tick(DeltaTime);
+    // TrajectoryBulletとBulletの両方がワールドに存在しているかどうかを確認
+    TArray<AActor*> FoundTrajectoryBullets;
+    TArray<AActor*> FoundBullets;
+    UGameplayStatics::GetAllActorsOfClass(GetWorld(), ATrajectoryBullet::StaticClass(), FoundTrajectoryBullets);
+    UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABullet::StaticClass(), FoundBullets);
+
+    // 片方が存在している場合
+    if (FoundTrajectoryBullets.Num() > 0 || FoundBullets.Num() > 0)
+    {
+        if (!SavedRotation.IsSet())
+        {
+            SavedRotation = GetActorRotation();
+        }
+    }
+    else
+    {
+        // 存在しない場合、保存された回転をクリア
+        SavedRotation.Reset();
+    }
+
+    // 保存された回転が設定されている場合、その回転を使用してキャラクターの回転を固定
+    if (SavedRotation.IsSet())
+    {
+        SetActorRotation(SavedRotation.GetValue());
+    }
    /* PlayerCharacter = Cast<ACharacter>(GetPlayer());
     
     {
@@ -152,32 +177,52 @@ float AGunMan::GetDistanceToPlayer() const
 void AGunMan::SpawnTrajectoryBullet()
 {
     
-    bIsSpawningBullet = true; // フラグをセット
-    LockedRotation = GetActorRotation(); // 現在の角度を保存
-    GetWorldTimerManager().SetTimer(RotationLockTimerHandle, this, &AGunMan::UnlockRotation, 6.0f, false);
+    //bIsSpawningBullet = true; // フラグをセット
+    //LockedRotation = GetActorRotation(); // 現在の角度を保存
+    //GetWorldTimerManager().SetTimer(RotationLockTimerHandle, this, &AGunMan::UnlockRotation, 6.0f, false);
    
    
 
-    // Spawn a TrajectoryBullet
+    //// Spawn a TrajectoryBullet
+    //FActorSpawnParameters SpawnParams;
+    //FVector SpawnLocation = GetActorLocation();
+    //FRotator SpawnRotation = GetActorRotation(); 
+
+    //ATrajectoryBullet* Bullet = GetWorld()->SpawnActor<ATrajectoryBullet>(TrajectoryBulletClass, SpawnLocation, SpawnRotation, SpawnParams);
+    //if (Health > 0)
+    //{
+    //    if (Bullet)
+    //    {
+    //        // Set up timer to replace TrajectoryBullet with Bullet after 2 seconds
+    //        GetWorldTimerManager().SetTimer(Bullet->GetLifeSpanTimerHandle(), this, &AGunMan::ReplaceWithBullet, 2.0f, false);
+    //    }
+
+    //}
+    
     FActorSpawnParameters SpawnParams;
-    FVector SpawnLocation = GetActorLocation();
-    FRotator SpawnRotation = GetActorRotation(); 
+
+    USkeletalMeshComponent* CharacterMesh = GetMesh();
+    FVector SpawnLocation = CharacterMesh->GetSocketLocation("Root");
+    FRotator SpawnRotation = CharacterMesh->GetSocketRotation("Root");
 
     ATrajectoryBullet* Bullet = GetWorld()->SpawnActor<ATrajectoryBullet>(TrajectoryBulletClass, SpawnLocation, SpawnRotation, SpawnParams);
     if (Health > 0)
     {
         if (Bullet)
         {
-            // Set up timer to replace TrajectoryBullet with Bullet after 2 seconds
+            Bullet->AttachToComponent(CharacterMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, "Root");
+            FRotator CurrentRotation = Bullet->GetActorRotation();
+            FRotator AdjustedRotation = FRotator(CurrentRotation.Pitch - 20.0f, CurrentRotation.Yaw + 90.0f, CurrentRotation.Roll+45.0f);  // 10.0f is just an example value
+            Bullet->SetActorRotation(AdjustedRotation);
+
+            // The rest of your code...
             GetWorldTimerManager().SetTimer(Bullet->GetLifeSpanTimerHandle(), this, &AGunMan::ReplaceWithBullet, 2.0f, false);
         }
-
     }
-    
-
     // Prevent movement for the lifespan of the TrajectoryBullet + 1 second
     GetCharacterMovement()->Deactivate();
     GetWorldTimerManager().SetTimer(MovementResumeTimerHandle, this, &AGunMan::ResumeMovement, Bullet->InitialLifeSpan + 1.0f, false);
+    bIsBulletAlive = true;
 }
 
 void AGunMan::ReplaceWithBullet()
@@ -198,6 +243,7 @@ void AGunMan::ReplaceWithBullet()
             GetWorld()->DestroyActor(TrajectoryBullet);
         }
     }
+    bIsRotation = true;
 }
 void AGunMan::ResumeMovement()
 {
