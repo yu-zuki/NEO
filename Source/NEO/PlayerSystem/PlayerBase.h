@@ -28,7 +28,7 @@ struct FMainAction
 {
 	GENERATED_BODY()
 
-		UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		UInputMappingContext* DefaultMappingContext;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
@@ -54,10 +54,10 @@ struct FPlayerStatus
 {
 	GENERATED_BODY()
 
-		UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		float HP;
 
-		UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		float MaxHP;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
@@ -83,7 +83,7 @@ struct FPlayerStatus
 };
 //----------------------------------------------------------------------------------------
 
-//-----------------アニメーション保管用-----------------------------------------------------
+//-----------------アニメーション保管用---------------------------------------------------
 USTRUCT(BlueprintType)
 struct FPlayerAnimation
 {
@@ -107,58 +107,37 @@ struct FPlayerAnimation
 };
 //----------------------------------------------------------------------------------------
 
+//-----------------プレイヤーの状態管理用-------------------------------------------------
+enum Player_State
+{
+	State_Idle = 0,
+	State_Jump,
+	State_Death
+};
+//----------------------------------------------------------------------------------------
 
 UCLASS()
 class NEO_API APlayerBase : public AInputCharacter
 {
 	GENERATED_BODY()
 
-	// プレイヤーのステート
-	enum Player_State
-	{
-		State_Idle = 0,
-		State_Jump,
-		State_Death
-	};
-
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		FMainAction MainActionMapping;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		FPlayerStatus PlayerStatus;
-
-protected:
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		FPlayerAnimation PlayerAnimation;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		TSubclassOf<UCameraShakeBase> ShakePattern;
-
 public:
-	// Sets default values for this character's properties
+
+	// コンストラクタ
 	APlayerBase();
 
 protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
-public:
 
 	//----------------入力で呼び出される関数-----------------------------
 	// 移動
-	void Move(const FInputActionValue& _value);
+	virtual void Move(const FInputActionValue& _value);
 
 	// ダッシュ切り替え
 	void Run();
 
 	// ジャンプ
-	void JumpStart();
-	void Jump();
-
-	// プレイヤーが地面にいるか
-	bool IsPlayerGrounded()const;
+	virtual void JumpStart();
+	virtual void Jump();
 
 	// 攻撃
 	virtual void Attack(int _attackNum = 0);
@@ -170,9 +149,10 @@ public:
 	virtual void Combo2();
 	//-------------------------------------------------------------------
 
+
 public:
 
-	//-----------------AnimNotifyで呼び出し(攻撃や被ダメージ処理)--------------------------------------------------------------------------------------------
+	//-----------------他クラスで呼び出し可--------------------------------------------------------------------------------------------
 	// コンボ継続
 	void ContinuationCombo();
 
@@ -183,7 +163,8 @@ public:
 
 	// ダメージを与える処理
 	virtual void SetCollision() { return; }
-
+	
+	// 操作可・不可を切り替える処理
 	void SetControl(bool _isControl) { IsControl = _isControl; }
 
 	// 死亡時のアニメーションの再生を遅くする
@@ -195,11 +176,18 @@ public:
 	// 現在のHPを返す
 	UFUNCTION(BlueprintCallable, Category = "GetStatus")
 		float GetHP()const { return PlayerStatus.HP; }
+
+	// 現在の移動量を返す
+	float GetDistanceAdvanced() { return DistanceAdvanced * deltaTime;}
+
+	// ダメージを受ける処理
+	UFUNCTION(BlueprintCallable, Category = "Action")
+		void TakedDamage(float _damage);
+
+	// プレイヤーが地面にいるか
+	bool IsPlayerGrounded()const;
 	//---------------------------------------------------------------------------------------------------------------------------------------------------
 
-
-	// アニメーション再生
-	void PlayAnimation(UAnimMontage* _toPlayAnimMontage, FName _startSectionName = "None", float _playRate = 1.f);
 
 private:
 
@@ -212,17 +200,19 @@ private:
 	// スプライン検索
 	AActor* GetSplineActor(const FName _tag);
 
+	// アニメーション再生
+	void PlayAnimation(UAnimMontage* _toPlayAnimMontage, FName _startSectionName = "None", float _playRate = 1.f);
 
-public:
-	// Called every frame
+protected:
+
+	// ゲーム開始時に呼び出される処理
+	virtual void BeginPlay() override;
+
+	// 毎フレーム呼び出される処理
 	virtual void Tick(float DeltaTime) override;
 
-	// Called to bind functionality to input
+	// 入力のセットアップ
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
-	// ダメージを受ける処理
-	UFUNCTION(BlueprintCallable, Category = "Action")
-		void TakedDamage(float _damage);
 
 	//------------------プレイヤーのセットアップ---------------------------------------------------------------------------------------------------------
 	// プレイヤーのデータを初期化
@@ -269,18 +259,44 @@ public:
 	//---------------------------------------------------------------------------------------------------------------------------------------------------
 
 
+	//-----------------プレイヤー管理用変数------------------------------------------------------------------
+private:
+
+	// プレイやーのアクション管理用
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		FMainAction MainActionMapping;
+
+protected:
+
+	// プレイヤーのステータス管理用
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		FPlayerStatus PlayerStatus;
+
+	// プレイヤーのアニメーション管理用
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		FPlayerAnimation PlayerAnimation;
+
+	// プレイヤーの状態管理用(enum)
+	Player_State PlayerState;
+	//-------------------------------------------------------------------------------------------------------------
+
+
 	//-----------------コンポーネント変数--------------------------------------------------------------------------
 	// 武器のメッシュ
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "WeaponMesh", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon Mesh", meta = (AllowPrivateAccess = "true"))
 		USkeletalMeshComponent* WeaponMesh;
 
 	// 攻撃のアシスト用コンポーネント
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AttackAssist", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Action Assist", meta = (AllowPrivateAccess = "true"))
 		class UActionAssistComponent* ActionAssistComp;
 
 	// 被ダメージ時のエフェクト
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Effect", meta = (AllowPrivateAccess = "true"))
 		class UNiagaraSystem* HitEffect;
+
+	// カメラの揺れ方
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		TSubclassOf<UCameraShakeBase> ShakePattern;
 
 	// キャラクターの動き
 	UCharacterMovementComponent* CharacterMovementComp;
@@ -288,53 +304,59 @@ public:
 
 protected:
 
-	bool IsControl;					// 入力可能かどうか
-
-	bool IsRunning;					// ダッシュ中のフラグ
-
-	float frames;					// フレーム		
-
-	const float radPerFrame = 3.14f / 30.f;
-
-	float JumpBeforePos_Z;					// ジャンプ前の高さ
-
-	Player_State PlayerState;				// プレイヤーのステート
-
-	bool IsAttacking;						// 攻撃中のフラグ
-
-	bool CanCombo;							// コンボ継続できるか
-
-	int ComboIndex;							// 何段目のコンボか
-
-	TArray<FName> ComboStartSectionNames;	// コンボの段数(First,Second,Third・・・)
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = "Attack")
+	// 何秒間ヒットストップを起こすか
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = "Action Assist")
 		float HitStopTime = 0.2f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = "GameOver")
-		bool CurveMode;
-
-
+	// 死亡アニメーションで倒れてからの再生スピード(1で通常スピード)
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"),Category = "GameOver")
-		float DeadAnimRate;							// 死亡アニメーションで倒れてからの再生スピード(1で通常スピード)
+		float DeadAnimRate = 0.01f;							
 
+	// 死んでからゲームオーバーまでの時間(秒)
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		float DeadToGameOverTime;					// 死んでからゲームオーバーまでの時間(秒)
+		float DeadToGameOverTime = 3.f;					
 
-
-
-public:
+	// 移動した距離
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		float DistanceAdvanced;
 
-	float deltaTime;
-
-
 private:
 
-	FTimerHandle TimerHandle_DeathToGameOver;		// ハンドル
+	// 入力可能かどうか
+	bool IsControl;					
 
-	class APlayerSpline* SplineActor;				// プレイヤーが通るスプライン
+	// ダッシュ中かどうか
+	bool IsRunning;		
+
+	// フレームカウント用
+	float frames;	
+
+	// ジャンプの計算
+	const float radPerFrame = 3.14f / 30.f;
+
+	// ジャンプ前の高さ
+	float JumpBeforePos_Z;					
+
+	// 攻撃中かどうか
+	bool IsAttacking;						
+
+	// コンボ継続できるか
+	bool CanCombo;							
+
+	// 何段目のコンボか
+	int ComboIndex;							
+
+	// コンボの段数(First,Second,Third・・・)
+	TArray<FName> ComboStartSectionNames;	
+
+	// ハンドル
+	FTimerHandle TimerHandle_DeathToGameOver;		
+
+	// プレイヤーが通るスプライン
+	class APlayerSpline* SplineActor;				
+
+	// デルタタイム保存用
+	float deltaTime;
 
 //////////////////////////////////////////////////////////////////////////
 ///UI

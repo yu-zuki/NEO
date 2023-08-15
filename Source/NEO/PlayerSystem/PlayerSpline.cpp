@@ -7,14 +7,14 @@
 // Sets default values
 APlayerSpline::APlayerSpline()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+ 	// Tick()を毎フレーム呼び出すか判定
 	PrimaryActorTick.bCanEverTick = true;
 
+	// "PlayerLoad"タグ追加
 	Tags.Add("PlayerLoad");
 
+	// スプラインコンポーネント作成
 	SplineComp = CreateDefaultSubobject<USplineComponent>("PlayerLoad");
-
-	//SplineComp->SetSplinePointType();
 }
 
 // Called when the game starts or when spawned
@@ -22,8 +22,8 @@ void APlayerSpline::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	// 全体の距離
-
+	// 全体の長さ取得
+	AllLength = SplineComp->GetSplineLength();
 }
 
 // Called every frame
@@ -43,27 +43,13 @@ void APlayerSpline::Tick(float DeltaTime)
 FRotator APlayerSpline::GetSplineAngle(float _distance)
 {
 	if (SplineComp)
-
-		//AllLength = SplineComp->GetSplineLength();
-
-		//float m_localLength = (float)((int)_distance % (int)AllLength);/*FMath::Fmod(_distance,AllLength);*/
-
-		////現在のスプラインの位置に合わせた回転情報の値を参照で返す
-		//FRotator SplineAngle = SplineComp->GetRotationAtDistanceAlongSpline(m_localLength, ESplineCoordinateSpace::World);
-
-		//rrrrr = SplineAngle;
-		//return SplineAngle;
-
-
 	{
-		AllLength = SplineComp->GetSplineLength();
-
+		// プレイヤーの現在の移動距離を%で取得
 		float m_localLength = (float)((int)_distance % (int)AllLength);/*FMath::Fmod(_distance,AllLength);*/
 
 		//現在のスプラインの位置に合わせた回転情報の値を参照で返す
 		FRotator SplineAngle = SplineComp->GetRotationAtDistanceAlongSpline(m_localLength, ESplineCoordinateSpace::World);
 
-		rrrrr = SplineAngle;
 		return SplineAngle;
 	}
 

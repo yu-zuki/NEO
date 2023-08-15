@@ -12,23 +12,17 @@ class NEO_API UCharacterAnimInstance : public UAnimInstance
 	GENERATED_BODY()
 
 
-protected:
-	UPROPERTY(BlueprintReadWrite)
-		FVector Velocity;
+public:
 
-	//歩行速度 
-	UPROPERTY(BlueprintReadWrite)
-		float GroundSpeed;
+	// 開始時処理
+	virtual void NativeBeginPlay() override;
 
-	// 動いているか
-	UPROPERTY(BlueprintReadWrite)
-		bool ShouldMove;
+	// 毎フレーム処理(Tick) 
+	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 
-	//接地してない状態かどうか. 空中にいるとTrue 
-	UPROPERTY(BlueprintReadWrite)
-		bool IsFall;
 
 protected:
+
 	// ベロシティ取得
 	UFUNCTION(BlueprintCallable, Category = "Character Parameter")
 		FVector GetVelocity() { return Velocity; }
@@ -37,14 +31,33 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = "Character Parameter")
 		float GetGroundSpeed() { return GroundSpeed; }
 
-public:
-	// 開始時処理
-	virtual void NativeBeginPlay() override;
+	// 動いているか取得
+	UFUNCTION(BlueprintCallable, Category = "Character Parameter")
+		bool  GetShouleMove() { return ShouldMove; }
 
-	// 毎フレーム処理(Tick) 
-	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
-	
+	// オーナーが空中にいるか取得
+	UFUNCTION(BlueprintCallable, Category = "Character Parameter")
+		bool  GetIsFall() { return IsFall; }
+
+
 private:
+
+	// オーナーをキャラクタークラスで取得
 	ACharacter* OwnerCharacter;
+
+	// オーナーのMovementComponent保存用
 	class UCharacterMovementComponent* CharacterMovementComp;
+
+	// 
+	FVector Velocity;
+
+	//歩行速度 
+	float GroundSpeed;
+
+	// 動いているか
+	bool ShouldMove;
+
+	// 接地してない状態かどうか. 空中にいるとTrue 
+	bool IsFall;
+
 };
