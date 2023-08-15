@@ -21,26 +21,9 @@ public:
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 
 
+
+
 protected:
-
-	// ベロシティ取得
-	UFUNCTION(BlueprintCallable, Category = "Character Parameter")
-		FVector GetVelocity() { return Velocity; }
-
-	// 移動速度取得
-	UFUNCTION(BlueprintCallable, Category = "Character Parameter")
-		float GetGroundSpeed() { return GroundSpeed; }
-
-	// 動いているか取得
-	UFUNCTION(BlueprintCallable, Category = "Character Parameter")
-		bool  GetShouleMove() { return ShouldMove; }
-
-	// オーナーが空中にいるか取得
-	UFUNCTION(BlueprintCallable, Category = "Character Parameter")
-		bool  GetIsFall() { return IsFall; }
-
-
-private:
 
 	// オーナーをキャラクタークラスで取得
 	ACharacter* OwnerCharacter;
@@ -49,15 +32,19 @@ private:
 	class UCharacterMovementComponent* CharacterMovementComp;
 
 	// 
-	FVector Velocity;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		FVector Velocity;
 
-	//歩行速度 
-	float GroundSpeed;
+	//歩行速度
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true")) 
+		float GroundSpeed;
 
 	// 動いているか
-	bool ShouldMove;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		bool ShouldMove;
 
 	// 接地してない状態かどうか. 空中にいるとTrue 
-	bool IsFall;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		bool IsFall;
 
 };
