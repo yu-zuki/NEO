@@ -83,7 +83,8 @@ void ALancer::Tick(float DeltaTime)
         //    // ŽŸ‚Ìƒ‰ƒ“ƒ_ƒ€‚ÈˆÚ“®‚Ü‚Å‚Ì‘Ò‹@ŽžŠÔ‚ðÝ’è‚·‚é
         //    TimeUntilNextRandomMove = FMath::RandRange(MinWaitTime, MaxWaitTime);
         //}
-       /* else */if (CurrentDistance > DesiredDistance&& bIsRandMove==false)
+       /* else */
+        if (CurrentDistance > DesiredDistance&& bIsRandMove==false)
         {
             SnappedDirection = GetSnappedDirection(DirectionToPlayer);
             MoveVector = SnappedDirection * MoveSpeed * DeltaTime;
