@@ -15,28 +15,31 @@ class NEO_API ACurveTrigger : public ATriggerBox
 	GENERATED_BODY()
 	
 public:
-	// Sets default values for this actor's properties
+
+	// コンストラクタ
 	ACurveTrigger();
 
+	// カーブに突入したか
+	bool GetenterCurve() { return EnterCurve; }
+
 protected:
-	// Called when the game starts or when spawned
+
+	// ゲーム開始時に呼び出される処理
 	virtual void BeginPlay() override;
 
 
-public:
-	UFUNCTION()
-		virtual void OnActorOverlapBegin(AActor* OverlappedActor, AActor* OtherActor);
+private:
 
-	UFUNCTION()
-		virtual void OnActorOverlapEnd(AActor* OverlappedActor, AActor* OtherActor);
+	// このActorに衝突した瞬間に行う処理
+	virtual void OnActorOverlapBegin(AActor* OverlappedActor, AActor* OtherActor);
 
-	UFUNCTION()
-		bool GetCurve() { return EnterCurve; }
-
+	// このActorに衝突し終わる瞬間に行う処理
+	virtual void OnActorOverlapEnd(AActor* OverlappedActor, AActor* OtherActor);
 
 
 private:
-	// 判定用のボックス
+
+	// 判定用のボックスコンポーネント
 	class UBoxComponent* CurveTriggerComp;
 
 	// カーブに入ったことを知らせる

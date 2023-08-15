@@ -11,31 +11,36 @@ class NEO_API APlayerCharacter : public APlayerBase
 {
 	GENERATED_BODY()
 
-public:
-	// Sets default values for this character's properties
+
+private:
+
+	// コンストラクタ
 	APlayerCharacter();
 
-protected:
-	// Called when the game starts or when spawned
+	// ゲーム開始時に呼び出される処理
 	virtual void BeginPlay() override;
 
-	//武器の当たり判定
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SwordCollision", meta = (AllowPrivateAccess = "true"))
-		class UCapsuleComponent* WeaponCollision;
-
-public:	
-	// Called every frame
+	// 毎フレーム呼び出される処理
 	virtual void Tick(float DeltaTime) override;
 
-	// Called to bind functionality to input
+	// 入力のセットアップ
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	// プレイヤーのデータを初期化
 	virtual void SetupPlayerData() override;
 
-	// セットアップアニメーションアセット
+	// アニメーションアセットを設定
 	void SetupAnimationAsset();
 
-	// コリジョン
+public:
+
+	// AnimNotifyで呼び出す
+	// コリジョン判定
 	void SetCollision();
+
+private:
+
+	// 武器の当たり判定
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SwordCollision", meta = (AllowPrivateAccess = "true"))
+		class UCapsuleComponent* WeaponCollision;
 };

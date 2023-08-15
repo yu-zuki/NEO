@@ -13,17 +13,10 @@ class NEO_API UActionAssistComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this component's properties
+
+	// コンストラクタ
 	UActionAssistComponent();
 
-protected:
-	// Called when the game starts
-	virtual void BeginPlay() override;
-
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
-public:
 	// 攻撃の角度修正
 	void CorrectAttackAngle();
 
@@ -42,6 +35,18 @@ public:
 	// アニメーション再生
 	void PlayAnimation(UAnimMontage* _toPlayAnimMontage, FName _startSectionName = "None", float _playRate = 1.f);
 
+	/////////////////////////////////////////////////////////////////////////
+	// 壁とのレイキャストを行う関数
+	bool WallCheck();
+
+protected:
+
+	// ゲーム開始時に呼び出される処理
+	virtual void BeginPlay() override;
+
+	// 毎フレーム呼び出される処理
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
 private:
 
 	// 前方にいるActorを返す
@@ -51,49 +56,41 @@ private:
 	void EndHitStop();
 
 
-
 protected:
 
 	//-------------各機能のON・OFF---------------------------------------------------
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack Assist")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Action Assist")
 		bool bUseCorrectAttackAngle;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack Assist")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Action Assist")
 		bool bUseHitStop;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack Assist")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Action Assist")
 		bool bUseHitEffect;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack Assist")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Action Assist")
 		bool bUseFaceCamera;
 
 	//----------------------------------------------------------------------------
 
-	// トレースの長さ
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack Assist")
-		float LineLength;
+	// 壁判定用のレイの長さ
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Action Assist")
+		float RayLength_WallCheck;
+
+	// 攻撃の角度補正用のレイの長さ
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Action Assist")
+		float RayLength_CorrectAngle;
 
 	// HitStopで止まる時間
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack Assist")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Action Assist")
 		float SpeedDuringHitStop;
 
-
-public:
-	/////////////////////////////////////////////////////////////////////////
-	// 壁とのレイキャストを行う関数
-	bool WallCheck();
-
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Camera)
-		bool WallHit;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Camera)
-		float RayDistance;
-
 private:
+
+	// タイマーハンドル
 	FTimerHandle TimerHandle_HitStop;
 
+	// アニメーションプレイ中かどうか
 	bool IsAnimationPlaying;
-
 
 };

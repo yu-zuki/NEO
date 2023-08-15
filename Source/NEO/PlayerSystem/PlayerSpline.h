@@ -11,29 +11,27 @@ class NEO_API APlayerSpline : public AActor
 {
 	GENERATED_BODY()
 	
-public:	
-	// Sets default values for this actor's properties
+private:
+
+	// コンストラクタ
 	APlayerSpline();
 
-protected:
-	// Called when the game starts or when spawned
+	// ゲーム開始時に呼び出される処理
 	virtual void BeginPlay() override;
 
-public:	
-	// Called every frame
+	// 毎フレーム呼び出される処理
 	virtual void Tick(float DeltaTime) override;
 
+public:
+
 	// スプラインの角度参照
-	UFUNCTION(BlueprintCallable, Category = "Load")
-		FRotator GetSplineAngle(float _distance);
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		float AllLength;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		FRotator rrrrr;
-
+	FRotator GetSplineAngle(float _distance);
 
 private:
+
+	// スプラインコンポーネント
 	class USplineComponent* SplineComp;
+
+	// スプライン全体の長さ
+	float AllLength;
 };

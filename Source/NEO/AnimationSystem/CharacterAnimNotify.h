@@ -14,6 +14,7 @@ class NEO_API UCharacterAnimNotify : public UAnimNotify
 
 public:
 
+    // 通知が来たときに行う処理
     virtual void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation) override;
 
     // 通知をエディタに公開するかどうか

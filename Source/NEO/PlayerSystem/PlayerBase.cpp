@@ -25,17 +25,15 @@
 
 // Sets default values
 APlayerBase::APlayerBase()
-	: IsControl(true)
+	: PlayerState(State_Idle)
+	, IsControl(true)
 	, IsRunning(false)
 	, frames(0.f)
-	, PlayerState(State_Idle)
 	, IsAttacking(false)
 	, CanCombo(false)
 	, ComboIndex(0)
-	, DeadAnimRate(0.01f)
-	, DeadToGameOverTime(3.f)
 {
-	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Tick()をマイフレーム呼ぶかどうかの判定
 	PrimaryActorTick.bCanEverTick = true;
 
 	// プレイヤーの設定
@@ -323,10 +321,9 @@ void APlayerBase::Move(const FInputActionValue& _value)
 
 		const FRotator YawRotation(0.f, Rotation.Yaw, 0.f);
 
-		// 移動方向取得(X,Y)
+		// スプラインに沿った移動方向取得(X,Y)
 		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
-		
 
 		// 移動
 		AddMovementInput(RightDirection, MovementVector.X);

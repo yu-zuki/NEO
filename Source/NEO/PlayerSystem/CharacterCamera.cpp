@@ -148,7 +148,7 @@ void ACharacterCamera::Tick(float DeltaTime)
 		FRotator newRotation;
 
 		//現在のスプライン上の距離から座標、回転を算出
-		GetCurrentInfo0nSpline(m_pPlayer->DistanceAdvanced * m_defaultSpeed * m_pPlayer->deltaTime, newLocation, newRotation);
+		GetCurrentInfo0nSpline(m_pPlayer->GetDistanceAdvanced() * m_defaultSpeed, newLocation, newRotation);
 
 		//if (m_CanMove)
 		//	GetCurrentInfo0nSpline(m_pPlayer->DistanceAdvanced * m_defaultSpeed * m_pPlayer->deltaTime, newLocation, newRotation);
