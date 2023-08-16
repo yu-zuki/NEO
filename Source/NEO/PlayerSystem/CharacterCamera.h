@@ -89,4 +89,8 @@ public:
 
 protected:
 	ACharacter* GetPlayer();
+
+	class USplineComponent* pSplineComp;
+
+	FVector GetSplineLocationAtDistance(float Distance);
 };

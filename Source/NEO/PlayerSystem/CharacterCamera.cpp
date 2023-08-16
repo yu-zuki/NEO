@@ -56,24 +56,7 @@ void ACharacterCamera::BeginPlay()
 		PlayerController->SetViewTargetWithBlend(this, 0.f);
 	}
 
-	//// プレイヤーの取得
-	//m_pCharaOwner = Cast<APlayerBase>(PawnOwner);
-
-	/*if (GameMode)
-	{
-		GameMode->SetViewTargetWithBlend(this, 0.5f);
-	}*/
-
-	//PlayerInfo = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
-	//PlayerInfo->SetOwner(this);
-	PlayerInfo = GetPlayer();
-
-	// 初期位置設定
-	/*StartPos = PlayerInfo->GetActorLocation();
-	PlayerToViewPointDistance = FVector(200.f,400.f,200.f);
-	SetActorLocation(StartPos);*/
-
-	//SetActorRotation(FRotator(-25.0, 0.0, 0.0));
+		PlayerInfo = GetPlayer();
 
 	//------------------------スプライン------------------------
 	m_pSplineActor = SplineActorInitialize(this, m_splineTagName);
@@ -85,89 +68,28 @@ void ACharacterCamera::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 
+	//Splineがなければ無効
+	if (!m_pSplineActor) { return; }
 
-	// プレイヤーを取得していない時
-	if (m_pPlayer == NULL)
-	{
-		// プレイヤーキャラクターの取得
-		TSubclassOf<APlayerBase> findClass1;
-		findClass1 = APlayerBase::StaticClass();
-		UGameplayStatics::GetAllActorsOfClass(GetWorld(), findClass1, Actors);
+	//検索して最初に見つけたSplineComponentオブジェクトを一つ取得
+	UActorComponent* pComponent =
+		m_pSplineActor->GetComponentByClass(USplineComponent::StaticClass());
 
-		if (Actors.Num())
-		{
-			m_pPlayer = Cast<APlayerBase>(Actors[0]);
+	//SplineComponentに型変換
+	pSplineComp = Cast<USplineComponent>(pComponent);
 
-		}
+	//SplineComponentが無ければ無効
+	if (!pSplineComp) { return; }
 
-	}
+	FVector TargetLocation = GetSplineLocationAtDistance(pSplineComp->GetSplineLength());
+	FVector CurrentLocation = GetPlayer()->GetActorLocation();
 
-	//ACharacter* tmp_PlayerInfo = NULL;
-	//if (tmp_PlayerInfo) return;
-	//tmp_PlayerInfo = GetPlayer();
+	FVector NewLocation = FMath::VInterpTo(CurrentLocation, TargetLocation, DeltaTime, m_defaultSpeed);
 
-	// プレイヤーの現在位置取得
-	if (m_pPlayer ==nullptr)
-	{
-		return;
-	}
-	FVector PlayerPos = m_pPlayer->GetActorLocation();
+	SetActorLocation(NewLocation);
+
 	
-	// 現在座標を取得する
-	FVector nowpos = GetActorLocation();
-	FVector newpos = nowpos;
 	
-	// 新しい座標を算出する
-	newpos = FMath::VInterpTo(nowpos, PlayerPos, DeltaTime, m_defaultSpeed);
-
-	//SetActorLocation(FVector(StartPos.X - PlayerToViewPointDistance.Z, PlayerPos.Y + PlayerToViewPointDistance.X,StartPos.Z + PlayerToViewPointDistance.Y));
-
-	//------------------------スプライン------------------------
-	//SplineActorが存在する場合
-	if (m_pSplineActor != NULL)
-	{
-		////移動距離の更新
-		//if(PlayerPos.Y >= GetActorLocation().Y - 520.0f)			//プレイヤーの方が右にいる場合
-		//	m_moveDistance = m_moveDistance + (m_defaultSpeed * DeltaTime);
-		//else if (PlayerPos.Y < GetActorLocation().Y - 480.0f)	//プレイヤーの方が左にいる場合
-		//	m_moveDistance = m_moveDistance - (m_defaultSpeed * DeltaTime);
-
-		//移動距離の更新
-		if (PlayerPos.Y > GetActorLocation().Y - 520.0f && PlayerPos.Y < GetActorLocation().Y - 480.0f)
-			return;
-		else if (PlayerPos.Y > GetActorLocation().Y - 520.0f)	//プレイヤーの方が右にいる場合
-			m_moveDistance = m_moveDistance + (m_defaultSpeed * DeltaTime);
-		else if (PlayerPos.Y < GetActorLocation().Y - 480.0f)	//プレイヤーの方が左にいる場合
-			m_moveDistance = m_moveDistance - (m_defaultSpeed * DeltaTime);
-
-		
-		
-
-		//更新後の新しい座標・回転情報を入れるローカル変数
-		FVector newLocation;
-		FRotator newRotation;
-
-		//現在のスプライン上の距離から座標、回転を算出
-		GetCurrentInfo0nSpline(m_pPlayer->GetDistanceAdvanced() * m_defaultSpeed, newLocation, newRotation);
-
-		//if (m_CanMove)
-		//	GetCurrentInfo0nSpline(m_pPlayer->DistanceAdvanced * m_defaultSpeed * m_pPlayer->deltaTime, newLocation, newRotation);
-		//else
-		//	GetCurrentInfo0nSpline(m_pPlayer->DistanceAdvanced, newLocation, newRotation);
-		//	SetActorLocation(newLocation);
-
-		////現在のスプライン上の距離から座標、回転を算出
-		//GetCurrentInfo0nSpline(m_moveDistance * m_defaultSpeed, newLocation, newRotation);
-
-
-		newRotation.Roll = -25.0;
-		
-		if (!m_CanMove)
-			return;
-
-		//更新後の座標・回転情報を反映
-		SetActorLocationAndRotation(newLocation, newRotation);
-	}
 }
 
 
@@ -200,7 +122,6 @@ AActor* ACharacterCamera::SplineActorInitialize(AActor* _pOwnerActor, const FNam
 				UE_LOG(LogTemp, Warning, TEXT("%s"), *message);
 
 				return pActor;
-
 			}
 		}
 	}
@@ -210,44 +131,7 @@ AActor* ACharacterCamera::SplineActorInitialize(AActor* _pOwnerActor, const FNam
 
 void ACharacterCamera::GetCurrentInfo0nSpline(float _length, FVector& _location, FRotator& _rotation)
 {
-	//Splineがなければ無効
-	if (!m_pSplineActor) { return; }
 
-	//検索して最初に見つけたSplineComponentオブジェクトを一つ取得
-	UActorComponent* pComponent =
-		m_pSplineActor->GetComponentByClass(USplineComponent::StaticClass());
-
-	//SplineComponentに型変換
-	USplineComponent* pSplineComp = Cast<USplineComponent>(pComponent);
-
-	//SplineComponentが無ければ無効
-	if (!pSplineComp) { return; }
-
-	////ループしない(一周だけ回る)
-	//if (_loop)
-	//{
-	//	m_localLength = _length;
-	//}
-	////ループする
-	//else
-	//{
-	//	//スプライン全体の長さに合わせた比率を求め、位置を更新させる
-	//	float overallLength = pSplineComp->GetSplineLength();
-	//	m_localLength = (float)((int)_length % (int)overallLength);
-
-	//}
-
-	//スプライン全体の長さに合わせた比率を求め、位置を更新させる
-	float overallLength = pSplineComp->GetSplineLength();
-	m_localLength = (float)((int)_length % (int)overallLength);
-
-
-	//現在のスプラインの位置に合わせた座標・回転情報の値を参照で返す
-	_location = pSplineComp->GetLocationAtDistanceAlongSpline(m_localLength,
-		ESplineCoordinateSpace::World);
-	_rotation = pSplineComp->GetRotationAtDistanceAlongSpline(m_localLength,
-		ESplineCoordinateSpace::World);
-	m_defaultRRRRRRRRRR = _rotation;
 }
 ACharacter* ACharacterCamera::GetPlayer()
 {
@@ -261,8 +145,12 @@ ACharacter* ACharacterCamera::GetPlayer()
 	}
 }
 
-//// キャラクターをセットする関数
-//void ACharacterCamera::GetCharacterOwner(APlayerBase* Chara)
-//{
-//	m_pCharaOwner = Chara;
-//}
+FVector ACharacterCamera::GetSplineLocationAtDistance(float Distance)
+{
+	if (pSplineComp)
+	{
+		FVector Location = pSplineComp->GetLocationAtDistanceAlongSpline(Distance, ESplineCoordinateSpace::World);
+		return Location;
+	}
+	return FVector::ZeroVector;
+}
