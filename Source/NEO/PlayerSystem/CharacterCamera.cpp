@@ -133,11 +133,11 @@ void ACharacterCamera::Tick(float DeltaTime)
 		//	m_moveDistance = m_moveDistance - (m_defaultSpeed * DeltaTime);
 
 		//移動距離の更新
-		if (PlayerPos.Y > GetActorLocation().Y - 520.0f && PlayerPos.Y < GetActorLocation().Y - 480.0f)
+		if (PlayerPos.Y > GetActorLocation().Y - 550.0f && PlayerPos.Y < GetActorLocation().Y - 450.0f)
 			return;
-		else if (PlayerPos.Y > GetActorLocation().Y - 520.0f)	//プレイヤーの方が右にいる場合
+		else if (PlayerPos.Y > GetActorLocation().Y - 510.0f)	//プレイヤーの方が右にいる場合
 			m_moveDistance = m_moveDistance + (m_defaultSpeed * DeltaTime);
-		else if (PlayerPos.Y < GetActorLocation().Y - 480.0f)	//プレイヤーの方が左にいる場合
+		else if (PlayerPos.Y < GetActorLocation().Y - 490.0f)	//プレイヤーの方が左にいる場合
 			m_moveDistance = m_moveDistance - (m_defaultSpeed * DeltaTime);
 
 		
@@ -148,7 +148,9 @@ void ACharacterCamera::Tick(float DeltaTime)
 		FRotator newRotation;
 
 		//現在のスプライン上の距離から座標、回転を算出
-		GetCurrentInfo0nSpline(m_pPlayer->GetDistanceAdvanced() * m_defaultSpeed, newLocation, newRotation);
+		//GetCurrentInfo0nSpline(m_pPlayer->DistanceAdvanced * m_defaultSpeed * m_pPlayer->deltaTime, newLocation, newRotation);
+		GetCurrentInfo0nSpline(m_moveDistance, newLocation, newRotation);
+
 
 		//if (m_CanMove)
 		//	GetCurrentInfo0nSpline(m_pPlayer->DistanceAdvanced * m_defaultSpeed * m_pPlayer->deltaTime, newLocation, newRotation);
