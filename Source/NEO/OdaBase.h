@@ -129,6 +129,22 @@ public:
 	//ダメージタイプクラス
 	UPROPERTY()
 		TSubclassOf < class UDamageType > DamageTypeClass;
+
+	//衝撃波のダメージを入れるための変数
+	UPROPERTY(BlueprintReadOnly, Category = "Damage")
+		float BladeDamage;
+
+	//通常の衝撃波のダメージ
+	UPROPERTY(EditAnywhere, Category = "Damage")
+		float ShockWaveDamage;	
+
+	//必殺技時の衝撃波のダメージ
+	UPROPERTY(EditAnywhere, Category = "Damage")
+		float UltShockWaveDamage;
+
+	//必殺技のダメージ
+	UPROPERTY(EditAnywhere,BlueprintReadOnly, Category = "Damage")
+		float UltDamage;
 	//----------------------------------------------------------------
 
 	

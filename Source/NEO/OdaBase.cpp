@@ -10,12 +10,16 @@
 // Sets default values
 //コンストラクタ+変数の初期化
 AOdaBase::AOdaBase() :
-	SpawnTimer(0), 
-	FlameCounter(0),
-	WaitTime(0),
-	OdaMoveEnum(ECPPOdaEnum::Stay1),
-	Attack1Delay(0),
-	RandomNum(-1),	
+	SpawnTimer(0),						//---------------------------
+	FlameCounter(0),					//タイマー系
+	WaitTime(0),						//---------------------------
+	OdaMoveEnum(ECPPOdaEnum::Stay1),	//列挙型
+	Attack1Delay(0),					//近接攻撃の待機時間
+	RandomNum(-1),
+	BladeDamage(0.f),
+	ShockWaveDamage(10.f),
+	UltShockWaveDamage(5.f),
+	UltDamage(30.f),
 	OdaSpeed(1.f),
 	OneMoreShockWave(false),
 	ChangeFlontTimer(200),
@@ -32,12 +36,12 @@ AOdaBase::AOdaBase() :
 	SwordAddDamage(5),
 	HoldDamageAdd(0),
 	bIsAttacked(false),
-	Health(600.f),
-	MaxHealth(600.f)
+	Health(1000.f),
+	MaxHealth(1000.f)
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
+	//Box Create
 	BoxComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("SwordComponent"), true);
 	BoxComponent->SetupAttachment(GetMesh(), "weapon_r");
 	BoxComponent->SetRelativeLocation(FVector(0.0f, -80.0f, 0.0f));
@@ -45,7 +49,7 @@ AOdaBase::AOdaBase() :
 	//UI Create
 	EnemyWidget = CreateDefaultSubobject<UEnemyBase_WidgetComponent>(TEXT("EnemyWidget"));
 	EnemyWidget->SetupAttachment(RootComponent);
-
+	// Assist Create
 	ActionAssistComp = CreateDefaultSubobject<UActionAssistComponent>(TEXT("ActionAssist"));
 
 }
@@ -110,11 +114,14 @@ void AOdaBase::Tick(float DeltaTime)
 			Attack1Wait();
 		}
 
+		//体力が半分以下になったら
 		if (Health < MaxHealth / 2.f)
 		{
+			//二回目を撃つためのタイマーを起動
 			UltTimer++;
 			if (UltTimer % 600 == 0)//600フレーム後に必殺を撃てるようにする
 			{
+				//必殺技を撃てるようにする
 				isUltShot = false;
 			}
 		}
@@ -231,7 +238,7 @@ void AOdaBase::OdaStay1(int Timer)
 			//もし攻撃のディレイの値が入っていなかったら
 			if (Attack1Delay != 0)
 			{
-				Attack1Delay = 20;
+				Attack1Delay = 10;
 			}
 
 			//random固定のリセット
@@ -256,7 +263,7 @@ void AOdaBase::OdaStay1(int Timer)
 		{
 			//軸を合わせに行く
 			OdaMove1(Timer, 60);
-			Attack1Delay = 30;
+			Attack1Delay = 15;
 		}
 		//-----------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -353,6 +360,8 @@ void AOdaBase::OdaAttack2(int Timer) {
 	//モーション(アニメーション)が起動したか
 	if (isMotionPlaying == true)
 	{
+		//ダメージ値を代入
+		BladeDamage = ShockWaveDamage;
 		//アニメーションを流す(今は仮)
 		PlayAnimMontage(AnimMontage_BossAttack2);
 		//一度だけ流したいのでフラグを切り替える
@@ -430,6 +439,8 @@ void AOdaBase::OdaUlt(int Timer)
 	//衝撃波を出したいのでNotifyを使って制御する(ShockWaveSpawnFlagChangeにて変数の中身を変更)
 	if (isShockWaveSpawnTiming == true)
 	{
+		//ダメージ値を代入
+		BladeDamage = UltShockWaveDamage;
 		//アクターのスポーン処理(ShockWaveSpawnはブループリント上で設定)
 		GetWorld()->SpawnActor<AActor>(ShockWaveSpawn, GetActorTransform());
 		//一度だけスポーンさせたいので切り替えておく
@@ -447,8 +458,8 @@ void AOdaBase::OdaUlt(int Timer)
 
 
 
-	//200フレームたったら
-	if (Timer % 400 == 0)
+	//300フレームたったら
+	if (Timer % 300 == 0)
 	{
 		//ステートを切り替える
 		OdaMoveEnum = ECPPOdaEnum::Stay1;
@@ -513,7 +524,7 @@ void AOdaBase::ApplyDamage(float Damage)
 			//フラグを切り替える
 			SpawnDelay = false;
 			//攻撃のディレイをセット
-			Attack1Delay = 30;
+			Attack1Delay = 10;
 		}
 		//エフェクトを出す
 		//UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), HitParticles, GetActorLocation());
@@ -533,6 +544,7 @@ void AOdaBase::ApplyDamage(float Damage)
 
 void AOdaBase::BossKnockback()
 {
+	//ボスがノックバックする処理
 	PlayAnimMontage(AnimMontage_BossBlowAway);
 }
 
@@ -630,11 +642,12 @@ void AOdaBase::Death()
 	ATGS_GameMode* GameMode = Cast<ATGS_GameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 	if (GameMode)
 	{
+		//ゲームモードを用いて消す
 		GameMode->DestroyEnemy(this, IsAreaEnemy);
 	}
 }
 
-//チェック
+//ボックスコリジョンに当たっているかチェック
 void AOdaBase::CheckOverlap()
 {
 	TArray<FHitResult> HitResults;
@@ -671,21 +684,18 @@ void AOdaBase::PlayerOnOverlap(FHitResult& _HitResult)
 			return;
 		}
 
-
-
 		if (Combo1Counter == 0)
 		{
-			Player->TakedDamage(SwordFirstDamage);						//プレイヤーにダメージを与える
+			Player->TakedDamage(SwordFirstDamage);						//プレイヤーにダメージを与える初段
 		}
 		else
 		{		
-			//倍率を加算していく
-			HoldDamageAdd += FMath::RandRange(1, int(SwordAddDamage*2/3));
+			//追加ダメージ値確認用
+			//UKismetSystemLibrary::PrintString(this, FString::FromInt(SwordFirstDamage + ((float)SwordFirstDamage*(float)(Combo1Counter/4.f))), true, true, FColor::Cyan, 2.f, TEXT("None"));
 
-			UKismetSystemLibrary::PrintString(this, FString::FromInt(SwordFirstDamage + (SwordAddDamage + HoldDamageAdd)), true, true, FColor::Cyan, 2.f, TEXT("None"));
-
-			Player->TakedDamage(SwordFirstDamage + (SwordAddDamage + HoldDamageAdd));						//プレイヤーにダメージを与える(後半の処理はコンボ時の追加ダメージ)
+			Player->TakedDamage(SwordFirstDamage + ((float)SwordFirstDamage * (float)(Combo1Counter / 4.f)));						//プレイヤーにダメージを与える(後半の処理はコンボ時の追加ダメージ)
 		}
+		//ヒットストップをかける
 		ActionAssistComp->HitStop(.2f);
 
 		//リセット
