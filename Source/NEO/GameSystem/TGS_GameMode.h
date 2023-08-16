@@ -65,7 +65,7 @@ public:
 
 //--------------------------------------------ÉLÅ[ì¸óÕ---------------------------------------------
 	UFUNCTION(BlueprintCallable, Category = "GameSystem")
-		void SetState_GameOver();
+		void SetState_GameOver(float _time = 0);
 
 	void SetSubAction(ESubAction _eSubAction);
 

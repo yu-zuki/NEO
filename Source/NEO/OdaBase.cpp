@@ -644,6 +644,8 @@ void AOdaBase::Death()
 	{
 		//ゲームモードを用いて消す
 		GameMode->DestroyEnemy(this, IsAreaEnemy);
+
+		GameMode->SetState_GameOver(0);
 	}
 }
 
