@@ -28,7 +28,7 @@ void ALancer::BeginPlay()
     PlayerCharacter = UGameplayStatics::GetPlayerCharacter(this, 0);
     // 5秒ごとにCheckPlayerInFront関数を実行するタイマーをセット
     GetWorldTimerManager().SetTimer(TimerHandle_CheckPlayerInFront, this, &ALancer::CheckPlayerInFront, 3.0f, true);
-    GetWorld()->GetTimerManager().SetTimer(MoveToTargetTimer, this, &ALancer::ChooseNewTarget, 4.0f, true);
+    GetWorld()->GetTimerManager().SetTimer(MoveToTargetTimer, this, &ALancer::ChooseNewTarget, 3.0f, true);
 }
 FVector ALancer::GetSnappedDirection(const FVector& Direction) const
 {
@@ -63,7 +63,9 @@ void ALancer::Tick(float DeltaTime)
     FVector DirectionToPlayer = GetPlayerDirection();
     FVector SnappedDirection;
     FVector MoveVector;
-    if (CurrentDistance < DesiredDistance + 400)
+    
+
+    if (CurrentDistance <= DesiredDistance + 400)
     {
         bIsRandMove = true;
     }
@@ -87,12 +89,14 @@ void ALancer::Tick(float DeltaTime)
         if (CurrentDistance > DesiredDistance&& bIsRandMove==false)
         {
             SnappedDirection = GetSnappedDirection(DirectionToPlayer);
-            MoveVector = SnappedDirection * MoveSpeed * DeltaTime;
+            MoveVector = SnappedDirection * Speed * DeltaTime;
+           
         }
        else if(CurrentDistance < DesiredDistance + 400 && CurrentTarget&& bIsRandMove==true) // DesiredDistanceより400m遠い場合
        {
            FVector DirectionToTarget = (CurrentTarget->GetActorLocation() - GetActorLocation()).GetSafeNormal();
-           MoveVector = DirectionToTarget * MoveSpeed * DeltaTime;
+           MoveVector = DirectionToTarget * Speed * DeltaTime;
+           
        }
 
        /* else if (CurrentDistance < DesiredDistance +400)

@@ -23,7 +23,7 @@ void UCharacterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
     Super::NativeUpdateAnimation(DeltaSeconds);
 
-    // OwnerCharacterにまつわる処理
+    // OwnerCharacterの現在のステータス取得
     if (OwnerCharacter)
     {
         // 速度を取得する

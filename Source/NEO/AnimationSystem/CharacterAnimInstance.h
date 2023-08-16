@@ -32,19 +32,18 @@ protected:
 	class UCharacterMovementComponent* CharacterMovementComp;
 
 	// 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly,Category = "Owner Status")
 		FVector Velocity;
 
 	//•às‘¬“x
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true")) 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Owner Status")
 		float GroundSpeed;
 
 	// “®‚¢‚Ä‚¢‚é‚©
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Owner Status")
 		bool ShouldMove;
 
-	// Ú’n‚µ‚Ä‚È‚¢ó‘Ô‚©‚Ç‚¤‚©. ‹ó’†‚É‚¢‚é‚ÆTrue 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	// ‹ó’†‚É‚¢‚éó‘Ô‚©‚Ç‚¤‚©
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Owner Status")
 		bool IsFall;
-
 };
