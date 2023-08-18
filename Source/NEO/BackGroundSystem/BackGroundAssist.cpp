@@ -61,7 +61,6 @@ void UBackGroundAssist::ToFaceCamera()
 	// カメラの位置が変わっていれば新しい方向を計算
 	if (BeforeCameraPos != CameraLocation)
 	{
-
 		// Camera To Enemy
 		FVector CameraToEnemy = GetOwner()->GetActorLocation() - GameMode->GetCameraLocation();
 		CameraToEnemy.Y = 0;
