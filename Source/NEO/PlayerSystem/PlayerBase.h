@@ -107,15 +107,6 @@ struct FPlayerAnimation
 };
 //----------------------------------------------------------------------------------------
 
-//-----------------プレイヤーの状態管理用-------------------------------------------------
-enum Player_State
-{
-	State_Idle = 0,
-	State_Jump,
-	State_Death
-};
-//----------------------------------------------------------------------------------------
-
 UCLASS()
 class NEO_API APlayerBase : public AInputCharacter
 {
@@ -276,8 +267,6 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		FPlayerAnimation PlayerAnimation;
 
-	// プレイヤーの状態管理用(enum)
-	Player_State PlayerState;
 	//-------------------------------------------------------------------------------------------------------------
 
 
@@ -327,6 +316,9 @@ private:
 
 	// ダッシュ中かどうか
 	bool IsRunning;		
+
+	// ジャンプ中かどうか
+	bool IsJumping;
 
 	// フレームカウント用
 	float frames;	

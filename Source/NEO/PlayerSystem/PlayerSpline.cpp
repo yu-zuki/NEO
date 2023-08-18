@@ -7,8 +7,8 @@
 // Sets default values
 APlayerSpline::APlayerSpline()
 {
- 	// Tick()を毎フレーム呼び出すか判定
-	PrimaryActorTick.bCanEverTick = true;
+ 	// Tick()を毎フレーム呼ばないようにする
+	PrimaryActorTick.bCanEverTick = false;
 
 	// "PlayerLoad"タグ追加
 	Tags.Add("PlayerLoad");

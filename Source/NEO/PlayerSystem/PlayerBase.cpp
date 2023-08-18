@@ -25,9 +25,9 @@
 
 // Sets default values
 APlayerBase::APlayerBase()
-	: PlayerState(State_Idle)
-	, IsControl(true)
+	: IsControl(true)
 	, IsRunning(false)
+	, IsJumping(false)
 	, frames(0.f)
 	, IsAttacking(false)
 	, CanCombo(false)
@@ -79,17 +79,13 @@ void APlayerBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	switch (PlayerState)
+	// ジャンプ中のみ処理
+	if (IsJumping)
 	{
-	case State_Idle:
-		break;
-	case State_Jump:
 		Jump();
-		break;
-	case State_Death:
-		break;
 	}
 
+	// デルタタイム加算
 	deltaTime = DeltaTime;
 }
 
@@ -332,15 +328,14 @@ void APlayerBase::Move(const FInputActionValue& _value)
 		// 移動方向に回転
 		RotateCharacter(MovementVector.X);
 
-		// 移動量保存
+		// 目の前に壁があるか判定し、ない時だけ処理
 		if (!ActionAssistComp->WallCheck())
 		{
+			// 移動量保存
 			DistanceAdvanced += MovementVector.X;
 
 		}
-
 	}
-
 }
 
 
@@ -387,7 +382,7 @@ void APlayerBase::JumpStart()
 
 		JumpBeforePos_Z = GetActorLocation().Z;
 
-		PlayerState = State_Jump;
+		IsJumping = true;
 	}
 }
 
@@ -413,7 +408,7 @@ void APlayerBase::Jump()
 	// 着地処理 下降開始から判定開始
 	if (IsPlayerGrounded() && frames >= 20.f)
 	{
-		PlayerState = State_Idle;
+		IsJumping = false;
 	}
 
 	// フレーム+1
@@ -588,7 +583,13 @@ void APlayerBase::CallGameModeFunc_DestroyPlayer()
 	}
 }
 
-//タグからActorを取得
+
+/*
+ * 関数名　　　　：GetSplineActor()
+ * 処理内容　　　：SplineActor検索
+ * 引数１　　　　：FName _tag・・・このタグを持ったActorを検索
+ * 戻り値　　　　：なし
+ */
 AActor* APlayerBase::GetSplineActor(const FName _tag)
 {
 	//ゲーム全体に対するActorの検索コストが高いため、一回保存しておくだけにする
@@ -668,9 +669,7 @@ void APlayerBase::TakedDamage(float _damage)
 		// HPが0以下になったら
 		if (PlayerStatus.HP <= 0.f)
 		{
-			// HPが0以下なら死
-			PlayerState = State_Death;
-
+			// コントロール不能へ
 			IsControl = false;
 
 			// 死亡アニメーション再生
@@ -679,6 +678,7 @@ void APlayerBase::TakedDamage(float _damage)
 			// ヒットエフェクト発生
 			ActionAssistComp->SpawnHitEffect(HitEffect, GetActorLocation());
 
+			// 死亡アニメーション再生
 			PlayAnimation(PlayerAnimation.Death);
 		}
 		else

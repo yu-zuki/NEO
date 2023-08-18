@@ -23,6 +23,7 @@ UActionAssistComponent::UActionAssistComponent()
 	, bUseHitEffect(true)
 	, bUseFaceCamera(true)
 {
+	// Tick()‚ğ–ˆƒtƒŒ[ƒ€ŒÄ‚Î‚È‚¢‚æ‚¤‚É‚·‚é
 	PrimaryComponentTick.bCanEverTick = false;
 
 	RayLength_WallCheck = 100.f;

@@ -13,15 +13,18 @@ class NEO_API UBackGroundAssist : public UActorComponent
 	GENERATED_BODY()
 
 public:	
-	// Sets default values for this component's properties
+
+	// コンストラクタ
 	UBackGroundAssist();
 
 protected:
-	// Called when the game starts
+
+	// ゲーム開始時に呼び出される処理
 	virtual void BeginPlay() override;
 
 public:	
-	// Called every frame
+
+	// 毎フレーム呼び出される処理
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 private:
@@ -30,6 +33,8 @@ private:
 	void ToFaceCamera();
 
 protected:
+
+	// 機能を使うかどうか
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack Assist")
 		bool bUseBillboard;
 

@@ -14,8 +14,7 @@
 UBackGroundAssist::UBackGroundAssist()
 	: bUseBillboard(true)
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
+	// Tickを毎フレーム呼び出すかどうか
 	PrimaryComponentTick.bCanEverTick = true;
 
 }
@@ -30,7 +29,7 @@ void UBackGroundAssist::BeginPlay()
 }
 
 
-// Called every frame
+// 毎フレーム呼び出す処理
 void UBackGroundAssist::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
@@ -42,7 +41,13 @@ void UBackGroundAssist::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 void UBackGroundAssist::ToFaceCamera()
 {
 	// 機能のオン・オフ
-	if (!bUseBillboard) { return; }
+	if (!bUseBillboard)
+	{
+		// ビルボード処理を行わない場合Tick()を呼ばないようにする
+		PrimaryComponentTick.bCanEverTick = false;
+
+		return; 
+	}
 
 	// ゲームモード作成
 	ATGS_GameMode* GameMode = Cast<ATGS_GameMode>(UGameplayStatics::GetGameMode(GetWorld()));
@@ -65,10 +70,5 @@ void UBackGroundAssist::ToFaceCamera()
 		FRotator LookAtRotation = CameraToEnemy.Rotation();
 		GetOwner()->SetActorRotation(FRotator(LookAtRotation.Pitch, LookAtRotation.Yaw, LookAtRotation.Roll));
 
-	}
-	// 変わっていなかったら計算しない
-	else
-	{
-		return;
 	}
 }

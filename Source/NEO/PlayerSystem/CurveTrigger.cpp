@@ -8,8 +8,8 @@
 // Sets default values
 ACurveTrigger::ACurveTrigger()
 {
-	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	// Tick()を毎フレーム呼ばないようにする
+	PrimaryActorTick.bCanEverTick = false;
 
 	// タグ設定
 	Tags.Add("CurveTrigger");
