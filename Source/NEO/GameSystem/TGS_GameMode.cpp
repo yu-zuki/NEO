@@ -185,8 +185,9 @@ void ATGS_GameMode::ClearEnemy()
 	GetGameState()->ClearEnemies();
 }
 
-void ATGS_GameMode::SetState_GameOver()
+void ATGS_GameMode::SetState_GameOver(float _time)
 {
+	
 	//ゲームステートをゲームオーバーにする
 	GetGameState()->bIsGameOver = true;
 }
