@@ -30,11 +30,11 @@ protected:
 
 private:
 
-	// このActorに衝突した瞬間に行う処理
-	virtual void OnActorOverlapBegin(AActor* OverlappedActor, AActor* OtherActor);
+	//// このActorに衝突した瞬間に行う処理
+	//virtual void OnActorOverlapBegin(AActor* OverlappedActor, AActor* OtherActor);
 
-	// このActorに衝突し終わる瞬間に行う処理
-	virtual void OnActorOverlapEnd(AActor* OverlappedActor, AActor* OtherActor);
+	//// このActorに衝突し終わる瞬間に行う処理
+	//virtual void OnActorOverlapEnd(AActor* OverlappedActor, AActor* OtherActor);
 
 
 private:

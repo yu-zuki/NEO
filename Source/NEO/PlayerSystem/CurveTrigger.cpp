@@ -16,8 +16,8 @@ ACurveTrigger::ACurveTrigger()
 
 	CurveTriggerComp = CreateDefaultSubobject<UBoxComponent>("TriggerCollision");
 
-	OnActorBeginOverlap.AddDynamic(this, &ACurveTrigger::OnActorOverlapBegin);
-	OnActorEndOverlap.AddDynamic(this, &ACurveTrigger::OnActorOverlapEnd);
+	//OnActorBeginOverlap.AddDynamic(this, &ACurveTrigger::OnActorOverlapBegin);
+	//OnActorEndOverlap.AddDynamic(this, &ACurveTrigger::OnActorOverlapEnd);
 }
 
 // Called when the game starts or when spawned
@@ -27,23 +27,23 @@ void ACurveTrigger::BeginPlay()
 
 }
 
-// トリガーに当たったらカーブ開始
-void ACurveTrigger::OnActorOverlapBegin(AActor* OverlappedActor, AActor* OtherActor)
-{
-	// ヒットしたアクターが"Player"タグを持っていたら
-	if (OtherActor && (OtherActor != this) && OtherActor->ActorHasTag("Player"))
-	{
-		// カーブに突入したことをプレイヤーに知らせる
-		EnterCurve = true;
-	}
-}
-
-void ACurveTrigger::OnActorOverlapEnd(AActor* OverlappedActor, AActor* OtherActor)
-{
-	// ヒットしたアクターが"Player"タグを持っていたら
-	if (OtherActor && (OtherActor != this) && OtherActor->ActorHasTag("Player"))
-	{
-		// カーブが終了したことをプレイヤーに知らせる
-		EnterCurve = false;
-	}
-}
+//// トリガーに当たったらカーブ開始
+//void ACurveTrigger::OnActorOverlapBegin(AActor* OverlappedActor, AActor* OtherActor)
+//{
+//	// ヒットしたアクターが"Player"タグを持っていたら
+//	if (OtherActor && (OtherActor != this) && OtherActor->ActorHasTag("Player"))
+//	{
+//		// カーブに突入したことをプレイヤーに知らせる
+//		EnterCurve = true;
+//	}
+//}
+//
+//void ACurveTrigger::OnActorOverlapEnd(AActor* OverlappedActor, AActor* OtherActor)
+//{
+//	// ヒットしたアクターが"Player"タグを持っていたら
+//	if (OtherActor && (OtherActor != this) && OtherActor->ActorHasTag("Player"))
+//	{
+//		// カーブが終了したことをプレイヤーに知らせる
+//		EnterCurve = false;
+//	}
+//}
