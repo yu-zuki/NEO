@@ -5,6 +5,7 @@
 #include "GameFramework/Character.h"
 #include "NEO/PlayerSystem/CharacterCamera.h"
 #include "Kismet/GameplayStatics.h"
+#include "NEO/PlayerSystem/PlayerBase.h"
 // Sets default values
 AObjectBase::AObjectBase()
 {
@@ -14,6 +15,8 @@ AObjectBase::AObjectBase()
 	RootComponent = Mesh;
 
 }
+
+
 
 // Called when the game starts or when spawned
 void AObjectBase::BeginPlay()
@@ -51,6 +54,24 @@ void AObjectBase::Tick(float DeltaTime)
 	Mesh->SetForcedLodModel(LodLevel);
 
 	*/
+	CheckAndDestroy();
+}
+void AObjectBase::TakeDamage(float DamageAmount)
+{
+	// HealthからDamageAmountを減算する
+	Health -= DamageAmount;
+
+	// Healthを確認して、必要であれば破壊する
+	CheckAndDestroy();
 }
 
+void AObjectBase::CheckAndDestroy()
+{
+	if (Health < 0)
+	{
+
+		// 必要であれば、全体のActorも破壊する
+		 Destroy();
+	}
+}
 
