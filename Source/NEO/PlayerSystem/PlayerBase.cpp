@@ -316,7 +316,7 @@ void APlayerBase::Move(const FInputActionValue& _value)
 		const FRotator Rotation = SplineActor->GetSplineAngle(DistanceAdvanced * CharacterMovementComp->MaxWalkSpeed * deltaTime);
 
 		const FRotator YawRotation(0.f, Rotation.Yaw, 0.f);
-
+		SplineYawRotation = YawRotation;
 		// ƒXƒvƒ‰ƒCƒ“‚É‰ˆ‚Á‚½ˆÚ“®•ûŒüŽæ“¾(X,Y)
 		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
