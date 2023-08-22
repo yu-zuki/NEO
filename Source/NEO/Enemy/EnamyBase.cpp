@@ -184,6 +184,8 @@ void AEnamyBase::ApplyDamage(float DamageAmount)
 		bIsDeath = true;
 		FVector ForceDirection = -GetActorForwardVector();
 		float ForceStrength = 1000.0f;  // Adjust this value as needed.
+		Tags.Remove(FName("Enemy"));
+
 		GetCharacterMovement()->AddForce(ForceDirection * ForceStrength);
 		GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 		GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldStatic, ECollisionResponse::ECR_Block);
