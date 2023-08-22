@@ -133,12 +133,21 @@ void ACharacterCamera::Tick(float DeltaTime)
 		//	m_moveDistance = m_moveDistance - (m_defaultSpeed * DeltaTime);
 
 		//移動距離の更新
-		if (PlayerPos.Y > GetActorLocation().Y - 520.0f && PlayerPos.Y < GetActorLocation().Y - 480.0f || m_CanMove == false)
+		//if (PlayerPos.Y > GetActorLocation().Y - 520.0f && PlayerPos.Y < GetActorLocation().Y - 480.0f || m_CanMove == false)
+		//	return;
+		//else if (PlayerPos.Y > GetActorLocation().Y - 510.0f)	//プレイヤーの方が右にいる場合
+		//	m_moveDistance = m_moveDistance + (m_defaultSpeed * DeltaTime);
+		//else if (PlayerPos.Y < GetActorLocation().Y - 490.0f)	//プレイヤーの方が左にいる場合
+		//	m_moveDistance = m_moveDistance - (m_defaultSpeed * DeltaTime);
+
+
+		if (PlayerPos.Y > GetActorLocation().Y && PlayerPos.Y < GetActorLocation().Y || m_CanMove == false)
 			return;
-		else if (PlayerPos.Y > GetActorLocation().Y - 510.0f)	//プレイヤーの方が右にいる場合
+		else if (PlayerPos.Y > GetActorLocation().Y)	//プレイヤーの方が右にいる場合
 			m_moveDistance = m_moveDistance + (m_defaultSpeed * DeltaTime);
-		else if (PlayerPos.Y < GetActorLocation().Y - 490.0f)	//プレイヤーの方が左にいる場合
+		else if (PlayerPos.Y < GetActorLocation().Y)	//プレイヤーの方が左にいる場合
 			m_moveDistance = m_moveDistance - (m_defaultSpeed * DeltaTime);
+
 
 		
 		
@@ -166,7 +175,7 @@ void ACharacterCamera::Tick(float DeltaTime)
 			return;
 
 		//更新後の座標・回転情報を反映
-		SetActorLocationAndRotation(newLocation, newRotation);
+		SetActorLocationAndRotation(newpos, newRotation);
 	}
 }
 
