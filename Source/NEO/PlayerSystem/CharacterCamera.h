@@ -75,7 +75,11 @@ public:
 		float m_moveDistance;		//速度
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly,Category = "SubChara")		//速度
-		FRotator m_defaultRRRRRRRRRR;		//速度
+		FRotator m_defaultRRRRRRRRRR;		//回転
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SubChara")		//速度
+		FVector m_splineloccation;		//距離
+
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SubChara")		//速度
 		bool m_CanMove;		//速度

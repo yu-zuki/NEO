@@ -7,6 +7,7 @@
 #include "CameraSpline.generated.h"
 
 class USplineComponent;
+class USceneComponent;
 
 UCLASS()
 class NEO_API ACameraSpline : public AActor
@@ -29,6 +30,10 @@ public:
 		/** Camera boom positioning the camera behind the character */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Spline)
 		class USplineComponent* SplineComp;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Spline)
+		class USceneComponent* SceneComp;
+
 
 
 };

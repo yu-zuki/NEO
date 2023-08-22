@@ -133,7 +133,7 @@ void ACharacterCamera::Tick(float DeltaTime)
 		//	m_moveDistance = m_moveDistance - (m_defaultSpeed * DeltaTime);
 
 		//移動距離の更新
-		if (PlayerPos.Y > GetActorLocation().Y - 550.0f && PlayerPos.Y < GetActorLocation().Y - 450.0f || m_CanMove == false)
+		if (PlayerPos.Y > GetActorLocation().Y - 520.0f && PlayerPos.Y < GetActorLocation().Y - 480.0f || m_CanMove == false)
 			return;
 		else if (PlayerPos.Y > GetActorLocation().Y - 510.0f)	//プレイヤーの方が右にいる場合
 			m_moveDistance = m_moveDistance + (m_defaultSpeed * DeltaTime);
@@ -158,8 +158,6 @@ void ACharacterCamera::Tick(float DeltaTime)
 		//	GetCurrentInfo0nSpline(m_pPlayer->DistanceAdvanced, newLocation, newRotation);
 		//	SetActorLocation(newLocation);
 
-		////現在のスプライン上の距離から座標、回転を算出
-		//GetCurrentInfo0nSpline(m_moveDistance * m_defaultSpeed, newLocation, newRotation);
 
 
 		newRotation.Roll = -25.0;
@@ -249,7 +247,7 @@ void ACharacterCamera::GetCurrentInfo0nSpline(float _length, FVector& _location,
 		ESplineCoordinateSpace::World);
 	_rotation = pSplineComp->GetRotationAtDistanceAlongSpline(m_localLength,
 		ESplineCoordinateSpace::World);
-	m_defaultRRRRRRRRRR = _rotation;
+	m_splineloccation = _location;
 }
 ACharacter* ACharacterCamera::GetPlayer()
 {

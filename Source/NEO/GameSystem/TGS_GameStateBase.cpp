@@ -316,6 +316,8 @@ void ATGS_GameStateBase::EnterBattleArea()
 	if (GetBattleAreaCamera()) {
 		ATGS_GameMode* GameMode = Cast<ATGS_GameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 		if (GameMode) {
+
+			//コメントアウトしておく
 			GameMode->SetViewTargetWithBlend(GetBattleAreaCamera(), 0.5f);
 		}
 		else {
