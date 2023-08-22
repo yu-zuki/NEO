@@ -308,7 +308,7 @@ void APlayerBase::Move(const FInputActionValue& _value)
 	if (!IsControl) { return; }
 
 	// input is a Vector2D
-	FVector2D MovementVector = _value.Get<FVector2D>();
+	MovementVector = _value.Get<FVector2D>();
 	
 	if (SplineActor)
 	{

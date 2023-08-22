@@ -118,7 +118,15 @@ void ACharacterCamera::Tick(float DeltaTime)
 	FVector newpos = nowpos;
 	
 	// 新しい座標を算出する
+	//if (m_pPlayer->MovementVector.X != 0.0f)
+	//{
+	//	newpos = FMath::VInterpTo(nowpos, PlayerPos, DeltaTime, m_defaultSpeed);
+
+	//}
+
 	newpos = FMath::VInterpTo(nowpos, PlayerPos, DeltaTime, m_defaultSpeed);
+
+
 
 	//SetActorLocation(FVector(StartPos.X - PlayerToViewPointDistance.Z, PlayerPos.Y + PlayerToViewPointDistance.X,StartPos.Z + PlayerToViewPointDistance.Y));
 
@@ -158,11 +166,11 @@ void ACharacterCamera::Tick(float DeltaTime)
 
 		//現在のスプライン上の距離から座標、回転を算出
 		//GetCurrentInfo0nSpline(m_pPlayer->DistanceAdvanced * m_defaultSpeed * m_pPlayer->deltaTime, newLocation, newRotation);
-		GetCurrentInfo0nSpline(m_moveDistance, newLocation, newRotation);
+		//GetCurrentInfo0nSpline(m_moveDistance, newLocation, newRotation);
 
+		GetCurrentInfo0nSpline(m_pPlayer->DistanceAdvanced * m_defaultSpeed * m_pPlayer->deltaTime, newLocation, newRotation);
 
 		//if (m_CanMove)
-		//	GetCurrentInfo0nSpline(m_pPlayer->DistanceAdvanced * m_defaultSpeed * m_pPlayer->deltaTime, newLocation, newRotation);
 		//else
 		//	GetCurrentInfo0nSpline(m_pPlayer->DistanceAdvanced, newLocation, newRotation);
 		//	SetActorLocation(newLocation);
@@ -171,11 +179,16 @@ void ACharacterCamera::Tick(float DeltaTime)
 
 		newRotation.Roll = -25.0;
 		
+		
 		if (!m_CanMove)
 			return;
-
+		
 		//更新後の座標・回転情報を反映
-		SetActorLocationAndRotation(newpos, m_pPlayer->SplineYawRotation);
+		SetActorLocation(FVector(newpos.X, GetActorLocation().Y, GetActorLocation().Z));
+		//SetActorLocation(nowpos);
+
+
+		SetActorRotation(m_pPlayer->SplineYawRotation);
 	}
 }
 

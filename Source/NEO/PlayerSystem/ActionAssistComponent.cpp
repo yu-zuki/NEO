@@ -12,6 +12,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include <Runtime/Engine/Classes/Components/CapsuleComponent.h>
 #include "NiagaraComponent.h"									
+#include "DrawDebugHelpers.h"
 #include "NiagaraFunctionLibrary.h"								
 
 #define DIRECTION_Y (90.f)
@@ -303,7 +304,7 @@ bool UActionAssistComponent::WallCheck()
 	float LineDirection = (Rotation_Z > 0) ? (RayLength_WallCheck) : (-RayLength_WallCheck);
 
 	// 始点
-	FVector start = pOwner->GetActorLocation();
+	FVector start = FVector(pOwner->GetActorLocation().X, pOwner->GetActorLocation().Y, pOwner->GetActorLocation().Z + 50.0f);
 	// 終点
 	FVector end = FVector(start.X, start.Y + LineDirection, start.Z);
 
@@ -327,6 +328,7 @@ bool UActionAssistComponent::WallCheck()
 	FHitResult HitResult;
 	// レイトレースを行う
 	bool bHit = GetWorld()->SweepSingleByChannel(HitResult, start, end, FQuat::Identity, ECC_Visibility, CapsuleShape, TraceParams);
+	UKismetSystemLibrary::DrawDebugLine(GetWorld(), start, end, FLinearColor::Red);
 
 
 	return bHit;

@@ -309,9 +309,13 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		float DeadToGameOverTime = 3.f;					
 
+public:
+
 	// 移動した距離
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		float DistanceAdvanced;
+
+	FVector2D MovementVector;
 
 private:
 
@@ -351,6 +355,7 @@ private:
 	// プレイヤーが通るスプライン
 	class APlayerSpline* SplineActor;				
 
+public:
 	// デルタタイム保存用
 	float deltaTime;
 
