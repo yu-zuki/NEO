@@ -329,5 +329,15 @@ bool UActionAssistComponent::WallCheck()
 	bool bHit = GetWorld()->SweepSingleByChannel(HitResult, start, end, FQuat::Identity, ECC_Visibility, CapsuleShape, TraceParams);
 
 
-	return bHit;
+	if (bHit)
+	{
+		// オブジェクトとエネミーの時だけ進むようにする
+		if (HitResult.GetActor()->ActorHasTag("Enemy") || HitResult.GetActor()->ActorHasTag("Object"))
+		{
+			return bHit;
+		}
+	}
+
+
+	return false;
 }

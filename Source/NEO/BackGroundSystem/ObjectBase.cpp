@@ -14,6 +14,8 @@ AObjectBase::AObjectBase()
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 	RootComponent = Mesh;
 
+	// オブジェクトタグ追加
+	Tags.Add("Object");
 }
 
 
