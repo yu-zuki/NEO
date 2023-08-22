@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Components/StaticMeshComponent.h"
 #include "ObjectBase.generated.h"
 
 UCLASS()
@@ -18,6 +19,14 @@ public:
 		UStaticMeshComponent* Mesh;
 	UPROPERTY()
 		class ACharacter* PlayerCharacter; // プレイヤーキャラクターの参照
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
+		float  Health;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
+		float  MaxHealth;
+	
+		void TakeDamage(float DamageAmount);
+
+		void CheckAndDestroy();
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

@@ -7,7 +7,8 @@
 #include "NEO/Enemy/GunMan.h"
 AGunFence::AGunFence()
 {
-	
+    MaxHealth = 100;
+    Health = MaxHealth;
 }
 
 ATargetPoint* AGunFence::FindNearestAvailableTargetPoint(const AActor* Actor)
