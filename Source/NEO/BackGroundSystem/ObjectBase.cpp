@@ -56,7 +56,7 @@ void AObjectBase::Tick(float DeltaTime)
 	*/
 	CheckAndDestroy();
 }
-void AObjectBase::TakeDamage(float DamageAmount)
+void AObjectBase::ReceiveDamage(float DamageAmount)
 {
 	// Health‚©‚çDamageAmount‚ðŒ¸ŽZ‚·‚é
 	Health -= DamageAmount;

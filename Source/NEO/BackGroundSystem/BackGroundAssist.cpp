@@ -38,6 +38,12 @@ void UBackGroundAssist::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 	ToFaceCamera();
 }
 
+
+/*
+ * 関数名　　　　：ToFaceCamera()
+ * 処理内容　　　：常にカメラに向ける処理
+ * 戻り値　　　　：なし
+ */
 void UBackGroundAssist::ToFaceCamera()
 {
 	// 機能のオン・オフ
@@ -61,13 +67,12 @@ void UBackGroundAssist::ToFaceCamera()
 	// カメラの位置が変わっていれば新しい方向を計算
 	if (BeforeCameraPos != CameraLocation)
 	{
-		// Camera To Enemy
-		FVector CameraToEnemy = GetOwner()->GetActorLocation() - GameMode->GetCameraLocation();
-		CameraToEnemy.Y = 0;
-		CameraToEnemy.Z = 0;
+		// カメラに向ける計算
+		FVector ToCamera = GetOwner()->GetActorLocation() - GameMode->GetCameraLocation();
+		ToCamera.Y = 0;
+		ToCamera.Z = 0;
 
-		FRotator LookAtRotation = CameraToEnemy.Rotation();
+		FRotator LookAtRotation = ToCamera.Rotation();
 		GetOwner()->SetActorRotation(FRotator(LookAtRotation.Pitch, LookAtRotation.Yaw, LookAtRotation.Roll));
-
 	}
 }

@@ -24,7 +24,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
 		float  MaxHealth;
 	
-		void TakeDamage(float DamageAmount);
+		void ReceiveDamage(float DamageAmount);
 
 		void CheckAndDestroy();
 protected:
