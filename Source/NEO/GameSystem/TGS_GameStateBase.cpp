@@ -318,7 +318,7 @@ void ATGS_GameStateBase::EnterBattleArea()
 		if (GameMode) {
 
 			//コメントアウトしておく
-			GameMode->SetViewTargetWithBlend(GetBattleAreaCamera(), 0.5f);
+			//GameMode->SetViewTargetWithBlend(GetBattleAreaCamera(), 0.5f);
 		}
 		else {
 			UE_LOG(LogTemp, Warning, TEXT("GameMode is not found"));
