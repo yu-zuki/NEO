@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "GeometryCollection/GeometryCollection.h"
 #include "Components/StaticMeshComponent.h"
 #include "ObjectBase.generated.h"
 
@@ -23,10 +24,14 @@ public:
 		float  Health;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
 		float  MaxHealth;
-	
+	UPROPERTY(EditDefaultsOnly, Category = "Destruction")
+		UGeometryCollection* GeometryCollectionAsset;
+
 		void ReceiveDamage(float DamageAmount);
 
 		void CheckAndDestroy();
+
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

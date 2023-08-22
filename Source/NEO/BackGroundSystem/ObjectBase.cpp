@@ -69,7 +69,11 @@ void AObjectBase::CheckAndDestroy()
 {
 	if (Health < 0)
 	{
-
+		if (GeometryCollectionAsset)
+		{
+			// ここでジオメトリコレクションアセットを使って破壊効果などを生成する処理を追加する
+			// 注意: 実際には、UE4のジオメトリコレクションの機能を使用して破壊効果を実装する必要があ。
+		}
 		// 必要であれば、全体のActorも破壊する
 		 Destroy();
 	}

@@ -8,7 +8,7 @@ public class NEO : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "HeadMountedDisplay", "EnhancedInput", "Niagara", "AIModule", "GameplayTasks", "UMG", "ProceduralMeshComponent" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "HeadMountedDisplay", "EnhancedInput", "Niagara", "AIModule", "GameplayTasks", "UMG", "ProceduralMeshComponent" ,"GeometryCollectionEngine" });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 
