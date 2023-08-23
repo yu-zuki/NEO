@@ -6,7 +6,7 @@
 AGFenceGeometryCollectionActor::AGFenceGeometryCollectionActor()
 {
     // ジオメトリコレクションアセットを設定
-    static const ConstructorHelpers::FObjectFinder<UGeometryCollection> GeoCollection(TEXT("GeometryCollection'/Game/ALL/Content/0102/Enemy/GunMan/MyGunFence_GeometryCollection.MyGunFence_GeometryCollection'"));
+    static const ConstructorHelpers::FObjectFinder<UGeometryCollection> GeoCollection(TEXT("GeometryCollection'/Game/0102/Enemy/Gunman/MyGunFence_GeometryCollection.MyGunFence_GeometryCollection'"));
     if (GeoCollection.Succeeded())
     {
         GetGeometryCollectionComponent()->RestCollection = GeoCollection.Object;
