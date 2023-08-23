@@ -69,13 +69,24 @@ void AObjectBase::CheckAndDestroy()
 {
 	if (Health < 0)
 	{
-		if (GeometryCollectionAsset)
+		if (GeometryCollectionClass)
 		{
-			// ここでジオメトリコレクションアセットを使って破壊効果などを生成する処理を追加する
-			// 注意: 実際には、UE4のジオメトリコレクションの機能を使用して破壊効果を実装する必要があ。
+			AGeometryCollectionActor* SpawnedGeometryCollection = GetWorld()->SpawnActor<AGeometryCollectionActor>(GeometryCollectionClass, GetActorLocation(), GetActorRotation());
+
+			if (SpawnedGeometryCollection)
+			{
+				FTimerHandle TimerHandle_DestroyGeometry;
+				GetWorld()->GetTimerManager().SetTimer(TimerHandle_DestroyGeometry, [SpawnedGeometryCollection]()
+					{
+						SpawnedGeometryCollection->Destroy();
+					}, 2.0f, false);
+			}
 		}
 		// 必要であれば、全体のActorも破壊する
 		 Destroy();
 	}
 }
+
+
+
 
