@@ -71,9 +71,24 @@ void AObjectBase::CheckAndDestroy()
 {
 	if (Health < 0)
 	{
+		if (GeometryCollectionClass)
+		{
+			AGeometryCollectionActor* SpawnedGeometryCollection = GetWorld()->SpawnActor<AGeometryCollectionActor>(GeometryCollectionClass, GetActorLocation(), GetActorRotation());
 
+			if (SpawnedGeometryCollection)
+			{
+				FTimerHandle TimerHandle_DestroyGeometry;
+				GetWorld()->GetTimerManager().SetTimer(TimerHandle_DestroyGeometry, [SpawnedGeometryCollection]()
+					{
+						SpawnedGeometryCollection->Destroy();
+					}, 2.0f, false);
+			}
+		}
 		// 必要であれば、全体のActorも破壊する
 		 Destroy();
 	}
 }
+
+
+
 

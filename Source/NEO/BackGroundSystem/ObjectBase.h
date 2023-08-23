@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "GeometryCollection/GeometryCollectionActor.h"
 #include "Components/StaticMeshComponent.h"
 #include "ObjectBase.generated.h"
 
@@ -14,19 +15,29 @@ class NEO_API AObjectBase : public AActor
 	
 public:	
 	// Sets default values for this actor's properties
-	AObjectBase();
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh")
-		UStaticMeshComponent* Mesh;
-	UPROPERTY()
-		class ACharacter* PlayerCharacter; // プレイヤーキャラクターの参照
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
-		float  Health;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
-		float  MaxHealth;
-	
-		void ReceiveDamage(float DamageAmount);
+    AObjectBase();
 
-		void CheckAndDestroy();
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh")
+        UStaticMeshComponent* Mesh;
+
+    UPROPERTY()
+        class ACharacter* PlayerCharacter; // プレイヤーキャラクターの参照
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
+        float  Health;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
+        float  MaxHealth;
+
+    UPROPERTY(EditDefaultsOnly, Category = "Destruction")
+        TSubclassOf<AGeometryCollectionActor> GeometryCollectionClass;
+
+    void ReceiveDamage(float DamageAmount);
+
+    void CheckAndDestroy();
+
+  
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
