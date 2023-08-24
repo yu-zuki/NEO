@@ -635,6 +635,19 @@ void AOdaBase::Is2Combo()
 	}
 }
 
+//プレイヤーをノックバックさせるために最後の攻撃かどうかをとる関数
+bool AOdaBase::LastAttack()
+{
+	if (Combo1Counter >= 3)
+	{
+		return true;
+	}
+	else if (Combo2Counter >= 2)
+	{
+		return true;
+	}
+	return false;
+}
 
 void AOdaBase::Death()
 {
@@ -688,14 +701,17 @@ void AOdaBase::PlayerOnOverlap(FHitResult& _HitResult)
 
 		if (Combo1Counter == 0)
 		{
-			Player->TakedDamage(SwordFirstDamage);						//プレイヤーにダメージを与える初段
+			Player->TakedDamage(SwordFirstDamage, LastAttack());						//プレイヤーにダメージを与える初段
+			UKismetSystemLibrary::PrintString(this, LastAttack() ? TEXT("true") : TEXT("false") , true, true, FColor::Cyan, 2.f, TEXT("None"));
+
 		}
 		else
 		{		
 			//追加ダメージ値確認用
 			//UKismetSystemLibrary::PrintString(this, FString::FromInt(SwordFirstDamage + ((float)SwordFirstDamage*(float)(Combo1Counter/4.f))), true, true, FColor::Cyan, 2.f, TEXT("None"));
 
-			Player->TakedDamage(SwordFirstDamage + ((float)SwordFirstDamage * (float)(Combo1Counter / 4.f)));						//プレイヤーにダメージを与える(後半の処理はコンボ時の追加ダメージ)
+			Player->TakedDamage(SwordFirstDamage + ((float)SwordFirstDamage * (float)(Combo1Counter / 4.f)), LastAttack());						//プレイヤーにダメージを与える(後半の処理はコンボ時の追加ダメージ)
+			UKismetSystemLibrary::PrintString(this, LastAttack() ? TEXT("true") : TEXT("false"), true, true, FColor::Cyan, 2.f, TEXT("None"));
 		}
 		//ヒットストップをかける
 		ActionAssistComp->HitStop(.2f);
