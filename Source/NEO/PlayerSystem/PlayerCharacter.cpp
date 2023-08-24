@@ -100,6 +100,13 @@ void APlayerCharacter::SetupAnimationAsset()
 	}
 
 	{
+		// 被ダメージアニメーションのパス保管用
+		TCHAR* KnockBackAnimationAssetPath = TEXT("/Game/0122/Player/Animation/Montage/KnockBack");
+
+		PlayerAnimation.KnockBack = GetAnimationAsset(KnockBackAnimationAssetPath);
+	}
+
+	{
 		// 死亡時アニメーションのパス保管
 		TCHAR* DeathAnimationAssetPath = TEXT("/Game/0122/Player/Animation/Montage/Death");
 

@@ -276,6 +276,10 @@ public:
 	//ダメージ加算した値を保存しておく変数
 	float HoldDamageAdd;
 
+	//プレイヤーをノックバックさせるために最後の攻撃かどうかをとる関数
+	UFUNCTION(BlueprintCallable)
+		bool LastAttack();
+
 	//モーション--------------------------------------------------------------------------------------------------
 	//のけぞるモーション
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AniMontage", meta = (AllowPrivateAccess = "true"))
