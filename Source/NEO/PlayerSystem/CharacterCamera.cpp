@@ -44,6 +44,10 @@ void ACharacterCamera::BeginPlay()
 {
 	Super::BeginPlay();
 
+
+	PlayerInfo = GetPlayer();
+	m_pPlayer = Cast<APlayerBase>(PlayerInfo);
+
 	ATGS_GameMode* GameMode = Cast<ATGS_GameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 	//AGameSystem_BattleArea BattleArea;
 
@@ -66,7 +70,6 @@ void ACharacterCamera::BeginPlay()
 
 	//PlayerInfo = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
 	//PlayerInfo->SetOwner(this);
-	PlayerInfo = GetPlayer();
 
 	// 初期位置設定
 	/*StartPos = PlayerInfo->GetActorLocation();
@@ -85,31 +88,29 @@ void ACharacterCamera::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 
-
-	// プレイヤーを取得していない時
-	if (m_pPlayer == NULL)
-	{
-		// プレイヤーキャラクターの取得
-		TSubclassOf<APlayerBase> findClass1;
-		findClass1 = APlayerBase::StaticClass();
-		UGameplayStatics::GetAllActorsOfClass(GetWorld(), findClass1, Actors);
-
-		if (Actors.Num())
-		{
-			m_pPlayer = Cast<APlayerBase>(Actors[0]);
-
-		}
-
-	}
-
 	//ACharacter* tmp_PlayerInfo = NULL;
 	//if (tmp_PlayerInfo) return;
 	//tmp_PlayerInfo = GetPlayer();
-
-	// プレイヤーの現在位置取得
-	if (m_pPlayer ==nullptr)
+	if (PlayerInfo == nullptr)
 	{
-		return;
+
+		PlayerInfo = GetPlayer();
+
+		m_pPlayer = Cast<APlayerBase>(PlayerInfo);
+
+		ATGS_GameMode* GameMode = Cast<ATGS_GameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+		//AGameSystem_BattleArea BattleArea;
+
+
+		APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 1);
+
+
+		if (PlayerController)
+		{
+			PlayerController->SetViewTargetWithBlend(this, 0.f);
+		}
+
+
 	}
 	FVector PlayerPos = m_pPlayer->GetActorLocation();
 	

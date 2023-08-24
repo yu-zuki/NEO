@@ -657,9 +657,10 @@ void APlayerBase::ResetCombo()
  * 関数名　　　　：TakedDamage()
  * 処理内容　　　：プレイヤーの被ダメージ処理
  * 引数１　　　　：float _damage・・・被ダメージ量
+ * 引数２　　　　：bool _isLastAttack・・・コンボの最終かどうか
  * 戻り値　　　　：なし
  */
-void APlayerBase::TakedDamage(float _damage)
+void APlayerBase::TakedDamage(float _damage, bool _isLastAttack /*= false*/)
 {
 	if (PlayerStatus.HP >= 0.f)
 	{
@@ -695,11 +696,17 @@ void APlayerBase::TakedDamage(float _damage)
 			// ヒットエフェクト発生
 			ActionAssistComp->SpawnHitEffect(HitEffect,GetActorLocation());
 
-			// ノックバック
-			
-
-			// 被ダメージアニメーション再生
-			PlayAnimation(PlayerAnimation.TakeDamage);
+			// 被ダメージアニメーション
+			if (!_isLastAttack)
+			{
+				// のけぞりアニメーション再生
+				PlayAnimation(PlayerAnimation.TakeDamage);
+			}
+			else
+			{
+				// ノックバックアニメーション再生
+				PlayAnimation(PlayerAnimation.KnockBack);
+			}
 		}
 	}
 }

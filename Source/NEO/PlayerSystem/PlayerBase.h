@@ -101,6 +101,10 @@ struct FPlayerAnimation
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Animation")
 		UAnimMontage* TakeDamage;
 
+	// 被ダメージ
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Animation")
+		UAnimMontage* KnockBack;
+
 	// 死亡時
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Animation")
 		UAnimMontage* Death;
@@ -173,7 +177,7 @@ public:
 
 	// ダメージを受ける処理
 	UFUNCTION(BlueprintCallable, Category = "Action")
-		void TakedDamage(float _damage);
+		void TakedDamage(float _damage, bool _isLastAttack = false);
 
 	// プレイヤーが地面にいるか
 	bool IsPlayerGrounded()const;
