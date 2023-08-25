@@ -378,6 +378,11 @@ AActor* ATGS_GameMode::GetCameraActor()
 	return CameraActor;
 }
 
+void ATGS_GameMode::SetSplineCamera(AActor* _splineCamera)
+{
+	GetGameState()->SplineCamera = _splineCamera;
+}
+
 void ATGS_GameMode::SetViewTargetWithBlend(AActor* NewViewTarget, float BlendTime, EViewTargetBlendFunction BlendFunc, float BlendExp, bool bLockOutgoing)
 {
 	//NULL Check

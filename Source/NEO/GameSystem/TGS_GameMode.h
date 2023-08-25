@@ -113,13 +113,15 @@ public:
 
 	AActor* GetPlayStartPoint();
 
-///////////////////////////////////////////////
-///カメラ処理
+	///////////////////////////////////////////////
+	///カメラ処理
 public:
-AActor* CameraActor;
-FVector GetCameraLocation();
-FRotator GetCameraRotation();
-AActor* GetCameraActor();
+	AActor* CameraActor;
+	FVector GetCameraLocation();
+	FRotator GetCameraRotation();
+	AActor* GetCameraActor();
+
+	void SetSplineCamera(AActor* _splineCamera);
 
 //使い方
 //　ATGS_GameMode* GameMode = Cast<ATGS_GameMode>(UGameplayStatics::GetGameMode(GetWorld()));

@@ -395,13 +395,9 @@ void ATGS_GameStateBase::ExitBattleArea()
 	if (PlayerCharacter) {
 		ATGS_GameMode* GameMode = Cast<ATGS_GameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 		if (GameMode) {
-
-			//Player取得
-			ACharacter* tmp_Character = Cast<ACharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(),0) );
-			AActor* tmp_CameraActor = tmp_Character->GetOwner();
-			if (tmp_CameraActor)			{
+			if (SplineCamera)			{
 				//カメラをプレイヤーのカメラに変更
-				GameMode->SetViewTargetWithBlend(tmp_CameraActor, 1.f);
+				GameMode->SetViewTargetWithBlend(SplineCamera, 1.f);
 			}
 			else {
 				//Log

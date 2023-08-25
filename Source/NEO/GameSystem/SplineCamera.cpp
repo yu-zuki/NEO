@@ -47,7 +47,12 @@ void ASplineCamera::BeginPlay()
 		GameMode->SetViewTargetWithBlend(this);
 	}
 
-	//GetPlayer
+	//CastTGSGameMode
+	ATGS_GameMode* TGSGameMode = Cast<ATGS_GameMode>(UGameplayStatics::GetGameMode(this));
+	if (TGSGameMode) {
+		TGSGameMode->SetSplineCamera(this);
+	}
+
 	ACharacter* PlayerCharacter = UGameplayStatics::GetPlayerCharacter(this, 0);
 	//SetOwner
 	if (PlayerCharacter) {

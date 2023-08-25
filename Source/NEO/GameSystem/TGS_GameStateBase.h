@@ -175,6 +175,9 @@ public:
 	TArray<class UProceduralMeshComponent*> BattleAreaMeshs;
 
 	AActor* GetBattleAreaCamera();
+
+	AActor* SplineCamera;
+
 //---------------------------------------------------------------------------------------------------------------------
 protected:
 	//ゲームインスタンスの取得
