@@ -85,12 +85,14 @@ void APlayerBase::Tick(float DeltaTime)
 		Jump();
 	}
 
+
+
 	// デルタタイム加算
 	deltaTime = DeltaTime;
 }
 
 
-// Called to bind functionality to input
+// 入力のバインド
 void APlayerBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
@@ -126,6 +128,9 @@ void APlayerBase::SetupPlayerData()
 
 	// コンボの名前格納
 	ComboStartSectionNames = { "First", "Second", "Third"/*,"Fourth"*/ };
+
+	// ゲームモード取得
+	pGameMode = Cast<ATGS_GameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 
 	// スプラインを検索して格納
 	AActor* tempSplineActor = GetSplineActor("PlayerLoad");
@@ -285,6 +290,7 @@ UAnimMontage* APlayerBase::GetAnimationAsset(TCHAR* _animAssetPath)
 	// アセットを探してセット
 	ConstructorHelpers::FObjectFinder<UAnimMontage> SearchAnimMontage(_animAssetPath);
 
+	// そのアセットが存在したら格納
 	if (SearchAnimMontage.Succeeded())
 	{
 		UAnimMontage* FoundAnimMontage = SearchAnimMontage.Object;
@@ -307,16 +313,18 @@ void APlayerBase::Move(const FInputActionValue& _value)
 	// コントロール可能か
 	if (!IsControl) { return; }
 
-	// input is a Vector2D
+	// 2軸で入力取得
 	FVector2D MovementVector = _value.Get<FVector2D>();
-	
-	if (SplineActor)
+
+	if (pGameMode)
 	{
-		// スプラインの角度取得
-		const FRotator Rotation = SplineActor->GetSplineAngle(DistanceAdvanced * CharacterMovementComp->MaxWalkSpeed * deltaTime);
+		// カメラの角度取得
+		const FRotator Rotation = pGameMode->GetCameraRotation();
 
 		const FRotator YawRotation(0.f, Rotation.Yaw, 0.f);
+
 		SplineYawRotation = YawRotation;
+
 		// スプラインに沿った移動方向取得(X,Y)
 		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
@@ -326,15 +334,7 @@ void APlayerBase::Move(const FInputActionValue& _value)
 		AddMovementInput(ForwardDirection, MovementVector.Y);
 
 		// 移動方向に回転
-		RotateCharacter(MovementVector.X);
-
-		// 目の前に壁があるか判定し、ない時だけ処理
-		if (!ActionAssistComp->WallCheck())
-		{
-			// 移動量保存
-			DistanceAdvanced += MovementVector.X;
-
-		}
+		RotateCharacter(MovementVector.Y);
 	}
 }
 
@@ -527,6 +527,28 @@ void APlayerBase::RotateCharacter(float _nowInput_X)
 
 
 /*
+ * 関数名　　　　：RotateCharacter()
+ * 処理内容　　　：キャラクターの移動量取得
+ * 引数１　　　　：FVector _nowPos・・・現在位置
+ * 戻り値　　　　：なし
+ */
+void APlayerBase::AmountOfMovement(FVector _nowPos)
+{
+	// 同じ位置にいたらスキップ
+	if (BeforePos == _nowPos) { return; }
+
+	// 距離計算
+	const float AmountOfMovement = FVector::Dist(_nowPos, BeforePos);
+
+	// 移動量保存
+	DistanceAdvanced += AmountOfMovement;
+
+	// 現在の位置を保存
+	BeforePos = _nowPos;
+}
+
+
+/*
  * 関数名　　　　：SlowDawnDeathAnimationRate()
  * 処理内容　　　：死亡時アニメーション引き伸ばし
  * 戻り値　　　　：なし
@@ -689,7 +711,7 @@ void APlayerBase::TakedDamage(float _damage, bool _isLastAttack /*= false*/)
 			{
 				IsAttacking = false;
 				CanCombo = false;
-				IsControl = true;
+				IsControl = false;
 				ComboIndex = 0;
 			}
 

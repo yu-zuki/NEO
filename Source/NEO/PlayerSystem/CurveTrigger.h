@@ -19,16 +19,8 @@ public:
 	// コンストラクタ
 	ACurveTrigger();
 
-	// カーブに突入したか
-	bool GetenterCurve() { return EnterCurve; }
-
-protected:
-
 	// ゲーム開始時に呼び出される処理
 	virtual void BeginPlay() override;
-
-
-private:
 
 	//// このActorに衝突した瞬間に行う処理
 	//virtual void OnActorOverlapBegin(AActor* OverlappedActor, AActor* OtherActor);
@@ -41,7 +33,4 @@ private:
 
 	// 判定用のボックスコンポーネント
 	class UBoxComponent* CurveTriggerComp;
-
-	// カーブに入ったことを知らせる
-	bool EnterCurve;
 };

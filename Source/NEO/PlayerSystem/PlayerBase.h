@@ -193,6 +193,9 @@ private:
 	// キャラクターの回転
 	void RotateCharacter(float _nowInput_X);
 
+	// キャラクターの移動量取得
+	void AmountOfMovement(FVector _nowPos);
+
 	// 死亡処理呼び出し
 	void CallGameModeFunc_DestroyPlayer();
 
@@ -335,7 +338,10 @@ private:
 	const float radPerFrame = 3.14f / 30.f;
 
 	// ジャンプ前の高さ
-	float JumpBeforePos_Z;					
+	float JumpBeforePos_Z;	
+
+	// 前の位置
+	FVector BeforePos;
 
 	// 攻撃中かどうか
 	bool IsAttacking;						
@@ -353,7 +359,10 @@ private:
 	FTimerHandle TimerHandle_DeathToGameOver;		
 
 	// プレイヤーが通るスプライン
-	class APlayerSpline* SplineActor;				
+	class APlayerSpline* SplineActor;		
+
+	// ゲームモード保存
+	class ATGS_GameMode* pGameMode;
 
 	// デルタタイム保存用
 	float deltaTime;
