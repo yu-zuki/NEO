@@ -357,9 +357,8 @@ void ATGS_GameStateBase::EnterBattleArea()
 	if (GetBattleAreaCamera()) {
 		ATGS_GameMode* GameMode = Cast<ATGS_GameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 		if (GameMode) {
-
 			//コメントアウトしておく
-			//GameMode->SetViewTargetWithBlend(GetBattleAreaCamera(), 0.5f);
+			GameMode->SetViewTargetWithBlend(GetBattleAreaCamera());
 		}
 		else {
 			UE_LOG(LogTemp, Warning, TEXT("GameMode is not found"));
@@ -399,10 +398,10 @@ void ATGS_GameStateBase::ExitBattleArea()
 
 			//Player取得
 			ACharacter* tmp_Character = Cast<ACharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(),0) );
-			AActor* tmp_CameraActor = GameMode->GetCameraActor();
+			AActor* tmp_CameraActor = tmp_Character->GetOwner();
 			if (tmp_CameraActor)			{
 				//カメラをプレイヤーのカメラに変更
-				GameMode->SetViewTargetWithBlend(tmp_CameraActor, 0.5f);
+				GameMode->SetViewTargetWithBlend(tmp_CameraActor, 1.f);
 			}
 			else {
 				//Log
@@ -425,10 +424,10 @@ void ATGS_GameStateBase::InitBattleArea()
 
 AActor* ATGS_GameStateBase::GetBattleAreaCamera()
 {
-	if (BattleAreaCamera)	{
+	if (BattleAreaCamera) {
 		return BattleAreaCamera;
 	}
-	else	{
+	else {
 		UE_LOG(LogTemp, Error, TEXT("BattleAreaCamera is not Found"));
 		return nullptr;
 	}
