@@ -18,6 +18,7 @@ enum class EGameState : uint8
 	EGame_Playing UMETA(DisplayName = "Game_Playing"),				// ゲーム中	
 	EGame_InBattleArea UMETA(DisplayName = "EGame_InBattleArea"),	// バトルエリア
 	EGame_Over UMETA(DisplayName = "Game_Over"),					// ゲームオーバー
+	EGame_Clear UMETA(DisplayName = "Game_Clear"),					// ゲームクリア
 
 	EGame_ReSpawnPlayer UMETA(DisplayName = "Game_ReSpawnPlayer"),	// プレイヤーの復活
 	EGame_Menu UMETA(DisplayName = "Game_Menu"),					// メニュー画面	
@@ -33,6 +34,7 @@ enum class ENextLevel : uint8
 	ENextLevel_Title UMETA(DisplayName = "NextLevel_Title"),				// タイトル画面
 	ENextLevel_Playing UMETA(DisplayName = "NextLevel_Playing"),			// ゲーム中
 	ENextLevel_Over UMETA(DisplayName = "NextLevel_Over"),					// ゲームオーバー
+	ENextLevel_Clear UMETA(DisplayName = "NextLevel_Clear"),							// ゲームクリア
 
 };
 
@@ -78,6 +80,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALevelName")
 		FName GameOverLevelName = FName(TEXT("GameOver"));		// ゲームオーバーのレベル名
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALevelName")
+		FName GameClearLevelName = FName(TEXT("GameClear"));		// ゲームオーバーのレベル名
+
 public:
 	FDateTime GameStartTime;						// ゲームの開始時間
 	FDateTime GameEndTime;							// ゲームの終了時間
@@ -112,6 +117,9 @@ public:
 
 	bool IsGameOver();								// ゲームオーバーかどうかを判定
 
+	bool bIsGameClear;								// ゲームクリアかどうかを判定
+	bool IsGameClear();								// ゲームクリアかどうかを判定
+
 	//-------------------------------------------------------------------------------------------------------
 protected:
 	//ゲームタイトルの処理
@@ -120,6 +128,9 @@ protected:
 	void OnGamePlaying(float DeltaTime);
 	//ゲームオーバーの処理
 	void OnGameOver();
+	//ゲームクリアの処理
+	void OnGameClear();
+
 	//プレイヤーの復活処理
 	void OnReSpawnPlayer();
 	//メニュー画面の処理

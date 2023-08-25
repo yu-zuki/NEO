@@ -67,6 +67,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "GameSystem")
 		void SetState_GameOver(float _time = 0);
 
+	UFUNCTION(BlueprintCallable, Category = "GameSystem")
+		void SetState_GameClear(float _time = 0);
+
 	void SetSubAction(ESubAction _eSubAction);
 
 //-----------------------------------------バトルエリア-------------------------------------------
