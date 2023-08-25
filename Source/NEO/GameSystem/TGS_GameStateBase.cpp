@@ -55,6 +55,9 @@ void ATGS_GameStateBase::UpdateGameState(float DeltaTime)
 	case EGameState::EGame_Over:
 		OnGameOver();
 		break;
+	case EGameState::EGame_Clear:
+		OnGameClear();
+		break;
 	case EGameState::EGame_ReSpawnPlayer:
 		OnReSpawnPlayer();
 		break;
@@ -128,6 +131,10 @@ void ATGS_GameStateBase::InitCurrentState()
 	{
 		ECurrentState = EGameState::EGame_Over;
 	}
+	else if ((FName)CurrentLevelName == GameClearLevelName)
+	{
+		ECurrentState = EGameState::EGame_Clear;
+	}
 
 	//インスタンスからゲームの状態を読み込む
 	if (ECurrentState != GetGameInstance()->LoadGameStateData()) {
@@ -168,6 +175,11 @@ bool ATGS_GameStateBase::IsGameOver()
 	// 例：　/*if (player.hp < 0) { return true }*/
 
 	return bIsGameOver;
+}
+
+bool ATGS_GameStateBase::IsGameClear()
+{
+	return bIsGameClear;
 }
 
 void ATGS_GameStateBase::OnGameTitle()
@@ -218,6 +230,20 @@ void ATGS_GameStateBase::OnGamePlaying(float DeltaTime)
 		GetGameInstance()->SaveGameStateData(ECurrentState);		//インスタンスにゲームの状態を保存
 		ChangeNextLevel(ENextLevel::ENextLevel_Over);
 	}
+	else if(IsGameClear()){
+		SetCurrentState(EGameState::EGame_Clear);
+		GameEndTime = FDateTime::Now();
+
+		GetGameInstance()->SaveGameStateData(ECurrentState);		//インスタンスにゲームの状態を保存
+		ChangeNextLevel(ENextLevel::ENextLevel_Clear);
+	}
+	else if (false) {
+		SetCurrentState(EGameState::EGame_Pause);
+	}
+	else if (false) {
+		SetCurrentState(EGameState::EGame_Menu);
+
+	}
 	else if (false) {
 		SetCurrentState(EGameState::EGame_Pause);
 	}
@@ -237,6 +263,21 @@ void ATGS_GameStateBase::OnGameOver()
 		SetCurrentState(EGameState::EGame_ReSpawnPlayer);
 	}
 	else if (EchangeLevel == EChangeLevel::EChangeLevel_Title) {
+		SetCurrentState(EGameState::EGame_Title);
+
+		GetGameInstance()->SaveGameStateData(ECurrentState);		//インスタンスにゲームの状態を保存
+		ChangeNextLevel(ENextLevel::ENextLevel_Title);
+	}
+
+	//Enterキーが押されたら、タイトルに戻る
+	if (UseSubAction() == ESubAction::ESubAction_Enter) {
+		EchangeLevel = EChangeLevel::EChangeLevel_Title;
+	}
+}
+
+void ATGS_GameStateBase::OnGameClear()
+{
+	if (EchangeLevel == EChangeLevel::EChangeLevel_Title) {
 		SetCurrentState(EGameState::EGame_Title);
 
 		GetGameInstance()->SaveGameStateData(ECurrentState);		//インスタンスにゲームの状態を保存
@@ -423,6 +464,9 @@ void ATGS_GameStateBase::ChangeNextLevel(ENextLevel NextLevel)
 		break;
 	case ENextLevel::ENextLevel_Over:
 		ChangeLevel(GameOverLevelName);
+		break;
+	case ENextLevel::ENextLevel_Clear:
+		ChangeLevel(GameClearLevelName);
 		break;
 	}
 }

@@ -192,6 +192,11 @@ void ATGS_GameMode::SetState_GameOver(float _time)
 	GetGameState()->bIsGameOver = true;
 }
 
+void ATGS_GameMode::SetState_GameClear(float _time)
+{
+	GetGameState()->bIsGameClear = true;
+}
+
 void ATGS_GameMode::SetSubAction(ESubAction _eSubAction)
 {
 	GetGameState()->SetSubAction(_eSubAction);
