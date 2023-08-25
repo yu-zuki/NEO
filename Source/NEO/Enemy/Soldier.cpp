@@ -7,6 +7,8 @@
 #include "GameFramework/Controller.h"
 #include "Kismet/GameplayStatics.h"
 
+
+
 ASoldier::ASoldier()
 {
     PrimaryActorTick.bCanEverTick = true;

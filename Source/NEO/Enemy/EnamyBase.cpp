@@ -37,7 +37,7 @@ AEnamyBase::AEnamyBase()
 	// アタックアシストコンポーネント作成
 	ActionAssistComp = CreateDefaultSubobject<UActionAssistComponent>(TEXT("AttackAssist"));
 	Damage = 5.0f;
-	DamageCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	
 }
 
 void AEnamyBase::DestoryEnemy()
@@ -72,6 +72,8 @@ void AEnamyBase::BeginPlay()
 	{
 		PlayerCharacter = Cast<ACharacter>(FoundPlayers[0]);
 	}*/
+
+	DamageCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 AActor* AEnamyBase::GetPlayer()
@@ -112,7 +114,7 @@ void AEnamyBase::Tick(float DeltaTime)
 				//bIsRotationがtrueなら
 				if (Health >= 0)
 				{
-					/*if (bIsRotation)
+					if (bIsRotation)
 					{
 					    FRotator NewRotation = GetActorRotation();
 					    NewRotation.Yaw = -90.0f;
@@ -126,12 +128,12 @@ void AEnamyBase::Tick(float DeltaTime)
 					    FRotator NewRotation = GetActorRotation();
 					    NewRotation.Yaw = 90.0f;
 					    SetActorRotation(NewRotation);
-					}*/
+					}
 
-					bool LookRight = (bIsRotation) ? (true) : (false);
+					/*bool LookRight = (bIsRotation) ? (true) : (false);
 
 
-					ActionAssistComp->OwnerParallelToCamera(LookRight);
+					ActionAssistComp->OwnerParallelToCamera(LookRight);*/
 
 				}
 			}
@@ -193,7 +195,7 @@ void AEnamyBase::ApplyDamage(float DamageAmount)
 	}
 	else
 	{
-		PlayAnimMontage(Damage_Reaction, 0.8, NAME_None);
+		PlayAnimMontage(Damage_Reaction, 0.1, NAME_None);
 
 		ActionAssistComp->SpawnHitEffect(NiagaraEffect, GetActorLocation());
 
@@ -257,10 +259,11 @@ bool AEnamyBase::IsAnimationAttacking() const
 	{
 		if (AnimAttack->Montage_IsPlaying(Attack) || AnimAttack->Montage_IsPlaying(Attack2) || AnimAttack->Montage_IsPlaying(Attack3))
 		{
-
+			DamageCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 			return true;
 		}
 	}
+	DamageCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	return false;
 }
 
@@ -288,8 +291,8 @@ void AEnamyBase::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* Oth
 			// Apply damage to the player
 			CastedPlayer->TakedDamage(Damage);
 			ActionAssistComp->HitStop(0.2f);
-
-			DamageCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+			
+		
 		}
 	}
 }

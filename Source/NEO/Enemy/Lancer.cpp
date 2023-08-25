@@ -15,7 +15,7 @@ ALancer::ALancer()
     GetCharacterMovement()->bOrientRotationToMovement = true;
     GetCharacterMovement()->RotationRate = FRotator(0.0f, 540.0f, 0.0f);
     GetCharacterMovement()->MaxWalkSpeed = MovementSpeed;
-    
+    Damage = 1.f;
 }
 
 
@@ -179,10 +179,14 @@ void ALancer::CheckPlayerInFront()
                     {
                         if (FMath::FRand() < 0.8f)
                         {
-                            PlayAnimMontage(Attack, 1, NAME_None);
-                              
+                            PlayAnimMontage(Attack, 1.2, NAME_None);
+                            
                         }
 
+                    }
+                    else
+                    {
+                    
                     }
                 }
             }
