@@ -10,6 +10,8 @@
 #include "Math/UnrealMathUtility.h"
 #include "../PlayerSystem/PlayerCharacter.h"
 #include "TGS_GameMode.h"
+#include "Components/BoxComponent.h"							//ボックスコンポーネントを使うため
+
 
 // Sets default values
 ASplineCamera::ASplineCamera()
@@ -24,6 +26,9 @@ ASplineCamera::ASplineCamera()
 
 	//CreateSplineComponent
 	SplineComponent = CreateDefaultSubobject<USplineComponent>(TEXT("SplineComponent"));
+
+	//Box
+	BoxComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxComponent"));
 
 	bMoveFlag = false;
 	CameraSpeed = 300.0f;
@@ -65,6 +70,9 @@ void ASplineCamera::BeginPlay()
 void ASplineCamera::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+
+	if (bMoveFlag != true) return;
 
 	// プレイヤーを取得
 	ACharacter* PlayerCharacter = UGameplayStatics::GetPlayerCharacter(this, 0);

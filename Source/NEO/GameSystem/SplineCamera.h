@@ -30,6 +30,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
 		class USplineComponent* SplineComponent;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
+		class UBoxComponent* BoxComponent;
+
 public:
 	//Camera Speed
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")

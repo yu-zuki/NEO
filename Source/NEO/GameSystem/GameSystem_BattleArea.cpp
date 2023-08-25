@@ -131,14 +131,16 @@ SFrustumVertices AGameSystem_BattleArea::GetFrustumVertices(FMinimalViewInfo Cam
 	
 	//最適化してない
 	SFrustumVertices FrustumVertices;
-	//FrustumVertices.BottomLeftNear = BottomLeftNear;
-	//FrustumVertices.TopRightNear = TopRightNear;
-	//FrustumVertices.BottomRightNear = BottomRightNear;
-	//FrustumVertices.TopLeftNear = TopLeftNear;
-	//FrustumVertices.BottomLeftFar = BottomLeftFar;
-	//FrustumVertices.TopRightFar = TopRightFar;
-	//FrustumVertices.BottomRightFar = BottomRightFar;
-	//FrustumVertices.TopLeftFar = TopLeftFar;
+
+	FrustumVertices.BottomLeftNear = BottomLeftNear;
+	FrustumVertices.TopRightNear = TopRightNear;
+	FrustumVertices.BottomRightNear = BottomRightNear;
+	FrustumVertices.TopLeftNear = TopLeftNear;
+	FrustumVertices.BottomLeftFar = BottomLeftFar;
+	FrustumVertices.TopRightFar = TopRightFar;
+	FrustumVertices.BottomRightFar = BottomRightFar;
+	FrustumVertices.TopLeftFar = TopLeftFar;
+
 
 
 	//FrustumVertices.BottomLeftNear = TopLeftNear;
@@ -191,32 +193,26 @@ void AGameSystem_BattleArea::CreateAreaMesh(SFrustumVertices FrustumVertices)
 	Triangles.Add(0);
 
 	// メッシュの作成
-	//LeftMesh->CreateMeshSection_LinearColor(0, Vertices, Triangles, TArray<FVector>(), TArray<FVector2D>(), TArray<FLinearColor>(), TArray<FProcMeshTangent>(), true);
+	LeftMesh->CreateMeshSection_LinearColor(0, Vertices, Triangles, TArray<FVector>(), TArray<FVector2D>(), TArray<FLinearColor>(), TArray<FProcMeshTangent>(), true);
 
 	//　レンダーしない
-	
+
 
 	//　衝突を無効に
 	LeftMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	//　右側の平面の頂点を追加
 	Vertices.Reset();
-	//Vertices.Add(FrustumVertices.BottomRightNear);
-	//Vertices.Add(FrustumVertices.TopRightNear);
-	//Vertices.Add(FrustumVertices.TopRightFar);
-	//Vertices.Add(FrustumVertices.BottomRightFar);
-
 	Vertices.Add(FrustumVertices.BottomRightNear);
 	Vertices.Add(FrustumVertices.TopRightNear);
 	Vertices.Add(FrustumVertices.TopRightFar);
 	Vertices.Add(FrustumVertices.BottomRightFar);
 
-
 	//
-	//RightMesh->CreateMeshSection_LinearColor(0, Vertices, Triangles, TArray<FVector>(), TArray<FVector2D>(), TArray<FLinearColor>(), TArray<FProcMeshTangent>(), true);
-	
+	RightMesh->CreateMeshSection_LinearColor(0, Vertices, Triangles, TArray<FVector>(), TArray<FVector2D>(), TArray<FLinearColor>(), TArray<FProcMeshTangent>(), true);
+
 	// 
-	
+
 
 	// 
 	RightMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -229,16 +225,12 @@ void AGameSystem_BattleArea::CreateAreaMesh(SFrustumVertices FrustumVertices)
 	Vertices.Add(FrustumVertices.BottomRightNear);
 
 	//
-	//NearMesh->CreateMeshSection_LinearColor(0, Vertices, Triangles, TArray<FVector>(), TArray<FVector2D>(), TArray<FLinearColor>(), TArray<FProcMeshTangent>(), true);
+	NearMesh->CreateMeshSection_LinearColor(0, Vertices, Triangles, TArray<FVector>(), TArray<FVector2D>(), TArray<FLinearColor>(), TArray<FProcMeshTangent>(), true);
 	NearMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	
+
 	LeftMesh->SetVisibility(false);
 	RightMesh->SetVisibility(false);
 	NearMesh->SetVisibility(false);
-
-	//LeftMesh->SetVisibility(true);
-	//RightMesh->SetVisibility(true);
-	//NearMesh->SetVisibility(true);
 
 }
 
