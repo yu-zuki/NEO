@@ -53,14 +53,14 @@ void AGameSystem_BattleArea::BeginPlay()
 {
 	Super::BeginPlay();
 
-	auto Transform = GetActorTransform();
+	//auto Transform = GetActorTransform();
 
-	// RootのTransformを初期化
-	GetRootComponent()->SetRelativeTransform(FTransform::Identity);
+	//// RootのTransformを初期化
+	//GetRootComponent()->SetRelativeTransform(FTransform::Identity);
 
-	CreateBattleArea();
+	//CreateBattleArea();
 
-	GetRootComponent()->SetRelativeTransform(Transform);
+	//GetRootComponent()->SetRelativeTransform(Transform);
 
 	StaticMeshComponent->OnComponentBeginOverlap.AddDynamic(this, &AGameSystem_BattleArea::BeginOverlap);
 	
@@ -268,7 +268,28 @@ int32 AGameSystem_BattleArea::CheckEnemyCount()
 
 void AGameSystem_BattleArea::EnterBattleArea()
 {
+	//カメラをコンポーネントを別のカメラに設定
 	ATGS_GameMode* GameMode = GetWorld()->GetAuthGameMode<ATGS_GameMode>();
+
+	//Transformを設定
+	UCameraComponent* NowCamera = GameMode->GetCameraActor()->FindComponentByClass<UCameraComponent>();
+	CameraComponent->SetWorldTransform(NowCamera->GetComponentTransform());
+	CameraComponent->FieldOfView = NowCamera->FieldOfView;
+	CameraComponent->AspectRatio = NowCamera->AspectRatio;
+
+
+	//Meshの生成
+	auto Transform = GetActorTransform();
+
+	// RootのTransformを初期化
+	GetRootComponent()->SetRelativeTransform(FTransform::Identity);
+
+	CreateBattleArea();
+
+	GetRootComponent()->SetRelativeTransform(Transform);
+
+	//GameModeに入ります
+
 	if (GameMode) {
 		bIsInBattleArea = true;
 		if (SpawnPoints.Num() == 0) {

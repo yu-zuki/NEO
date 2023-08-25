@@ -46,6 +46,13 @@ void ASplineCamera::BeginPlay()
 	if (GameMode) {
 		GameMode->SetViewTargetWithBlend(this);
 	}
+
+	//GetPlayer
+	ACharacter* PlayerCharacter = UGameplayStatics::GetPlayerCharacter(this, 0);
+	//SetOwner
+	if (PlayerCharacter) {
+		PlayerCharacter->SetOwner(this);
+	}
 	
 }
 
@@ -54,22 +61,23 @@ void ASplineCamera::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	// 获取玩家角色
+	// プレイヤーを取得
 	ACharacter* PlayerCharacter = UGameplayStatics::GetPlayerCharacter(this, 0);
 	if (PlayerCharacter && SplineComponent)
 	{
-		// 获取玩家角色的位置
+		// プレイヤーの位置を取得
 		FVector PlayerLocation = PlayerCharacter->GetActorLocation();
 
-		// 获取Spline曲线上距离玩家最近的点
+		// Spline曲線上でプレイヤーに最も近い点を取得
 		FVector NearestPoint = SplineComponent->FindLocationClosestToWorldLocation(PlayerLocation, ESplineCoordinateSpace::World);
 
-		// 设置相机位置为Spline曲线上距离玩家最近的点
+		// プレイヤーとカメラの距離を取得
 		FVector CameraLocation = NearestPoint;
 		CameraComponent->SetWorldLocation(CameraLocation);
 
-		// 使相机朝向玩家
+		// プレイヤーの方向を向く
 		FRotator NewRotation = (PlayerLocation - CameraLocation).Rotation();
+		NewRotation.Pitch = -25.f;
 
 		CameraComponent->SetWorldRotation(NewRotation);
 	}
