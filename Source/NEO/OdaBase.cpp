@@ -642,7 +642,10 @@ bool AOdaBase::LastAttack()
 	{
 		return true;
 	}
+
 	else if (Combo2Counter == 2)
+
+
 	{
 		return true;
 	}
