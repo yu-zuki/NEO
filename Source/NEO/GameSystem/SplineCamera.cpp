@@ -9,6 +9,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Math/UnrealMathUtility.h"
 #include "../PlayerSystem/PlayerCharacter.h"
+#include "DrawDebugHelpers.h"
 #include "TGS_GameMode.h"
 #include "Components/BoxComponent.h"							//ボックスコンポーネントを使うため
 
@@ -84,12 +85,26 @@ void ASplineCamera::Tick(float DeltaTime)
 		// Spline曲線上でプレイヤーに最も近い点を取得
 		FVector NearestPoint = SplineComponent->FindLocationClosestToWorldLocation(PlayerLocation, ESplineCoordinateSpace::World);
 
-		// プレイヤーとカメラの距離を取得
-		FVector CameraLocation = NearestPoint;
+		
+		UE_LOG(LogTemp, Log, TEXT("location: %s"), *NearestPoint.ToString());	
+
+		//FVector CameraLocation = NearestPoint;	// プレイヤーとカメラの距離を取得
+
+		FVector BeforeCameraLocation = CameraComponent->GetComponentLocation();
+		FVector CameraLocation = FMath::VInterpTo(BeforeCameraLocation,NearestPoint,DeltaTime, CameraSpeed);	// プレイヤーとカメラの距離を取得
+
+
+		DrawDebugPoint(GetWorld(), BeforeCameraLocation, 100, FColor(52, 220, 239), false);
+
+		
+
 		CameraComponent->SetWorldLocation(CameraLocation);
 
 		// プレイヤーの方向を向く
-		FRotator NewRotation = (PlayerLocation - CameraLocation).Rotation();
+		//FRotator NewRotation = (PlayerLocation - CameraLocation).Rotation();
+
+		FRotator NewRotation = SplineComponent->FindRotationClosestToWorldLocation(CameraLocation, ESplineCoordinateSpace::World);
+		NewRotation.Yaw += -90.f;
 		NewRotation.Pitch = -25.f;
 
 		CameraComponent->SetWorldRotation(NewRotation);
