@@ -32,9 +32,6 @@ public:
 	// カメラシェイク
 	void CameraShake(TSubclassOf<UCameraShakeBase> _shakePattern, float _scale = 1.f);
 
-	// アニメーション再生
-	void PlayAnimation(UAnimMontage* _toPlayAnimMontage, FName _startSectionName = "None", float _playRate = 1.f);
-
 	/////////////////////////////////////////////////////////////////////////
 	// 壁とのレイキャストを行う関数
 	bool WallCheck();
@@ -85,12 +82,25 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Action Assist")
 		float SpeedDuringHitStop;
 
+	// HitStopで止まる時間
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Action Assist")
+		float aiueo;
+
+	// カーブの名前
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Action Assist")
+		FName CurveName;
+
+
 private:
 
 	// タイマーハンドル
 	FTimerHandle TimerHandle_HitStop;
 
+	// AnimInstance格納用
+	UAnimInstance* OwnerAnimInstance;
+
 	// アニメーションプレイ中かどうか
 	bool IsAnimationPlaying;
 
+	UAnimMontage* PlayAnimMontage;
 };

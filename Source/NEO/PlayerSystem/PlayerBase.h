@@ -185,9 +185,6 @@ public:
 
 
 	//-------------------------スプライン------------------------------
-public:
-	FRotator SplineYawRotation;
-
 private:
 
 	// キャラクターの回転
@@ -203,7 +200,7 @@ private:
 	AActor* GetSplineActor(const FName _tag);
 
 	// アニメーション再生
-	void PlayAnimation(UAnimMontage* _toPlayAnimMontage, FName _startSectionName = "None", float _playRate = 1.f);
+	void PlayAnimation(UAnimMontage* _toPlayAnimMontage, FName _startSectionName = "None", float _playRate = 1.f, FName _curveName = "None");
 
 protected:
 
@@ -290,6 +287,10 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Action Assist", meta = (AllowPrivateAccess = "true"))
 		class UActionAssistComponent* ActionAssistComp;
 
+	// AnimInstance
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animation", meta = (AllowPrivateAccess = "true"))
+		class UAnimInstance* PlayerAnimInstance;
+
 	// 被ダメージ時のエフェクト
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Effect", meta = (AllowPrivateAccess = "true"))
 		class UNiagaraSystem* HitEffect;
@@ -355,6 +356,9 @@ private:
 	// コンボの段数(First,Second,Third・・・)
 	TArray<FName> ComboStartSectionNames;	
 
+	// アニメーションのカーブの名前
+	TArray<FName> AnimationCurveNames;
+
 	// ハンドル
 	FTimerHandle TimerHandle_DeathToGameOver;		
 
@@ -375,5 +379,4 @@ public:
 		float GetPlayerHPPercent()const { return PlayerStatus.HP / PlayerStatus.MaxHP; }
 
 	class UTGS_GameInstance* GetGameInstance();
-
 };

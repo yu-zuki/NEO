@@ -44,6 +44,8 @@ void UActionAssistComponent::BeginPlay()
 void UActionAssistComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+
 }
 
 
@@ -142,34 +144,6 @@ void UActionAssistComponent::CameraShake(TSubclassOf<UCameraShakeBase> _shakePat
 
 	// カメラシェイク開始
 	CameraManager->StartCameraShake(_shakePattern, _scale);
-}
-
-
-/*
- * 関数名　　　　：PlayAnimation()
- * 処理内容　　　：プレイヤーのアニメーション再生(再生中は操作不可)
- * 引数１　　　　：UAnimMontage* _toPlayAnimMontage ・・・再生するアニメーション
- * 引数２　　　　：FName _startSectionName・・・・・・・・コンボの何段目から再生するか
- * 引数３　　　　：float _playRate・・・・・・・・・・・・アニメーションの再生速度
- * 戻り値　　　　：なし
- */
-void UActionAssistComponent::PlayAnimation(UAnimMontage* _toPlayAnimMontage, FName _startSectionName /*= "None"*/, float _playRate /*= 1.f*/)
-{
-	// キャラクタークラスにキャスト
-	ACharacter* Owner = Cast<ACharacter>(GetOwner());
-	if (!Owner) { return; }
-
-	// 移動不能へ
-	//Owner->GetCharacterMovement()->DisableMovement();
-
-	// 再生するアニメーションを格納
-	UAnimMontage* toPlayAnimMontage = _toPlayAnimMontage;
-
-	// アニメーション再生
-	if (toPlayAnimMontage != nullptr)
-	{
-		Owner->PlayAnimMontage(_toPlayAnimMontage, _playRate, _startSectionName);
-	}
 }
 
 

@@ -129,8 +129,14 @@ void APlayerBase::SetupPlayerData()
 	// コンボの名前格納
 	ComboStartSectionNames = { "First", "Second", "Third"/*,"Fourth"*/ };
 
+	// カーブの名前格納
+	AnimationCurveNames = { "AnimRate_Combo1","AnimRate_Combo2" };
+
 	// ゲームモード取得
 	pGameMode = Cast<ATGS_GameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+
+	// AnimInstance取得
+	PlayerAnimInstance = GetMesh()->GetAnimInstance();
 
 	// スプラインを検索して格納
 	AActor* tempSplineActor = GetSplineActor("PlayerLoad");
@@ -323,8 +329,6 @@ void APlayerBase::Move(const FInputActionValue& _value)
 
 		const FRotator YawRotation(0.f, Rotation.Yaw, 0.f);
 
-		SplineYawRotation = YawRotation;
-
 		// スプラインに沿った移動方向取得(X,Y)
 		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
@@ -446,7 +450,7 @@ void APlayerBase::Attack(int _attackNum /*= 0*/)
 	// プレイヤーの角度修正
 	ActionAssistComp->CorrectAttackAngle();
 
-	if (IsPlayerGrounded())
+	if (!IsJumping)
 	{
 		if (!IsAttacking)
 		{
@@ -467,7 +471,7 @@ void APlayerBase::Attack(int _attackNum /*= 0*/)
 		}
 
 		// 攻撃のアニメーション再生
-		PlayAnimation(PlayerAnimation.Combo[_attackNum], ComboStartSectionNames[ComboIndex]);
+		PlayAnimation(PlayerAnimation.Combo[_attackNum], ComboStartSectionNames[ComboIndex],1.f, AnimationCurveNames[_attackNum]);
 	}
 	else
 	{
@@ -739,18 +743,21 @@ void APlayerBase::TakedDamage(float _damage, bool _isLastAttack /*= false*/)
  * 処理内容　　　：プレイヤーのアニメーション再生(再生中は操作不可)
  * 戻り値　　　　：なし
  */
-void APlayerBase::PlayAnimation(UAnimMontage* _toPlayAnimMontage, FName _startSectionName /*= "None"*/, float _playRate /*= 1.f*/)
+void APlayerBase::PlayAnimation(UAnimMontage* _toPlayAnimMontage, FName _startSectionName /*= "None"*/, float _playRate /*= 1.f*/,FName _curveName /*= "None"*/)
 {
 	// コントロール不能へ
 	IsControl = false;
 
-	// 再生するアニメーションを格納
-	UAnimMontage* toPlayAnimMontage = _toPlayAnimMontage;
+	// カーブがあれば
+	if (_curveName != "None")
+	{
+		
+	}
 
 	// アニメーション再生
-	if (toPlayAnimMontage != nullptr)
+	if (_toPlayAnimMontage != nullptr)
 	{
-		ActionAssistComp->PlayAnimation(_toPlayAnimMontage, _startSectionName, _playRate);
+		PlayAnimMontage(_toPlayAnimMontage, _playRate, _startSectionName);	
 	}
 }
 
