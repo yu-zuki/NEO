@@ -28,6 +28,8 @@ struct FMainAction
 {
 	GENERATED_BODY()
 
+public:
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		UInputMappingContext* DefaultMappingContext;
 
@@ -54,6 +56,7 @@ struct FPlayerStatus
 {
 	GENERATED_BODY()
 
+public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		float HP;
 
