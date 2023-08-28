@@ -90,8 +90,13 @@ void ASplineCamera::Tick(float DeltaTime)
 
 		//FVector CameraLocation = NearestPoint;	// プレイヤーとカメラの距離を取得
 
-		FVector BeforeCameraLocation = CameraComponent->GetComponentLocation();
-		FVector CameraLocation = FMath::VInterpTo(BeforeCameraLocation,NearestPoint,DeltaTime, CameraSpeed);	// プレイヤーとカメラの距離を取得
+		FVector BeforeCameraLocation = CameraComponent->GetComponentLocation();		//カメラの座標を取得
+
+		// カメラの座標をSpline曲線上でプレイヤーに最も近い点に滑らかに移動させる
+		//FVector CameraLocation = FMath::VInterpTo(BeforeCameraLocation,NearestPoint,DeltaTime, CameraSpeed);	
+
+		FVector CameraLocation = FMath::Lerp(BeforeCameraLocation, NearestPoint, 0.08);
+
 
 
 		DrawDebugPoint(GetWorld(), BeforeCameraLocation, 100, FColor(52, 220, 239), false);
@@ -103,7 +108,10 @@ void ASplineCamera::Tick(float DeltaTime)
 		// プレイヤーの方向を向く
 		//FRotator NewRotation = (PlayerLocation - CameraLocation).Rotation();
 
+		//Spline曲線上でプレイヤーに最も近い点の回転を取得
 		FRotator NewRotation = SplineComponent->FindRotationClosestToWorldLocation(CameraLocation, ESplineCoordinateSpace::World);
+		
+		//プレイヤーの方を向くように調整
 		NewRotation.Yaw += -90.f;
 		NewRotation.Pitch = -25.f;
 
