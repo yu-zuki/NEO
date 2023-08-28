@@ -179,8 +179,8 @@ void AOdaBase::ToPlayerRotate()
 {
 	bool LookRight;
 
-	//ボスがプレイヤーより多いとき
-	if (GetActorLocation().Y > UGameplayStatics::GetPlayerPawn(GetWorld(), 0)->GetActorLocation().Y)
+	//ボスがプレイヤーの右にいるとき
+	if (GetActorLocation().Y < UGameplayStatics::GetPlayerPawn(GetWorld(), 0)->GetActorLocation().Y)
 	{
 		LookRight = true;
 		
