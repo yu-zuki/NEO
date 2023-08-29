@@ -93,9 +93,9 @@ void ASplineCamera::Tick(float DeltaTime)
 		FVector BeforeCameraLocation = CameraComponent->GetComponentLocation();		//カメラの座標を取得
 
 		// カメラの座標をSpline曲線上でプレイヤーに最も近い点に滑らかに移動させる
-		//FVector CameraLocation = FMath::VInterpTo(BeforeCameraLocation,NearestPoint,DeltaTime, CameraSpeed);	
+		FVector CameraLocation = FMath::VInterpTo(BeforeCameraLocation,NearestPoint,DeltaTime, CameraSpeed);	
 
-		FVector CameraLocation = FMath::Lerp(BeforeCameraLocation, NearestPoint, 0.08);
+		//FVector CameraLocation = FMath::Lerp(BeforeCameraLocation, NearestPoint, 0.08);
 
 
 
