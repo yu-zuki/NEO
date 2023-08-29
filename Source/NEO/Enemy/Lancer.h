@@ -4,6 +4,7 @@
 #include "Engine/TargetPoint.h"
 #include "Components/BoxComponent.h"
 #include "EnamyBase.h"
+#include "Components/SplineComponent.h"
 #include "Lancer.generated.h"
 
 UCLASS()
@@ -20,6 +21,8 @@ public:
         float MovementSpeed = 100.0f; // 移動速度
     float Speed = 100.0f;
     void ChooseNewTarget();
+    UPROPERTY(VisibleAnywhere)
+        USplineComponent* MoveSpline;
 protected:
     virtual void BeginPlay() override;
 
@@ -50,4 +53,6 @@ private:
     FTimerHandle MoveToTargetTimer;
    
     ATargetPoint* CurrentTarget = nullptr;
+    float SpawnTime; // スポーンした時間を記録する変数
+    bool bHasPattern1Tag; // pattern1というTagを持っているかどうか
 };

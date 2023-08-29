@@ -15,7 +15,9 @@ ALancer::ALancer()
     GetCharacterMovement()->bOrientRotationToMovement = true;
     GetCharacterMovement()->RotationRate = FRotator(0.0f, 540.0f, 0.0f);
     GetCharacterMovement()->MaxWalkSpeed = MovementSpeed;
-    
+    bHasPattern1Tag = Tags.Contains("pattern1"); 
+     MoveSpline = CreateDefaultSubobject<USplineComponent>(TEXT("MoveSpline"));
+    MoveSpline->SetupAttachment(RootComponent);
 }
 
 
@@ -29,6 +31,7 @@ void ALancer::BeginPlay()
     // 5秒ごとにCheckPlayerInFront関数を実行するタイマーをセット
     GetWorldTimerManager().SetTimer(TimerHandle_CheckPlayerInFront, this, &ALancer::CheckPlayerInFront, 3.0f, true);
     GetWorld()->GetTimerManager().SetTimer(MoveToTargetTimer, this, &ALancer::ChooseNewTarget, 3.0f, true);
+    SpawnTime = GetWorld()->GetTimeSeconds();
 }
 FVector ALancer::GetSnappedDirection(const FVector& Direction) const
 {
@@ -54,7 +57,18 @@ void ALancer::Tick(float DeltaTime)
         bShouldSkipNextMovement = false;
         return;
     }
-   
+    if (bHasPattern1Tag && GetWorld()->GetTimeSeconds() - SpawnTime < 3.0f)
+    {
+        float TimeSinceSpawn = GetWorld()->GetTimeSeconds() - SpawnTime;
+        float SplineDuration = 3.0f;  // スプラインを完了するまでの時間
+        float SplineProgress = FMath::Clamp(TimeSinceSpawn / SplineDuration, 0.0f, 1.0f);
+
+        FVector NewLocation = MoveSpline->GetLocationAtSplineInputKey(SplineProgress, ESplineCoordinateSpace::World);
+        SetActorLocation(NewLocation);
+
+        return; // 他のTick処理をスキップ
+    }
+
     Super::Tick(DeltaTime);
     PlayerCharacter = Cast<ACharacter>(GetPlayer());
     if (!PlayerCharacter) return;
