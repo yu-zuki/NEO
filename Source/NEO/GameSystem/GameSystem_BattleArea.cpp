@@ -315,3 +315,12 @@ void AGameSystem_BattleArea::GetSpawnPoints()
 
 }
 
+void AGameSystem_BattleArea::IgnoreCollision()
+{
+	StaticMeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+}
+
+void AGameSystem_BattleArea::ResetCollision()
+{
+	StaticMeshComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+}

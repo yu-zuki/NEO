@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "DeathTrigger.h"
+#include "NEO/GameSystem/GameSystem_BattleArea.h"
 #include "NiagaraComponent.h"
 #include "EnemyBaseAnimInstance.h"
 #include "EnamyBase.generated.h"
@@ -129,5 +130,5 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
 		class UEnemyBase_WidgetComponent* EnemyWidget;
 	AActor* GetEnemyActor() const;
-
+	TArray<AGameSystem_BattleArea*> BattleAreaReferences;  // 複数のバトルエリアの参照
 };

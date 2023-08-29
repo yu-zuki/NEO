@@ -55,4 +55,6 @@ private:
     ATargetPoint* CurrentTarget = nullptr;
     float SpawnTime; // スポーンした時間を記録する変数
     bool bHasPattern1Tag; // pattern1というTagを持っているかどうか
+    ECollisionResponse DefaultCollisionResponseToPlayers;  // プレイヤーに対するデフォルトのコリジョンレスポンス
+    ECollisionResponse DefaultCollisionResponseToWorld;  // 地面（WorldStatic）に対するデフォルトのコリジョンレスポンス
 };

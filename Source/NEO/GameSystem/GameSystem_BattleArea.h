@@ -114,7 +114,10 @@ public:
 	//SpawnActorを取得する
 	void GetSpawnPoints();
 
-
+	// コリジョンを無視する関
+	void IgnoreCollision();
+	// コリジョンを元に戻す関数
+	void ResetCollision();
 	//////////////////////////////////壁の当たり判定を生成//////////////////////////////////////////////////
 
 

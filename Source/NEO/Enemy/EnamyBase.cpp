@@ -65,6 +65,15 @@ void AEnamyBase::BeginPlay()
 	{
 		AnimInstance = GetMesh()->GetAnimInstance();
 	}
+	TArray<AActor*> TempBattleAreas;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AGameSystem_BattleArea::StaticClass(), TempBattleAreas);
+
+	for (AActor* Actor : TempBattleAreas) {
+		AGameSystem_BattleArea* BattleArea = Cast<AGameSystem_BattleArea>(Actor);
+		if (BattleArea) {
+			
+		}
+	}
 	/*TArray<AActor*> FoundPlayers;
 	UGameplayStatics::GetAllActorsWithTag(GetWorld(), TEXT("Player"), FoundPlayers);
 
