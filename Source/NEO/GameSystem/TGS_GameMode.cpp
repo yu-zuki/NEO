@@ -138,8 +138,11 @@ AActor* ATGS_GameMode::SpawnEnemy(ASpawnPoint* spawnPoint)
 	//Transform‚ðŽæ“¾‚·‚é
 	FTransform spawnTransform = spawnPoint->GetTransform();
 
-	//SpawnPoint‚ðŽg‚Á‚ÄA“G‚ð¶¬‚·‚é
-	AActor* spawn_Actor = GetWorld()->SpawnActor(spawnPoint->GetSpawnActorClass());
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+	AActor* spawn_Actor = GetWorld()->SpawnActor<AActor>(spawnPoint->GetSpawnActorClass(), spawnPoint->GetActorLocation(), spawnPoint->GetActorRotation(), SpawnParams);
+
 
 	AOdaBase* Boss = Cast<AOdaBase>(spawn_Actor);
 	AEnamyBase* Enemy = Cast<AEnamyBase> (spawn_Actor);
