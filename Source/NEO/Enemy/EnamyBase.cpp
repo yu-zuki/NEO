@@ -38,6 +38,11 @@ AEnamyBase::AEnamyBase()
 	ActionAssistComp = CreateDefaultSubobject<UActionAssistComponent>(TEXT("AttackAssist"));
 	Damage = 5.0f;
 	DamageCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	bHasPattern1Tag = Tags.Contains("pattern1");
+	MoveSpline = CreateDefaultSubobject<USplineComponent>(TEXT("MoveSpline"));
+	MoveSpline->SetupAttachment(RootComponent);
+	MovementSpline = CreateDefaultSubobject<USplineComponent>(TEXT("MovementSpline1"));
+	MovementSpline->SetupAttachment(RootComponent);
 }
 
 void AEnamyBase::DestoryEnemy()
@@ -81,6 +86,13 @@ void AEnamyBase::BeginPlay()
 	{
 		PlayerCharacter = Cast<ACharacter>(FoundPlayers[0]);
 	}*/
+	if (ActorHasTag("pattern2")) {
+		// Yawを中心に180度回転させるにゃ
+		AddActorLocalRotation(FRotator(0.0f, 180.0f, 0.0f));
+		// スプラインに沿って移動を開始するにゃ
+		bShouldMoveAlongSpline = true;
+		TimeSinceStartOfMovement = 0.0f;
+	}
 }
 
 AActor* AEnamyBase::GetPlayer()
@@ -146,7 +158,42 @@ void AEnamyBase::Tick(float DeltaTime)
 			}
 		}
 	}
+	if (bHasPattern1Tag && GetWorld()->GetTimeSeconds() - SpawnTime < 4.5f)
+	{
+		float TimeSinceSpawn = GetWorld()->GetTimeSeconds() - SpawnTime;
+		float SplineDuration = 3.0f;  // スプラインを完了するまでの時間
+		float SplineProgress = FMath::Clamp(TimeSinceSpawn / SplineDuration, 0.0f, 1.0f);
+		FVector NewLocation = MoveSpline->GetLocationAtSplineInputKey(SplineProgress, ESplineCoordinateSpace::World);
+		SetActorLocation(NewLocation);
+		for (AGameSystem_BattleArea* BattleArea : BattleAreaReferences) {
+			if (BattleArea && BattleArea->IsOverlappingActor(this)) {
+				BattleArea->IgnoreCollision();
+			}
+		}
+		return; // 他のTick処理をスキップ
+	}
+	else
+	{
+		for (AGameSystem_BattleArea* BattleArea : BattleAreaReferences) {
+			if (BattleArea) {
+				BattleArea->ResetCollision();
+			}
+		}
+	}
+	if (bShouldMoveAlongSpline) {
+		// 3秒間移動させるにゃ
+		TimeSinceStartOfMovement += DeltaTime;
+		float Alpha = FMath::Min(TimeSinceStartOfMovement / MovementDuration, 1.0f);
+		FVector NewLocation = MovementSpline->GetLocationAtDistanceAlongSpline(MovementSpline->GetSplineLength() * Alpha, ESplineCoordinateSpace::Local);
+		SetActorLocation(NewLocation);
 
+		if (Alpha >= 1.0f) {
+			bShouldMoveAlongSpline = false;
+		}
+
+		// 他のTick処理を停止するにゃ
+		return;
+	}
 	CheckHealth();
 }
 

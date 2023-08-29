@@ -15,9 +15,7 @@ ALancer::ALancer()
     GetCharacterMovement()->bOrientRotationToMovement = true;
     GetCharacterMovement()->RotationRate = FRotator(0.0f, 540.0f, 0.0f);
     GetCharacterMovement()->MaxWalkSpeed = MovementSpeed;
-    bHasPattern1Tag = Tags.Contains("pattern1"); 
-     MoveSpline = CreateDefaultSubobject<USplineComponent>(TEXT("MoveSpline"));
-    MoveSpline->SetupAttachment(RootComponent);
+  
 }
 
 
@@ -58,28 +56,7 @@ void ALancer::Tick(float DeltaTime)
         bShouldSkipNextMovement = false;
         return;
     }
-    if (bHasPattern1Tag && GetWorld()->GetTimeSeconds() - SpawnTime < 4.5f)
-    {
-        float TimeSinceSpawn = GetWorld()->GetTimeSeconds() - SpawnTime;
-        float SplineDuration = 3.0f;  // スプラインを完了するまでの時間
-        float SplineProgress = FMath::Clamp(TimeSinceSpawn / SplineDuration, 0.0f, 1.0f);
-        FVector NewLocation = MoveSpline->GetLocationAtSplineInputKey(SplineProgress, ESplineCoordinateSpace::World);
-        SetActorLocation(NewLocation);
-        for (AGameSystem_BattleArea* BattleArea : BattleAreaReferences) {
-            if (BattleArea && BattleArea->IsOverlappingActor(this)) {
-                BattleArea->IgnoreCollision();
-            }
-        }
-        return; // 他のTick処理をスキップ
-    }
-    else
-    {
-        for (AGameSystem_BattleArea* BattleArea : BattleAreaReferences) {
-            if (BattleArea) {
-                BattleArea->ResetCollision();
-            }
-        }
-    }
+    
    
 
    

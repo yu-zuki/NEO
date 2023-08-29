@@ -7,6 +7,7 @@
 #include "DeathTrigger.h"
 #include "NEO/GameSystem/GameSystem_BattleArea.h"
 #include "NiagaraComponent.h"
+#include "Components/SplineComponent.h"
 #include "EnemyBaseAnimInstance.h"
 #include "EnamyBase.generated.h"
 
@@ -51,6 +52,8 @@ public:
 	// Damage to be dealt to the player
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage")
 		float Damage;
+	UPROPERTY(VisibleAnywhere)
+		USplineComponent* MoveSpline;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -83,7 +86,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Enemy", meta = (AllowPrivateAccess = "true"))
 		float DesiredDistanceFromEnemy = 300.0f;
 
-
+	bool bHasPattern1Tag; // pattern1というTagを持っているかどうか
 	void AfterDeath();
 
 	void DamageReac();
@@ -131,4 +134,14 @@ public:
 		class UEnemyBase_WidgetComponent* EnemyWidget;
 	AActor* GetEnemyActor() const;
 	TArray<AGameSystem_BattleArea*> BattleAreaReferences;  // 複数のバトルエリアの参照
+	float SpawnTime; // スポーンした時間を記録する変数
+	USplineComponent* MovementSpline;
+
+	// 移動を開始するためのフラグと時間にゃ
+	bool bShouldMoveAlongSpline = false;
+	float TimeSinceStartOfMovement = 0.0f;
+
+	// 3秒間移動するための定数にゃ
+	static constexpr float MovementDuration = 3.0f;
+
 };
