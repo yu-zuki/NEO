@@ -12,5 +12,17 @@ AGeoBigFence::AGeoBigFence()
         GetGeometryCollectionComponent()->RestCollection = GeoCollection.Object;
     }
 
+    NiagaraComponent = CreateDefaultSubobject<UNiagaraComponent>(TEXT("NiagaraComponent"));
+    NiagaraComponent->SetupAttachment(RootComponent);
+}
 
+void AGeoBigFence::BeginPlay()
+{
+    Super::BeginPlay();
+    // Niagara particle system‚ðÄ¶
+    if (NiagaraComponent)
+    {
+        NiagaraComponent->Activate();
+        NiagaraComponent->SetPaused(false);
+    }
 }

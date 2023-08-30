@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GeometryCollection/GeometryCollectionActor.h"
+#include "NiagaraComponent.h"
 #include "GeoBigFence.generated.h"
 
 /**
@@ -15,4 +16,8 @@ class NEO_API AGeoBigFence : public AGeometryCollectionActor
 	GENERATED_BODY()
 public:
 	AGeoBigFence();
+	virtual void BeginPlay() override;
+	UPROPERTY(EditAnywhere, Category = "Effects")
+		UNiagaraComponent* NiagaraComponent;
+
 };
