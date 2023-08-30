@@ -87,16 +87,17 @@ void AOdaBase::Tick(float DeltaTime)
 
 		//フレームごとに加算する
 		FlameCounter++;
+		AActor* Player = GetPlayer();
+
+		//リスポーンした時に中身がなくなってしまうので更新
+		if (Player == nullptr)  return;
+
 		//向きをプレイヤーの方に向ける(60フレーム毎に更新)
 		if (FlameCounter % 60 == 0)
 		{
 			//プレイヤーの方を向く
 			ToPlayerRotate();
 		}
-
-		AActor* Player = GetPlayer();
-		//リスポーンした時に中身がなくなってしまうので更新
-		if (Player == nullptr)  return;
 
 		//距離を取る
 		//X軸
