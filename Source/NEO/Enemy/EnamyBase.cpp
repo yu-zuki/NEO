@@ -87,9 +87,9 @@ void AEnamyBase::BeginPlay()
 		PlayerCharacter = Cast<ACharacter>(FoundPlayers[0]);
 	}*/
 	if (ActorHasTag("pattern2")) {
-		// Yawを中心に180度回転させるにゃ
+		// Yawを中心に180度回転させる
 		AddActorLocalRotation(FRotator(0.0f, 180.0f, 0.0f));
-		// スプラインに沿って移動を開始するにゃ
+		// スプラインに沿って移動を開始する
 		bShouldMoveAlongSpline = true;
 		TimeSinceStartOfMovement = 0.0f;
 	}
@@ -131,9 +131,9 @@ void AEnamyBase::Tick(float DeltaTime)
 				// キャラクターの位置と自分の位置を比較してY軸より前にいるかどうかを判定
 				bIsRotation = CharacterLocation.Y > MyLocation.Y;
 				//bIsRotationがtrueなら
-				if (Health >= 0)
+				if (Health >= 0&& ActorHasTag("pattern1"))
 				{
-					/*if (bIsRotation)
+					if (bIsRotation)
 					{
 					    FRotator NewRotation = GetActorRotation();
 					    NewRotation.Yaw = -90.0f;
@@ -147,12 +147,29 @@ void AEnamyBase::Tick(float DeltaTime)
 					    FRotator NewRotation = GetActorRotation();
 					    NewRotation.Yaw = 90.0f;
 					    SetActorRotation(NewRotation);
-					}*/
+					}
+				if (Health >= 0 && ActorHasTag("pattern2"))
+				{
+					if (bIsRotation)
+					{
+						FRotator NewRotation = GetActorRotation();
+						NewRotation.Yaw = -90.0f;
+						SetActorRotation(NewRotation);
 
-					bool LookRight = (bIsRotation) ? (true) : (false);
 
 
-					ActionAssistComp->OwnerParallelToCamera(LookRight);
+					}
+					else
+					{
+						FRotator NewRotation = GetActorRotation();
+						NewRotation.Yaw = 90.0f;
+						SetActorRotation(NewRotation);
+					}
+				}
+					/*bool LookRight = (bIsRotation) ? (true) : (false);
+
+
+					ActionAssistComp->OwnerParallelToCamera(LookRight);*/
 
 				}
 			}
