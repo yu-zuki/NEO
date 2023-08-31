@@ -39,10 +39,13 @@ AEnamyBase::AEnamyBase()
 	Damage = 5.0f;
 	DamageCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	bHasPattern1Tag = Tags.Contains("pattern1");
+	bHasPattern2Tag = Tags.Contains("pattern2");
+	bHasPattern3Tag = Tags.Contains("pattern3");
+
 	MoveSpline = CreateDefaultSubobject<USplineComponent>(TEXT("MoveSpline"));
 	MoveSpline->SetupAttachment(RootComponent);
-	MovementSpline = CreateDefaultSubobject<USplineComponent>(TEXT("MovementSpline1"));
-	MovementSpline->SetupAttachment(RootComponent);
+	/*MovementSpline = CreateDefaultSubobject<USplineComponent>(TEXT("MovementSpline1"));
+	MovementSpline->SetupAttachment(RootComponent);*/
 }
 
 void AEnamyBase::DestoryEnemy()
@@ -86,13 +89,13 @@ void AEnamyBase::BeginPlay()
 	{
 		PlayerCharacter = Cast<ACharacter>(FoundPlayers[0]);
 	}*/
-	if (ActorHasTag("pattern2")) {
-		// Yawを中心に180度回転させる
-		AddActorLocalRotation(FRotator(0.0f, 180.0f, 0.0f));
-		// スプラインに沿って移動を開始する
-		bShouldMoveAlongSpline = true;
-		TimeSinceStartOfMovement = 0.0f;
-	}
+	//if (ActorHasTag("pattern2")) {
+	//	// Yawを中心に180度回転させる
+	//	AddActorLocalRotation(FRotator(0.0f, 180.0f, 0.0f));
+	//	// スプラインに沿って移動を開始する
+	//	bShouldMoveAlongSpline = true;
+	//	TimeSinceStartOfMovement = 0.0f;
+	//}
 }
 
 AActor* AEnamyBase::GetPlayer()
@@ -144,11 +147,37 @@ void AEnamyBase::Tick(float DeltaTime)
 					}
 					else
 					{
-					    FRotator NewRotation = GetActorRotation();
-					    NewRotation.Yaw = 90.0f;
-					    SetActorRotation(NewRotation);
+						FRotator NewRotation = GetActorRotation();
+						NewRotation.Yaw = 90.0f;
+						SetActorRotation(NewRotation);
+
 					}
-				if (Health >= 0 && ActorHasTag("pattern2"))
+				}
+				else if (Health >= 0 && ActorHasTag("pattern2"))
+				{
+					if (bIsRotation)
+					{
+						FRotator NewRotation = GetActorRotation();
+						NewRotation.Yaw = -180.0f;
+						SetActorRotation(NewRotation);
+
+
+
+					}
+					else
+					{
+						FRotator NewRotation = GetActorRotation();
+						NewRotation.Yaw = 0.0f;
+						SetActorRotation(NewRotation);
+					}
+				
+					/*bool LookRight = (bIsRotation) ? (true) : (false);
+
+
+					ActionAssistComp->OwnerParallelToCamera(LookRight);*/
+
+				}
+				else if (Health >= 0 && ActorHasTag("pattern3"))
 				{
 					if (bIsRotation)
 					{
@@ -164,18 +193,13 @@ void AEnamyBase::Tick(float DeltaTime)
 						FRotator NewRotation = GetActorRotation();
 						NewRotation.Yaw = 90.0f;
 						SetActorRotation(NewRotation);
+
 					}
-				}
-					/*bool LookRight = (bIsRotation) ? (true) : (false);
-
-
-					ActionAssistComp->OwnerParallelToCamera(LookRight);*/
-
 				}
 			}
 		}
 	}
-	if (bHasPattern1Tag && GetWorld()->GetTimeSeconds() - SpawnTime < 4.5f)
+	if (bHasPattern1Tag && GetWorld()->GetTimeSeconds() - SpawnTime < 4.5f|| bHasPattern2Tag ||bHasPattern3Tag)	
 	{
 		float TimeSinceSpawn = GetWorld()->GetTimeSeconds() - SpawnTime;
 		float SplineDuration = 3.0f;  // スプラインを完了するまでの時間
