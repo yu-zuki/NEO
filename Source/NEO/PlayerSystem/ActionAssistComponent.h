@@ -24,7 +24,7 @@ public:
 	void HitStop(float _stopTime);
 
 	// エフェクトスポーン
-	void SpawnHitEffect(class UNiagaraSystem* _hitParticle, FVector _spawnPos);
+	void SpawnEffect(class UNiagaraSystem* _hitParticle, FVector _spawnPos);
 
 	// オーナーをカメラに向ける
 	void OwnerParallelToCamera(bool _lookRight);

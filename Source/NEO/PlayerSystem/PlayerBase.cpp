@@ -28,6 +28,7 @@ APlayerBase::APlayerBase()
 	: IsControl(true)
 	, IsRunning(false)
 	, IsJumping(false)
+	, IsHoldWeapon(true)
 	, frames(0.f)
 	, IsAttacking(false)
 	, CanCombo(false)
@@ -127,7 +128,7 @@ void APlayerBase::SetupPlayerData()
 	SetupMainActionMapping();
 
 	// コンボの名前格納
-	ComboStartSectionNames = { "First", "Second", "Third"/*,"Fourth"*/ };
+	ComboStartSectionNames = { "First", "Second", "Third","Fourth" };
 
 	// ゲームモード取得
 	pGameMode = Cast<ATGS_GameMode>(UGameplayStatics::GetGameMode(GetWorld()));
@@ -323,8 +324,6 @@ void APlayerBase::Move(const FInputActionValue& _value)
 
 		const FRotator YawRotation(0.f, Rotation.Yaw, 0.f);
 
-		SplineYawRotation = YawRotation;
-
 		// スプラインに沿った移動方向取得(X,Y)
 		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
@@ -446,7 +445,7 @@ void APlayerBase::Attack(int _attackNum /*= 0*/)
 	// プレイヤーの角度修正
 	ActionAssistComp->CorrectAttackAngle();
 
-	if (IsPlayerGrounded())
+	if (!IsJumping)
 	{
 		if (!IsAttacking)
 		{
@@ -473,6 +472,7 @@ void APlayerBase::Attack(int _attackNum /*= 0*/)
 	{
 		// 攻撃のアニメーション再生
 		PlayAnimation(PlayerAnimation.AirAttack);
+		ComboIndex = 2;
 	}
 }
 
@@ -684,51 +684,104 @@ void APlayerBase::ResetCombo()
  */
 void APlayerBase::TakedDamage(float _damage, bool _isLastAttack /*= false*/)
 {
-	if (PlayerStatus.HP >= 0.f)
+	//if (PlayerStatus.HP >= 0.f)
+	//{
+	//	// HP計算
+	//	PlayerStatus.HP -= _damage;
+
+	//	// HPが0以下になったら
+	//	if (PlayerStatus.HP <= 0.f)
+	//	{
+	//		// コントロール不能へ
+	//		IsControl = false;
+
+	//		// コリジョンをオフに
+	//		SetActorEnableCollision(true);
+
+	//		// ヒットエフェクト発生
+	//		ActionAssistComp->SpawnHitEffect(HitEffect, GetActorLocation());
+
+	//		// 死亡アニメーション再生
+	//		PlayAnimation(PlayerAnimation.Death);
+	//	}
+	//	else
+	//	{
+	//		// 攻撃中のフラグリセット
+	//		if (IsAttacking)
+	//		{
+	//			IsAttacking = false;
+	//			CanCombo = false;
+	//			IsControl = false;
+	//			ComboIndex = 0;
+	//		}
+
+	//		// ヒットエフェクト発生
+	//		ActionAssistComp->SpawnHitEffect(HitEffect,GetActorLocation());
+
+	//		// 被ダメージアニメーション
+	//		if (!_isLastAttack)
+	//		{
+	//			// のけぞりアニメーション再生
+	//			PlayAnimation(PlayerAnimation.TakeDamage);
+	//		}
+	//		else
+	//		{
+	//			// ノックバックアニメーション再生
+	//			PlayAnimation(PlayerAnimation.KnockBack);
+	//		}
+	//	}
+	//}
+
+	// 武器を持っていないときに攻撃を受けたら死亡
+	if (!IsHoldWeapon)
 	{
-		// HP計算
-		PlayerStatus.HP -= _damage;
+		// コントロール不能へ
+		IsControl = false;
 
-		// HPが0以下になったら
-		if (PlayerStatus.HP <= 0.f)
+		// コリジョンをオフに
+		SetActorEnableCollision(true);
+
+		// ヒットエフェクト発生
+		ActionAssistComp->SpawnEffect(HitEffect, GetActorLocation());
+
+		// 死亡アニメーション再生
+		PlayAnimation(PlayerAnimation.Death);
+	}
+	// 武器を落とす
+	else
+	{
+		// 攻撃中のフラグリセット
+		if (IsAttacking)
 		{
-			// コントロール不能へ
+			IsAttacking = false;
+			CanCombo = false;
 			IsControl = false;
+			ComboIndex = 0;
+		}
 
-			// 死亡アニメーション再生
-			SetActorEnableCollision(true);
+		// ヒットエフェクト発生
+		ActionAssistComp->SpawnEffect(HitEffect, GetActorLocation());
 
-			// ヒットエフェクト発生
-			ActionAssistComp->SpawnHitEffect(HitEffect, GetActorLocation());
 
-			// 死亡アニメーション再生
-			PlayAnimation(PlayerAnimation.Death);
+		// 敵のコンボが最終段だった時必ず武器を落とす
+		if (_isLastAttack)
+		{
+			PlayerStatus.WeaponDropLimit = 0;
+		}
+
+		// 被ダメージアニメーション
+		if (PlayerStatus.WeaponDropLimit <= 0)
+		{
+			// ノックバックアニメーション再生
+			PlayAnimation(PlayerAnimation.KnockBack);
+
+			// 攻撃を受ける
+			--PlayerStatus.WeaponDropLimit;
 		}
 		else
 		{
-			// 攻撃中のフラグリセット
-			if (IsAttacking)
-			{
-				IsAttacking = false;
-				CanCombo = false;
-				IsControl = false;
-				ComboIndex = 0;
-			}
-
-			// ヒットエフェクト発生
-			ActionAssistComp->SpawnHitEffect(HitEffect,GetActorLocation());
-
-			// 被ダメージアニメーション
-			if (!_isLastAttack)
-			{
-				// のけぞりアニメーション再生
-				PlayAnimation(PlayerAnimation.TakeDamage);
-			}
-			else
-			{
-				// ノックバックアニメーション再生
-				PlayAnimation(PlayerAnimation.KnockBack);
-			}
+			// のけぞりアニメーション再生
+			PlayAnimation(PlayerAnimation.TakeDamage);
 		}
 	}
 }

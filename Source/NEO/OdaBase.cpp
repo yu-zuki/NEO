@@ -529,7 +529,7 @@ void AOdaBase::ApplyDamage(float Damage)
 		}
 		//エフェクトを出す
 		//UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), HitParticles, GetActorLocation());
-		ActionAssistComp->SpawnHitEffect(HitParticles, GetActorLocation());
+		ActionAssistComp->SpawnEffect(HitParticles, GetActorLocation());
 
 		//ノックバックのアニメーションを流す
 		PlayAnimMontage(AnimMontage_BossKnockMontage);

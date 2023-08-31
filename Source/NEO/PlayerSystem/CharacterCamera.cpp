@@ -176,7 +176,7 @@ void ACharacterCamera::Tick(float DeltaTime)
 			return;
 
 		//XVŒã‚ÌÀ•WE‰ñ“]î•ñ‚ð”½‰f
-		SetActorLocationAndRotation(newpos, m_pPlayer->SplineYawRotation);
+		//SetActorLocationAndRotation(newpos, m_pPlayer->SplineYawRotation);
 	}
 }
 

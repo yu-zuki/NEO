@@ -61,7 +61,7 @@ void APlayerGun::SetupPlayerData()
 	TCHAR* WeaponAssetPath = TEXT("/Game/0122/Player/Weapon/Weapons/Blade/Swords/Blade_BlackKnight/SK_Blade_BlackKnight");
 
 	// ƒZƒbƒg
-	SetupWeaponMesh(WeaponMesh, WeaponAssetPath, "WeaponMesh");
+	SetupWeaponMesh(WeaponSkeletalMesh, WeaponAssetPath, "WeaponMesh");
 
 	SetupCollisionComponent(WeaponCollision);
 

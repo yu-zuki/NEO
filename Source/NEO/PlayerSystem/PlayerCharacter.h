@@ -43,4 +43,8 @@ private:
 	// •Ší‚Ì“–‚½‚è”»’è
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SwordCollision", meta = (AllowPrivateAccess = "true"))
 		class UCapsuleComponent* WeaponCollision;
+
+	// •Ší‚ÌƒƒbƒVƒ…
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon Mesh", meta = (AllowPrivateAccess = "true"))
+		UStaticMeshComponent* WeaponStaticMesh;
 };

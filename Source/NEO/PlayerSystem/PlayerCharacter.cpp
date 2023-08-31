@@ -48,10 +48,10 @@ void APlayerCharacter::SetupPlayerData()
 	Super::SetupPlayerData();
 
 	// 武器のメッシュのパス
-	TCHAR* WeaponAssetPath = TEXT("/Game/0122/Player/Weapon/Weapons/Blade/Swords/Blade_BlackKnight/SK_Blade_BlackKnight");
+	TCHAR* WeaponAssetPath = TEXT("/Game/0139/Player/EnemySwordJoint");
 
 	// 武器のメッシュ設定
-	SetupWeaponMesh(WeaponMesh, WeaponAssetPath, "WeaponMesh");
+	SetupWeaponMesh(WeaponStaticMesh, WeaponAssetPath, "WeaponMesh");
 
 	// コリジョン設定
 	SetupCollisionComponent(WeaponCollision);
@@ -76,7 +76,7 @@ void APlayerCharacter::SetupAnimationAsset()
 		TCHAR* ComboAnimationAssetPaths[2];
 
 		// アニメーションアセットのパス
-		ComboAnimationAssetPaths[0] = TEXT("/Game/0122/Player/Animation/Montage/Combo/SwordCombo");
+		ComboAnimationAssetPaths[0] = TEXT("/Game/0122/Player/Animation/Montage/Combo/Combo1");
 		ComboAnimationAssetPaths[1] = TEXT("/Game/0122/Player/Animation/Montage/Combo/SwordCombo2");
 
 		for (int i = 0; i < 2; ++i)
@@ -87,28 +87,28 @@ void APlayerCharacter::SetupAnimationAsset()
 	
 	{
 		// 空中での攻撃アニメーション
-		TCHAR* AirAttackAnimationAssetPath = TEXT("/Game/0122/Player/Animation/Montage/Combo/AirAttack");
+		TCHAR* AirAttackAnimationAssetPath = TEXT("/Game/0122/Player/Animation/Montage/Combo/JumpAttack_Montage");
 
 		PlayerAnimation.AirAttack = GetAnimationAsset(AirAttackAnimationAssetPath);
 	}
 
 	{
 		// 被ダメージアニメーションのパス保管用
-		TCHAR* DamageAnimationAssetPath = TEXT("/Game/0122/Player/Animation/Montage/Damaged");
+		TCHAR* DamageAnimationAssetPath = TEXT("/Game/0122/Player/Animation/Montage/Damaged_Montage");
 
 		PlayerAnimation.TakeDamage = GetAnimationAsset(DamageAnimationAssetPath);
 	}
 
 	{
 		// 被ダメージアニメーションのパス保管用
-		TCHAR* KnockBackAnimationAssetPath = TEXT("/Game/0122/Player/Animation/Montage/KnockBack");
+		TCHAR* KnockBackAnimationAssetPath = TEXT("/Game/0122/Player/Animation/Montage/KnockBack_Montage");
 
 		PlayerAnimation.KnockBack = GetAnimationAsset(KnockBackAnimationAssetPath);
 	}
 
 	{
 		// 死亡時アニメーションのパス保管
-		TCHAR* DeathAnimationAssetPath = TEXT("/Game/0122/Player/Animation/Montage/Death");
+		TCHAR* DeathAnimationAssetPath = TEXT("/Game/0122/Player/Animation/Montage/Death_Montage");
 
 		PlayerAnimation.Death = GetAnimationAsset(DeathAnimationAssetPath);
 	}
@@ -149,7 +149,12 @@ void APlayerCharacter::SetCollision()
 			if (tempActor && tempActor->ActorHasTag("Object"))
 			{
 				AObjectBase* Object = Cast<AObjectBase>(HitResult.GetActor());
-				Object->ReceiveDamage(GetDamageAmount());
+
+				if (Object)
+				{
+					Object->ReceiveDamage(GetDamageAmount());
+
+				}
 				break; 
 			}
 

@@ -104,13 +104,13 @@ void UActionAssistComponent::HitStop(float _stopTime)
 
 
 /*
- * 関数名　　　　：SpawnHitEffect()
+ * 関数名　　　　：SpawnEffect()
  * 引数１　　　　：UNiagaraSystem* _hitParticle・・・出現させるエフェクト
  * 引数２　　　　：FVector _spawnPos・・・・・・・・・出現させる場所
- * 処理内容　　　：ヒットエフェクトをスポーン
+ * 処理内容　　　：エフェクトを出現する
  * 戻り値　　　　：なし
  */
-void UActionAssistComponent::SpawnHitEffect(UNiagaraSystem* _hitParticle, FVector _spawnPos)
+void UActionAssistComponent::SpawnEffect(UNiagaraSystem* _hitParticle, FVector _spawnPos)
 {
 	// 機能のオン・オフ
 	if (!bUseHitEffect) { return; }

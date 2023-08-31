@@ -44,4 +44,7 @@ public:
 	// “ñ‚Â–Ú‚ÌƒRƒ“ƒ{
 	virtual void Combo2()override;
 
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon Mesh", meta = (AllowPrivateAccess = "true"))
+		USkeletalMeshComponent* WeaponSkeletalMesh;
 };

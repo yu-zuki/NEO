@@ -64,6 +64,9 @@ public:
 		float MaxHP;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		int WeaponDropLimit = 3;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		int RemainingLife;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
@@ -187,10 +190,6 @@ public:
 	//---------------------------------------------------------------------------------------------------------------------------------------------------
 
 
-	//-------------------------スプライン------------------------------
-public:
-	FRotator SplineYawRotation;
-
 private:
 
 	// キャラクターの回転
@@ -285,10 +284,6 @@ protected:
 
 
 	//-----------------コンポーネント変数--------------------------------------------------------------------------
-	// 武器のメッシュ
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon Mesh", meta = (AllowPrivateAccess = "true"))
-		USkeletalMeshComponent* WeaponMesh;
-
 	// 攻撃のアシスト用コンポーネント
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Action Assist", meta = (AllowPrivateAccess = "true"))
 		class UActionAssistComponent* ActionAssistComp;
@@ -333,6 +328,9 @@ private:
 
 	// ジャンプ中かどうか
 	bool IsJumping;
+
+	// 武器を持っているかどうか
+	bool IsHoldWeapon;
 
 	// フレームカウント用
 	float frames;	
