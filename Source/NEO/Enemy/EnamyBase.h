@@ -87,6 +87,9 @@ public:
 		float DesiredDistanceFromEnemy = 300.0f;
 
 	bool bHasPattern1Tag; // pattern1‚Æ‚¢‚¤Tag‚ğ‚Á‚Ä‚¢‚é‚©‚Ç‚¤‚©
+	bool bHasPattern2Tag;
+	bool bHasPattern3Tag;
+
 	void AfterDeath();
 
 	void DamageReac();
