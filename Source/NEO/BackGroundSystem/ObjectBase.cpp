@@ -62,7 +62,7 @@ void AObjectBase::ReceiveDamage(float DamageAmount)
 {
 	// HealthからDamageAmountを減算する
 	Health -= DamageAmount;
-
+	
 	// Healthを確認して、必要であれば破壊する
 	CheckAndDestroy();
 }

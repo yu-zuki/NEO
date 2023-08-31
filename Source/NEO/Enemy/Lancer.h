@@ -20,6 +20,7 @@ public:
         float MovementSpeed = 100.0f; // 移動速度
     float Speed = 100.0f;
     void ChooseNewTarget();
+   
 protected:
     virtual void BeginPlay() override;
 
@@ -50,4 +51,8 @@ private:
     FTimerHandle MoveToTargetTimer;
    
     ATargetPoint* CurrentTarget = nullptr;
+    
+    
+    ECollisionResponse DefaultCollisionResponseToPlayers;  // プレイヤーに対するデフォルトのコリジョンレスポンス
+    ECollisionResponse DefaultCollisionResponseToWorld;  // 地面（WorldStatic）に対するデフォルトのコリジョンレスポンス
 };

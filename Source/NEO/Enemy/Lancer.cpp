@@ -15,7 +15,7 @@ ALancer::ALancer()
     GetCharacterMovement()->bOrientRotationToMovement = true;
     GetCharacterMovement()->RotationRate = FRotator(0.0f, 540.0f, 0.0f);
     GetCharacterMovement()->MaxWalkSpeed = MovementSpeed;
-    
+  
 }
 
 
@@ -29,6 +29,7 @@ void ALancer::BeginPlay()
     // 5秒ごとにCheckPlayerInFront関数を実行するタイマーをセット
     GetWorldTimerManager().SetTimer(TimerHandle_CheckPlayerInFront, this, &ALancer::CheckPlayerInFront, 3.0f, true);
     GetWorld()->GetTimerManager().SetTimer(MoveToTargetTimer, this, &ALancer::ChooseNewTarget, 3.0f, true);
+    SpawnTime = GetWorld()->GetTimeSeconds();
 }
 FVector ALancer::GetSnappedDirection(const FVector& Direction) const
 {
@@ -49,13 +50,16 @@ FVector ALancer::GetSnappedDirection(const FVector& Direction) const
 
 void ALancer::Tick(float DeltaTime)
 {
+    Super::Tick(DeltaTime);
     if (bIsNowDamage || bShouldSkipNextMovement)
     {
         bShouldSkipNextMovement = false;
         return;
     }
+    
    
-    Super::Tick(DeltaTime);
+
+   
     PlayerCharacter = Cast<ACharacter>(GetPlayer());
     if (!PlayerCharacter) return;
 
@@ -65,7 +69,7 @@ void ALancer::Tick(float DeltaTime)
     FVector MoveVector;
     
 
-    if (CurrentDistance <= DesiredDistance + 400)
+    if (CurrentDistance <= DesiredDistance + 300)
     {
         bIsRandMove = true;
     }
