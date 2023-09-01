@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Rolling.h"
 #include "Pusher.generated.h"
 
 UCLASS()

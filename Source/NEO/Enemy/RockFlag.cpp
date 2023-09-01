@@ -30,11 +30,7 @@ void ARockFlag::Tick(float DeltaTime)
 }
 void ARockFlag::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	bIsOnStep = true;
-}
-void ARockFlag::SpawnPusher()
-{
-	if (PusherClass && SpawnPointOne && SpawnPointTwo&&bIsOnStep==true) 
+	if (PusherClass && SpawnPointOne && SpawnPointTwo)
 	{
 		// 1‘Ì–Ú‚ÌPusher‚ðo‚·
 		FVector SpawnLocationOne = SpawnPointOne->GetActorLocation();
@@ -44,9 +40,13 @@ void ARockFlag::SpawnPusher()
 		// 2‘Ì–Ú‚ÌPusher‚ðo‚·
 		FVector SpawnLocationTwo = SpawnPointTwo->GetActorLocation();
 		AActor* SpawnedPusherTwo = GetWorld()->SpawnActor<AActor>(PusherClass, SpawnLocationTwo, SpawnRotation);
-	
-		
+
+
 
 		FlagBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
+}
+void ARockFlag::SpawnPusher()
+{
+	
 }
