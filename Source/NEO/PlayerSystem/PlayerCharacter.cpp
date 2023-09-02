@@ -48,19 +48,16 @@ void APlayerCharacter::SetupPlayerData()
 	Super::SetupPlayerData();
 
 	// 武器のメッシュのパス
-	TCHAR* WeaponAssetPath = TEXT("/Game/0139/Player/EnemySwordJoint");
+	TCHAR* WeaponAssetPath = TEXT("/Game/0139/CharacterModel/EnemySwordJoint");
 
 	// 武器のメッシュ設定
-	SetupWeaponMesh(WeaponStaticMesh, WeaponAssetPath, "WeaponMesh");
+	SetupWeaponMesh(WeaponStaticMesh, WeaponAssetPath);
 
 	// コリジョン設定
 	SetupCollisionComponent(WeaponCollision);
 
 	// アニメーションアセット設定
 	SetupAnimationAsset();
-
-	// プレイヤーのステータス初期化
-	SetupPlayerStatus();
 }
 
 
@@ -77,11 +74,11 @@ void APlayerCharacter::SetupAnimationAsset()
 
 		// アニメーションアセットのパス
 		ComboAnimationAssetPaths[0] = TEXT("/Game/0122/Player/Animation/Montage/Combo/Combo1");
-		ComboAnimationAssetPaths[1] = TEXT("/Game/0122/Player/Animation/Montage/Combo/SwordCombo2");
+		ComboAnimationAssetPaths[1] = TEXT("/Game/0122/Player/Animation/Montage/Combo/Combo2");
 
 		for (int i = 0; i < 2; ++i)
 		{
-			(PlayerAnimation.Combo).Add(GetAnimationAsset(ComboAnimationAssetPaths[i]));
+			PlayerAnimation.ComboAttack[i] = GetAnimationAsset(ComboAnimationAssetPaths[i]);
 		}
 	}
 	

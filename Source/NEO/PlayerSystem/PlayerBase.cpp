@@ -124,8 +124,10 @@ void APlayerBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
  */
 void APlayerBase::SetupPlayerData()
 {
-	// メインアクションのボタンをマッピング
+
 	SetupMainActionMapping();
+
+	SetupPlayerStatus();
 
 	// コンボの名前格納
 	ComboStartSectionNames = { "First", "Second", "Third","Fourth" };
@@ -466,7 +468,7 @@ void APlayerBase::Attack(int _attackNum /*= 0*/)
 		}
 
 		// 攻撃のアニメーション再生
-		PlayAnimation(PlayerAnimation.Combo[_attackNum], ComboStartSectionNames[ComboIndex]);
+		PlayAnimation(PlayerAnimation.ComboAttack[_attackNum], ComboStartSectionNames[ComboIndex]);
 	}
 	else
 	{
@@ -684,106 +686,106 @@ void APlayerBase::ResetCombo()
  */
 void APlayerBase::TakedDamage(float _damage, bool _isLastAttack /*= false*/)
 {
-	//if (PlayerStatus.HP >= 0.f)
-	//{
-	//	// HP計算
-	//	PlayerStatus.HP -= _damage;
-
-	//	// HPが0以下になったら
-	//	if (PlayerStatus.HP <= 0.f)
-	//	{
-	//		// コントロール不能へ
-	//		IsControl = false;
-
-	//		// コリジョンをオフに
-	//		SetActorEnableCollision(true);
-
-	//		// ヒットエフェクト発生
-	//		ActionAssistComp->SpawnHitEffect(HitEffect, GetActorLocation());
-
-	//		// 死亡アニメーション再生
-	//		PlayAnimation(PlayerAnimation.Death);
-	//	}
-	//	else
-	//	{
-	//		// 攻撃中のフラグリセット
-	//		if (IsAttacking)
-	//		{
-	//			IsAttacking = false;
-	//			CanCombo = false;
-	//			IsControl = false;
-	//			ComboIndex = 0;
-	//		}
-
-	//		// ヒットエフェクト発生
-	//		ActionAssistComp->SpawnHitEffect(HitEffect,GetActorLocation());
-
-	//		// 被ダメージアニメーション
-	//		if (!_isLastAttack)
-	//		{
-	//			// のけぞりアニメーション再生
-	//			PlayAnimation(PlayerAnimation.TakeDamage);
-	//		}
-	//		else
-	//		{
-	//			// ノックバックアニメーション再生
-	//			PlayAnimation(PlayerAnimation.KnockBack);
-	//		}
-	//	}
-	//}
-
-	// 武器を持っていないときに攻撃を受けたら死亡
-	if (!IsHoldWeapon)
+	if (PlayerStatus.HP >= 0.f)
 	{
-		// コントロール不能へ
-		IsControl = false;
+		// HP計算
+		PlayerStatus.HP -= _damage;
 
-		// コリジョンをオフに
-		SetActorEnableCollision(true);
-
-		// ヒットエフェクト発生
-		ActionAssistComp->SpawnEffect(HitEffect, GetActorLocation());
-
-		// 死亡アニメーション再生
-		PlayAnimation(PlayerAnimation.Death);
-	}
-	// 武器を落とす
-	else
-	{
-		// 攻撃中のフラグリセット
-		if (IsAttacking)
+		// HPが0以下になったら
+		if (PlayerStatus.HP <= 0.f)
 		{
-			IsAttacking = false;
-			CanCombo = false;
+			// コントロール不能へ
 			IsControl = false;
-			ComboIndex = 0;
-		}
 
-		// ヒットエフェクト発生
-		ActionAssistComp->SpawnEffect(HitEffect, GetActorLocation());
+			// コリジョンをオフに
+			SetActorEnableCollision(true);
 
+			// ヒットエフェクト発生
+			ActionAssistComp->SpawnEffect(HitEffect, GetActorLocation());
 
-		// 敵のコンボが最終段だった時必ず武器を落とす
-		if (_isLastAttack)
-		{
-			PlayerStatus.WeaponDropLimit = 0;
-		}
-
-		// 被ダメージアニメーション
-		if (PlayerStatus.WeaponDropLimit <= 0)
-		{
-			// ノックバックアニメーション再生
-			PlayAnimation(PlayerAnimation.KnockBack);
-
-			// 攻撃を受ける
-			--PlayerStatus.WeaponDropLimit;
+			// 死亡アニメーション再生
+			PlayAnimation(PlayerAnimation.Death);
 		}
 		else
 		{
-			// のけぞりアニメーション再生
-			PlayAnimation(PlayerAnimation.TakeDamage);
+			// 攻撃中のフラグリセット
+			if (IsAttacking)
+			{
+				IsAttacking = false;
+				CanCombo = false;
+				IsControl = false;
+				ComboIndex = 0;
+			}
+
+			// ヒットエフェクト発生
+			ActionAssistComp->SpawnEffect(HitEffect,GetActorLocation());
+
+			// 被ダメージアニメーション
+			if (!_isLastAttack)
+			{
+				// のけぞりアニメーション再生
+				PlayAnimation(PlayerAnimation.TakeDamage);
+			}
+			else
+			{
+				// ノックバックアニメーション再生
+				PlayAnimation(PlayerAnimation.KnockBack);
+			}
 		}
 	}
+
+	//// 武器を持っていないときに攻撃を受けたら死亡
+	//if (!IsHoldWeapon)
+	//{
+	//	// コントロール不能へ
+	//	IsControl = false;
+
+	//	// コリジョンをオフに
+	//	SetActorEnableCollision(true);
+
+	//	// ヒットエフェクト発生
+	//	ActionAssistComp->SpawnEffect(HitEffect, GetActorLocation());
+
+	//	// 死亡アニメーション再生
+	//	PlayAnimation(PlayerAnimation.Death);
+	//}
+	//// 武器を落とす
+	//else
+	//{
+	//	// 攻撃中のフラグリセット
+	//	if (IsAttacking)
+	//	{
+	//		IsAttacking = false;
+	//		CanCombo = false;
+	//		IsControl = false;
+	//		ComboIndex = 0;
+	//	}
+
+	//	// ヒットエフェクト発生
+	//	ActionAssistComp->SpawnEffect(HitEffect, GetActorLocation());
+
+
+	//	// 敵のコンボが最終段だった時必ず武器を落とす
+	//	if (_isLastAttack)
+	//	{
+	//		PlayerStatus.WeaponDropLimit = 0;
+	//	}
+
+	//	// 被ダメージアニメーション
+	//	if (PlayerStatus.WeaponDropLimit <= 0)
+	//	{
+	//		// ノックバックアニメーション再生
+	//		PlayAnimation(PlayerAnimation.KnockBack);
+
+	//		// 攻撃を受ける
+	//		--PlayerStatus.WeaponDropLimit;
+	//	}
+	//	else
+	//	{
+	//		// のけぞりアニメーション再生
+	//		PlayAnimation(PlayerAnimation.TakeDamage);
+	//	}
+	//}
 }
 
 

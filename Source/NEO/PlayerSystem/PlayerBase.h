@@ -31,22 +31,22 @@ struct FMainAction
 public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		UInputMappingContext* DefaultMappingContext;
+		UInputMappingContext* DefaultMappingContext = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		UInputAction* MoveAction;
+		UInputAction* MoveAction = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		UInputAction* RunAction;
+		UInputAction* RunAction = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		UInputAction* JumpAction;
+		UInputAction* JumpAction = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		UInputAction* ComboAction1;
+		UInputAction* ComboAction1 = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		UInputAction* ComboAction2;
+		UInputAction* ComboAction2 = nullptr;
 };
 //----------------------------------------------------------------------------------------
 
@@ -58,34 +58,34 @@ struct FPlayerStatus
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		float HP;
+		float HP = 100;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		float MaxHP;
+		float MaxHP = 100;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		int WeaponDropLimit = 3;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		int RemainingLife;
+		int RemainingLife = 2;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		float DamageAmount;
+		float DamageAmount = 10.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		float ComboDamageFactor;
+		float ComboDamageFactor = 2.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		float JumpHeight;
+		float JumpHeight = 150.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		float WalkSpeed;
+		float WalkSpeed = 500.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		float RunSpeed;
+		float RunSpeed = 500.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		float NowMoveSpeed;
+		float NowMoveSpeed = 600.f;
 };
 //----------------------------------------------------------------------------------------
 
@@ -97,23 +97,23 @@ struct FPlayerAnimation
 
 	// コンボ
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Animation")
-		TArray<UAnimMontage*> Combo;
+		TArray<UAnimMontage*> ComboAttack = { nullptr,nullptr };
 
 	// 空中にいるときの攻撃
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Animation")
-		UAnimMontage* AirAttack;
+		UAnimMontage* AirAttack = nullptr;
 
 	// 被ダメージ
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Animation")
-		UAnimMontage* TakeDamage;
+		UAnimMontage* TakeDamage = nullptr;
 
 	// 被ダメージ
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Animation")
-		UAnimMontage* KnockBack;
+		UAnimMontage* KnockBack = nullptr;
 
 	// 死亡時
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Animation")
-		UAnimMontage* Death;
+		UAnimMontage* Death = nullptr;
 };
 //----------------------------------------------------------------------------------------
 
@@ -230,8 +230,8 @@ protected:
 	void SetupMainActionMapping();
 
 	// 引数によってスタティックメッシュかスケルタルメッシュのセットアップ
-	void SetupWeaponMesh(UStaticMeshComponent*& MeshComp, TCHAR* WeaponAssetPath, FName PublicName = "WeaponMesh");
-	void SetupWeaponMesh(USkeletalMeshComponent*& MeshComp, TCHAR* WeaponAssetPath, FName PublicName = "WeaponMesh");
+	void SetupWeaponMesh(UStaticMeshComponent*& MeshComp, TCHAR* WeaponAssetPath, FName PublicName = "WeaponStaticMesh");
+	void SetupWeaponMesh(USkeletalMeshComponent*& MeshComp, TCHAR* WeaponAssetPath, FName PublicName = "WeaponSkeletalMesh");
 
 	// 指定したパスのアニメーションアセットを返す
 	UAnimMontage* GetAnimationAsset(TCHAR* _animAssetPath);

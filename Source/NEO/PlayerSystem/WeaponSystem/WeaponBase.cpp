@@ -11,6 +11,8 @@ AWeaponBase::AWeaponBase()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
 
+	// オーナーのデータ初期化
+	InitializeOwnerData(nullptr,"NULL", "None");
 }
 
 // Called when the game starts or when spawned

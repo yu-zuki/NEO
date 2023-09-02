@@ -19,15 +19,15 @@ public:
 
 	// オーナーになるキャラクターの情報
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		ACharacter* pOwner;
+		ACharacter* pOwner = nullptr;
 
 	// オーナーのタグ
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		FName OwnerTag;
+		FName OwnerTag = "None";
 
 	// アタッチするソケットの名前
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		FName SocketName;
+		FName SocketName = "None";
 };
 //----------------------------------------------------------------------------------------
 

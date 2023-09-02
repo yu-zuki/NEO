@@ -76,7 +76,7 @@ void APlayerGun::SetupPlayerData()
 
 	for (int i = 0; i < 2; ++i)
 	{
-		(PlayerAnimation.Combo).Add(GetAnimationAsset(AnimationAssetPaths[i]));
+		PlayerAnimation.ComboAttack[i] = GetAnimationAsset(AnimationAssetPaths[i]);
 	}
 }
 

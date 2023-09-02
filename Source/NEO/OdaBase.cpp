@@ -633,7 +633,7 @@ void AOdaBase::Is2Combo()
 		//変数をリセット
 		Combo2Counter = 0;
 	}
-	UKismetSystemLibrary::PrintString(this, LastAttack() ? TEXT("true") : TEXT("false"), true, true, FColor::Cyan, 2.f, TEXT("None"));
+	//UKismetSystemLibrary::PrintString(this, LastAttack() ? TEXT("true") : TEXT("false"), true, true, FColor::Cyan, 2.f, TEXT("None"));
 }
 
 //プレイヤーをノックバックさせるために最後の攻撃かどうかをとる関数
