@@ -17,6 +17,10 @@ void APusher::BeginPlay()
 {
 	Super::BeginPlay();
 	GetWorld()->GetTimerManager().SetTimer(RollingSpawnTimer, this, &APusher::SpawnRolling, 3.0f, true);
+
+	FRotator NewRotation = GetActorRotation();
+	NewRotation.Yaw = 90.0f;
+	SetActorRotation(NewRotation);
 }
 
 // Called every frame
@@ -49,8 +53,30 @@ void APusher::SpawnRolling()
 			FName SocketName = TEXT("enemy_L_hand");
 			FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
 			SpawnedRolling->AttachToComponent(GetMesh(), AttachmentRules, SocketName);
+
+			CurrentRolling = SpawnedRolling;
+
+			// 3秒後にアタッチを解除するにゃ
+			FTimerHandle UnusedHandle;
+			GetWorldTimerManager().SetTimer(UnusedHandle, this, &APusher::DetachRolling, 3.0f, false);
 		}
 
 	
+	}
+}
+void APusher::DetachRolling()
+{
+	if (CurrentRolling)
+	{
+		CurrentRolling->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+		// 重力（物理シミュレーション）を有効にする
+		if (CurrentRolling->Sphere)  // nullチェック
+		{
+			CurrentRolling->Sphere->SetSimulatePhysics(true);
+			FVector ForwardForce = GetActorForwardVector() * 1000.0f;  // 適当な大きさ
+			CurrentRolling->Sphere->AddForce(ForwardForce);
+		}
+
+		CurrentRolling = nullptr;  // null
 	}
 }

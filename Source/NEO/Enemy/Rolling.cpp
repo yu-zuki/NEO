@@ -2,6 +2,7 @@
 
 
 #include "Rolling.h"
+#include "NEO/PlayerSystem/PlayerBase.h"
 #include "Kismet/GameplayStatics.h"
 // Sets default values
 ARolling::ARolling()
@@ -13,10 +14,20 @@ ARolling::ARolling()
 	RollingSphere = CreateDefaultSubobject<USphereComponent>(TEXT("RollingSphere"));
 	RollingSphere->OnComponentBeginOverlap.AddDynamic(this, &ARolling::OnOverlap);
 	RollingSphere->SetupAttachment(Sphere);
+	Damage = 5.0f;
 }
 
 void ARolling::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	
+		APlayerBase* CastedPlayer = Cast<APlayerBase>(OtherActor);
+		if (CastedPlayer)
+		{
+			// Apply damage to the player
+			CastedPlayer->TakedDamage(Damage);
+			Destroy();
+		}
+	
 
 }
 
@@ -24,7 +35,7 @@ void ARolling::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Other
 void ARolling::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	SetLifeSpan(8.0f);
 }
 
 // Called every frame
