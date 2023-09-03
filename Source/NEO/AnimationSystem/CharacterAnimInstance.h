@@ -20,9 +20,6 @@ public:
 	// 毎フレーム処理(Tick) 
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 
-
-
-
 protected:
 
 	// オーナーをキャラクタークラスで取得
