@@ -2,12 +2,13 @@
 
 
 #include "Pusher.h"
-
+#include "TimerManager.h"
 // Sets default values
 APusher::APusher()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
 
 }
 
@@ -15,7 +16,7 @@ APusher::APusher()
 void APusher::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	GetWorld()->GetTimerManager().SetTimer(RollingSpawnTimer, this, &APusher::SpawnRolling, 3.0f, true);
 }
 
 // Called every frame
@@ -32,3 +33,24 @@ void APusher::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 }
 
+void APusher::SpawnRolling()
+{
+	PlayAnimMontage(Push, 1, NAME_None);
+
+	if (RollingToSpawn)
+	{
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+		ARolling* SpawnedRolling = GetWorld()->SpawnActor<ARolling>(RollingToSpawn, FVector::ZeroVector, FRotator::ZeroRotator, SpawnParams);
+
+		if (SpawnedRolling)
+		{
+			FName SocketName = TEXT("enemy_L_hand");
+			FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
+			SpawnedRolling->AttachToComponent(GetMesh(), AttachmentRules, SocketName);
+		}
+
+	
+	}
+}

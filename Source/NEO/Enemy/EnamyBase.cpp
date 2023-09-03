@@ -30,7 +30,7 @@ AEnamyBase::AEnamyBase()
 	DamageCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("DamageCollision"));
 	if (DamageCollision)
 	{
-		DamageCollision->SetupAttachment(GetMesh(), TEXT("FX_weapon_base"));
+		DamageCollision->SetupAttachment(GetMesh(), TEXT("enemy_R_hand"));
 		DamageCollision->OnComponentBeginOverlap.AddDynamic(this, &AEnamyBase::OnOverlapBegin);
 
 	}
