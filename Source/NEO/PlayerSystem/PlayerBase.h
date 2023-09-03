@@ -76,7 +76,7 @@ public:
 		float DamageAmount = 10.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		float ComboDamageFactor = 2.f;
+		float ComboDamageFactor = 1.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		float JumpHeight = 150.f;

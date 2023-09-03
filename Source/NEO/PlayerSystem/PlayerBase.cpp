@@ -483,6 +483,9 @@ void APlayerBase::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Ot
  */
 void APlayerBase::Attack(int _attackNum /*= 0*/)
 {
+	// コントロール不能へ
+	IsControl = false;
+
 	// プレイヤーの角度修正
 	ActionAssistComp->CorrectAttackAngle();
 
@@ -525,8 +528,8 @@ void APlayerBase::Attack(int _attackNum /*= 0*/)
  */
 void APlayerBase::Combo1()
 {
-	// コントロール可能か
-	if (!IsControl) { return; }
+	// 攻撃可能か
+	if (!IsControl || !IsHoldWeapon) { return; }
 
 	// 攻撃
 	Attack(0);
@@ -539,8 +542,8 @@ void APlayerBase::Combo1()
  */
 void APlayerBase::Combo2()
 {
-	// コントロール可能か
-	if (!IsControl) { return; }
+	// 攻撃可能か
+	if (!IsControl || !IsHoldWeapon) { return; }
 
 	// 攻撃
 	Attack(1);
