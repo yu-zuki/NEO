@@ -38,13 +38,4 @@ public:
 	// コリジョン判定
 	void SetCollision();
 
-private:
-
-	// 武器の当たり判定
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SwordCollision", meta = (AllowPrivateAccess = "true"))
-		class UCapsuleComponent* WeaponCollision;
-
-	// 武器のメッシュ
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon Mesh", meta = (AllowPrivateAccess = "true"))
-		UStaticMeshComponent* WeaponStaticMesh;
 };

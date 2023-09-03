@@ -21,6 +21,7 @@
 #include "PlayerSpline.h"
 #include "NiagaraComponent.h"
 #include "ActionAssistComponent.h"
+#include "NEO/PlayerSystem/WeaponSystem/WeaponBase.h"
 
 
 // Sets default values
@@ -55,6 +56,8 @@ APlayerBase::APlayerBase()
 	// アタックアシストコンポーネント作成
 	ActionAssistComp = CreateDefaultSubobject<UActionAssistComponent>(TEXT("AttackAssist"));
 
+	// コリジョンイベントを設定
+	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &APlayerBase::OnOverlap);
 }
 
 
@@ -72,6 +75,21 @@ void APlayerBase::BeginPlay()
 		}
 	}
 
+	// 武器をSpawn
+	if (WeaponClass && !Weapon)
+	{
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.Owner = this;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+		Weapon = GetWorld()->SpawnActor<AWeaponBase>(WeaponClass, SpawnParams);
+
+		if (Weapon)
+		{
+			Weapon->AttachToHand(this, "hand_rSocket");
+
+		}
+	}
 }
 
 
@@ -436,6 +454,27 @@ bool APlayerBase::IsPlayerGrounded() const
 }
 
 
+// 接触開始時に行う処理
+void APlayerBase::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	// オーバーラップした際に実行したいイベント
+	if (OtherActor && (OtherActor != this) && OtherComp)
+	{
+		// 当たったのがプレイヤーの時装備させる
+		if (OtherActor->ActorHasTag("Weapon") && !IsHoldWeapon)
+		{
+			// 新しい武器を作成
+			AWeaponBase* NewWeapon = Cast<AWeaponBase>(OtherActor);
+
+			// プレイヤーに装備させる
+			NewWeapon->AttachToHand(this, "hand_rSocket");
+
+			IsHoldWeapon = true;
+		}
+	}
+}
+
+
 /*
  * 関数名　　　　：Attack()
  * 処理内容　　　：プレイヤーの攻撃処理
@@ -677,6 +716,7 @@ void APlayerBase::ResetCombo()
 	ComboIndex = 0;
 }
 
+
 /*
  * 関数名　　　　：TakedDamage()
  * 処理内容　　　：プレイヤーの被ダメージ処理
@@ -686,106 +726,66 @@ void APlayerBase::ResetCombo()
  */
 void APlayerBase::TakedDamage(float _damage, bool _isLastAttack /*= false*/)
 {
-	if (PlayerStatus.HP >= 0.f)
+	// 武器を持っていないときに攻撃を受けたら死亡
+	if (!IsHoldWeapon)
 	{
-		// HP計算
-		PlayerStatus.HP -= _damage;
+		// コントロール不能へ
+		IsControl = false;
 
-		// HPが0以下になったら
-		if (PlayerStatus.HP <= 0.f)
+		// コリジョンをオフに
+		SetActorEnableCollision(true);
+
+		// ヒットエフェクト発生
+		ActionAssistComp->SpawnEffect(HitEffect, GetActorLocation());
+
+		// 死亡アニメーション再生
+		PlayAnimation(PlayerAnimation.Death);
+	}
+	// 武器を持っているとき
+	else
+	{
+		// 攻撃中のフラグリセット
+		if (IsAttacking)
 		{
-			// コントロール不能へ
+			IsAttacking = false;
+			CanCombo = false;
 			IsControl = false;
+			ComboIndex = 0;
+		}
 
-			// コリジョンをオフに
-			SetActorEnableCollision(true);
+		// ヒットエフェクト発生
+		ActionAssistComp->SpawnEffect(HitEffect, GetActorLocation());
 
-			// ヒットエフェクト発生
-			ActionAssistComp->SpawnEffect(HitEffect, GetActorLocation());
+		// 敵のコンボが最終段だった時必ず武器を落とす
+		if (_isLastAttack)
+		{
+			PlayerStatus.WeaponDropLimit = 0;
+		}
 
-			// 死亡アニメーション再生
-			PlayAnimation(PlayerAnimation.Death);
+		// 被ダメージアニメーション
+		if (PlayerStatus.WeaponDropLimit <= 0)
+		{
+			// ノックバックアニメーション再生
+			PlayAnimation(PlayerAnimation.KnockBack);
+
+
+			// 武器を落とす
+			if (Weapon && IsHoldWeapon)
+			{
+				Weapon->DetachToHand();
+				IsHoldWeapon = false;
+				PlayerStatus.WeaponDropLimit = PlayerStatus.DefaultWeaponDropLimit;
+			}
 		}
 		else
 		{
-			// 攻撃中のフラグリセット
-			if (IsAttacking)
-			{
-				IsAttacking = false;
-				CanCombo = false;
-				IsControl = false;
-				ComboIndex = 0;
-			}
+			// のけぞりアニメーション再生
+			PlayAnimation(PlayerAnimation.TakeDamage);
 
-			// ヒットエフェクト発生
-			ActionAssistComp->SpawnEffect(HitEffect,GetActorLocation());
-
-			// 被ダメージアニメーション
-			if (!_isLastAttack)
-			{
-				// のけぞりアニメーション再生
-				PlayAnimation(PlayerAnimation.TakeDamage);
-			}
-			else
-			{
-				// ノックバックアニメーション再生
-				PlayAnimation(PlayerAnimation.KnockBack);
-			}
+			// 攻撃を受ける
+			--PlayerStatus.WeaponDropLimit;
 		}
 	}
-
-	//// 武器を持っていないときに攻撃を受けたら死亡
-	//if (!IsHoldWeapon)
-	//{
-	//	// コントロール不能へ
-	//	IsControl = false;
-
-	//	// コリジョンをオフに
-	//	SetActorEnableCollision(true);
-
-	//	// ヒットエフェクト発生
-	//	ActionAssistComp->SpawnEffect(HitEffect, GetActorLocation());
-
-	//	// 死亡アニメーション再生
-	//	PlayAnimation(PlayerAnimation.Death);
-	//}
-	//// 武器を落とす
-	//else
-	//{
-	//	// 攻撃中のフラグリセット
-	//	if (IsAttacking)
-	//	{
-	//		IsAttacking = false;
-	//		CanCombo = false;
-	//		IsControl = false;
-	//		ComboIndex = 0;
-	//	}
-
-	//	// ヒットエフェクト発生
-	//	ActionAssistComp->SpawnEffect(HitEffect, GetActorLocation());
-
-
-	//	// 敵のコンボが最終段だった時必ず武器を落とす
-	//	if (_isLastAttack)
-	//	{
-	//		PlayerStatus.WeaponDropLimit = 0;
-	//	}
-
-	//	// 被ダメージアニメーション
-	//	if (PlayerStatus.WeaponDropLimit <= 0)
-	//	{
-	//		// ノックバックアニメーション再生
-	//		PlayAnimation(PlayerAnimation.KnockBack);
-
-	//		// 攻撃を受ける
-	//		--PlayerStatus.WeaponDropLimit;
-	//	}
-	//	else
-	//	{
-	//		// のけぞりアニメーション再生
-	//		PlayAnimation(PlayerAnimation.TakeDamage);
-	//	}
-	//}
 }
 
 

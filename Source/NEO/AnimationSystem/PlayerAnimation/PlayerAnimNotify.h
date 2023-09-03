@@ -14,7 +14,8 @@ enum class EPlayerNotifyType :uint8
     NotifyType_ResetCombo   UMETA(DisplayName = "ResetCombo"),
     NotifyType_SaveCombo    UMETA(DisplayName = "SaveCombo"),
     NotifyType_CanControl   UMETA(DisplayName = "CanControl"),
-    NotifyType_SlowDown     UMETA(DisplayName = "SlowDown")
+    NotifyType_SlowDown     UMETA(DisplayName = "SlowDown"),
+    NotifyType_DropWeapon   UMETA(DisplayName = "DropWeapon")
 };
 
 

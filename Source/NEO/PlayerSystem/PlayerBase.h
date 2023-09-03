@@ -64,7 +64,10 @@ public:
 		float MaxHP = 100;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		int WeaponDropLimit = 3;
+		int WeaponDropLimit = 2;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		int DefaultWeaponDropLimit = WeaponDropLimit;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		int RemainingLife = 2;
@@ -164,6 +167,12 @@ public:
 
 	// ダメージを与える処理
 	virtual void SetCollision() { return; }
+
+	// ヒットストップ
+	void HitStop() { ActionAssistComp->HitStop(HitStopTime); }
+
+	// カメラシェイク
+	void CameraShake() { ActionAssistComp->CameraShake(ShakePattern); }
 	
 	// 操作可・不可を切り替える処理
 	void SetControl(bool _isControl) { IsControl = _isControl; }
@@ -187,6 +196,10 @@ public:
 
 	// プレイヤーが地面にいるか
 	bool IsPlayerGrounded()const;
+
+	// 接触開始時に行う処理
+	UFUNCTION()
+		virtual void OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	//---------------------------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -236,7 +249,6 @@ protected:
 	// 指定したパスのアニメーションアセットを返す
 	UAnimMontage* GetAnimationAsset(TCHAR* _animAssetPath);
 
-
 	// ---------コリジョンコンポーネント作成テンプレート
 	/*
 	 * 関数名　　　　：SetupCollisionComponent()
@@ -280,11 +292,15 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		FPlayerAnimation PlayerAnimation;
 
+	// プレイヤーの武器
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Battle", meta = (AllowPrivateAccess = "true"))
+		TSubclassOf<class AWeaponBase> WeaponClass;
+
 	//-------------------------------------------------------------------------------------------------------------
 
 
 	//-----------------コンポーネント変数--------------------------------------------------------------------------
-	// 攻撃のアシスト用コンポーネント
+	// 攻撃のアシスト用
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Action Assist", meta = (AllowPrivateAccess = "true"))
 		class UActionAssistComponent* ActionAssistComp;
 
@@ -294,13 +310,11 @@ protected:
 
 	// カメラの揺れ方
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		TSubclassOf<UCameraShakeBase> ShakePattern;
+		TSubclassOf<class UCameraShakeBase> ShakePattern;
 
 	// キャラクターの動き
 	UCharacterMovementComponent* CharacterMovementComp;
 	//-------------------------------------------------------------------------------------------------------------
-
-protected:
 
 	// 何秒間ヒットストップを起こすか
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = "Action Assist")
@@ -317,6 +331,9 @@ protected:
 	// 移動した距離
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		float DistanceAdvanced;
+
+	// 武器のクラス
+	class AWeaponBase* Weapon;
 
 private:
 

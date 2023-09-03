@@ -99,7 +99,7 @@ void ASplineCamera::Tick(float DeltaTime)
 
 
 
-		DrawDebugPoint(GetWorld(), BeforeCameraLocation, 100, FColor(52, 220, 239), false);
+		//DrawDebugPoint(GetWorld(), BeforeCameraLocation, 100, FColor(52, 220, 239), false);
 
 		
 

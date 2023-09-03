@@ -19,7 +19,7 @@ public:
 
 	// オーナーになるキャラクターの情報
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		ACharacter* pOwner = nullptr;
+		AActor* pOwner = nullptr;
 
 	// オーナーのタグ
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
@@ -47,14 +47,9 @@ protected:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	// 接触開始時に行う処理
-	UFUNCTION()
-		virtual void OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
-	// 引数によってスタティックメッシュかスケルタルメッシュのセットアップ
+	// StaticMeshのセットアップ
 	void SetupWeaponMesh(UStaticMeshComponent*& MeshComp, TCHAR* WeaponAssetPath, FName PublicName = "WeaponMesh");
-	void SetupWeaponMesh(USkeletalMeshComponent*& MeshComp, TCHAR* WeaponAssetPath, FName PublicName = "WeaponMesh");
-
 
 // ---------コリジョンコンポーネント作成テンプレート
 /*
@@ -84,27 +79,45 @@ protected:
 public:	
 
 	// プレイヤーの手に付ける
-	void AttachToHand(ACharacter* ParentCharacter, FName SocketName);
+	void AttachToHand(ACharacter* _owner, FName SocketName);
 
 	// プレイヤーの手から外れる
 	void DetachToHand();
+
+	// ダメージを与える処理(オーバーライド用)
+	virtual void SetCollision() { return; }
+
 
 
 protected:
 
 	// オーナーのデータ初期化
-	void InitializeOwnerData(ACharacter* _owner,FName _ownerTag,FName _socketName);
+	void SetupOwnerData(AActor* _owner,FName _ownerTag,FName _socketName);
 
 	// 外れた時吹っ飛ぶ
 	void BlowsAway();
 
-	// ダメージを与える処理(オーバーライド用)
-	virtual void SetCollision() { return; }
+
+
+protected:
+
+	// オーナーの情報
+	FOwnerInfo OwnerInfo;
+
+	// 武器のメッシュ
+	class UStaticMeshComponent* WeaponStaticMesh;
+
 
 private:
 
-	FOwnerInfo OwnerInfo;
-
 	// プレイヤーに持たれているかのフラグ
 	bool IsHeld;
+
+	// 攻撃のアシスト用
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Action Assist", meta = (AllowPrivateAccess = "true"))
+		class UActionAssistComponent* ActionAssistComp;
+
+	// 被ダメージ時のエフェクト
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Effect", meta = (AllowPrivateAccess = "true"))
+		class UNiagaraSystem* AuraEffect;
 };

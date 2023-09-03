@@ -5,6 +5,7 @@
 #include "../OdaBase.h"
 #include "NEO/BackGroundSystem/ObjectBase.h"
 #include "ActionAssistComponent.h"
+#include "NEO/PlayerSystem/WeaponSystem/WeaponBase.h"
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -14,12 +15,14 @@ APlayerCharacter::APlayerCharacter()
 
 	// Playerのセットアップ
 	SetupPlayerData();
+
 }
 
 // Called when the game starts or when spawned
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
 
 }
 
@@ -47,14 +50,14 @@ void APlayerCharacter::SetupPlayerData()
 {
 	Super::SetupPlayerData();
 
-	// 武器のメッシュのパス
-	TCHAR* WeaponAssetPath = TEXT("/Game/0139/CharacterModel/EnemySwordJoint");
+	//// 武器のメッシュのパス
+	//TCHAR* WeaponAssetPath = TEXT("/Game/0139/CharacterModel/EnemySwordJoint");
 
-	// 武器のメッシュ設定
-	SetupWeaponMesh(WeaponStaticMesh, WeaponAssetPath);
+	//// 武器のメッシュ設定
+	//SetupWeaponMesh(WeaponStaticMesh, WeaponAssetPath);
 
-	// コリジョン設定
-	SetupCollisionComponent(WeaponCollision);
+	//// コリジョン設定
+	//SetupCollisionComponent(WeaponCollision);
 
 	// アニメーションアセット設定
 	SetupAnimationAsset();
@@ -119,77 +122,82 @@ void APlayerCharacter::SetupAnimationAsset()
  */
 void APlayerCharacter::SetCollision()
 {
-	// 自身に当たらないようにする
-	FCollisionQueryParams CollisionParams;
-	CollisionParams.AddIgnoredActor(this);
+	//// 自身に当たらないようにする
+	//FCollisionQueryParams CollisionParams;
+	//CollisionParams.AddIgnoredActor(this);
 
-	TArray<FHitResult> HitResults;
+	//TArray<FHitResult> HitResults;
 
-	// 当たり判定を取る範囲
-	FVector Start = WeaponCollision->GetComponentLocation();
-	FVector End = Start;
-	FQuat Rot = WeaponCollision->GetComponentQuat();
-	FCollisionShape CollisionShape = FCollisionShape::MakeCapsule(WeaponCollision->GetScaledCapsuleRadius(), WeaponCollision->GetScaledCapsuleHalfHeight());
+	//// 当たり判定を取る範囲
+	//FVector Start = WeaponCollision->GetComponentLocation();
+	//FVector End = Start;
+	//FQuat Rot = WeaponCollision->GetComponentQuat();
+	//FCollisionShape CollisionShape = FCollisionShape::MakeCapsule(WeaponCollision->GetScaledCapsuleRadius(), WeaponCollision->GetScaledCapsuleHalfHeight());
 
-	// あたっているか確認
-	bool isHit = GetWorld()->SweepMultiByChannel(HitResults, Start, End, Rot, ECollisionChannel::ECC_GameTraceChannel1, CollisionShape, CollisionParams);
+	//// あたっているか確認
+	//bool isHit = GetWorld()->SweepMultiByChannel(HitResults, Start, End, Rot, ECollisionChannel::ECC_GameTraceChannel1, CollisionShape, CollisionParams);
 
-	if (isHit)
+	//if (isHit)
+	//{
+	//	// 当たったオブジェクトの数だけ繰り返し
+	//	for (const FHitResult HitResult : HitResults)
+	//	{
+	//		// 当たったキャラクターを格納
+	//		AActor* tempActor = HitResult.GetActor();
+
+	//		// 先にオブジェクトに当たったら処理しない
+	//		if (tempActor && tempActor->ActorHasTag("Object"))
+	//		{
+	//			AObjectBase* Object = Cast<AObjectBase>(HitResult.GetActor());
+
+	//			if (Object)
+	//			{
+	//				Object->ReceiveDamage(GetDamageAmount());
+
+	//			}
+	//			break; 
+	//		}
+
+	//		// ヒットしたアクターが"Enemy"タグを持っていたら
+	//		if (tempActor && tempActor->ActorHasTag("Enemy"))
+	//		{
+
+	//			// エネミーのdamage処理
+	//			AEnamyBase* Enemy = Cast<AEnamyBase>(HitResult.GetActor());
+	//			AOdaBase* Oda = Cast<AOdaBase>(HitResult.GetActor());
+
+	//			if (Enemy)
+	//			{
+	//				// ヒットストップ
+	//				ActionAssistComp->HitStop(HitStopTime);
+	//				Enemy->ApplyDamage(GetDamageAmount());
+	//				
+	//			}
+	//			else if (Oda) 
+	//			{
+	//				// ヒットストップ
+	//				ActionAssistComp->HitStop(HitStopTime);
+	//				Oda->ApplyDamage(GetDamageAmount());
+
+	//				if (GetComboIndex() == 2)
+	//				{
+	//					Oda->BossKnockback();
+	//				}
+
+	//			}
+
+	//			// コンボのフィニッシュのみカメラを揺らす
+	//			if (GetComboIndex() == 2)
+	//			{
+	//				ActionAssistComp->CameraShake(ShakePattern);
+
+	//			}
+	//		}
+	//	}
+	//}
+
+	if (Weapon)
 	{
-		// 当たったオブジェクトの数だけ繰り返し
-		for (const FHitResult HitResult : HitResults)
-		{
-			// 当たったキャラクターを格納
-			AActor* tempActor = HitResult.GetActor();
-
-			// 先にオブジェクトに当たったら処理しない
-			if (tempActor && tempActor->ActorHasTag("Object"))
-			{
-				AObjectBase* Object = Cast<AObjectBase>(HitResult.GetActor());
-
-				if (Object)
-				{
-					Object->ReceiveDamage(GetDamageAmount());
-
-				}
-				break; 
-			}
-
-			// ヒットしたアクターが"Enemy"タグを持っていたら
-			if (tempActor && tempActor->ActorHasTag("Enemy"))
-			{
-
-				// エネミーのdamage処理
-				AEnamyBase* Enemy = Cast<AEnamyBase>(HitResult.GetActor());
-				AOdaBase* Oda = Cast<AOdaBase>(HitResult.GetActor());
-
-				if (Enemy)
-				{
-					// ヒットストップ
-					ActionAssistComp->HitStop(HitStopTime);
-					Enemy->ApplyDamage(GetDamageAmount());
-					
-				}
-				else if (Oda) 
-				{
-					// ヒットストップ
-					ActionAssistComp->HitStop(HitStopTime);
-					Oda->ApplyDamage(GetDamageAmount());
-
-					if (GetComboIndex() == 2)
-					{
-						Oda->BossKnockback();
-					}
-
-				}
-
-				// コンボのフィニッシュのみカメラを揺らす
-				if (GetComboIndex() == 2)
-				{
-					ActionAssistComp->CameraShake(ShakePattern);
-
-				}
-			}
-		}
+		Weapon->SetCollision();
 	}
 }
