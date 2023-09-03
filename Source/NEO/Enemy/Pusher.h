@@ -36,4 +36,8 @@ public:
 	void SpawnRolling();
 
 	FTimerHandle RollingSpawnTimer;
+	UFUNCTION()
+		void DetachRolling();
+
+	ARolling* CurrentRolling;
 };

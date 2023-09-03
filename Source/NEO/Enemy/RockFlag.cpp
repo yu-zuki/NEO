@@ -2,6 +2,7 @@
 
 
 #include "RockFlag.h"
+#include "NEO/PlayerSystem/PlayerBase.h"
 
 // Sets default values
 ARockFlag::ARockFlag()
@@ -30,21 +31,26 @@ void ARockFlag::Tick(float DeltaTime)
 }
 void ARockFlag::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (PusherClass && SpawnPointOne && SpawnPointTwo)
+	APlayerBase* CastedPlayer = Cast<APlayerBase>(OtherActor);
+	if (CastedPlayer)
 	{
-		// 1体目のPusherを出す
-		FVector SpawnLocationOne = SpawnPointOne->GetActorLocation();
-		FRotator SpawnRotation = FRotator(0.f, 0.f, 0.f);
-		AActor* SpawnedPusherOne = GetWorld()->SpawnActor<AActor>(PusherClass, SpawnLocationOne, SpawnRotation);
+		if (PusherClass && SpawnPointOne && SpawnPointTwo)
+		{
+			// 1体目のPusherを出す
+			FVector SpawnLocationOne = SpawnPointOne->GetActorLocation();
+			FRotator SpawnRotation = FRotator(0.f, 0.f, 0.f);
+			AActor* SpawnedPusherOne = GetWorld()->SpawnActor<AActor>(PusherClass, SpawnLocationOne, SpawnRotation);
 
-		// 2体目のPusherを出す
-		FVector SpawnLocationTwo = SpawnPointTwo->GetActorLocation();
-		AActor* SpawnedPusherTwo = GetWorld()->SpawnActor<AActor>(PusherClass, SpawnLocationTwo, SpawnRotation);
+			// 2体目のPusherを出す
+			FVector SpawnLocationTwo = SpawnPointTwo->GetActorLocation();
+			AActor* SpawnedPusherTwo = GetWorld()->SpawnActor<AActor>(PusherClass, SpawnLocationTwo, SpawnRotation);
 
 
 
-		FlagBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+			FlagBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		}
 	}
+	
 }
 void ARockFlag::SpawnPusher()
 {
