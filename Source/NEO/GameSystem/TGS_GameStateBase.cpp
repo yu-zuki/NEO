@@ -34,6 +34,8 @@ void ATGS_GameStateBase::InitGameState()
 
 	//PlayerTypeを初期化する
 	InitPlayerType();
+
+	ECurrentTitleState = ETitleState::ETitle_None;
 }
 
 void ATGS_GameStateBase::UpdateGameState(float DeltaTime)
@@ -198,18 +200,23 @@ void ATGS_GameStateBase::OnGameTitle()
 
 	ESubAction currentSubAction = UseSubAction();					//SubActionを取得
 	//Enterキーを押したら、ゲームを開始する
-	if (currentSubAction == ESubAction::ESubAction_Enter) {
+	//if (currentSubAction == ESubAction::ESubAction_Enter) {
+	//	EchangeLevel = EChangeLevel::EChangeLevel_Playing;
+	//}
+
+	if (currentSubAction != ESubAction::ESubAction_None) {
 		EchangeLevel = EChangeLevel::EChangeLevel_Playing;
 	}
+
 	//PlayerTypeを選択
-	else if (currentSubAction == ESubAction::ESubAction_Right) {
-		//PlayerTypeを変更する
-		NextPlayerType();
-	}
-	else if (currentSubAction == ESubAction::ESubAction_Left) {
-		//PlayerTypeを変更する
-		BackPlayerType();
-	}
+	//else if (currentSubAction == ESubAction::ESubAction_Right) {
+	//	//PlayerTypeを変更する
+	//	NextPlayerType();
+	//}
+	//else if (currentSubAction == ESubAction::ESubAction_Left) {
+	//	//PlayerTypeを変更する
+	//	BackPlayerType();
+	//}
 
 }
 

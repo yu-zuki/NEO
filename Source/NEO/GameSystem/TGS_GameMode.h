@@ -97,6 +97,13 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "GamerPlayerUI")
 		float GetPlayerP();
+
+	UFUNCTION(BlueprintCallable, Category = "TitleUI")
+		ETitleState GetTitleState();
+
+	UFUNCTION(BlueprintCallable, Category = "TitleUI")
+		void SetTitleState(ETitleState _NewState);
+	
 ///////////////////////////////////////////////////////////
 ///Player‘I‘ð
 void SelctorPlayerType();
