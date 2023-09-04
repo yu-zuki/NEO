@@ -12,6 +12,9 @@
 #include "JumpModuleActor.h"
 #include "Ingame_WG.h"
 
+//GameのDebugキー
+#define PLAYINGDEBUG true
+
 ATGS_GameStateBase::ATGS_GameStateBase()
 	:ECurrentState(EGameState::EGame_None), EchangeLevel(EChangeLevel::EChangeLevel_None), ECurrentPlayerType(EPlayerType::EPlayerType_None)
 	,NowBattleArea(false)
@@ -259,9 +262,11 @@ void ATGS_GameStateBase::OnGamePlaying(float DeltaTime)
 		SetCurrentState(EGameState::EGame_Menu);
 	}
 
-	//Enterキーが押されたら、ゲームをGameOverにする
-	if (UseSubAction() == ESubAction::ESubAction_Enter) {
-		EchangeLevel = EChangeLevel::EChangeLevel_Over;
+	if (PLAYINGDEBUG) {
+		//Enterキーが押されたら、ゲームをGameOverにする
+		if (UseSubAction() == ESubAction::ESubAction_Enter) {
+			EchangeLevel = EChangeLevel::EChangeLevel_Over;
+		}
 	}
 }
 
@@ -331,7 +336,7 @@ void ATGS_GameStateBase::OnGamePause()
 void ATGS_GameStateBase::OnInBattleArea()
 {
 	//Debug用 BattleAreaから出る
-	if (UseSubAction() == ESubAction::ESubAction_Enter || BattleAreaEnemyCount <= 0) {
+	if ( (UseSubAction() == ESubAction::ESubAction_Enter  && PLAYINGDEBUG) || BattleAreaEnemyCount <= 0) {
 		//バトルエリアから出る
 		ExitBattleArea();
 		SetCurrentState(EGameState::EGame_Playing);
