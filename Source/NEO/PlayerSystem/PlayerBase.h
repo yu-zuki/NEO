@@ -181,7 +181,8 @@ public:
 	void SlowDownDeathAnimationRate();
 
 	// ダメージ量を返す関数
-	float GetDamageAmount()const { return PlayerStatus.DamageAmount * (((float)ComboIndex + 1.f) * PlayerStatus.ComboDamageFactor); }
+	UFUNCTION(BlueprintCallable, Category = "Action")
+		float GetDamageAmount()const { return PlayerStatus.DamageAmount * (((float)ComboIndex + 1.f) * PlayerStatus.ComboDamageFactor); }
 
 	// 現在のHPを返す
 	UFUNCTION(BlueprintCallable, Category = "GetStatus")
@@ -348,6 +349,9 @@ private:
 
 	// 武器を持っているかどうか
 	bool IsHoldWeapon;
+
+	// 死んでいるかどうか
+	bool IsDeath;
 
 	// フレームカウント用
 	float frames;	
