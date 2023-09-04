@@ -35,7 +35,7 @@ void ATGS_GameStateBase::InitGameState()
 	//PlayerType‚ğ‰Šú‰»‚·‚é
 	InitPlayerType();
 
-	ECurrentTitleState = ETitleState::ETitle_None;
+	//ECurrentTitleState = ETitleState::ETitle_None;
 }
 
 void ATGS_GameStateBase::UpdateGameState(float DeltaTime)
