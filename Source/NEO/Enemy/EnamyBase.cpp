@@ -133,6 +133,7 @@ void AEnamyBase::Tick(float DeltaTime)
 				FVector MyLocation = Pawn->GetActorLocation();
 				// キャラクターの位置と自分の位置を比較してY軸より前にいるかどうかを判定
 				bIsRotation = CharacterLocation.Y > MyLocation.Y;
+				bIsRotationTag2 = CharacterLocation.X > MyLocation.X;
 				//bIsRotationがtrueなら
 				if (Health >= 0&& ActorHasTag("pattern1"))
 				{
@@ -155,7 +156,7 @@ void AEnamyBase::Tick(float DeltaTime)
 				}
 				else if (Health >= 0 && ActorHasTag("pattern2"))
 				{
-					if (bIsRotation)
+					if (bIsRotationTag2)
 					{
 						FRotator NewRotation = GetActorRotation();
 						NewRotation.Yaw = -180.0f;

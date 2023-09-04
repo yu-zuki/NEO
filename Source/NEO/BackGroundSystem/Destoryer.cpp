@@ -51,7 +51,7 @@ void ADestoryer::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 	// X軸に進む
 	FVector RightVector = GetActorRightVector();
-	FVector NewLocation = GetActorLocation() + (RightVector * 100 * DeltaTime);  // スピードは100とした
+	FVector NewLocation = GetActorLocation() + (RightVector * 150 * DeltaTime);  // スピードは100とした
 	SetActorLocation(NewLocation);
 
 	// 経過時間を更新

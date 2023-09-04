@@ -8,7 +8,6 @@
 #include "NEO/GameSystem/GameSystem_BattleArea.h"
 #include "NiagaraComponent.h"
 #include "Components/SplineComponent.h"
-#include "EnemyBaseAnimInstance.h"
 #include "EnamyBase.generated.h"
 
 UCLASS()
@@ -110,20 +109,22 @@ public:
 	
 	bool bIsRotation;
 
+	bool bIsRotationTag2;
+
 	bool bIsDeath;
 	
 	bool IsAnimationAttacking() const;
-
+	UFUNCTION(BlueprintCallable)
 	bool IsIdol() const { return bIsIdol; }
 	bool IsWalking() const { return bIsWalking; }
+	UFUNCTION(BlueprintCallable)
 	bool IsRunning ()const { return bIsRunning; }
 	bool IsAttacking() const { return bIsAttacking; }
 	bool IsReactingToDamage() const { return bIsReactingToDamage; }
 	bool IsDead() const { return bIsDead; }
 	bool IsAir() const{ return bIsAir; }
-private:
 
-	///////////////////////////////アニメーション///////////////////////////////////////////
+
 	bool bIsIdol;
 	bool bIsWalking;
 	bool bIsRunning;
@@ -140,11 +141,11 @@ public:
 	float SpawnTime; // スポーンした時間を記録する変数
 	USplineComponent* MovementSpline;
 
-	// 移動を開始するためのフラグと時間にゃ
+	// 移動を開始するためのフラグと時間
 	bool bShouldMoveAlongSpline = false;
 	float TimeSinceStartOfMovement = 0.0f;
 
-	// 3秒間移動するための定数にゃ
+	// 3秒間移動するための定数
 	static constexpr float MovementDuration = 3.0f;
 
 };

@@ -4,21 +4,23 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "EnamyBase.h"
 #include "Rolling.h"
 #include "Pusher.generated.h"
 
 UCLASS()
-class NEO_API APusher : public ACharacter
+class NEO_API APusher : public AEnamyBase
 {
 	GENERATED_BODY()
 
 public:
 	// Sets default values for this character's properties
 	APusher();
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
-		UAnimMontage* Attack;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
 		UAnimMontage* Push;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
+		UAnimMontage* Idol;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawning")
 		TSubclassOf<ARolling> RollingToSpawn;
 
