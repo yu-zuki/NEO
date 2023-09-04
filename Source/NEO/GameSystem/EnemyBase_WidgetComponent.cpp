@@ -67,17 +67,17 @@ void UEnemyBase_WidgetComponent::LookAtPlayer()
 
 void UEnemyBase_WidgetComponent::SetHPInfo(float HP, float MaxHP)
 {
-	if (WidgetClass != nullptr) {
-		//Get Character Widget
-		UEnemyBase_UMG* CharacterWidget = Cast<UEnemyBase_UMG>(GetWidget());
-		if (CharacterWidget != nullptr) {
-			//Set HP
-			CharacterWidget->SetPlayerInfo(HP, MaxHP);
-		}
-		else {
-			UE_LOG(LogTemp, Warning, TEXT("CharacterWidget is nullptr"));
-		}
-	}
+	//if (WidgetClass != nullptr) {
+	//	//Get Character Widget
+	//	UEnemyBase_UMG* CharacterWidget = Cast<UEnemyBase_UMG>(GetWidget());
+	//	if (CharacterWidget != nullptr) {
+	//		//Set HP
+	//		CharacterWidget->SetPlayerInfo(HP, MaxHP);
+	//	}
+	//	else {
+	//		UE_LOG(LogTemp, Warning, TEXT("CharacterWidget is nullptr"));
+	//	}
+	//}
 }
 
 void UEnemyBase_WidgetComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
