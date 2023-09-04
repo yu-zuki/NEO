@@ -30,6 +30,7 @@ APlayerBase::APlayerBase()
 	, IsRunning(false)
 	, IsJumping(false)
 	, IsHoldWeapon(true)
+	, IsDeath(false)
 	, frames(0.f)
 	, IsAttacking(false)
 	, CanCombo(false)
@@ -730,10 +731,13 @@ void APlayerBase::ResetCombo()
 void APlayerBase::TakedDamage(float _damage, bool _isLastAttack /*= false*/)
 {
 	// 武器を持っていないときに攻撃を受けたら死亡
-	if (!IsHoldWeapon)
+	if (!IsHoldWeapon && !IsDeath)
 	{
 		// コントロール不能へ
 		IsControl = false;
+
+		// 死亡状態へ
+		IsDeath = true;
 
 		// コリジョンをオフに
 		SetActorEnableCollision(true);
