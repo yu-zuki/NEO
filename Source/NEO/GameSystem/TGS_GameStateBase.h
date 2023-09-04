@@ -57,6 +57,14 @@ enum class EPlayerType : uint8
 	EPlayerType_3 UMETA(DisplayName = "PlayerType_3"),							// プレイヤー3
 };
 
+UENUM(BlueprintType)
+enum class ETitleState : uint8
+{
+	ETitle_None UMETA(DisplayName = "ETitle_None"),								// None
+	ETitle_DemoScene UMETA(DisplayName = "ETitle_DemoScene"),					// DEMO動画
+	ETitle_TitleScene UMETA(DisplayName = "ETitle_TitleScene"),					// タイトルシーン
+};
+
 /**
  *
  */
@@ -222,6 +230,8 @@ public:
 
 	UFUNCTION(CallInEditor)
 		void BackPlayerType();
+
+	ETitleState ECurrentTitleState;
 
 //////////////////////////////////////////////////////////////////////////
 ///プレイヤーキャラクターの選択

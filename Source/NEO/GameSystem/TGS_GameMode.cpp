@@ -263,6 +263,16 @@ float ATGS_GameMode::GetPlayerP()
 	return PlayerPtr ? PlayerPtr->GetPlayerHPPercent() : 0 ;
 }
 
+ETitleState ATGS_GameMode::GetTitleState()
+{
+	return GetGameState()->ECurrentTitleState;
+}
+
+void ATGS_GameMode::SetTitleState(ETitleState _NewState)
+{
+	GetGameState()->ECurrentTitleState = _NewState;
+}
+
 void ATGS_GameMode::SelctorPlayerType()
 {
 	//NULL CHECK
