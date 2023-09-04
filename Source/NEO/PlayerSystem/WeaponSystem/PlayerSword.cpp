@@ -9,6 +9,7 @@
 #include "NEO/OdaBase.h"
 #include "NEO/BackGroundSystem/ObjectBase.h"
 #include "Components/CapsuleComponent.h"
+#include "NEO/PlayerSystem/ActionAssistComponent.h"
 
 // Sets default values
 APlayerSword::APlayerSword()
@@ -58,11 +59,14 @@ void APlayerSword::SetCollision()
 
 	if (pPlayer)
 	{
-		// 自身に当たらないようにする
+		// 自分とプレイヤーに当たらないようにする
 		FCollisionQueryParams CollisionParams;
+		CollisionParams.AddIgnoredActor(this);
 		CollisionParams.AddIgnoredActor(pPlayer);
 
 		TArray<FHitResult> HitResults;
+
+		float DamageAmount = pPlayer->GetDamageAmount();
 
 		// 当たり判定を取る範囲
 		FVector Start = WeaponCollision->GetComponentLocation();
@@ -88,7 +92,7 @@ void APlayerSword::SetCollision()
 
 					if (Object)
 					{
-						Object->ReceiveDamage(pPlayer->GetDamageAmount());
+						Object->ReceiveDamage(DamageAmount);
 
 					}
 					break;
@@ -104,12 +108,11 @@ void APlayerSword::SetCollision()
 
 					if (Enemy)
 					{
-						Enemy->ApplyDamage(pPlayer->GetDamageAmount());
-
+						Enemy->ApplyDamage(DamageAmount);
 					}
 					else if (Oda)
 					{
-						Oda->ApplyDamage(pPlayer->GetDamageAmount());
+						Oda->ApplyDamage(DamageAmount);
 
 						if (pPlayer->GetComboIndex() == 3)
 						{
@@ -118,15 +121,19 @@ void APlayerSword::SetCollision()
 
 					}
 
+					// ヒットエフェクト表示
+					ActionAssistComp->SpawnEffect(HitEffect, HitResult.Location);
 
 					// ヒットストップ
 					pPlayer->HitStop();
 
 					// コンボのフィニッシュのみカメラを揺らす
-					if (pPlayer->GetComboIndex() == 2)
+					if (pPlayer->GetComboIndex() == 3)
 					{
 						pPlayer->CameraShake();
 					}
+
+					break;
 				}
 			}
 		}

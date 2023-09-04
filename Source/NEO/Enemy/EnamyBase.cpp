@@ -293,7 +293,7 @@ void AEnamyBase::ApplyDamage(float DamageAmount)
 	{
 		PlayAnimMontage(Damage_Reaction, 0.8, NAME_None);
 
-		ActionAssistComp->SpawnEffect(NiagaraEffect, GetActorLocation());
+		//ActionAssistComp->SpawnEffect(NiagaraEffect, GetActorLocation());
 
 	}
 

@@ -28,7 +28,12 @@ private:
 	// 当たり判定
 	void SetCollision();
 
+
 private:
+
+	// 被ダメージ時のエフェクト
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Effect", meta = (AllowPrivateAccess = "true"))
+		class UNiagaraSystem* HitEffect;
 
 
 	// 武器の当たり判定

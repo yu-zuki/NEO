@@ -168,11 +168,17 @@ public:
 	// ダメージを与える処理
 	virtual void SetCollision() { return; }
 
+	// アクションアシストコンポーネントを取得
+	class UActionAssistComponent* GetActionAssistComponent()const { return ActionAssistComp; }
+
 	// ヒットストップ
 	void HitStop() { ActionAssistComp->HitStop(HitStopTime); }
 
 	// カメラシェイク
 	void CameraShake() { ActionAssistComp->CameraShake(ShakePattern); }
+
+	// エフェクトスポーン
+	void SpawnEffect() { ActionAssistComp->SpawnEffect(HitEffect,GetActorLocation()); }
 	
 	// 操作可・不可を切り替える処理
 	void SetControl(bool _isControl) { IsControl = _isControl; }

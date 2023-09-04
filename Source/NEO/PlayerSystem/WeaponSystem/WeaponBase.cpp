@@ -4,6 +4,9 @@
 #include "WeaponBase.h"
 #include "GameFramework/Character.h"
 #include "NEO/PlayerSystem/ActionAssistComponent.h"
+#include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
+#include "NEO/PlayerSystem/ActionAssistComponent.h"
 
 // Sets default values
 AWeaponBase::AWeaponBase()
@@ -15,7 +18,7 @@ AWeaponBase::AWeaponBase()
 	// タグ設定
 	Tags.Add("Weapon");
 
-	// アクションアシストコンポーネント作成
+	// アタックアシストコンポーネント作成
 	ActionAssistComp = CreateDefaultSubobject<UActionAssistComponent>(TEXT("AttackAssist"));
 }
 
@@ -71,12 +74,12 @@ void AWeaponBase::AttachToHand(ACharacter* _owner, FName _socketName)
 	// 持たれている状態にする
 	IsHeld = true;
 
+	
 	// キャラクターにアタッチ
 	if (_owner)
 	{
-		AttachToComponent(_owner->GetMesh(), FAttachmentTransformRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepRelative, false), _socketName);
+		AttachToComponent(_owner->GetMesh(), FAttachmentTransformRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, false), _socketName);
 	}
-
 }
 
 
@@ -93,14 +96,8 @@ void AWeaponBase::DetachToHand()
 	// キャラクターから外す
 	DetachFromActor(FDetachmentTransformRules(EDetachmentRule::KeepWorld, EDetachmentRule::KeepWorld, EDetachmentRule::KeepWorld,false));
 
-
 	// 吹き飛ばす
 	BlowsAway();
-
-	//if (AuraEffect)
-	//{
-	//	ActionAssistComp->SpawnEffect(AuraEffect, GetActorLocation());
-	//}
 }
 
 

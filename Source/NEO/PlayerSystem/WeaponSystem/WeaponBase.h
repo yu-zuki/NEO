@@ -97,6 +97,9 @@ protected:
 	// 外れた時吹っ飛ぶ
 	void BlowsAway();
 
+	UFUNCTION(BlueprintCallable, Category = "Hold")
+		bool GetIsHeld()const { return IsHeld;}
+
 
 
 protected:
@@ -107,17 +110,16 @@ protected:
 	// 武器のメッシュ
 	class UStaticMeshComponent* WeaponStaticMesh;
 
+	class UActionAssistComponent* ActionAssistComp;
 
 private:
 
 	// プレイヤーに持たれているかのフラグ
 	bool IsHeld;
 
-	// 攻撃のアシスト用
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Action Assist", meta = (AllowPrivateAccess = "true"))
-		class UActionAssistComponent* ActionAssistComp;
 
 	// 被ダメージ時のエフェクト
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Effect", meta = (AllowPrivateAccess = "true"))
 		class UNiagaraSystem* AuraEffect;
+
 };
