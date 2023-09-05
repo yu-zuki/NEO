@@ -174,9 +174,11 @@ void UActionAssistComponent::PlayAnimation(UAnimMontage* _toPlayAnimMontage, FNa
 
 
 /*
- * 関数名　　　　：GetFrontActor()
- * 処理内容　　　：敵が直線状にいるか判定
- * 戻り値　　　　：見つけた敵の情報を返す
+ * 関数名　　　　：PlaySound()
+ * 処理内容　　　：音声再生
+ * 引数１　　　　：USoundBase* _sound_Obj・・・音声のアセット
+ * 引数２　　　　：音声を開始する時間
+ * 戻り値　　　　：なし
  */
 void UActionAssistComponent::PlaySound(USoundBase* _sound_Obj,float _startTime /*= 0*/)
 {
