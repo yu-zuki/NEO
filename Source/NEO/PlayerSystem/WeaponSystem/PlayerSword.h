@@ -35,6 +35,11 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Effect", meta = (AllowPrivateAccess = "true"))
 		class UNiagaraSystem* HitEffect;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Effect", meta = (AllowPrivateAccess = "true"))
+		class USoundBase* EnemyHitSoundObj;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Effect", meta = (AllowPrivateAccess = "true"))
+		class USoundBase* ObjectHitSoundObj;
 
 	// ïêäÌÇÃìñÇΩÇËîªíË
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SwordCollision", meta = (AllowPrivateAccess = "true"))

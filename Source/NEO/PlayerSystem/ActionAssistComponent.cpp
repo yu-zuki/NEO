@@ -12,7 +12,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include <Runtime/Engine/Classes/Components/CapsuleComponent.h>
 #include "NiagaraComponent.h"									
-#include "NiagaraFunctionLibrary.h"								
+#include "NiagaraFunctionLibrary.h"		
 
 #define DIRECTION_Y (90.f)
 
@@ -171,6 +171,22 @@ void UActionAssistComponent::PlayAnimation(UAnimMontage* _toPlayAnimMontage, FNa
 		Owner->PlayAnimMontage(_toPlayAnimMontage, _playRate, _startSectionName);
 	}
 }
+
+
+/*
+ * 関数名　　　　：GetFrontActor()
+ * 処理内容　　　：敵が直線状にいるか判定
+ * 戻り値　　　　：見つけた敵の情報を返す
+ */
+void UActionAssistComponent::PlaySound(USoundBase* _sound_Obj,float _startTime /*= 0*/)
+{
+	if (_sound_Obj)
+	{
+		// 再生(7番目の引き数でオーナーアクターを自分に)
+		UGameplayStatics::PlaySound2D(GetWorld(), _sound_Obj, 1.0f, 1.0f, _startTime, nullptr, GetOwner());
+	}
+}
+
 
 
 /*

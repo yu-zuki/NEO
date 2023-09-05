@@ -35,6 +35,9 @@ public:
 	// アニメーション再生
 	void PlayAnimation(UAnimMontage* _toPlayAnimMontage, FName _startSectionName = "None", float _playRate = 1.f);
 
+	// サウンド再生
+	void PlaySound(class USoundBase* _sound_Obj, float StartTime = 0);
+
 	/////////////////////////////////////////////////////////////////////////
 	// 壁とのレイキャストを行う関数
 	bool WallCheck();

@@ -19,7 +19,7 @@ APlayerSword::APlayerSword()
 
 
 	// 武器のメッシュのパス
-	TCHAR* WeaponAssetPath = TEXT("/Game/0139/CharacterModel/EnemySwordJoint");
+	TCHAR* WeaponAssetPath = TEXT("/Game/0122/Player/Weapon/Sword/Sword");
 
 	// 武器のメッシュ設定
 	SetupWeaponMesh(WeaponStaticMesh, WeaponAssetPath);
@@ -94,6 +94,8 @@ void APlayerSword::SetCollision()
 					{
 						Object->ReceiveDamage(DamageAmount);
 
+						// オブジェクト破壊用のサウンド再生
+						ActionAssistComp->PlaySound(ObjectHitSoundObj);
 					}
 					break;
 				}
@@ -120,9 +122,18 @@ void APlayerSword::SetCollision()
 						}
 
 					}
+					if (HitEffect)
+					{
+						// ヒットエフェクト表示
+						ActionAssistComp->SpawnEffect(HitEffect, HitResult.Location);
+					}
 
-					// ヒットエフェクト表示
-					ActionAssistComp->SpawnEffect(HitEffect, HitResult.Location);
+					if (EnemyHitSoundObj)
+					{
+						// 斬撃SE再生
+						ActionAssistComp->PlaySound(EnemyHitSoundObj);
+					}
+
 
 					// ヒットストップ
 					pPlayer->HitStop();
