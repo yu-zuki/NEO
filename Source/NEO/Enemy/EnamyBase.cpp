@@ -5,7 +5,6 @@
 #include "EngineUtils.h"
 #include "NEO/GameSystem/TGS_GameMode.h"
 #include "Kismet/GameplayStatics.h"
-#include "NEO/GameSystem/GameSystem_BattleArea.h"
 #include "NEO/GameSystem/Enemy_UMG.h"
 #include "Components/WidgetComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -74,15 +73,7 @@ void AEnamyBase::BeginPlay()
 	{
 		AnimInstance = GetMesh()->GetAnimInstance();
 	}
-	TArray<AActor*> TempBattleAreas;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AGameSystem_BattleArea::StaticClass(), TempBattleAreas);
-
-	for (AActor* Actor : TempBattleAreas) {
-		AGameSystem_BattleArea* BattleArea = Cast<AGameSystem_BattleArea>(Actor);
-		if (BattleArea) {
-			
-		}
-	}
+	
 	/*TArray<AActor*> FoundPlayers;
 	UGameplayStatics::GetAllActorsWithTag(GetWorld(), TEXT("Player"), FoundPlayers);
 
@@ -223,28 +214,28 @@ void AEnamyBase::Tick(float DeltaTime)
 			}
 		}
 	}
-	if (bHasPattern1Tag && GetWorld()->GetTimeSeconds() - SpawnTime < 4.5f|| bHasPattern2Tag ||bHasPattern3Tag)	
-	{
-		float TimeSinceSpawn = GetWorld()->GetTimeSeconds() - SpawnTime;
-		float SplineDuration = 3.0f;  // スプラインを完了するまでの時間
-		float SplineProgress = FMath::Clamp(TimeSinceSpawn / SplineDuration, 0.0f, 1.0f);
-		FVector NewLocation = MoveSpline->GetLocationAtSplineInputKey(SplineProgress, ESplineCoordinateSpace::World);
-		SetActorLocation(NewLocation);
-		for (AGameSystem_BattleArea* BattleArea : BattleAreaReferences) {
-			if (BattleArea && BattleArea->IsOverlappingActor(this)) {
-				BattleArea->IgnoreCollision();
-			}
-		}
-		return; // 他のTick処理をスキップ
-	}
-	else
-	{
-		for (AGameSystem_BattleArea* BattleArea : BattleAreaReferences) {
-			if (BattleArea) {
-				BattleArea->ResetCollision();
-			}
-		}
-	}
+	//if (bHasPattern1Tag && GetWorld()->GetTimeSeconds() - SpawnTime < 4.5f|| bHasPattern2Tag ||bHasPattern3Tag)	
+	//{
+	//	float TimeSinceSpawn = GetWorld()->GetTimeSeconds() - SpawnTime;
+	//	float SplineDuration = 3.0f;  // スプラインを完了するまでの時間
+	//	float SplineProgress = FMath::Clamp(TimeSinceSpawn / SplineDuration, 0.0f, 1.0f);
+	//	FVector NewLocation = MoveSpline->GetLocationAtSplineInputKey(SplineProgress, ESplineCoordinateSpace::World);
+	//	SetActorLocation(NewLocation);
+	//	for (AGameSystem_BattleArea* BattleArea : BattleAreaReferences) {
+	//		if (BattleArea && BattleArea->IsOverlappingActor(this)) {
+	//			BattleArea->IgnoreCollision();
+	//		}
+	//	}
+	//	return; // 他のTick処理をスキップ
+	//}
+	//else
+	//{
+	//	for (AGameSystem_BattleArea* BattleArea : BattleAreaReferences) {
+	//		if (BattleArea) {
+	//			BattleArea->ResetCollision();
+	//		}
+	//	}
+	//}
 	if (bShouldMoveAlongSpline) {
 		// 3秒間移動させるにゃ
 		TimeSinceStartOfMovement += DeltaTime;

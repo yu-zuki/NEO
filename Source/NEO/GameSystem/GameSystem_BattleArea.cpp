@@ -63,6 +63,7 @@ void AGameSystem_BattleArea::BeginPlay()
 
 	//GetRootComponent()->SetRelativeTransform(Transform);
 
+	StaticMeshComponent->OnComponentBeginOverlap.AddDynamic(this, &AGameSystem_BattleArea::BeginOverlap);
 	
 	GetSpawnPoints();
 }
@@ -315,20 +316,3 @@ void AGameSystem_BattleArea::GetSpawnPoints()
 
 }
 
-void AGameSystem_BattleArea::IgnoreCollision()
-{
-	UE_LOG(LogTemp, Warning, TEXT("IgnoreCollision called"));
-	StaticMeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	LeftMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	RightMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	NearMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-}
-
-void AGameSystem_BattleArea::ResetCollision()
-{
-	UE_LOG(LogTemp, Warning, TEXT("ResetCollision called"));
-	StaticMeshComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	LeftMesh->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	RightMesh->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	NearMesh->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-}

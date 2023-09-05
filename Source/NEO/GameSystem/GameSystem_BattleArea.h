@@ -28,7 +28,7 @@ class NEO_API AGameSystem_BattleArea : public AActor
 public:	
 	// Sets default values for this actor's properties
 	AGameSystem_BattleArea();
-
+protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
@@ -113,10 +113,6 @@ public:
 	//SpawnActorを取得する
 	void GetSpawnPoints();
 
-	// コリジョンを無視する関
-	void IgnoreCollision();
-	// コリジョンを元に戻す関数
-	void ResetCollision();
 	//////////////////////////////////壁の当たり判定を生成//////////////////////////////////////////////////
 
 
