@@ -5,6 +5,7 @@
 #include "EngineUtils.h"
 #include "NEO/GameSystem/TGS_GameMode.h"
 #include "Kismet/GameplayStatics.h"
+#include "NEO/GameSystem/GameSystem_BattleArea.h"
 #include "NEO/GameSystem/Enemy_UMG.h"
 #include "Components/WidgetComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -96,6 +97,28 @@ void AEnamyBase::BeginPlay()
 	//	bShouldMoveAlongSpline = true;
 	//	TimeSinceStartOfMovement = 0.0f;
 	//}
+	TArray<AActor*> FoundBattleAreas;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AGameSystem_BattleArea::StaticClass(), FoundBattleAreas);
+
+	for (AActor* Actor : FoundBattleAreas)
+	{
+		AGameSystem_BattleArea* BattleArea = Cast<AGameSystem_BattleArea>(Actor);
+		if (BattleArea)
+		{
+			// BattleAreaの各メッシュコンポーネント（LeftMesh, RightMesh, NearMesh）を取得する。
+			UProceduralMeshComponent* LeftMesh = BattleArea->LeftMesh;
+			UProceduralMeshComponent* RightMesh = BattleArea->RightMesh;
+			UProceduralMeshComponent* NearMesh = BattleArea->NearMesh;
+
+			// EnamyBaseのカプセルコリジョンがこれらのメッシュコンポーネントを無視するように設定する。
+			if (LeftMesh && RightMesh && NearMesh)
+			{
+				CapsuleComponent->SetCollisionResponseToChannel(LeftMesh->GetCollisionObjectType(), ECR_Ignore);
+				CapsuleComponent->SetCollisionResponseToChannel(RightMesh->GetCollisionObjectType(), ECR_Ignore);
+				CapsuleComponent->SetCollisionResponseToChannel(NearMesh->GetCollisionObjectType(), ECR_Ignore);
+			}
+		}
+	}
 }
 
 AActor* AEnamyBase::GetPlayer()
