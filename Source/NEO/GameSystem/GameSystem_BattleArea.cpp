@@ -63,7 +63,8 @@ void AGameSystem_BattleArea::BeginPlay()
 
 	//GetRootComponent()->SetRelativeTransform(Transform);
 
-	
+	StaticMeshComponent->OnComponentBeginOverlap.AddDynamic(this, &AGameSystem_BattleArea::BeginOverlap);
+
 	GetSpawnPoints();
 }
 
