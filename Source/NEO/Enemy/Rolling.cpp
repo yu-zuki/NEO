@@ -45,3 +45,8 @@ void ARolling::Tick(float DeltaTime)
 
 }
 
+void ARolling::DestoryRock()
+{
+	ARolling* RollingActor = nullptr;
+	GetWorld()->DestroyActor(RollingActor);
+}
