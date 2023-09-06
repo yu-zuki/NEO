@@ -60,6 +60,7 @@ protected:
 		int SpawnTimer;
 	//----------------------------------------------------------------------------------------
 
+
 	//カウンター------------------------------------------------------------
 	//時間の取得
 	int FlameCounter;
@@ -67,7 +68,10 @@ protected:
 	//int型のカウンター
 	int WaitTime;
 	//---------------------------------------------------------------------
-	
+
+	//ボスが動いていいかどうか
+	bool isMove;
+
 	//ボスとプレイヤーとの距離----------------------------
 	//X軸
 	//ボス
@@ -94,6 +98,10 @@ protected:
 
 public:	
 
+	//刀の情報を取得
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Sword", meta = (AllowPrivateAccess = "true"))
+		UStaticMeshComponent* swordConp;
+
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
@@ -111,7 +119,7 @@ public:
 
 	//剣のコリジョン
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "BoxComp", meta = (AllowPrivateAccess = "true"))
-	UBoxComponent* BoxComponent;
+	UBoxComponent* BoxComp;
 
 	//キャラクタームーブメント
 	UPROPERTY()
@@ -299,12 +307,17 @@ public:
 
 	//ふっとぶモーション
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AniMontage", meta = (AllowPrivateAccess = "true"))
-		class UAnimMontage* AnimMontage_BossBlowAway;
+		class UAnimMontage* AnimMontage_BossBlowAway;	
+	
+	//死亡モーション
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AniMontage", meta = (AllowPrivateAccess = "true"))
+		class UAnimMontage* AnimMontage_BossDeath;
 	//-------------------------------------------------------------------------------------------------------------
 
 	//ノックバックしてふっとぶ関数
 	UFUNCTION()
 		void BossKnockback();
+
 
 	//前方移動
 	UFUNCTION()
@@ -316,6 +329,8 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Damage")
 		float SwordAddDamage;
+
+	//ボスを消すための関数
 
 
 	//ボックスコンポーネントのオーバーラップ処理

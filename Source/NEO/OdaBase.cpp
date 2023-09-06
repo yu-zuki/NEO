@@ -13,6 +13,7 @@ AOdaBase::AOdaBase() :
 	SpawnTimer(0),						//---------------------------
 	FlameCounter(0),					//タイマー系
 	WaitTime(0),						//---------------------------
+	isMove(true),
 	OdaMoveEnum(ECPPOdaEnum::Stay1),	//列挙型
 	Attack1Delay(0),					//近接攻撃の待機時間
 	RandomNum(-1),
@@ -41,10 +42,16 @@ AOdaBase::AOdaBase() :
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
+	swordConp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Sword"), true);
+	swordConp->SetupAttachment(GetMesh(), "R_Weapon");
+
+
 	//Box Create
-	BoxComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("SwordComponent"), true);
-	BoxComponent->SetupAttachment(GetMesh(), "weapon_r");
-	BoxComponent->SetRelativeLocation(FVector(0.0f, -80.0f, 0.0f));
+	BoxComp = CreateDefaultSubobject<UBoxComponent>(TEXT("SwordComponent"), true);
+	BoxComp->SetupAttachment(GetMesh(), "R_Weapon");
+	BoxComp->SetRelativeLocation(FVector(0.0f, 0.f, 0.0f));
+	BoxComp->SetBoxExtent(FVector(10.f, 70.f, 10.f));
 
 	//UI Create
 	EnemyWidget = CreateDefaultSubobject<UEnemyBase_WidgetComponent>(TEXT("EnemyWidget"));
@@ -78,101 +85,99 @@ void AOdaBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 void AOdaBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	
+	//プレイヤーがリスポーンした時に中身がなくなってしまうので更新
+	AActor* Player = GetPlayer();
+	//プレイヤーがなかったらこれ以降の処理をスルーする
+	if (Player == nullptr)  return;
 
-
-	if (SpawnDelay != true)
+	if (FVector::Dist(GetActorLocation(), UGameplayStatics::GetPlayerPawn(GetWorld(), 0)->GetActorLocation()) <= 1000.f)
 	{
-		//Enemy Hp Set
-		EnemyWidget->SetHPInfo(Health, MaxHealth);
+		
+			//Enemy Hp Set
+			EnemyWidget->SetHPInfo(Health, MaxHealth);
 
-		//フレームごとに加算する
-		FlameCounter++;
-		AActor* Player = GetPlayer();
+			//フレームごとに加算する
+			FlameCounter++;
 
-		//リスポーンした時に中身がなくなってしまうので更新
-		if (Player == nullptr)  return;
 
-		//向きをプレイヤーの方に向ける(60フレーム毎に更新)
-		if (FlameCounter % 60 == 0)
-		{
-			//プレイヤーの方を向く
-			ToPlayerRotate();
-		}
-
-		//距離を取る
-		//X軸
-		BossPosX = FVector(GetActorLocation().X, 0.f, 0.f);
-		PlayerPosX = FVector(Player->GetActorLocation().X, 0.f, 0.f);
-
-		//Y軸
-		BossPosY = FVector(0.f, GetActorLocation().Y, 0.f);
-		PlayerPosY = FVector(0.f, Player->GetActorLocation().Y, 0.f);
-
-		//カウンター起動
-		WaitTime++;
-		if (isAttack1Waiting)
-		{
-			Attack1Wait();
-		}
-
-		//体力が半分以下になったら
-		if (Health < MaxHealth / 2.f)
-		{
-			//二回目を撃つためのタイマーを起動
-			UltTimer++;
-			if (UltTimer % 600 == 0)//600フレーム後に必殺を撃てるようにする
+			if (isMove == false)
 			{
-				//必殺技を撃てるようにする
-				isUltShot = false;
+				return;
 			}
-		}
-
-		//状態ごとに動きを切り替える
-		switch (OdaMoveEnum)
-		{
-			//待機,動き
-		case ECPPOdaEnum::Stay1:
-			OdaStay1(WaitTime);
-			break;
-
-			//攻撃１
-		case ECPPOdaEnum::Attack1:
-			if (Attack1WaitTimer % Attack1WaitingTime == 0)
+			//向きをプレイヤーの方に向ける(60フレーム毎に更新)
+			if (FlameCounter % 60 == 0)
 			{
-				OdaAttack1(WaitTime);
+				//プレイヤーの方を向く
+				ToPlayerRotate();
 			}
-			else if (WaitTime % Attack1WaitingTime == 0)
+
+			//距離を取る
+			//X軸
+			BossPosX = FVector(GetActorLocation().X, 0.f, 0.f);
+			PlayerPosX = FVector(Player->GetActorLocation().X, 0.f, 0.f);
+
+			//Y軸
+			BossPosY = FVector(0.f, GetActorLocation().Y, 0.f);
+			PlayerPosY = FVector(0.f, Player->GetActorLocation().Y, 0.f);
+
+			//カウンター起動
+			WaitTime++;
+			if (isAttack1Waiting)
 			{
-				OdaAttack1(WaitTime);
+				Attack1Wait();
 			}
-			break;
 
-			//攻撃２
-		case ECPPOdaEnum::Attack2:
-			OdaAttack2(WaitTime);
+			//体力が半分以下になったら
+			if (Health < MaxHealth / 2.f)
+			{
+				//二回目を撃つためのタイマーを起動
+				UltTimer++;
+				if (UltTimer % 600 == 0)//600フレーム後に必殺を撃てるようにする
+				{
+					//必殺技を撃てるようにする
+					isUltShot = false;
+				}
+			}
 
-			break;
+			//状態ごとに動きを切り替える
+			switch (OdaMoveEnum)
+			{
+				//待機,動き
+			case ECPPOdaEnum::Stay1:
+				OdaStay1(WaitTime);
+				break;
 
-			//必殺技
-		case ECPPOdaEnum::Ultimate:
-			OdaUlt(WaitTime);
-			break;
+				//攻撃１
+			case ECPPOdaEnum::Attack1:
+				if (Attack1WaitTimer % Attack1WaitingTime == 0)
+				{
+					OdaAttack1(WaitTime);
+				}
+				else if (WaitTime % Attack1WaitingTime == 0)
+				{
+					OdaAttack1(WaitTime);
+				}
+				break;
 
-		default:
-			break;
-		}
+				//攻撃２
+			case ECPPOdaEnum::Attack2:
+				OdaAttack2(WaitTime);
 
-	}
-	else//ボスがスポーンした直後の処理
-	{
-		//カウンターを起動
-		SpawnTimer++;
-		//カウンターが一定数を超えたら
-		if (SpawnTimer % 300 == 0)
-		{
-			//動き出すためのフラグを切り替える
-			SpawnDelay = false;
-		}
+				break;
+
+				//必殺技
+			case ECPPOdaEnum::Ultimate:
+				OdaUlt(WaitTime);
+				break;
+
+			default:
+				break;
+			}
+
+		
+
+
 	}
 }
 //Y軸だけを見てどっち側にいるか
@@ -184,7 +189,7 @@ void AOdaBase::ToPlayerRotate()
 	if (GetActorLocation().Y < UGameplayStatics::GetPlayerPawn(GetWorld(), 0)->GetActorLocation().Y)
 	{
 		LookRight = true;
-		
+
 		//yを270に向ける(左)
 		//SetActorRotation(FRotator(0.f, 270.f, 0.f));
 	}
@@ -357,7 +362,7 @@ void AOdaBase::OdaAttack1(int Timer) {
 //攻撃２
 void AOdaBase::OdaAttack2(int Timer) {
 	//UKismetSystemLibrary::PrintString(this, "Attack2", true, true, FColor::Cyan, 2.f, TEXT("None"));
-	
+
 	//モーション(アニメーション)が起動したか
 	if (isMotionPlaying == true)
 	{
@@ -374,7 +379,7 @@ void AOdaBase::OdaAttack2(int Timer) {
 	if (isShockWaveSpawnTiming == true)
 	{
 		//アクターのスポーン処理(ShockWaveSpawnはブループリント上で設定)
-		GetWorld()->SpawnActor<AActor>(ShockWaveSpawn,GetActorTransform());
+		GetWorld()->SpawnActor<AActor>(ShockWaveSpawn, GetActorTransform());
 		//一度だけスポーンさせたいので切り替えておく
 		isShockWaveSpawnTiming = false;
 	}
@@ -394,7 +399,7 @@ void AOdaBase::OdaAttack2(int Timer) {
 		//else
 		//{
 
-			OdaMoveEnum = ECPPOdaEnum::Stay1;
+		OdaMoveEnum = ECPPOdaEnum::Stay1;
 
 		//}
 		//切り替えるにあたって変数を初期化する
@@ -531,14 +536,27 @@ void AOdaBase::ApplyDamage(float Damage)
 		//UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), HitParticles, GetActorLocation());
 		ActionAssistComp->SpawnEffect(HitParticles, GetActorLocation());
 
+		Health -= Damage;
 		//ノックバックのアニメーションを流す
 		PlayAnimMontage(AnimMontage_BossKnockMontage);
-		Health -= Damage;
 		//HPが0になったら
 		if (Health <= 0.f)
 		{
-			//体力が0以下になったときの処理
+			//動けるかどうかの変数をfalseにしておく
+			if (isMove == true)
+			{
+				isMove = false;
+			}
 			Death();
+
+				this->StopAnimMontage();
+				//アニメーションを流す(今は仮)
+				PlayAnimMontage(AnimMontage_BossDeath);
+				//一度だけ流したいのでフラグを切り替える
+				isMotionPlaying = false;
+
+
+
 		}
 	}
 }
@@ -645,8 +663,6 @@ bool AOdaBase::LastAttack()
 	}
 
 	else if (Combo2Counter == 2)
-
-
 	{
 		return true;
 	}
@@ -659,9 +675,9 @@ void AOdaBase::Death()
 	ATGS_GameMode* GameMode = Cast<ATGS_GameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 	if (GameMode)
 	{
+		//現在エラーで落ちるので普通に消す
 		//ゲームモードを用いて消す
 		GameMode->DestroyEnemy(this, IsAreaEnemy);
-
 		GameMode->SetState_GameClear(0);
 	}
 }
@@ -673,10 +689,10 @@ void AOdaBase::CheckOverlap()
 	FCollisionQueryParams CollisionParams;
 	CollisionParams.AddIgnoredActor(this);
 
-	FVector Start = BoxComponent->GetComponentLocation();
+	FVector Start = BoxComp->GetComponentLocation();
 	FVector End = Start;// + GetActorForwardVector() * 100.0f;
-	FQuat Rot = BoxComponent->GetComponentQuat();			// 
-	FCollisionShape CollisionBox = FCollisionShape::MakeBox(BoxComponent->GetUnscaledBoxExtent());
+	FQuat Rot = BoxComp->GetComponentQuat();			// 
+	FCollisionShape CollisionBox = FCollisionShape::MakeBox(BoxComp->GetUnscaledBoxExtent());
 
 	bool isHit = GetWorld()->SweepMultiByChannel(HitResults, Start, End, Rot, ECollisionChannel::ECC_GameTraceChannel1, CollisionBox, CollisionParams);
 
@@ -706,11 +722,11 @@ void AOdaBase::PlayerOnOverlap(FHitResult& _HitResult)
 		if (Combo1Counter == 0)
 		{
 			Player->TakedDamage(SwordFirstDamage, LastAttack());						//プレイヤーにダメージを与える初段
-			UKismetSystemLibrary::PrintString(this, LastAttack() ? TEXT("true") : TEXT("false") , true, true, FColor::Cyan, 2.f, TEXT("None"));
+			UKismetSystemLibrary::PrintString(this, LastAttack() ? TEXT("true") : TEXT("false"), true, true, FColor::Cyan, 2.f, TEXT("None"));
 
 		}
 		else
-		{		
+		{
 			//追加ダメージ値確認用
 			//UKismetSystemLibrary::PrintString(this, FString::FromInt(SwordFirstDamage + ((float)SwordFirstDamage*(float)(Combo1Counter/4.f))), true, true, FColor::Cyan, 2.f, TEXT("None"));
 
