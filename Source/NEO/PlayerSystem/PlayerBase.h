@@ -194,9 +194,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "GetStatus")
 		float GetHP()const { return PlayerStatus.HP; }
 
-	// 現在の移動量を返す
-	float GetDistanceAdvanced() { return DistanceAdvanced * deltaTime;}
-
 	// ダメージを受ける処理
 	UFUNCTION(BlueprintCallable, Category = "Action")
 		void TakedDamage(float _damage, bool _isLastAttack = false);
@@ -391,16 +388,6 @@ private:
 
 	// ゲームモード保存
 	class ATGS_GameMode* pGameMode;
-
-	// デルタタイム保存用
-	float deltaTime;
-
-//////////////////////////////////////////////////////////////////////////
-///UI
-public:
-	//プレイヤーのHPの％を返す
-	UFUNCTION(BlueprintCallable, Category = "UI")
-		float GetPlayerHPPercent()const { return PlayerStatus.HP / PlayerStatus.MaxHP; }
 
 	class UTGS_GameInstance* GetGameInstance();
 

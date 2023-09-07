@@ -260,7 +260,7 @@ uint8 ATGS_GameMode::GetCurrentState()
 
 float ATGS_GameMode::GetPlayerP()
 {	
-	return PlayerPtr ? PlayerPtr->GetPlayerHPPercent() : 0 ;
+	return /*PlayerPtr ? PlayerPtr->GetPlayerHPPercent() : */0 ;
 }
 
 ETitleState ATGS_GameMode::GetTitleState()

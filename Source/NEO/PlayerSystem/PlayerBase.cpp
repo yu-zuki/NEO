@@ -104,11 +104,6 @@ void APlayerBase::Tick(float DeltaTime)
 	{
 		Jump();
 	}
-
-
-
-	// デルタタイム加算
-	deltaTime = DeltaTime;
 }
 
 
@@ -395,7 +390,7 @@ void APlayerBase::JumpStart()
 	if (!IsControl) { return; }
 
 	// 地上にいたらジャンプ開始
-	if (IsPlayerGrounded())
+	if (!IsJumping)
 	{
 		// ジャンプ時間
 		frames = 0.f;
@@ -730,6 +725,8 @@ void APlayerBase::ResetCombo()
  */
 void APlayerBase::TakedDamage(float _damage, bool _isLastAttack /*= false*/)
 {
+	if (IsDeath) { return; }
+
 	// 武器を持っていないときに攻撃を受けたら死亡
 	if (!IsHoldWeapon && !IsDeath)
 	{
