@@ -574,12 +574,19 @@ void AOdaBase::ApplyDamage(float Damage)
 		//ActionAssistComp->SpawnEffect(HitParticles, GetActorLocation());
 
 			//ラストヒットがここを通ってもこの下の処理にさせない処理
-		if (!isBossHPRock)
-		{
 			Health -= Damage;
-		}
 		//ノックバックのアニメーションを流す
-		PlayAnimMontage(AnimMontage_BossKnockMontage);
+			if (!isBossHPRock)
+			{
+				//モーション(アニメーション)が起動したか
+				if (isMotionPlaying == true)
+				{
+					//アニメーションを流す(今は仮)
+					PlayAnimMontage(AnimMontage_BossKnockMontage);
+					//一度だけ流したいのでフラグを切り替える
+					isMotionPlaying = false;
+				}
+			}
 
 		//HPが0になったら
 		if (Health <= 0.f)
@@ -639,8 +646,14 @@ void AOdaBase::BossKnockback()
 	//ラストヒットがここを通ってもこの下の処理にさせない処理
 	if (!isBossHPRock)
 	{
-		//ボスがノックバックする処理
-		PlayAnimMontage(AnimMontage_BossBlowAway);
+		//モーション(アニメーション)が起動したか
+		if (isMotionPlaying == true)
+		{
+			//ボスがノックバックする処理
+			PlayAnimMontage(AnimMontage_BossBlowAway);
+			//一度だけ流したいのでフラグを切り替える
+			isMotionPlaying = false;
+		}
 	}
 }
 
