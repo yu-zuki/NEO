@@ -28,6 +28,7 @@
 APlayerBase::APlayerBase()
 	: IsControl(true)
 	, IsRunning(false)
+	, IsLookRight(true)
 	, IsJumping(false)
 	, IsHoldWeapon(true)
 	, IsDeath(false)
@@ -104,6 +105,12 @@ void APlayerBase::Tick(float DeltaTime)
 	{
 		Jump();
 	}
+
+	// アニメーションに合わせて移動
+	if (EnableRootMotion)
+	{
+		RootMotion(AnimationMoveValue);
+	}
 }
 
 
@@ -138,9 +145,10 @@ void APlayerBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
  */
 void APlayerBase::SetupPlayerData()
 {
-
+	// アクションをマッピング
 	SetupMainActionMapping();
 
+	// ステータス設定
 	SetupPlayerStatus();
 
 	// コンボの名前格納
@@ -558,11 +566,10 @@ void APlayerBase::RotateCharacter(float _nowInput_X)
 	if (_nowInput_X == 0) { return; }
 
 	// 右を向いているか確認
-	bool LookRight = (_nowInput_X != 1.f) ? (true) : (false);
+	IsLookRight = (_nowInput_X != 1.f) ? (true) : (false);
 
 	// 回転
-	ActionAssistComp->OwnerParallelToCamera(LookRight);
-
+	ActionAssistComp->OwnerParallelToCamera(IsLookRight);
 }
 
 
@@ -589,7 +596,7 @@ void APlayerBase::AmountOfMovement(FVector _nowPos)
 
 
 /*
- * 関数名　　　　：SlowDawnDeathAnimationRate()
+ * 関数名　　　　：SlowDownDeathAnimationRate()
  * 処理内容　　　：死亡時アニメーション引き伸ばし
  * 戻り値　　　　：なし
  */
@@ -602,6 +609,38 @@ void APlayerBase::SlowDownDeathAnimationRate()
 	// プレイヤーを削除
 	FTimerManager& TimerManager = GetWorld()->GetTimerManager();
 	TimerManager.SetTimer(TimerHandle_DeathToGameOver, this, &APlayerBase::CallGameModeFunc_DestroyPlayer, DeadToGameOverTime, false);
+}
+
+
+
+/*
+ * 関数名　　　　：SetEnableRootMotion()
+ * 処理内容　　　：RootMotionの開始と移動距離
+ * 引数１　　　　：bool _enableRootMotion・・・ルートモーションのオンオフ
+ * 引数２　　　　：float _distance・・・・・・・アニメーションで移動した距離
+ * 戻り値　　　　：なし
+ */
+void APlayerBase::SetEnableRootMotion(bool _enableRootMotion, float _distance /*= 0*/)
+{
+	// アニメーション移動開始
+	EnableRootMotion = _enableRootMotion; 
+
+	// アニメーションでの移動値
+	AnimationMoveValue = _distance;
+}
+
+
+/*
+ * 関数名　　　　：RootMotion()
+ * 処理内容　　　：RootMotionの疑似的な実装
+ * 引数１　　　　：float _distance・・・アニメーションで移動した距離
+ * 戻り値　　　　：なし
+ */
+void APlayerBase::RootMotion(float _distance)
+{
+	const float Distance = (IsLookRight) ? (-_distance) : (_distance);
+	const FVector Vector = FVector(0.f, Distance, 0.f);
+	AddActorWorldOffset(Vector,false);
 }
 
 

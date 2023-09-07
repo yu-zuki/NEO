@@ -186,6 +186,12 @@ public:
 	// 死亡時のアニメーションの再生を遅くする
 	void SlowDownDeathAnimationRate();
 
+	// 疑似RootMotion開始
+	void SetEnableRootMotion(bool _enableRootMotion, float _distance = 0);
+	
+	// RootMotion
+	void RootMotion(float _distance);
+
 	// ダメージ量を返す関数
 	UFUNCTION(BlueprintCallable, Category = "Action")
 		float GetDamageAmount()const { return PlayerStatus.DamageAmount * (((float)ComboIndex + 1.f) * PlayerStatus.ComboDamageFactor); }
@@ -347,8 +353,17 @@ private:
 	// ダッシュ中かどうか
 	bool IsRunning;		
 
+	// 右を向いているか
+	bool IsLookRight;
+
 	// ジャンプ中かどうか
 	bool IsJumping;
+
+	// EnableRootMotion
+	bool EnableRootMotion;
+
+	// ルートモーションでの移動値
+	float AnimationMoveValue;
 
 	// 武器を持っているかどうか
 	bool IsHoldWeapon;

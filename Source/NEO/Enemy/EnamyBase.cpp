@@ -282,12 +282,6 @@ void AEnamyBase::CheckCollisonOff()
 	}
 }
 
-// Called to bind functionality to input
-void AEnamyBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-}
 
 
 void AEnamyBase::ApplyDamage(float DamageAmount)

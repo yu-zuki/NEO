@@ -29,7 +29,7 @@ protected:
     
     virtual void Tick(float DeltaTime) override;
     
-    virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+    
 
 private:
     UPROPERTY(EditAnywhere, Category = "Rotation")

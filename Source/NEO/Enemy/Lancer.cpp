@@ -133,10 +133,7 @@ void ALancer::ChooseNewTarget()
         CurrentTarget = Cast<ATargetPoint>(FoundTargetPoints[FMath::RandRange(0, FoundTargetPoints.Num() - 1)]);
     }
 }
-void ALancer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-    Super::SetupPlayerInputComponent(PlayerInputComponent);
-}
+
 FVector ALancer::GetPlayerDirection() const
 {
     if (!PlayerCharacter) return FVector::ZeroVector;

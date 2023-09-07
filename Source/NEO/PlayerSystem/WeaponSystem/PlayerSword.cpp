@@ -114,6 +114,17 @@ void APlayerSword::SetCollision()
 					if (Enemy)
 					{
 						Enemy->ApplyDamage(DamageAmount);
+
+						int ComboNum = pPlayer->GetComboIndex();
+
+						if (ComboNum == 1)
+						{
+							Enemy->AddActorLocalOffset(FVector(-100.f, 0.f, 0.f));
+						}
+						else if (ComboNum == 2)
+						{
+							Enemy->AddActorLocalOffset(FVector(-300.f, 0.f, 0.f));
+						}
 					}
 					else if (Oda)
 					{
@@ -123,7 +134,6 @@ void APlayerSword::SetCollision()
 						{
 							Oda->BossKnockback();
 						}
-
 					}
 					if (HitEffect)
 					{
