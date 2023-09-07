@@ -228,7 +228,7 @@ void AGunMan::UnlockRotation()
 
 void AGunMan::PlayAttackAnim()
 {
-    if (Health < 0)
+    if (Health > 0)
     {
         PlayAnimMontage(Attack, 1.0f, NAME_None);
         SetActorTickEnabled(false);
