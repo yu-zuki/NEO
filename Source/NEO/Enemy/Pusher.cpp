@@ -65,7 +65,10 @@ void APusher::SpawnRolling()
 
 		}
 
-	
+		if (Health < 0)
+		{
+			CheckHP();
+	}
 	}
 }
 void APusher::DetachRolling()
@@ -89,7 +92,7 @@ void APusher::ApplyDamagePush(float DamageAmount)
 	if (Health > 0)
 	{
 
-		PlayAnimMontage(DeathMon, 1.0, NAME_None);
+		
 		Tags.Remove(FName("Enemy"));
 		GetWorldTimerManager().SetTimer(TimerHandle_DeathPusher, this, &APusher::DeathPusher,0.5f, true);
 
@@ -99,4 +102,9 @@ void APusher::ApplyDamagePush(float DamageAmount)
 void APusher::DeathPusher()
 {
 	Destroy();
+}
+
+void APusher::CheckHP()
+{
+	PlayAnimMontage(DeathMon, 1.0, NAME_None);
 }

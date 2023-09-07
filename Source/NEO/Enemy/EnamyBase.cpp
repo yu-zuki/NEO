@@ -292,7 +292,7 @@ void AEnamyBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 }
 
 
-void AEnamyBase::ApplyDamage(float DamageAmount)
+void AEnamyBase::ApplyDamage(float DamageAmount, bool LastAttack)
 {
 
 	Health -= DamageAmount;

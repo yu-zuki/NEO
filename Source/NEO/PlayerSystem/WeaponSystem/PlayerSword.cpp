@@ -111,15 +111,17 @@ void APlayerSword::SetCollision()
 					AEnamyBase* Enemy = Cast<AEnamyBase>(HitResult.GetActor());
 					AOdaBase* Oda = Cast<AOdaBase>(HitResult.GetActor());
 
+					bool LastAttack = (pPlayer->GetComboIndex() == 3)?(true):(false);
+
 					if (Enemy)
 					{
-						Enemy->ApplyDamage(DamageAmount);
+						Enemy->ApplyDamage(DamageAmount, LastAttack);
 					}
 					else if (Oda)
 					{
 						Oda->ApplyDamage(DamageAmount);
 
-						if (pPlayer->GetComboIndex() == 3)
+						if (LastAttack)
 						{
 							Oda->BossKnockback();
 						}

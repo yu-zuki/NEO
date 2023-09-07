@@ -81,7 +81,7 @@ public:
 		TSubclassOf<ADeathTrigger>DeathTriggerClass;
 	
 	UFUNCTION(BlueprintCallable, Category = "Health")
-		virtual void ApplyDamage(float DamageAmount);
+		virtual void ApplyDamage(float DamageAmount,bool LastAttack);
 
 	void MaintainDistanceFromEnemy();
 	 

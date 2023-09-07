@@ -53,5 +53,7 @@ public:
 
 	ARolling* CurrentRolling;
 
+	void CheckHP();
+
 	bool DeathCheck;
 };
