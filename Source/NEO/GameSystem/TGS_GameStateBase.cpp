@@ -51,6 +51,9 @@ void ATGS_GameStateBase::UpdateGameState(float DeltaTime)
 	case EGameState::EGame_Title:
 		OnGameTitle();
 		break;
+	case EGameState::EGame_Opening:
+		OnGameOpening();
+		break;
 	case EGameState::EGame_Playing:
 		OnGamePlaying(DeltaTime);
 		break;
@@ -190,25 +193,18 @@ bool ATGS_GameStateBase::IsGameClear()
 
 void ATGS_GameStateBase::OnGameTitle()
 {
-	if (EchangeLevel == EChangeLevel::EChangeLevel_Playing)			//レベルを変更できるかどうか
-	{
-		SetCurrentState(EGameState::EGame_Playing);					//意味ないかも
+	ESubAction currentSubAction = UseSubAction();					//SubActionを取得
+
+	//Anyキーを押したら、ゲームをOPに遷移
+	if (currentSubAction != ESubAction::ESubAction_None) {
+
+		SetCurrentState(EGameState::EGame_Opening);					//意味ないかも
 		GetGameInstance()->SaveGameStateData(ECurrentState);		//インスタンスにゲームの状態を保存
 		GetGameInstance()->SavePlayerType(ECurrentPlayerType);		//インスタンスにPlayerTypeを保存
 
 		GetGameInstance()->SaveRemainingLife(Life);					//PlayerLifeReset
 
-		ChangeNextLevel(ENextLevel::ENextLevel_Playing);			//レベルを変更
-	}
-
-	ESubAction currentSubAction = UseSubAction();					//SubActionを取得
-	//Enterキーを押したら、ゲームを開始する
-	//if (currentSubAction == ESubAction::ESubAction_Enter) {
-	//	EchangeLevel = EChangeLevel::EChangeLevel_Playing;
-	//}
-
-	if (currentSubAction != ESubAction::ESubAction_None) {
-		EchangeLevel = EChangeLevel::EChangeLevel_Playing;
+		ChangeNextLevel(ENextLevel::ENextLevel_Opening);			//レベルを変更
 	}
 
 	//PlayerTypeを選択
@@ -221,6 +217,17 @@ void ATGS_GameStateBase::OnGameTitle()
 	//	BackPlayerType();
 	//}
 
+}
+
+void ATGS_GameStateBase::OnGameOpening()
+{
+	if (PLAYINGDEBUG)	{
+		//Enterキーが押されたら、ゲームをGameOverにする
+		if (UseSubAction() != ESubAction::ESubAction_None) {
+
+			MoveToIngameLevel();
+		}
+	}
 }
 
 
@@ -467,6 +474,9 @@ void ATGS_GameStateBase::ChangeNextLevel(ENextLevel NextLevel)
 	case ENextLevel::ENextLevel_Title:
 		ChangeLevel(GameTitleLevelName);
 		break;
+	case ENextLevel::ENextLevel_Opening:
+		ChangeLevel(GameOpeningLevelName);
+		break;
 	case ENextLevel::ENextLevel_Playing:
 		ChangeLevel(GamePlayLevelName);
 		break;
@@ -541,6 +551,14 @@ void ATGS_GameStateBase::BackPlayerType()
 	else {
 		UE_LOG(LogTemp, Error, TEXT("ECurrentPlayerType is not found"));
 	}
+}
+
+void ATGS_GameStateBase::MoveToIngameLevel()
+{
+	SetCurrentState(EGameState::EGame_Playing);
+
+	GetGameInstance()->SaveGameStateData(ECurrentState);		//インスタンスにゲームの状態を保存
+	ChangeNextLevel(ENextLevel::ENextLevel_Playing);
 }
 
 /**
