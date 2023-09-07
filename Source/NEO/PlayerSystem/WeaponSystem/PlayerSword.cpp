@@ -54,6 +54,9 @@ void APlayerSword::Tick(float DeltaTime)
  */
 void APlayerSword::SetCollision()
 {
+	// 持っていないときはスキップ
+	if (!GetIsHeld()) { return; }
+
 	// プレイヤーのベースクラスにキャスト
 	APlayerBase* pPlayer = Cast<APlayerCharacter>(OwnerInfo.pOwner);
 

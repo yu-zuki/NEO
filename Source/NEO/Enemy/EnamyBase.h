@@ -105,7 +105,8 @@ public:
 
 	bool bIsShoot = false;
 
-	float GetHP() { return Health; }
+	UFUNCTION(BlueprintCallable)
+		float GetHP()const { return Health; }
 	
 	bool bIsRotation;
 
