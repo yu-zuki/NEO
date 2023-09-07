@@ -86,7 +86,7 @@ void ASplineCamera::Tick(float DeltaTime)
 		FVector NearestPoint = SplineComponent->FindLocationClosestToWorldLocation(PlayerLocation, ESplineCoordinateSpace::World);
 
 		
-		UE_LOG(LogTemp, Log, TEXT("location: %s"), *NearestPoint.ToString());	
+		//UE_LOG(LogTemp, Log, TEXT("location: %s"), *NearestPoint.ToString());	
 
 		//FVector CameraLocation = NearestPoint;	// プレイヤーとカメラの距離を取得
 
