@@ -69,7 +69,7 @@ void ALancer::Tick(float DeltaTime)
     FVector MoveVector;
     
 
-    if (CurrentDistance <= DesiredDistance + 300)
+    if (CurrentDistance <= DesiredDistance + 100)
     {
         bIsRandMove = true;
     }

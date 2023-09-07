@@ -7,6 +7,7 @@
 #include "DeathTrigger.h"
 #include "NEO/GameSystem/GameSystem_BattleArea.h"
 #include "NiagaraComponent.h"
+#include "Components/StaticMeshComponent.h"
 #include "Components/SplineComponent.h"
 #include "EnamyBase.generated.h"
 
@@ -34,6 +35,8 @@ public:
 		UAnimMontage* Damage_Reaction;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
 		UAnimMontage* MovingAnimation;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wepon")
+		UStaticMeshComponent* Wepon;
 	UPROPERTY()
 		UAnimInstance* AnimInstance;
 	UFUNCTION(BlueprintCallable, Category = "Area")
