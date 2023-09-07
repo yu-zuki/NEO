@@ -45,6 +45,8 @@ AEnamyBase::AEnamyBase()
 
 	MoveSpline = CreateDefaultSubobject<USplineComponent>(TEXT("MoveSpline"));
 	MoveSpline->SetupAttachment(RootComponent);
+	Wepon = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Wepon"));
+	Wepon -> SetupAttachment(RootComponent);
 	/*MovementSpline = CreateDefaultSubobject<USplineComponent>(TEXT("MovementSpline1"));
 	MovementSpline->SetupAttachment(RootComponent);*/
 }
