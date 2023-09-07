@@ -573,7 +573,11 @@ void AOdaBase::ApplyDamage(float Damage)
 		//UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), HitParticles, GetActorLocation());
 		//ActionAssistComp->SpawnEffect(HitParticles, GetActorLocation());
 
-		Health -= Damage;
+			//ラストヒットがここを通ってもこの下の処理にさせない処理
+		if (!isBossHPRock)
+		{
+			Health -= Damage;
+		}
 		//ノックバックのアニメーションを流す
 		PlayAnimMontage(AnimMontage_BossKnockMontage);
 
