@@ -318,6 +318,9 @@ public:
 	UFUNCTION()
 		void BossKnockback();
 
+	//アニメーション中に通知で呼び出す死亡関数
+	UFUNCTION()
+		void  DeathMotion();
 
 	//前方移動
 	UFUNCTION()

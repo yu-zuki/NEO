@@ -180,7 +180,12 @@ void AOdaBase::Tick(float DeltaTime)
 
 	}
 }
-//Y軸だけを見てどっち側にいるか
+
+/*
+ * 関数名　　　　：ToPlayerRotate()
+ * 処理内容　　　：Y軸だけを見てどっち側にいるかを判定する関数
+ * 戻り値　　　　：なし
+ */
 void AOdaBase::ToPlayerRotate()
 {
 	bool LookRight;
@@ -204,13 +209,21 @@ void AOdaBase::ToPlayerRotate()
 	ActionAssistComp->OwnerParallelToCamera(LookRight);
 }
 
-//近接攻撃をした後待機するカウンターを起動
+/*
+ * 関数名　　　　：Attack1Wait()
+ * 処理内容　　　：近接攻撃をした後待機するカウンターを起動する関数
+ * 戻り値　　　　：なし
+ */
 void AOdaBase::Attack1Wait()
 {
 	Attack1WaitTimer++;
 }
 
-//待機関数
+/*
+ * 関数名　　　　：OdaStay1()
+ * 処理内容　　　：攻撃せず待機しているときの関数
+ * 戻り値　　　　：なし
+ */
 void AOdaBase::OdaStay1(int Timer)
 {
 	//モーションを流す状態かどうか(isMotionPlayingをtrueにする)
@@ -289,7 +302,11 @@ void AOdaBase::OdaStay1(int Timer)
 	}
 }
 
-
+/*
+ * 関数名　　　　：OdaMove1()
+ * 処理内容　　　：軸を合わせるなど動きについての関数
+ * 戻り値　　　　：なし
+ */
 void AOdaBase::OdaMove1(int DeltaTime, int StopTimer)
 {
 	if (isAttack1Waiting)
@@ -316,9 +333,11 @@ void AOdaBase::OdaMove1(int DeltaTime, int StopTimer)
 	}
 
 }
-
-
-//攻撃１
+/*
+ * 関数名　　　　：OdaAttack1()
+ * 処理内容　　　：近距離攻撃をするための関数
+ * 戻り値　　　　：なし
+ */
 void AOdaBase::OdaAttack1(int Timer) {
 	//UKismetSystemLibrary::PrintString(this, "Attack1", true, true, FColor::Cyan, 2.f, TEXT("None"));
 	if (Attack1Delay == 0)
@@ -342,8 +361,8 @@ void AOdaBase::OdaAttack1(int Timer) {
 		}
 	}
 
-	//300フレームたったら
-	if (Timer % 100 == 0)
+	//200フレームたったら
+	if (Timer % 200 == 0)
 	{
 		//ステートを切り替える
 		OdaMoveEnum = ECPPOdaEnum::Stay1;
@@ -351,7 +370,7 @@ void AOdaBase::OdaAttack1(int Timer) {
 		WaitTime = 0;
 		//リセット
 		NotAttackCount = 0;
-		//ノックバック中に攻撃モーションに入るとHPロックが作動し続けてしまうのでここで切り替える(応急処置)
+		//ノックバック中に攻撃モーションに入るとHPロックが作動し続けてしまうのでここで切り替える
 		if (isHPLock == true)
 		{
 			HPLock();
@@ -359,7 +378,12 @@ void AOdaBase::OdaAttack1(int Timer) {
 	}
 }
 
-//攻撃２
+
+/*
+ * 関数名　　　　：OdaAttack2()
+ * 処理内容　　　：遠距離攻撃をするための関数
+ * 戻り値　　　　：なし
+ */
 void AOdaBase::OdaAttack2(int Timer) {
 	//UKismetSystemLibrary::PrintString(this, "Attack2", true, true, FColor::Cyan, 2.f, TEXT("None"));
 
@@ -368,7 +392,7 @@ void AOdaBase::OdaAttack2(int Timer) {
 	{
 		//ダメージ値を代入
 		BladeDamage = ShockWaveDamage;
-		//アニメーションを流す(今は仮)
+		//アニメーションを流す
 		PlayAnimMontage(AnimMontage_BossAttack2);
 		//一度だけ流したいのでフラグを切り替える
 		isMotionPlaying = false;
@@ -387,21 +411,9 @@ void AOdaBase::OdaAttack2(int Timer) {
 	//200フレームたったら
 	if (Timer % 200 == 0)
 	{
-		////いったんfalseにする
-		//OneMoreShockWave = false;
-		////ステートを切り替える(右の数字分の確率でもう一度衝撃波を飛ばしてみる)
-		//if (FMath::RandRange(0, 100) <= 80)
-		//{
-		//	UKismetSystemLibrary::PrintString(this, "OneMore", true, true, FColor::Cyan, 2.f, TEXT("None"));
-		//	//もう一度打つための変数にtrueを入れる
-		//	OneMoreShockWave = true;
-		//}
-		//else
-		//{
-
+		//待機する関数にもどる
 		OdaMoveEnum = ECPPOdaEnum::Stay1;
 
-		//}
 		//切り替えるにあたって変数を初期化する
 		WaitTime = 0;
 		//リセット
@@ -413,9 +425,14 @@ void AOdaBase::OdaAttack2(int Timer) {
 		}
 	}
 }
+/*
+ * 関数名　　　　：OdaUlt()
+ * 処理内容　　　：必殺技攻撃をするための関数
+ * 戻り値　　　　：なし
+ */
 void AOdaBase::OdaUlt(int Timer)
 {
-	//UKismetSystemLibrary::PrintString(this, "Ult", true, true, FColor::Cyan, 2.f, TEXT("None"));
+	
 	if (Timer % 30 == 0 && isUltShotTiming != true)
 	{
 		isUltShotTiming = true;
@@ -442,7 +459,7 @@ void AOdaBase::OdaUlt(int Timer)
 		isMotionPlaying = false;
 	}
 
-	//衝撃波を出したいのでNotifyを使って制御する(ShockWaveSpawnFlagChangeにて変数の中身を変更)
+	//衝撃波を出したいのでNotifyを使って制御する(UltSpawnFlagChangeにて変数の中身を変更)
 	if (isShockWaveSpawnTiming == true)
 	{
 		//ダメージ値を代入
@@ -474,14 +491,23 @@ void AOdaBase::OdaUlt(int Timer)
 		isUltShotTiming = false;
 	}
 }
-//AnimNotifyにて変更、攻撃のフラグのon,off
+/*
+ * 関数名　　　　：AttackFlagChange()
+ * 処理内容　　　：AnimNotifyにて変更、攻撃のフラグのon,offについての関数
+ * 戻り値　　　　：なし
+ */
 void AOdaBase::AttackFlagChange()
 {
 	//反転させる
 	IsAttackNow = !IsAttackNow;
 }
 
-//これが呼ばれたら衝撃波をスポーンさせるための変数を切り替える
+
+/*
+ * 関数名　　　　：ShockWaveSpawnFlagChange()
+ * 処理内容　　　：衝撃波をスポーンさせるための変数を切り替える為の関数
+ * 戻り値　　　　：なし
+ */
 void AOdaBase::ShockWaveSpawnFlagChange()
 {
 	//衝撃波を出現させる為の変数をtrueに変える
@@ -489,12 +515,16 @@ void AOdaBase::ShockWaveSpawnFlagChange()
 	//もしIsAttackNowがtrueになっていたら
 	if (IsAttackNow == true)
 	{
-		//falseにしてみる
+		//falseにする
 		IsAttackNow = false;
 	}
 }
 
-//これが呼ばれたら必殺技をスポーンさせるための変数を切り替える
+/*
+ * 関数名　　　　：UltSpawnFlagChange()
+ * 処理内容　　　：必殺技をスポーンさせるための変数を切り替える為の関数
+ * 戻り値　　　　：なし
+ */
 void AOdaBase::UltSpawnFlagChange()
 {
 	//必殺技を出現させる為の変数をtrueに変える
@@ -507,7 +537,11 @@ void AOdaBase::UltSpawnFlagChange()
 	}
 }
 
-//ダメージを受けた時の処理
+/*
+ * 関数名　　　　：ApplyDamage()
+ * 処理内容　　　：ダメージを受けた時の処理
+ * 戻り値　　　　：なし
+ */
 void AOdaBase::ApplyDamage(float Damage)
 {
 
@@ -554,20 +588,25 @@ void AOdaBase::ApplyDamage(float Damage)
 				PlayAnimMontage(AnimMontage_BossDeath);
 				//一度だけ流したいのでフラグを切り替える
 				isMotionPlaying = false;
-
-
-
 		}
 	}
 }
-
+/*
+ * 関数名　　　　：BossKnockback()
+ * 処理内容　　　：ボスがノックバックする処理
+ * 戻り値　　　　：なし
+ */
 void AOdaBase::BossKnockback()
 {
 	//ボスがノックバックする処理
 	PlayAnimMontage(AnimMontage_BossBlowAway);
 }
 
-
+/*
+ * 関数名　　　　：HPLock()
+ * 処理内容　　　：HPロック用のスイッチを切り替える処理
+ * 戻り値　　　　：なし
+ */
 void AOdaBase::HPLock()
 {
 	//HPロック用のスイッチを切り替える
@@ -575,20 +614,34 @@ void AOdaBase::HPLock()
 }
 
 //動き関連
+
+/*
+ * 関数名　　　　：BossMove()
+ * 処理内容　　　：正面方向に歩く処理
+ * 戻り値　　　　：なし
+ */
 void AOdaBase::BossMove(float Speed, FVector MoveSize)
 {
-	//(仮)正面方向に歩く処理
+	//正面方向に歩く処理
 	AddMovementInput(MoveSize, 1.f);
 }
 
-//プレイヤーを取得する処理
+/*
+ * 関数名　　　　：GetPlayer()
+ * 処理内容　　　：プレイヤーを取得する処理
+ * 戻り値　　　　：AActor(プレイヤーの情報)
+ */
 AActor* AOdaBase::GetPlayer()
 {
 	PlayerChara = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
 	return PlayerChara;
 }
 
-//プレイヤーに対してのHPロックするための関数
+/*
+ * 関数名　　　　：toPlayerAttacked()
+ * 処理内容　　　：プレイヤーに対してのHPロックするための関数
+ * 戻り値　　　　：AActor(プレイヤーの情報)
+ */
 void AOdaBase::toPlayerAttacked()
 {
 	if (bIsAttacked)
@@ -597,6 +650,11 @@ void AOdaBase::toPlayerAttacked()
 	}
 }
 
+/*
+ * 関数名　　　　：Is1Combo()
+ * 処理内容　　　：近距離攻撃のコンボをするための関数
+ * 戻り値　　　　：なし
+ */
 void AOdaBase::Is1Combo()
 {
 	if (!bIsAttacked || Combo1Counter >= 3)
@@ -613,6 +671,11 @@ void AOdaBase::Is1Combo()
 		Combo1Counter++;
 	}
 }
+/*
+ * 関数名　　　　：Is2Combo()
+ * 処理内容　　　：遠距離攻撃のコンボをするための関数
+ * 戻り値　　　　：なし
+ */
 void AOdaBase::Is2Combo()
 {
 	if (Combo2Counter == 0)
@@ -653,8 +716,11 @@ void AOdaBase::Is2Combo()
 	}
 	//UKismetSystemLibrary::PrintString(this, LastAttack() ? TEXT("true") : TEXT("false"), true, true, FColor::Cyan, 2.f, TEXT("None"));
 }
-
-//プレイヤーをノックバックさせるために最後の攻撃かどうかをとる関数
+/*
+ * 関数名　　　　：LastAttack()
+ * 処理内容　　　：プレイヤーをノックバックさせるために最後の攻撃かどうかをとる関数
+ * 戻り値　　　　：bool(最後の攻撃ならtrueをかえす)
+ */
 bool AOdaBase::LastAttack()
 {
 	if (Combo1Counter >= 3)
@@ -669,20 +735,38 @@ bool AOdaBase::LastAttack()
 	return false;
 }
 
+//下のDeathを呼ぶための関数
+void AOdaBase::DeathMotion()
+{
+	Death();
+}
+
+/*
+ * 関数名　　　　：Death()
+ * 処理内容　　　：体力が0以下になったときに動く関数
+ * 戻り値　　　　：なし
+ */
 void AOdaBase::Death()
 {
 	//ゲームモードにてこのアクタを消す処理
 	ATGS_GameMode* GameMode = Cast<ATGS_GameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 	if (GameMode)
 	{
-		//現在エラーで落ちるので普通に消す
-		//ゲームモードを用いて消す
-		GameMode->DestroyEnemy(this, IsAreaEnemy);
-		GameMode->SetState_GameClear(0);
+		if (this != NULL)
+		{
+			//現在エラーで落ちるので普通に消す
+			//ゲームモードを用いて消す
+			GameMode->DestroyEnemy(this, IsAreaEnemy);
+			GameMode->SetState_GameClear(0);
+		}
 	}
 }
 
-//ボックスコリジョンに当たっているかチェック
+/*
+ * 関数名　　　　：CheckOverlap()
+ * 処理内容　　　：ボックスコリジョンに当たっているかチェック
+ * 戻り値　　　　：なし
+ */
 void AOdaBase::CheckOverlap()
 {
 	TArray<FHitResult> HitResults;
@@ -708,7 +792,12 @@ void AOdaBase::CheckOverlap()
 		PlayerOnOverlap(HitResult);
 	}
 }
-//プレイヤーが当たったら
+
+/*
+ * 関数名　　　　：CheckOverlap()
+ * 処理内容　　　：プレイヤーが当たったらの処理
+ * 戻り値　　　　：なし
+ */
 void AOdaBase::PlayerOnOverlap(FHitResult& _HitResult)
 {
 	//Cast
