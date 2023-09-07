@@ -138,8 +138,7 @@ public:
 	bool bIsAir;
 	///UI
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
-		class UEnemyBase_WidgetComponent* EnemyWidget;
+
 	AActor* GetEnemyActor() const;
 	TArray<AGameSystem_BattleArea*> BattleAreaReferences;  // 複数のバトルエリアの参照
 	float SpawnTime; // スポーンした時間を記録する変数
