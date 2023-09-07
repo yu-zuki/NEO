@@ -402,10 +402,10 @@ AActor* AEnamyBase::GetEnemyActor() const
 
 void AEnamyBase::OnOverlapBeginWall(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (OtherComp->GetCollisionObjectType() == ECollisionChannel::ECC_GameTraceChannel2)  // WallCollision と同じ
+	if (GetCapsuleComponent())  // WallCollision と同じ
 	{
 		// この EnemyBase のコリジョンレスポンスを Block に設定
-		GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel2, ECollisionResponse::ECR_Block);
+		GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel1, ECollisionResponse::ECR_Block);
 	}
 }
 

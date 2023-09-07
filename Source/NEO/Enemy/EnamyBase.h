@@ -151,7 +151,7 @@ public:
 	// 3ïbä‘à⁄ìÆÇ∑ÇÈÇΩÇﬂÇÃíËêî
 	static constexpr float MovementDuration = 3.0f;
 	ECollisionChannel EnemyCollison = ECollisionChannel::ECC_GameTraceChannel1;
-	ECollisionChannel WallCollison= ECollisionChannel::ECC_GameTraceChannel2;
+	
 	UFUNCTION()
     void OnOverlapBeginWall(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 };
