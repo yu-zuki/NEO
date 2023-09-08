@@ -25,8 +25,7 @@ AEnamyBase::AEnamyBase()
 	PrimaryActorTick.bCanEverTick = true;
 
 	//UI Create
-	EnemyWidget = CreateDefaultSubobject<UEnemyBase_WidgetComponent>(TEXT("EnemyWidget"));
-	EnemyWidget->SetupAttachment(RootComponent);
+	
 	bIsDeath = false;
 	DamageCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("DamageCollision"));
 	if (DamageCollision)
@@ -137,8 +136,9 @@ void AEnamyBase::Tick(float DeltaTime)
 	}
 
 	Super::Tick(DeltaTime);
-	//Enemy Hp Set
-	EnemyWidget->SetHPInfo(Health, MaxHealth);
+
+
+
 
 	//キャラクターの位置を取得
 	FVector CharacterLocation = GetActorLocation();

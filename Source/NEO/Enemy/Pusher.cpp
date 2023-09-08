@@ -20,7 +20,7 @@ APusher::APusher()
 void APusher::BeginPlay()
 {
 	Super::BeginPlay();
-	GetWorld()->GetTimerManager().SetTimer(RollingSpawnTimer, this, &APusher::SpawnRolling, 3.0f, true);
+	GetWorld()->GetTimerManager().SetTimer(RollingSpawnTimer, this, &APusher::DoPush, 3.0f, true);
 	FRotator NewRotation = GetActorRotation();
 	NewRotation.Yaw = 90.0f;
 	SetActorRotation(NewRotation);
@@ -37,18 +37,16 @@ void APusher::Tick(float DeltaTime)
 }
 
 // Called to bind functionality to input
-void APusher::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+
+
+void APusher::DoPush()
 {
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-	if (DeathCheck == true)
-	{
-		/*DestoryRock();*/
-	}
+	PlayAnimMontage(Push, 1.5, NAME_None);
 }
 
 void APusher::SpawnRolling()
 {
-	PlayAnimMontage(Push, 1.5, NAME_None);
+	
 
 	if (RollingToSpawn&&DeathCheck==false)
 	{
@@ -65,9 +63,6 @@ void APusher::SpawnRolling()
 
 			CurrentRolling = SpawnedRolling;
 
-			// 3秒後にアタッチを解除する
-			FTimerHandle UnusedHandle;
-			GetWorldTimerManager().SetTimer(UnusedHandle, this, &APusher::DetachRolling, 1.0f, false);
 		}
 
 	
@@ -91,7 +86,7 @@ void APusher::DetachRolling()
 }
 void APusher::ApplyDamagePush(float DamageAmount)
 {
-	if (Health < 0)
+	if (Health > 0)
 	{
 
 		PlayAnimMontage(DeathMon, 1.0, NAME_None);
