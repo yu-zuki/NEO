@@ -21,7 +21,7 @@ public:
 	void CorrectAttackAngle();
 
 	// ヒットストップ処理
-	void HitStop(float _stopTime);
+	void HitStop(float _speedDuringHitStop, float _stopTime);
 
 	// エフェクトスポーン
 	void SpawnEffect(class UNiagaraSystem* _hitParticle, FVector _spawnPos);
@@ -38,9 +38,8 @@ public:
 	// サウンド再生
 	void PlaySound(class USoundBase* _sound_Obj, float StartTime = 0);
 
-	/////////////////////////////////////////////////////////////////////////
-	// 壁とのレイキャストを行う関数
-	bool WallCheck();
+	// レイを飛ばす
+	bool WallCheck(float _lineLength);
 
 protected:
 
@@ -76,17 +75,9 @@ protected:
 
 	//----------------------------------------------------------------------------
 
-	// 壁判定用のレイの長さ
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Action Assist")
-		float RayLength_WallCheck;
-
 	// 攻撃の角度補正用のレイの長さ
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Action Assist")
 		float RayLength_CorrectAngle;
-
-	// HitStopで止まる時間
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Action Assist")
-		float SpeedDuringHitStop;
 
 private:
 
@@ -95,5 +86,4 @@ private:
 
 	// アニメーションプレイ中かどうか
 	bool IsAnimationPlaying;
-
 };

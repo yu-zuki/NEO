@@ -172,7 +172,7 @@ public:
 	class UActionAssistComponent* GetActionAssistComponent()const { return ActionAssistComp; }
 
 	// ヒットストップ
-	void HitStop(float _stopTime) { ActionAssistComp->HitStop(_stopTime); }
+	void HitStop(float _speedDuringHitStop, float _stopTime) { ActionAssistComp->HitStop(_speedDuringHitStop,_stopTime); }
 
 	// カメラシェイク
 	void CameraShake() { ActionAssistComp->CameraShake(ShakePattern); }

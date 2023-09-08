@@ -26,9 +26,7 @@ UActionAssistComponent::UActionAssistComponent()
 	// Tick()を毎フレーム呼ばないようにする
 	PrimaryComponentTick.bCanEverTick = false;
 
-	RayLength_WallCheck = 100.f;
 	RayLength_CorrectAngle = 300.f;
-	SpeedDuringHitStop = 0.1f;
 }
 
 
@@ -78,11 +76,12 @@ void UActionAssistComponent::CorrectAttackAngle()
 
 /*
  * 関数名　　　　：HitStop()
- * 引数１　　　　：float _stopTime・・・止める時間
+ * 引数１　　　　：float _speedDuringHitStop・・・止まっているときのスピード(1.fで通常の速さ)
+ * 引数２　　　　：float _stopTime・・・止める時間
  * 処理内容　　　：ヒットストップを起こす
  * 戻り値　　　　：なし
  */
-void UActionAssistComponent::HitStop(float _stopTime)
+void UActionAssistComponent::HitStop(float _speedDuringHitStop,float _stopTime)
 {
 	// 機能のオン・オフ
 	if (!bUseHitStop) { return; }
@@ -95,7 +94,7 @@ void UActionAssistComponent::HitStop(float _stopTime)
 	}
 
 	// HitStopを開始
-	Character->GetMesh()->GlobalAnimRateScale = SpeedDuringHitStop;
+	Character->GetMesh()->GlobalAnimRateScale = _speedDuringHitStop;
 
 	// HitStopを停止
 	FTimerManager& TimerManager = GetWorld()->GetTimerManager();
@@ -261,7 +260,7 @@ void UActionAssistComponent::EndHitStop()
 
 /*
  * 関数名　　　　：OwnerParallelToCamera()
- * 引数         ：bool _lookRight・・・現在右を向いているか
+ * 引数			 ：bool _lookRight・・・現在右を向いているか
  * 処理内容　　　：オーナーをカメラに向ける
  * 戻り値　　　　：なし
  */
@@ -304,7 +303,7 @@ void UActionAssistComponent::OwnerParallelToCamera(bool _lookRight)
 
 
 // 壁とのレイキャストを行う関数
-bool UActionAssistComponent::WallCheck()
+bool UActionAssistComponent::WallCheck(float _lineLength)
 {
 
 	ACharacter* pOwner = Cast<ACharacter>(GetOwner());
@@ -317,12 +316,12 @@ bool UActionAssistComponent::WallCheck()
 	// レイキャストを実行する際のパラメータを設定する
 	// レイキャストの開始位置はキャラクターの現在位置
 	float Rotation_Z = pOwner->GetActorRotation().Yaw;
-	float LineDirection = (Rotation_Z > 0) ? (RayLength_WallCheck) : (-RayLength_WallCheck);
+	float LineLength = (Rotation_Z > 0) ? (_lineLength) : (-_lineLength);
 
 	// 始点
 	FVector start = pOwner->GetActorLocation();
 	// 終点
-	FVector end = FVector(start.X, start.Y + LineDirection, start.Z);
+	FVector end = FVector(start.X, start.Y + LineLength, start.Z);
 
 	//UE_LOG(LogTemp, Warning, TEXT("capsuleHeigth : %f"), Capsule->GetScaledCapsuleHalfHeight());
 	//UE_LOG(LogTemp, Warning, TEXT("capsuleHeigth / 2 : %f"), Capsule->GetScaledCapsuleHalfHeight() / 2.0f);

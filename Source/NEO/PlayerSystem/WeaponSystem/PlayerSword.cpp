@@ -161,7 +161,7 @@ void APlayerSword::SetCollision()
 
 
 					// ヒットストップ
-					pPlayer->HitStop(HitStopTime);
+					pPlayer->HitStop(0.1f,HitStopTime);
 
 					// コンボのフィニッシュのみカメラを揺らす
 					if (ComboNum == 3)

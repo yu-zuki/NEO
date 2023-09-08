@@ -823,7 +823,7 @@ void AOdaBase::PlayerOnOverlap(FHitResult& _HitResult)
 			UKismetSystemLibrary::PrintString(this, LastAttack() ? TEXT("true") : TEXT("false"), true, true, FColor::Cyan, 2.f, TEXT("None"));
 		}
 		//ヒットストップをかける
-		ActionAssistComp->HitStop(.2f);
+		ActionAssistComp->HitStop(0.1f,0.2f);
 
 		//リセット
 		bIsAttacked = true;
