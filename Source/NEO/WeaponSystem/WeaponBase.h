@@ -19,7 +19,7 @@ public:
 
 	// オーナーになるキャラクターの情報
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		AActor* pOwner = nullptr;
+		class ACharacter* pOwner = nullptr;
 
 	// オーナーのタグ
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
@@ -92,7 +92,7 @@ public:
 protected:
 
 	// オーナーのデータ初期化
-	void SetupOwnerData(AActor* _owner,FName _ownerTag,FName _socketName);
+	void SetupOwnerData(ACharacter* _owner,FName _ownerTag,FName _socketName);
 
 	// 外れた時吹っ飛ぶ
 	void BlowsAway();

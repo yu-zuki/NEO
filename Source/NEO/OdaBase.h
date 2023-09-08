@@ -84,7 +84,7 @@ protected:
 	//プレイヤー
 	FVector PlayerPosY;
 	//---------------------------------------------------
-	
+
 	//列挙型
 	ECPPOdaEnum OdaMoveEnum;
 
@@ -96,7 +96,7 @@ protected:
 	UPROPERTY()
 		int RandomNum;
 
-public:	
+public:
 
 	//刀の情報を取得
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Sword", meta = (AllowPrivateAccess = "true"))
@@ -119,7 +119,7 @@ public:
 
 	//剣のコリジョン
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "BoxComp", meta = (AllowPrivateAccess = "true"))
-	UBoxComponent* BoxComp;
+		UBoxComponent* BoxComp;
 
 	//キャラクタームーブメント
 	UPROPERTY()
@@ -132,7 +132,11 @@ public:
 
 	//ダメージ処理-----------------------------------------------------
 	UFUNCTION()
-	virtual void ApplyDamage(float Damage);
+		virtual void ApplyDamage(float Damage);
+
+
+	UFUNCTION()
+		void WorldTimeReturn();
 
 	//ダメージタイプクラス
 	UPROPERTY()
@@ -144,18 +148,18 @@ public:
 
 	//通常の衝撃波のダメージ
 	UPROPERTY(EditAnywhere, Category = "Damage")
-		float ShockWaveDamage;	
+		float ShockWaveDamage;
 
 	//必殺技時の衝撃波のダメージ
 	UPROPERTY(EditAnywhere, Category = "Damage")
 		float UltShockWaveDamage;
 
 	//必殺技のダメージ
-	UPROPERTY(EditAnywhere,BlueprintReadOnly, Category = "Damage")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Damage")
 		float UltDamage;
 	//----------------------------------------------------------------
 
-	
+
 
 
 	//速度----------------------------------
@@ -252,7 +256,7 @@ public:
 
 	//近距離攻撃のコンボ
 	UFUNCTION()
-	void Is1Combo();
+		void Is1Combo();
 
 	//遠距離攻撃のコンボ
 	UFUNCTION()
@@ -288,6 +292,13 @@ public:
 	UFUNCTION(BlueprintCallable)
 		bool LastAttack();
 
+	UPROPERTY()
+		bool isBossHPRock;
+
+	UFUNCTION()
+		void BossHPRock();
+
+
 	//モーション--------------------------------------------------------------------------------------------------
 	//のけぞるモーション
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AniMontage", meta = (AllowPrivateAccess = "true"))
@@ -307,8 +318,8 @@ public:
 
 	//ふっとぶモーション
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AniMontage", meta = (AllowPrivateAccess = "true"))
-		class UAnimMontage* AnimMontage_BossBlowAway;	
-	
+		class UAnimMontage* AnimMontage_BossBlowAway;
+
 	//死亡モーション
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AniMontage", meta = (AllowPrivateAccess = "true"))
 		class UAnimMontage* AnimMontage_BossDeath;
@@ -322,9 +333,11 @@ public:
 	UFUNCTION()
 		void  DeathMotion();
 
+	FTimerHandle TimerHandle_DeathToGameOver;
+
 	//前方移動
 	UFUNCTION()
-		void BossMove(float Speed , FVector MoveSize);
+		void BossMove(float Speed, FVector MoveSize);
 
 	//ダメージ値
 	UPROPERTY(EditAnywhere, Category = "Damage")
@@ -363,8 +376,8 @@ public:
 
 	void Death();
 
-//////////////////////////////////////////////////////////////////////////
-//UI
+	//////////////////////////////////////////////////////////////////////////
+	//UI
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
 		class UEnemyBase_WidgetComponent* EnemyWidget;
 

@@ -21,7 +21,7 @@
 #include "PlayerSpline.h"
 #include "NiagaraComponent.h"
 #include "ActionAssistComponent.h"
-#include "NEO/PlayerSystem/WeaponSystem/WeaponBase.h"
+#include "NEO/WeaponSystem/WeaponBase.h"
 
 
 // Sets default values
@@ -470,8 +470,14 @@ void APlayerBase::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Ot
 			// 新しい武器を作成
 			AWeaponBase* NewWeapon = Cast<AWeaponBase>(OtherActor);
 
+			if (Weapon != NewWeapon)
+			{
+				Weapon = NewWeapon;
+				Weapon->SetOwner(this);
+			}
+
 			// プレイヤーに装備させる
-			NewWeapon->AttachToHand(this, "hand_rSocket");
+			Weapon->AttachToHand(this, "hand_rSocket");
 
 			IsHoldWeapon = true;
 		}
@@ -639,8 +645,13 @@ void APlayerBase::SetEnableRootMotion(bool _enableRootMotion, float _distance /*
 void APlayerBase::RootMotion(float _distance)
 {
 	const float Distance = (IsLookRight) ? (-_distance) : (_distance);
+	//FVector ForwardVector = GetForWardVector();
+	const FRotator Rotation = GetActorRotation();
 	const FVector Vector = FVector(0.f, Distance, 0.f);
-	AddActorWorldOffset(Vector,false);
+
+	//FVector newVector = ForwardVector + Vector;
+
+	//AddActorWorldOffset(newVector,false);
 }
 
 

@@ -35,7 +35,7 @@ void APlayerSword::BeginPlay()
 	Super::BeginPlay();
 
 
-	AActor* pPlayer = UGameplayStatics::GetPlayerCharacter(this, 0);
+	ACharacter* pPlayer = UGameplayStatics::GetPlayerCharacter(this, 0);
 
 	SetupOwnerData(pPlayer, "Player", "hand_rSocket");
 }
@@ -125,6 +125,22 @@ void APlayerSword::SetCollision()
 						HitStopTime = 0.3f;
 					}
 
+
+					// ヒットストップ
+					pPlayer->HitStop(0.1f, HitStopTime);
+
+					// コンボのフィニッシュのみカメラを揺らす
+					if (ComboNum == 3)
+					{
+						pPlayer->CameraShake();
+					}
+
+					if (EnemyHitSoundObj)
+					{
+						// 斬撃SE再生
+						ActionAssistComp->PlaySound(EnemyHitSoundObj);
+					}
+
 					if (Enemy)
 					{
 						Enemy->ApplyDamage(DamageAmount);
@@ -135,8 +151,10 @@ void APlayerSword::SetCollision()
 						}
 						else if (ComboNum == 2)
 						{
-							Enemy->AddActorLocalOffset(FVector(-300.f, 0.f, 0.f));
+							Enemy->AddActorLocalOffset(FVector(-100.f, 0.f, 0.f));
 						}
+
+						Enemy->ActionAssistComp->HitStop(0.1f, HitStopTime);
 					}
 					else if (Oda)
 					{
@@ -153,21 +171,6 @@ void APlayerSword::SetCollision()
 						ActionAssistComp->SpawnEffect(HitEffect, HitResult.Location);
 					}
 
-					if (EnemyHitSoundObj)
-					{
-						// 斬撃SE再生
-						ActionAssistComp->PlaySound(EnemyHitSoundObj);
-					}
-
-
-					// ヒットストップ
-					pPlayer->HitStop(0.1f,HitStopTime);
-
-					// コンボのフィニッシュのみカメラを揺らす
-					if (ComboNum == 3)
-					{
-						pPlayer->CameraShake();
-					}
 
 					break;
 				}

@@ -5,7 +5,7 @@
 #include "../OdaBase.h"
 #include "NEO/BackGroundSystem/ObjectBase.h"
 #include "ActionAssistComponent.h"
-#include "NEO/PlayerSystem/WeaponSystem/WeaponBase.h"
+#include "NEO/WeaponSystem/WeaponBase.h"
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()

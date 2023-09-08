@@ -75,11 +75,12 @@ void AWeaponBase::AttachToHand(ACharacter* _owner, FName _socketName)
 	// 持たれている状態にする
 	IsHeld = true;
 
+	OwnerInfo.pOwner = _owner;
 	
 	// キャラクターにアタッチ
-	if (_owner)
+	if (OwnerInfo.pOwner)
 	{
-		AttachToComponent(_owner->GetMesh(), FAttachmentTransformRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, false), _socketName);
+		AttachToComponent(OwnerInfo.pOwner->GetMesh(), FAttachmentTransformRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, false), _socketName);
 	}
 }
 
@@ -99,8 +100,9 @@ void AWeaponBase::DetachToHand()
 
 	// 吹き飛ばす
 	BlowsAway();
-}
 
+	OwnerInfo.pOwner = nullptr;
+}
 
 /*
  * 関数名　　　　：SetupOwnerData()
@@ -110,7 +112,7 @@ void AWeaponBase::DetachToHand()
  * 処理内容　　　：オーナーの情報初期化
  * 戻り値　　　　：なし
  */
-void AWeaponBase::SetupOwnerData(AActor* _owner, FName _ownerTag, FName _socketName)
+void AWeaponBase::SetupOwnerData(ACharacter* _owner, FName _ownerTag, FName _socketName)
 {
 	if (_owner)
 	{
