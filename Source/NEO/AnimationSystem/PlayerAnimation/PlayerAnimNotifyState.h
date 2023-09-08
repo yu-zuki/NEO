@@ -12,7 +12,8 @@ enum class EPlayerNotifyStateType :uint8
 {
     NotifyType_RootMotion_Attack1   UMETA(DisplayName = "RootMotion_Attack1"),
     NotifyType_RootMotion_Attack2   UMETA(DisplayName = "RootMotion_Attack2"),
-    NotifyType_RootMotion_Attack3   UMETA(DisplayName = "RootMotion_Attack3")
+    NotifyType_RootMotion_Attack3   UMETA(DisplayName = "RootMotion_Attack3"),
+    NotifyType_RootMotion_KnockBack   UMETA(DisplayName = "RootMotion_KnockBack")
 };
 
 UCLASS()

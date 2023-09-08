@@ -29,6 +29,11 @@ void UPlayerAnimNotifyState::NotifyBeginAction(AActor* _Owner, UAnimSequenceBase
         {
             pPlayer->SetEnableRootMotion(true,8.f);
         }
+        else if (NotifyType == EPlayerNotifyStateType::NotifyType_RootMotion_KnockBack)
+        {
+            pPlayer->SetEnableRootMotion(true, -5.f);
+        }
+
     }
 }
 
@@ -49,6 +54,10 @@ void UPlayerAnimNotifyState::NotifyEndAction(AActor* _Owner, UAnimSequenceBase* 
             pPlayer->SetEnableRootMotion(false);
         }
         else if (NotifyType == EPlayerNotifyStateType::NotifyType_RootMotion_Attack3)
+        {
+            pPlayer->SetEnableRootMotion(false);
+        }
+        else if (NotifyType == EPlayerNotifyStateType::NotifyType_RootMotion_KnockBack)
         {
             pPlayer->SetEnableRootMotion(false);
         }

@@ -109,7 +109,7 @@ void APlayerBase::Tick(float DeltaTime)
 	// アニメーションに合わせて移動
 	if (EnableRootMotion && !ActionAssistComp->WallCheck(10.f))
 	{
-		RootMotion(AnimationMoveValue);
+		//RootMotion(AnimationMoveValue);
 	}
 }
 
@@ -639,8 +639,13 @@ void APlayerBase::SetEnableRootMotion(bool _enableRootMotion, float _distance /*
 void APlayerBase::RootMotion(float _distance)
 {
 	const float Distance = (IsLookRight) ? (-_distance) : (_distance);
+	//FVector ForwardVector = GetForWardVector();
+	const FRotator Rotation = GetActorRotation();
 	const FVector Vector = FVector(0.f, Distance, 0.f);
-	AddActorWorldOffset(Vector,false);
+
+	//FVector newVector = ForwardVector + Vector;
+
+	//AddActorWorldOffset(newVector,false);
 }
 
 
