@@ -25,6 +25,7 @@ class NEO_API UEnemyAnimNotify : public UCharacterAnimNotify
 	
 public:
 
+
 	virtual bool CanBePlaced(UAnimSequenceBase* Animation) const { return true; }
 
 protected:

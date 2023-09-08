@@ -43,6 +43,7 @@ void UEnemyAnimNotify::NotifyAction(AActor* _Owner, UAnimSequenceBase* Animation
         else if (NotifyType == EEnemyNotifyType::NotifyType6)
         {
             pPusher->DetachRolling();
+        
         }
     }
 }

@@ -42,6 +42,7 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Spawning")
 		TSubclassOf<class ATrajectoryBullet> TrajectoryBulletClass;
 
+
 	UPROPERTY(EditAnywhere, Category = "Spawning")
 		TSubclassOf<class ABullet> BulletClass;
 
