@@ -44,4 +44,8 @@ private:
 	// 武器の当たり判定
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SwordCollision", meta = (AllowPrivateAccess = "true"))
 		class UCapsuleComponent* WeaponCollision;
+
+	// 何秒間ヒットストップを起こすか
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = "Action Assist")
+		float HitStopTime = 0.2f;
 };

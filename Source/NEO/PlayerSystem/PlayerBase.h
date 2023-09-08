@@ -172,7 +172,7 @@ public:
 	class UActionAssistComponent* GetActionAssistComponent()const { return ActionAssistComp; }
 
 	// ヒットストップ
-	void HitStop() { ActionAssistComp->HitStop(HitStopTime); }
+	void HitStop(float _stopTime) { ActionAssistComp->HitStop(_stopTime); }
 
 	// カメラシェイク
 	void CameraShake() { ActionAssistComp->CameraShake(ShakePattern); }
@@ -325,10 +325,6 @@ protected:
 	// キャラクターの動き
 	UCharacterMovementComponent* CharacterMovementComp;
 	//-------------------------------------------------------------------------------------------------------------
-
-	// 何秒間ヒットストップを起こすか
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = "Action Assist")
-		float HitStopTime = 0.2f;
 
 	// 死亡アニメーションで倒れてからの再生スピード(1で通常スピード)
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"),Category = "GameOver")
