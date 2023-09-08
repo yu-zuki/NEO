@@ -30,7 +30,7 @@ AGunMan::AGunMan()
     MaxHealth = 100;
     Health = MaxHealth;
     bIsBulletAlive = false;
-    BulletSpawnTimerHandle = FTimerHandle();
+
 }
 
 
@@ -41,7 +41,7 @@ void AGunMan::BeginPlay()
     // プレイヤーキャラクターの参照を取得
     PlayerCharacter = UGameplayStatics::GetPlayerCharacter(this, 0);
     
-    GetWorldTimerManager().SetTimer(BulletSpawnTimerHandle, this, &AGunMan::SpawnTrajectoryBullet, 3.0f, true);
+    
 }
 
 FVector AGunMan::GetSnappedDirection(const FVector& Direction) const
@@ -215,14 +215,10 @@ void AGunMan::SpawnTrajectoryBullet()
             FRotator AdjustedRotation = FRotator(CurrentRotation.Pitch - 20.0f, CurrentRotation.Yaw + 90.0f, CurrentRotation.Roll+45.0f);  // 10.0f is just an example value
             Bullet->SetActorRotation(AdjustedRotation);
 
-            // The rest of your code...
-            GetWorldTimerManager().SetTimer(Bullet->GetLifeSpanTimerHandle(), this, &AGunMan::ReplaceWithBullet, 2.0f, false);
         }
     }
     // Prevent movement for the lifespan of the TrajectoryBullet + 1 second
-    GetCharacterMovement()->Deactivate();
-    GetWorldTimerManager().SetTimer(MovementResumeTimerHandle, this, &AGunMan::ResumeMovement, Bullet->InitialLifeSpan + 1.0f, false);
-    bIsBulletAlive = true;
+   
 }
 
 void AGunMan::ReplaceWithBullet()
@@ -234,16 +230,7 @@ void AGunMan::ReplaceWithBullet()
     FRotator SpawnRotation = GetActorRotation(); // Adjust as necessary
 
     ABullet* Bullet = GetWorld()->SpawnActor<ABullet>(BulletClass, SpawnLocation, SpawnRotation, SpawnParams);
-    if (Bullet)
-    {
-        // Destroy the TrajectoryBullet if it's valid
-        ATrajectoryBullet* TrajectoryBullet = Bullet->GetTrajectoryBullet();
-        if (IsValid(TrajectoryBullet))
-        {
-            GetWorld()->DestroyActor(TrajectoryBullet);
-        }
-    }
-    bIsRotation = true;
+   
 }
 void AGunMan::ResumeMovement()
 {
