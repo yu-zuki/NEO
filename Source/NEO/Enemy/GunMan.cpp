@@ -213,6 +213,7 @@ void AGunMan::ReplaceWithBullet()
     {
         AActor* SpawnedBullet = GetWorld()->SpawnActor<AActor>(BulletClass, SpawnBulletLocation, SpawnBulletRotation);
 
+
     }
 }
 void AGunMan::ResumeMovement()

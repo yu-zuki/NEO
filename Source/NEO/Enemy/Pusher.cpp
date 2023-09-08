@@ -33,6 +33,7 @@ void APusher::Tick(float DeltaTime)
 	if (DeathCheck == true)
 	{
 
+
 	}
 }
 

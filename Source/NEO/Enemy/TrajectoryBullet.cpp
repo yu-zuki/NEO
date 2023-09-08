@@ -15,6 +15,7 @@ ATrajectoryBullet::ATrajectoryBullet()
     // Attach Niagara Component to Root
     RootComponent = NiagaraComponent;
     
+
 }
 
 // Called when the game starts or when spawned
