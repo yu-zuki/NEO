@@ -134,6 +134,10 @@ public:
 	UFUNCTION()
 	virtual void ApplyDamage(float Damage);
 
+
+	UFUNCTION()
+		void WorldTimeReturn();
+
 	//ダメージタイプクラス
 	UPROPERTY()
 		TSubclassOf < class UDamageType > DamageTypeClass;
@@ -288,6 +292,13 @@ public:
 	UFUNCTION(BlueprintCallable)
 		bool LastAttack();
 
+	UPROPERTY()
+		bool isBossHPRock;
+
+	UFUNCTION()
+		void BossHPRock();
+
+
 	//モーション--------------------------------------------------------------------------------------------------
 	//のけぞるモーション
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AniMontage", meta = (AllowPrivateAccess = "true"))
@@ -321,6 +332,8 @@ public:
 	//アニメーション中に通知で呼び出す死亡関数
 	UFUNCTION()
 		void  DeathMotion();
+
+	FTimerHandle TimerHandle_DeathToGameOver;
 
 	//前方移動
 	UFUNCTION()
