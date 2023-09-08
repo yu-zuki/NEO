@@ -232,7 +232,7 @@ void AGunMan::PlayAttackAnim()
     if (Health > 0)
     {
         PlayAnimMontage(Attack, 1.0f, NAME_None);
-        SetActorTickEnabled(false);
+       /* SetActorTickEnabled(false);*/
         GetWorldTimerManager().SetTimer(TickEnableTimerHandle, this, &AGunMan::EnableTickAfterDelay, 3.0f, false);
     }
    
@@ -240,5 +240,5 @@ void AGunMan::PlayAttackAnim()
 void AGunMan::EnableTickAfterDelay()
 {
     // Tick‚ğÄ—LŒø‰»‚·‚é
-    SetActorTickEnabled(true);
+    /*SetActorTickEnabled(true);*/
 }

@@ -7,6 +7,7 @@
 #include "DeathTrigger.h"
 #include "NEO/GameSystem/GameSystem_BattleArea.h"
 #include "NiagaraComponent.h"
+#include "NEO/WeaponSystem/EnemySword.h"
 #include "Components/SplineComponent.h"
 #include "EnamyBase.generated.h"
 
@@ -75,7 +76,8 @@ public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Death")
 		TSubclassOf<ADeathTrigger>DeathTriggerClass;
-	
+	UPROPERTY(EditAnywhere, Category = "Spawning")
+		TSubclassOf<class AEnemySword> EnemySwordClass;
 	UFUNCTION(BlueprintCallable, Category = "Health")
 		virtual void ApplyDamage(float DamageAmount);
 
@@ -87,7 +89,7 @@ public:
 	bool bHasPattern1Tag; // pattern1Ç∆Ç¢Ç§TagÇéùÇ¡ÇƒÇ¢ÇÈÇ©Ç«Ç§Ç©
 	bool bHasPattern2Tag;
 	bool bHasPattern3Tag;
-
+	bool bHasWeponTag;
 	void AfterDeath();
 
 	void DamageReac();
@@ -101,6 +103,8 @@ public:
 	void CheckCollisonOn();
 
 	void CheckCollisonOff();
+
+	void SpawnSword();
 
 	bool bIsShoot = false;
 
