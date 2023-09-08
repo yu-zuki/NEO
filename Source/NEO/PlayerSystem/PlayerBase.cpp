@@ -473,7 +473,6 @@ void APlayerBase::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Ot
 			if (Weapon != NewWeapon)
 			{
 				Weapon = NewWeapon;
-				Weapon->SetOwner(this);
 			}
 
 			// ƒvƒŒƒCƒ„[‚É‘•”õ‚³‚¹‚é
