@@ -100,7 +100,6 @@ void APlayerSword::SetCollision()
 						// オブジェクト破壊用のサウンド再生
 						ActionAssistComp->PlaySound(ObjectHitSoundObj);
 					}
-					break;
 				}
 
 				// ヒットしたアクターが"Enemy"タグを持っていたら
@@ -111,11 +110,24 @@ void APlayerSword::SetCollision()
 					AEnamyBase* Enemy = Cast<AEnamyBase>(HitResult.GetActor());
 					AOdaBase* Oda = Cast<AOdaBase>(HitResult.GetActor());
 
+					int ComboNum = pPlayer->GetComboIndex();
+
+					if (ComboNum < 2)
+					{
+						HitStopTime = 0.2f;
+					}
+					else if (ComboNum == 2)
+					{
+						HitStopTime = 0.25f;
+					}
+					else
+					{
+						HitStopTime = 0.3f;
+					}
+
 					if (Enemy)
 					{
 						Enemy->ApplyDamage(DamageAmount);
-
-						int ComboNum = pPlayer->GetComboIndex();
 
 						if (ComboNum == 1)
 						{
@@ -149,10 +161,10 @@ void APlayerSword::SetCollision()
 
 
 					// ヒットストップ
-					pPlayer->HitStop();
+					pPlayer->HitStop(HitStopTime);
 
 					// コンボのフィニッシュのみカメラを揺らす
-					if (pPlayer->GetComboIndex() == 3)
+					if (ComboNum == 3)
 					{
 						pPlayer->CameraShake();
 					}

@@ -392,6 +392,15 @@ AActor* AEnamyBase::GetEnemyActor() const
 	return nullptr; // Enemyタグを持つアクターが見つからない場合
 }
 
+void AEnamyBase::OnOverlapBeginWall(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (GetCapsuleComponent())  // WallCollision と同じ
+	{
+		// この EnemyBase のコリジョンレスポンスを Block に設定
+		GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel1, ECollisionResponse::ECR_Block);
+	}
+}
+
 void AEnamyBase::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 
