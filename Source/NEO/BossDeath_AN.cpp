@@ -16,5 +16,5 @@ void UBossDeath_AN::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* 
 		return;
 	}
 	//‘Ì—Í‚ª0ˆÈ‰º‚É‚È‚Á‚½‚Æ‚«‚Ìˆ—
-	aOda->DeathMotion();
+	aOda->WorldTimeReturn();
 }
