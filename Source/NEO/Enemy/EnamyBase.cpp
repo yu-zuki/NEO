@@ -25,7 +25,8 @@ AEnamyBase::AEnamyBase()
 	PrimaryActorTick.bCanEverTick = true;
 
 	//UI Create
-	
+	EnemyWidget = CreateDefaultSubobject<UEnemyBase_WidgetComponent>(TEXT("EnemyWidget"));
+	EnemyWidget->SetupAttachment(RootComponent);
 	bIsDeath = false;
 	DamageCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("DamageCollision"));
 	if (DamageCollision)
@@ -44,8 +45,6 @@ AEnamyBase::AEnamyBase()
 
 	MoveSpline = CreateDefaultSubobject<USplineComponent>(TEXT("MoveSpline"));
 	MoveSpline->SetupAttachment(RootComponent);
-	Wepon = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Wepon"));
-	Wepon -> SetupAttachment(RootComponent);
 	/*MovementSpline = CreateDefaultSubobject<USplineComponent>(TEXT("MovementSpline1"));
 	MovementSpline->SetupAttachment(RootComponent);*/
 }
@@ -138,9 +137,8 @@ void AEnamyBase::Tick(float DeltaTime)
 	}
 
 	Super::Tick(DeltaTime);
-
-
-
+	//Enemy Hp Set
+	EnemyWidget->SetHPInfo(Health, MaxHealth);
 
 	//キャラクターの位置を取得
 	FVector CharacterLocation = GetActorLocation();
@@ -284,12 +282,6 @@ void AEnamyBase::CheckCollisonOff()
 	}
 }
 
-// Called to bind functionality to input
-void AEnamyBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-}
 
 
 void AEnamyBase::ApplyDamage(float DamageAmount)

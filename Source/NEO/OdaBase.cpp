@@ -72,9 +72,6 @@ void AOdaBase::BeginPlay()
 
 	//ディレイを一定時間か攻撃を受けたら処理を切り替える
 	SpawnDelay = true;
-
-	//ボスのロックをつけておく
-	isBossHPRock = true;
 }
 
 
@@ -365,7 +362,7 @@ void AOdaBase::OdaAttack1(int Timer) {
 	}
 
 	//200フレームたったら
-	if (Timer % 150 == 0)
+	if (Timer % 200 == 0)
 	{
 		//ステートを切り替える
 		OdaMoveEnum = ECPPOdaEnum::Stay1;
@@ -571,12 +568,11 @@ void AOdaBase::ApplyDamage(float Damage)
 		}
 		//エフェクトを出す
 		//UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), HitParticles, GetActorLocation());
-		//ActionAssistComp->SpawnEffect(HitParticles, GetActorLocation());
+		ActionAssistComp->SpawnEffect(HitParticles, GetActorLocation());
 
 		Health -= Damage;
 		//ノックバックのアニメーションを流す
 		PlayAnimMontage(AnimMontage_BossKnockMontage);
-
 		//HPが0になったら
 		if (Health <= 0.f)
 		{
@@ -585,46 +581,16 @@ void AOdaBase::ApplyDamage(float Damage)
 			{
 				isMove = false;
 			}
-			this->StopAnimMontage();
+			Death();
 
-
-			UGameplayStatics::SetGlobalTimeDilation(GetWorld(), .2f);
-
-			//アニメーションを流す
-			PlayAnimMontage(AnimMontage_BossDeath);
-			// プレイヤーを削除
-			FTimerManager& TimerManager2 = GetWorld()->GetTimerManager();
-			TimerManager2.SetTimer(TimerHandle_DeathToGameOver, this, &AOdaBase::Death, AnimMontage_BossDeath->GetPlayLength()-0.5f, false);
-
-			//一度だけ流したいのでフラグを切り替える
-			isMotionPlaying = false;
-
-
-
-			//AnimMontage_BossDeath->GetPlayLength();
+				this->StopAnimMontage();
+				//アニメーションを流す(今は仮)
+				PlayAnimMontage(AnimMontage_BossDeath);
+				//一度だけ流したいのでフラグを切り替える
+				isMotionPlaying = false;
 		}
 	}
 }
-/*
- * 関数名　　　　：WorldTimeReturn()
- * 処理内容　　　：ボスを倒した後の世界の動きを戻すための関数
- * 戻り値　　　　：なし
- */
-void AOdaBase::WorldTimeReturn()
-{
-	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1.f);
-}
-
-/*
- * 関数名　　　　：BossKnockback()
- * 処理内容　　　：ボスがノックバックする処理
- * 戻り値　　　　：なし
- */
-void AOdaBase::BossHPRock()
-{
-	isBossHPRock = !isBossHPRock;
-}
-
 /*
  * 関数名　　　　：BossKnockback()
  * 処理内容　　　：ボスがノックバックする処理
@@ -632,12 +598,8 @@ void AOdaBase::BossHPRock()
  */
 void AOdaBase::BossKnockback()
 {
-	//ラストヒットがここを通ってもこの下の処理にさせない処理
-	if (!isBossHPRock)
-	{
-		//ボスがノックバックする処理
-		PlayAnimMontage(AnimMontage_BossBlowAway);
-	}
+	//ボスがノックバックする処理
+	PlayAnimMontage(AnimMontage_BossBlowAway);
 }
 
 /*
@@ -761,17 +723,14 @@ void AOdaBase::Is2Combo()
  */
 bool AOdaBase::LastAttack()
 {
-	if (isMove)
+	if (Combo1Counter >= 3)
 	{
-		if (Combo1Counter >= 3)
-		{
-			return true;
-		}
+		return true;
+	}
 
-		else if (Combo2Counter == 2)
-		{
-			return true;
-		}
+	else if (Combo2Counter == 2)
+	{
+		return true;
 	}
 	return false;
 }

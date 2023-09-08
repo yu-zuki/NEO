@@ -172,7 +172,7 @@ public:
 	class UActionAssistComponent* GetActionAssistComponent()const { return ActionAssistComp; }
 
 	// ヒットストップ
-	void HitStop() { ActionAssistComp->HitStop(HitStopTime); }
+	void HitStop(float _stopTime) { ActionAssistComp->HitStop(_stopTime); }
 
 	// カメラシェイク
 	void CameraShake() { ActionAssistComp->CameraShake(ShakePattern); }
@@ -185,6 +185,12 @@ public:
 
 	// 死亡時のアニメーションの再生を遅くする
 	void SlowDownDeathAnimationRate();
+
+	// 疑似RootMotion開始
+	void SetEnableRootMotion(bool _enableRootMotion, float _distance = 0);
+	
+	// RootMotion
+	void RootMotion(float _distance);
 
 	// ダメージ量を返す関数
 	UFUNCTION(BlueprintCallable, Category = "Action")
@@ -320,10 +326,6 @@ protected:
 	UCharacterMovementComponent* CharacterMovementComp;
 	//-------------------------------------------------------------------------------------------------------------
 
-	// 何秒間ヒットストップを起こすか
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = "Action Assist")
-		float HitStopTime = 0.2f;
-
 	// 死亡アニメーションで倒れてからの再生スピード(1で通常スピード)
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"),Category = "GameOver")
 		float DeadAnimRate = 0.01f;							
@@ -347,8 +349,17 @@ private:
 	// ダッシュ中かどうか
 	bool IsRunning;		
 
+	// 右を向いているか
+	bool IsLookRight;
+
 	// ジャンプ中かどうか
 	bool IsJumping;
+
+	// EnableRootMotion
+	bool EnableRootMotion;
+
+	// ルートモーションでの移動値
+	float AnimationMoveValue;
 
 	// 武器を持っているかどうか
 	bool IsHoldWeapon;

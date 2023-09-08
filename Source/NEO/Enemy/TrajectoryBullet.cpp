@@ -10,27 +10,27 @@ ATrajectoryBullet::ATrajectoryBullet()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-    NiagaraComponent = CreateDefaultSubobject<UNiagaraComponent>(TEXT("NiagaraComponent"));
+    BulletMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BulletMeshComponent"));
+    RootComponent = BulletMeshComponent;
 
-    // Attach Niagara Component to Root
-    RootComponent = NiagaraComponent;
     
+    MinOpacity = 0.0f;
+    MaxOpacity = 1.0f;
+    BlinkDuration = 2.0f;
 }
 
 // Called when the game starts or when spawned
 void ATrajectoryBullet::BeginPlay()
 {
 	Super::BeginPlay();
-    
-    if (NiagaraSystemAsset)
+    if (BulletMaterial)
     {
-        // Set the asset for the Niagara Component
-        NiagaraComponent->SetAsset(NiagaraSystemAsset);
-
-        // Activate the Niagara System
-        NiagaraComponent->Activate();
+        DynamicMaterialInstance = UMaterialInstanceDynamic::Create(BulletMaterial, this);
+        if (DynamicMaterialInstance)
+        {
+            BulletMeshComponent->SetMaterial(0, DynamicMaterialInstance);
+        }
     }
-
     GetWorldTimerManager().SetTimer(LifeSpanTimerHandle, [this]()
         {
             Destroy();
@@ -45,6 +45,38 @@ void ATrajectoryBullet::Tick(float DeltaTime)
 
 }
 
+void ATrajectoryBullet::StartBlinking()
+{
+    if (DynamicMaterialInstance)
+    {
+      
+        SetBulletOpacity(MaxOpacity);
 
+       
+        GetWorldTimerManager().SetTimer(BlinkTimerHandle, this, &ATrajectoryBullet::BlinkBullet, BlinkDuration, true);
+    }
+}
 
+void ATrajectoryBullet::SetBulletOpacity(float Opacity)
+{
+    if (DynamicMaterialInstance)
+    {
+        DynamicMaterialInstance->SetScalarParameterValue(TEXT("Opacity"), Opacity);
+    }
+}
 
+void ATrajectoryBullet::BlinkBullet()
+{
+   
+    // Toggle the bullet opacity between the minimum and maximum values
+    FName OpacityParamName = FName("Opacity");
+    float CurrentOpacity;
+    DynamicMaterialInstance->GetScalarParameterValue(OpacityParamName, CurrentOpacity);
+
+    float NewOpacity = (CurrentOpacity == MinOpacity) ? MaxOpacity : MinOpacity;
+    SetBulletOpacity(NewOpacity);
+}
+void ATrajectoryBullet::DeleteBullet()
+{
+    Destroy();
+}

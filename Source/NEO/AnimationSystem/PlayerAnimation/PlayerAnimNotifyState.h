@@ -10,7 +10,9 @@
 UENUM(BlueprintType)
 enum class EPlayerNotifyStateType :uint8
 {
-	NotifyType_Combo UMETA(DisplayName = "ComboBranch"),
+    NotifyType_RootMotion_Attack1   UMETA(DisplayName = "RootMotion_Attack1"),
+    NotifyType_RootMotion_Attack2   UMETA(DisplayName = "RootMotion_Attack2"),
+    NotifyType_RootMotion_Attack3   UMETA(DisplayName = "RootMotion_Attack3")
 };
 
 UCLASS()

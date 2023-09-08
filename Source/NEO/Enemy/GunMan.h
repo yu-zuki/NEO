@@ -33,7 +33,7 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 	
-
+private:
 	UPROPERTY(EditAnywhere, Category = "Rotation")
 		bool bIsRotation;
 	FVector GetPlayerDirection() const;
@@ -48,8 +48,6 @@ public:
 	FTimerHandle BulletSpawnTimerHandle;
 	FTimerHandle MovementResumeTimerHandle;
 	FTimerHandle RotationLockTimerHandle;
-	FTimerHandle AttackTimerHandle;
-	FTimerHandle TickEnableTimerHandle;
 	bool bIsSpawningBullet;
 	bool bIsBulletAlive;
 	FRotator LockedRotation;
@@ -57,8 +55,6 @@ public:
 	void ReplaceWithBullet();
 	void ResumeMovement();
 	void UnlockRotation();
-	void PlayAttackAnim();
 	TOptional<FRotator> SavedRotation;
-	void EnableTickAfterDelay();
-	
+
 };

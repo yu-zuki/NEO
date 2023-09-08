@@ -16,9 +16,18 @@ void UPlayerAnimNotifyState::NotifyBeginAction(AActor* _Owner, UAnimSequenceBase
 
     if (pPlayer)
     {
-        if (NotifyType == EPlayerNotifyStateType::NotifyType_Combo)
+        // アニメーションでの移動開始
+        if (NotifyType == EPlayerNotifyStateType::NotifyType_RootMotion_Attack1)
         {
-            pPlayer->ContinuationCombo();
+            pPlayer->SetEnableRootMotion(true,2.f);
+        }
+        else if (NotifyType == EPlayerNotifyStateType::NotifyType_RootMotion_Attack2)
+        {
+            pPlayer->SetEnableRootMotion(true,5.f);
+        }
+        else if (NotifyType == EPlayerNotifyStateType::NotifyType_RootMotion_Attack3)
+        {
+            pPlayer->SetEnableRootMotion(true,8.f);
         }
     }
 }
@@ -30,9 +39,18 @@ void UPlayerAnimNotifyState::NotifyEndAction(AActor* _Owner, UAnimSequenceBase* 
 
     if (pPlayer)
     {
-        if (NotifyType == EPlayerNotifyStateType::NotifyType_Combo)
+        // アニメーションでの移動終了
+        if (NotifyType == EPlayerNotifyStateType::NotifyType_RootMotion_Attack1)
         {
-            pPlayer->ResetCombo();
+            pPlayer->SetEnableRootMotion(false);
+        }
+        else if (NotifyType == EPlayerNotifyStateType::NotifyType_RootMotion_Attack2)
+        {
+            pPlayer->SetEnableRootMotion(false);
+        }
+        else if (NotifyType == EPlayerNotifyStateType::NotifyType_RootMotion_Attack3)
+        {
+            pPlayer->SetEnableRootMotion(false);
         }
     }
 }

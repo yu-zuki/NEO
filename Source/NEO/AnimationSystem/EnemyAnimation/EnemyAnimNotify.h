@@ -11,11 +11,7 @@ UENUM(BlueprintType)
 enum class EEnemyNotifyType :uint8
 {
 	NotifyType1 UMETA(DisplayName = "EnemyCollisionOn"),
-	NotifyType2 UMETA(DisplayName = "EnemyCollisionOff"),
-	NotifyType3 UMETA(DisplayName = "SpawnTrajectoryBullet"),
-	NotifyType4 UMETA(DisplayName = "SpawnBullet"),
-	NotifyType5 UMETA(DisplayName = "SpawnRock"),
-	NotifyType6 UMETA(DisplayName = "DetachRock")
+	NotifyType2 UMETA(DisplayName = "EnemyCollisionOff")
 };
 
 UCLASS()

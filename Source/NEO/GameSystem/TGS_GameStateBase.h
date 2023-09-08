@@ -15,7 +15,6 @@ enum class EGameState : uint8
 	EGame_None UMETA(DisplayName = "Game_None"),					// ゲームスタート前
 
 	EGame_Title UMETA(DisplayName = "Game_Title"),					// タイトル画面
-	EGame_Opening UMETA(DisplayName = "Game_Opening"),				//オープニング
 	EGame_Playing UMETA(DisplayName = "Game_Playing"),				// ゲーム中	
 	EGame_InBattleArea UMETA(DisplayName = "EGame_InBattleArea"),	// バトルエリア
 	EGame_Over UMETA(DisplayName = "Game_Over"),					// ゲームオーバー
@@ -33,10 +32,9 @@ enum class ENextLevel : uint8
 {
 	ENextLevel_None UMETA(DisplayName = "NextLevel_None"),					// None
 	ENextLevel_Title UMETA(DisplayName = "NextLevel_Title"),				// タイトル画面
-	ENextLevel_Opening UMETA(DisplayName = "NextLevel_Opening"),			// オープニング
 	ENextLevel_Playing UMETA(DisplayName = "NextLevel_Playing"),			// ゲーム中
 	ENextLevel_Over UMETA(DisplayName = "NextLevel_Over"),					// ゲームオーバー
-	ENextLevel_Clear UMETA(DisplayName = "NextLevel_Clear"),				// ゲームクリア
+	ENextLevel_Clear UMETA(DisplayName = "NextLevel_Clear"),							// ゲームクリア
 
 };
 
@@ -83,9 +81,6 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALevelName")
 		FName GameTitleLevelName = FName(TEXT("GameTitle"));	// ゲームタイトルのレベル名
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALevelName")
-		FName GameOpeningLevelName = FName(TEXT("GameOpening"));	// ゲームオープニングのレベル名
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ALevelName")
 		FName GamePlayLevelName = FName(TEXT("GamePlay"));		// ゲームプレイのレベル名
@@ -137,9 +132,6 @@ public:
 protected:
 	//ゲームタイトルの処理
 	void OnGameTitle();
-
-	void OnGameOpening();
-
 	//ゲームプレイ中の処理
 	void OnGamePlaying(float DeltaTime);
 	//ゲームオーバーの処理
@@ -254,5 +246,4 @@ public:
 		int32 Life = 2;
 
 public:
-		void MoveToIngameLevel();
 };

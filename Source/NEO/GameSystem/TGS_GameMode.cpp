@@ -437,11 +437,6 @@ ATGS_GameStateBase* ATGS_GameMode::GetGameState()
 	return GameState;
 }
 
-void ATGS_GameMode::MoveToInGameLevel()
-{
-	GetGameState()->MoveToIngameLevel();
-}
-
 UTGS_GameInstance* ATGS_GameMode::GetGameInstance()
 {
 	UWorld* World = GetWorld();

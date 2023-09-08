@@ -23,11 +23,14 @@ AGunMan::AGunMan()
     // Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
     PrimaryActorTick.bCanEverTick = true;
 
-    
+    // キャラクターの移動方式を設定
+    GetCharacterMovement()->bOrientRotationToMovement = true;
+    GetCharacterMovement()->RotationRate = FRotator(0.0f, 540.0f, 0.0f);
+    GetCharacterMovement()->MaxWalkSpeed = MovementSpeed;
     MaxHealth = 100;
     Health = MaxHealth;
     bIsBulletAlive = false;
-   
+    BulletSpawnTimerHandle = FTimerHandle();
 }
 
 
@@ -38,7 +41,7 @@ void AGunMan::BeginPlay()
     // プレイヤーキャラクターの参照を取得
     PlayerCharacter = UGameplayStatics::GetPlayerCharacter(this, 0);
     
-    GetWorldTimerManager().SetTimer(AttackTimerHandle, this,&AGunMan::PlayAttackAnim, 5.0f, true);
+    GetWorldTimerManager().SetTimer(BulletSpawnTimerHandle, this, &AGunMan::SpawnTrajectoryBullet, 3.0f, true);
 }
 
 FVector AGunMan::GetSnappedDirection(const FVector& Direction) const
@@ -174,46 +177,73 @@ float AGunMan::GetDistanceToPlayer() const
 void AGunMan::SpawnTrajectoryBullet()
 {
     
+    //bIsSpawningBullet = true; // フラグをセット
+    //LockedRotation = GetActorRotation(); // 現在の角度を保存
+    //GetWorldTimerManager().SetTimer(RotationLockTimerHandle, this, &AGunMan::UnlockRotation, 6.0f, false);
    
+   
+
+    //// Spawn a TrajectoryBullet
+    //FActorSpawnParameters SpawnParams;
+    //FVector SpawnLocation = GetActorLocation();
+    //FRotator SpawnRotation = GetActorRotation(); 
+
+    //ATrajectoryBullet* Bullet = GetWorld()->SpawnActor<ATrajectoryBullet>(TrajectoryBulletClass, SpawnLocation, SpawnRotation, SpawnParams);
+    //if (Health > 0)
+    //{
+    //    if (Bullet)
+    //    {
+    //        // Set up timer to replace TrajectoryBullet with Bullet after 2 seconds
+    //        GetWorldTimerManager().SetTimer(Bullet->GetLifeSpanTimerHandle(), this, &AGunMan::ReplaceWithBullet, 2.0f, false);
+    //    }
+
+    //}
+    
+    FActorSpawnParameters SpawnParams;
+
     USkeletalMeshComponent* CharacterMesh = GetMesh();
-    FVector SpawnLocation = CharacterMesh->GetSocketLocation("enemy_root");
-    FRotator SpawnRotation = CharacterMesh->GetSocketRotation("enemy_root");
-    if (TrajectoryBulletClass)
+    FVector SpawnLocation = CharacterMesh->GetSocketLocation("Root");
+    FRotator SpawnRotation = CharacterMesh->GetSocketRotation("Root");
+
+    ATrajectoryBullet* Bullet = GetWorld()->SpawnActor<ATrajectoryBullet>(TrajectoryBulletClass, SpawnLocation, SpawnRotation, SpawnParams);
+    if (Health > 0)
     {
-        AActor* SpawnedTrajectoryBullet = GetWorld()->SpawnActor<AActor>(TrajectoryBulletClass, SpawnLocation, SpawnRotation);
-        if (SpawnedTrajectoryBullet)
+        if (Bullet)
         {
-            SpawnedTrajectoryBullet->AttachToComponent(CharacterMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, "enemy_root");
-         }
+            Bullet->AttachToComponent(CharacterMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, "Root");
+            FRotator CurrentRotation = Bullet->GetActorRotation();
+            FRotator AdjustedRotation = FRotator(CurrentRotation.Pitch - 20.0f, CurrentRotation.Yaw + 90.0f, CurrentRotation.Roll+45.0f);  // 10.0f is just an example value
+            Bullet->SetActorRotation(AdjustedRotation);
+
+            // The rest of your code...
+            GetWorldTimerManager().SetTimer(Bullet->GetLifeSpanTimerHandle(), this, &AGunMan::ReplaceWithBullet, 2.0f, false);
+        }
     }
+    // Prevent movement for the lifespan of the TrajectoryBullet + 1 second
+    GetCharacterMovement()->Deactivate();
+    GetWorldTimerManager().SetTimer(MovementResumeTimerHandle, this, &AGunMan::ResumeMovement, Bullet->InitialLifeSpan + 1.0f, false);
+    bIsBulletAlive = true;
 }
 
 void AGunMan::ReplaceWithBullet()
 {
-    //bIsSpawningBullet = false;
-    //// Replace TrajectoryBullet with Bullet
-    //FActorSpawnParameters SpawnParams;
-    //FVector SpawnLocation = GetActorLocation(); // Adjust as necessary
-    //FRotator SpawnRotation = GetActorRotation(); // Adjust as necessary
+    bIsSpawningBullet = false;
+    // Replace TrajectoryBullet with Bullet
+    FActorSpawnParameters SpawnParams;
+    FVector SpawnLocation = GetActorLocation(); // Adjust as necessary
+    FRotator SpawnRotation = GetActorRotation(); // Adjust as necessary
 
-    //ABullet* Bullet = GetWorld()->SpawnActor<ABullet>(BulletClass, SpawnLocation, SpawnRotation, SpawnParams);
-    //if (Bullet)
-    //{
-    //    // Destroy the TrajectoryBullet if it's valid
-    //    ATrajectoryBullet* TrajectoryBullet = Bullet->GetTrajectoryBullet();
-    //    if (IsValid(TrajectoryBullet))
-    //    {
-    //        GetWorld()->DestroyActor(TrajectoryBullet);
-    //    }
-    //}
-    //bIsRotation = true;
-    FVector SpawnBulletLocation = GetActorLocation(); // または他の場所
-    FRotator SpawnBulletRotation = GetActorRotation(); // または他の回転
-    if (BulletClass)
+    ABullet* Bullet = GetWorld()->SpawnActor<ABullet>(BulletClass, SpawnLocation, SpawnRotation, SpawnParams);
+    if (Bullet)
     {
-        AActor* SpawnedBullet = GetWorld()->SpawnActor<AActor>(BulletClass, SpawnBulletLocation, SpawnBulletRotation);
-
+        // Destroy the TrajectoryBullet if it's valid
+        ATrajectoryBullet* TrajectoryBullet = Bullet->GetTrajectoryBullet();
+        if (IsValid(TrajectoryBullet))
+        {
+            GetWorld()->DestroyActor(TrajectoryBullet);
+        }
     }
+    bIsRotation = true;
 }
 void AGunMan::ResumeMovement()
 {
@@ -224,20 +254,4 @@ void AGunMan::ResumeMovement()
 void AGunMan::UnlockRotation()
 {
     bIsSpawningBullet = false;
-}
-
-void AGunMan::PlayAttackAnim()
-{
-    if (Health > 0)
-    {
-        PlayAnimMontage(Attack, 1.0f, NAME_None);
-        SetActorTickEnabled(false);
-        GetWorldTimerManager().SetTimer(TickEnableTimerHandle, this, &AGunMan::EnableTickAfterDelay, 3.0f, false);
-    }
-   
-}
-void AGunMan::EnableTickAfterDelay()
-{
-    // Tickを再有効化する
-    SetActorTickEnabled(true);
 }

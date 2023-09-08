@@ -7,7 +7,6 @@
 #include "DeathTrigger.h"
 #include "NEO/GameSystem/GameSystem_BattleArea.h"
 #include "NiagaraComponent.h"
-#include "Components/StaticMeshComponent.h"
 #include "Components/SplineComponent.h"
 #include "EnamyBase.generated.h"
 
@@ -35,8 +34,6 @@ public:
 		UAnimMontage* Damage_Reaction;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
 		UAnimMontage* MovingAnimation;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wepon")
-		UStaticMeshComponent* Wepon;
 	UPROPERTY()
 		UAnimInstance* AnimInstance;
 	UFUNCTION(BlueprintCallable, Category = "Area")
@@ -69,8 +66,7 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
 		float  Health;
@@ -138,7 +134,8 @@ public:
 	bool bIsAir;
 	///UI
 public:
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
+		class UEnemyBase_WidgetComponent* EnemyWidget;
 	AActor* GetEnemyActor() const;
 	TArray<AGameSystem_BattleArea*> BattleAreaReferences;  // 複数のバトルエリアの参照
 	float SpawnTime; // スポーンした時間を記録する変数

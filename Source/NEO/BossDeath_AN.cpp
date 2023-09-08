@@ -15,6 +15,6 @@ void UBossDeath_AN::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* 
 		UE_LOG(LogTemp, Warning, TEXT("RemoveOda is not Found"));
 		return;
 	}
-	//Ž€‚ñ‚¾‚Æ‚«‚ÌŽžŠÔ‚ð–ß‚·ˆ—
-	aOda->WorldTimeReturn();
+	//‘Ì—Í‚ª0ˆÈ‰º‚É‚È‚Á‚½‚Æ‚«‚Ìˆ—
+	aOda->DeathMotion();
 }
