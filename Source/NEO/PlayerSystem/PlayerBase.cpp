@@ -109,7 +109,7 @@ void APlayerBase::Tick(float DeltaTime)
 	// アニメーションに合わせて移動
 	if (EnableRootMotion && !ActionAssistComp->WallCheck(10.f))
 	{
-		RootMotion(AnimationMoveValue);
+		//RootMotion(AnimationMoveValue);
 	}
 }
 
