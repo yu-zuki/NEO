@@ -35,7 +35,7 @@ void APlayerSword::BeginPlay()
 	Super::BeginPlay();
 
 
-	AActor* pPlayer = UGameplayStatics::GetPlayerCharacter(this, 0);
+	ACharacter* pPlayer = UGameplayStatics::GetPlayerCharacter(this, 0);
 
 	SetupOwnerData(pPlayer, "Player", "hand_rSocket");
 }
@@ -151,7 +151,7 @@ void APlayerSword::SetCollision()
 						}
 						else if (ComboNum == 2)
 						{
-							Enemy->AddActorLocalOffset(FVector(-300.f, 0.f, 0.f));
+							Enemy->AddActorLocalOffset(FVector(-100.f, 0.f, 0.f));
 						}
 
 						Enemy->ActionAssistComp->HitStop(0.1f, HitStopTime);
