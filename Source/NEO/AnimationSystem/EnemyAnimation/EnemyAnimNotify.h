@@ -15,7 +15,8 @@ enum class EEnemyNotifyType :uint8
 	NotifyType3 UMETA(DisplayName = "SpawnTrajectoryBullet"),
 	NotifyType4 UMETA(DisplayName = "SpawnBullet"),
 	NotifyType5 UMETA(DisplayName = "SpawnRock"),
-	NotifyType6 UMETA(DisplayName = "DetachRock")
+	NotifyType6 UMETA(DisplayName = "DetachRock"),
+	NotifyType7 UMETA(DisplayName = "SpawnWepon")
 };
 
 UCLASS()

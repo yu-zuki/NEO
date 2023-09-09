@@ -12,6 +12,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/BoxComponent.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Engine/World.h" 
 #include "Camera/CameraComponent.h"
 #include "NEO/GameSystem/EnemyBase_WidgetComponent.h"
 #include "NEO/PlayerSystem/ActionAssistComponent.h"
@@ -41,6 +42,7 @@ AEnamyBase::AEnamyBase()
 	bHasPattern1Tag = Tags.Contains("pattern1");
 	bHasPattern2Tag = Tags.Contains("pattern2");
 	bHasPattern3Tag = Tags.Contains("pattern3");
+	bHasWeponTag = Tags.Contains("HasWepon");
 
 	MoveSpline = CreateDefaultSubobject<USplineComponent>(TEXT("MoveSpline"));
 	MoveSpline->SetupAttachment(RootComponent);
@@ -281,7 +283,10 @@ void AEnamyBase::CheckCollisonOff()
 
 	}
 }
-
+void AEnamyBase::SpawnSword()
+{
+	
+}
 
 
 void AEnamyBase::ApplyDamage(float DamageAmount)
@@ -304,6 +309,7 @@ void AEnamyBase::ApplyDamage(float DamageAmount)
 		GetCharacterMovement()->AddForce(ForceDirection * ForceStrength);
 		GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 		GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldStatic, ECollisionResponse::ECR_Block);
+
 
 	}
 	else
@@ -336,7 +342,20 @@ void AEnamyBase::MaintainDistanceFromEnemy()
 }
 void AEnamyBase::AfterDeath()
 {
+	FVector SpawnLocation = GetActorLocation();
+	FRotator SpawnRotation = GetActorRotation();
+
+	// ここでnullチェックを入れる
+	if (GetWorld())
+	{
+		if (bHasWeponTag)
+		{
+			AActor* SpawnedEnemySword = GetWorld()->SpawnActor<AActor>(EnemySwordClass, SpawnLocation, SpawnRotation);
+
+		}
+	}
 	DestoryEnemy();
+	
 }
 
 void AEnamyBase::DamageReac()

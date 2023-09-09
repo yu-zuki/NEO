@@ -45,6 +45,11 @@ void UEnemyAnimNotify::NotifyAction(AActor* _Owner, UAnimSequenceBase* Animation
             pPusher->DetachRolling();
         
         }
+        else if (NotifyType == EEnemyNotifyType::NotifyType7)
+        {
+            pEnemy->SpawnSword();
+
+        }
     }
 }
 
