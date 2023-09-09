@@ -843,13 +843,11 @@ void APlayerBase::ContinuationCombo()
  */
 void APlayerBase::ResetCombo()
 {
-	// フラグリセット
-	IsAttacking = false;
-	CanCombo = false;
-	IsControl = true;
+	// 攻撃中のフラグをすべてリセット
+	ResetAllAttackFlags();
 
-	// コンボリセット
-	ComboIndex = 0;
+	// コントロール可能状態へ
+	IsControl = true;
 }
 
 

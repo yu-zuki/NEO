@@ -39,7 +39,7 @@ void UPlayerAnimNotifyState::NotifyBeginAction(AActor* _Owner, UAnimSequenceBase
         }
         else if (NotifyType == EPlayerNotifyStateType::NotifyType_RootMotion_KnockBack)
         {
-            pPlayer->SetEnableRootMotion(true, -5.f);
+            pPlayer->SetEnableRootMotion(true, -2.f);
         }
 
     }

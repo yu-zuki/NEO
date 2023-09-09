@@ -73,11 +73,11 @@ void UActionAssistComponent::CorrectAttackAngle()
 		float CorrectAngle = direction.Rotation().Yaw;
 
 		// Å‘å•â³Šp“x‚ğ’´‚¦‚Ä‚¢‚½‚ç’l‚ğ•â³
-		if ( (0.f < CorrectAngle && CorrectAngle < CurrentRotation.Yaw - MaxCorrectAngle) || (-180.f < CorrectAngle && CorrectAngle < CurrentRotation.Yaw - MaxCorrectAngle))
+		if ( (0.f < CorrectAngle && CorrectAngle < DIRECTION_Y - MaxCorrectAngle) || (-180.f < CorrectAngle && CorrectAngle < DIRECTION_Y - MaxCorrectAngle))
 		{
-			CorrectAngle = DIRECTION_Y - MaxCorrectAngle;
+			CorrectAngle = -DIRECTION_Y - MaxCorrectAngle;
 		}
-		else if ( (180.f > CorrectAngle && CorrectAngle > CurrentRotation.Yaw + MaxCorrectAngle) || (0.f > CorrectAngle && CorrectAngle > CurrentRotation.Yaw + MaxCorrectAngle))
+		else if ( (180.f > CorrectAngle && CorrectAngle > -DIRECTION_Y + MaxCorrectAngle) || (0.f > CorrectAngle && CorrectAngle > -DIRECTION_Y + MaxCorrectAngle))
 		{
 			CorrectAngle = DIRECTION_Y + MaxCorrectAngle;
 		}
