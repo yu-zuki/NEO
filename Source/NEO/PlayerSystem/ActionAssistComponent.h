@@ -79,6 +79,10 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Action Assist")
 		float RayLength_CorrectAngle;
 
+	// 攻撃の角度補正の最大角度
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Action Assist")
+		float MaxCorrectAngle;
+
 private:
 
 	// タイマーハンドル

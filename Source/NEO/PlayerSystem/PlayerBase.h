@@ -3,11 +3,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Character.h"
 #include "InputActionValue.h"
-#include "NEO/GameSystem/InputCharacter.h"
-#include <unordered_map>
 #include <type_traits>
+#include "NEO/GameSystem/InputCharacter.h"
+#include "NEO/WeaponSystem/WeaponBase.h"
 #include "ActionAssistComponent.h"
 #include <Runtime/Engine/Classes/Components/CapsuleComponent.h>
 
@@ -61,7 +60,7 @@ public:
 		float HP = 100;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		float MaxHP = 100;
+		float MaxHP = HP;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		int WeaponDropLimit = 2;
@@ -74,6 +73,12 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		float DamageAmount = 10.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		float InvincibilityTime_Short = 0.3f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		float InvincibilityTime_Long = 0.5f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		float ComboDamageFactor = 1.f;
@@ -105,6 +110,10 @@ struct FPlayerAnimation
 	// 空中にいるときの攻撃
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Animation")
 		UAnimMontage* AirAttack = nullptr;
+
+	// 空中にいるときの攻撃
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Animation")
+		UAnimMontage* ChargeAttack = nullptr;
 
 	// 被ダメージ
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Animation")
@@ -143,14 +152,20 @@ protected:
 	virtual void JumpStart();
 	virtual void Jump();
 
-	// 攻撃
-	virtual void Attack(int _attackNum = 0);
+	// コンボ攻撃
+	virtual void ComboAttack(int _attackNum = 0);
+
+	// チャージ攻撃
+	void Attack_Start();
 
 	// 一つ目のコンボ
-	virtual void Combo1();
+	virtual void Attack1();
 
 	// 二つ目のコンボ
-	virtual void Combo2();
+	virtual void Attack2();
+
+	// チャージ攻撃
+	virtual void ChargeAttack();
 	//-------------------------------------------------------------------
 
 
@@ -169,7 +184,7 @@ public:
 	virtual void SetCollision() { return; }
 
 	// アクションアシストコンポーネントを取得
-	class UActionAssistComponent* GetActionAssistComponent()const { return ActionAssistComp; }
+	UActionAssistComponent* GetActionAssistComponent()const { return ActionAssistComp; }
 
 	// ヒットストップ
 	void HitStop(float _speedDuringHitStop, float _stopTime) { ActionAssistComp->HitStop(_speedDuringHitStop,_stopTime); }
@@ -221,8 +236,14 @@ private:
 	// キャラクターの移動量取得
 	void AmountOfMovement(FVector _nowPos);
 
+	// 無敵解除
+	void InvincibilityRelease() { IsInvincibility = false; }
+
 	// 死亡処理呼び出し
 	void CallGameModeFunc_DestroyPlayer();
+
+	// 攻撃に関するフラグをすべてリセット
+	void ResetAllAttackFlags();
 
 	// スプライン検索
 	AActor* GetSplineActor(const FName _tag);
@@ -247,7 +268,8 @@ protected:
 
 	// プレイヤーのステータス初期化
 	void SetupPlayerStatus(float _hp = 100.f, int _remainingLife = 3.f, float _damageAmount = 10.f,
-							float _jumpHeight = 150.f, float _comboDamageFactor = 1.f, float _walkSpeed = 10.f, float _runSpeed = 30.f);
+							float _invincibilityTime_Short = 0.3f, float _invincibilityTime_Long = 0.5f,
+							float _jumpHeight = 150.f,float _comboDamageFactor = 1.f, float _walkSpeed = 10.f, float _runSpeed = 30.f);
 
 	// ボタンの設定
 	void SetupMainActionMapping();
@@ -258,32 +280,6 @@ protected:
 
 	// 指定したパスのアニメーションアセットを返す
 	UAnimMontage* GetAnimationAsset(TCHAR* _animAssetPath);
-
-	// ---------コリジョンコンポーネント作成テンプレート
-	/*
-	 * 関数名　　　　：SetupCollisionComponent()
-	 * 処理内容　　　：武器のコリジョンセットアップ
-	 * 引数１　　　　：T* CollisionComp・・・・・・・・・コリジョンコンポーネント(「T」は UBoxComponent,USphereComponent,UCapsuleComponent のいずれか)
-	 * 引数２　　　　：FName PublicName・・・・・・・・・エディタでの公開名
-	 * 戻り値　　　　：なし
-	 */
-	template<class T>
-	void SetupCollisionComponent(T*& CollisionComp, FName PublicName = "CollisionComp")
-	{
-		static_assert(std::is_same<T, UBoxComponent>::value || std::is_same<T, USphereComponent>::value || std::is_same<T, UCapsuleComponent>::value,
-			"「T」は UBoxComponent,USphereComponent,UCapsuleComponent のいずれか ");
-
-		// 対応するオブジェクト生成
-		CollisionComp = CreateDefaultSubobject<T>(PublicName);
-
-		if (CollisionComp)
-		{
-			// 武器のメッシュに追従
-			CollisionComp->SetupAttachment(GetMesh(), "hand_rSocket");
-		}
-	}
-	//---------------------------------------------------------------------------------------------------------------------------------------------------
-
 
 	//-----------------プレイヤー管理用変数------------------------------------------------------------------
 private:
@@ -302,9 +298,13 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		FPlayerAnimation PlayerAnimation;
 
+	// 現在所持している武器を判別するEnum
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "WeaponType")
+		EWeaponType WeaponType;
+
 	// プレイヤーの武器
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Battle", meta = (AllowPrivateAccess = "true"))
-		TSubclassOf<class AWeaponBase> WeaponClass;
+		TSubclassOf<AWeaponBase> WeaponClass;
 
 	//-------------------------------------------------------------------------------------------------------------
 
@@ -312,7 +312,7 @@ protected:
 	//-----------------コンポーネント変数--------------------------------------------------------------------------
 	// 攻撃のアシスト用
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Action Assist", meta = (AllowPrivateAccess = "true"))
-		class UActionAssistComponent* ActionAssistComp;
+		UActionAssistComponent* ActionAssistComp;
 
 	// 被ダメージ時のエフェクト
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Effect", meta = (AllowPrivateAccess = "true"))
@@ -361,11 +361,20 @@ private:
 	// ルートモーションでの移動値
 	float AnimationMoveValue;
 
+	// 溜めているかどうか
+	bool IsCharging;
+
+	// 溜め攻撃のための長押し時間
+	const float ChargeTime = 0.5f;
+
 	// 武器を持っているかどうか
 	bool IsHoldWeapon;
 
 	// 死んでいるかどうか
 	bool IsDeath;
+
+	// 無敵状態かどうか
+	bool IsInvincibility;
 
 	// フレームカウント用
 	float frames;	
@@ -386,13 +395,16 @@ private:
 	bool CanCombo;							
 
 	// 何段目のコンボか
-	int ComboIndex;							
+	int ComboIndex;		
 
 	// コンボの段数(First,Second,Third・・・)
 	TArray<FName> ComboStartSectionNames;	
 
+	// チャージ開始時間
+	FDateTime ChargeStartTime;
+
 	// ハンドル
-	FTimerHandle TimerHandle_DeathToGameOver;		
+	FTimerHandle TimerHandle;		
 
 	// プレイヤーが通るスプライン
 	class APlayerSpline* SplineActor;		
@@ -401,5 +413,4 @@ private:
 	class ATGS_GameMode* pGameMode;
 
 	class UTGS_GameInstance* GetGameInstance();
-
 };

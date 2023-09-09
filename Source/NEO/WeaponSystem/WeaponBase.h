@@ -31,6 +31,18 @@ public:
 };
 //----------------------------------------------------------------------------------------
 
+
+//-----------------武器の種類-------------------------------------------------------------
+UENUM(BlueprintType)
+enum class EWeaponType :uint8
+{
+	WeaponType_Sword   UMETA(DisplayName = "Sword"),
+	WeaponType_Lance   UMETA(DisplayName = "Lance"),
+	WeaponType_Gun     UMETA(DisplayName = "Gun"),
+};
+//----------------------------------------------------------------------------------------
+
+
 UCLASS()
 class NEO_API AWeaponBase : public AActor
 {
@@ -87,6 +99,17 @@ public:
 	// ダメージを与える処理(オーバーライド用)
 	virtual void SetCollision() { return; }
 
+	// 持たれている状態か
+	UFUNCTION(BlueprintCallable, Category = "State")
+		bool GetIsHeld()const { return IsHeld;}
+
+	// 飛んでいる状態か
+	UFUNCTION(BlueprintCallable, Category = "State")
+		bool GetIsFalling()const { return IsFalling; }
+
+	// 武器の種類判別用
+	EWeaponType GetWeaponType()const { return WeaponType; }
+
 
 
 protected:
@@ -96,9 +119,6 @@ protected:
 
 	// 外れた時吹っ飛ぶ
 	void BlowsAway();
-
-	UFUNCTION(BlueprintCallable, Category = "Hold")
-		bool GetIsHeld()const { return IsHeld;}
 
 
 
@@ -110,16 +130,29 @@ protected:
 	// 武器のメッシュ
 	class UStaticMeshComponent* WeaponStaticMesh;
 
-	class UActionAssistComponent* ActionAssistComp;
+	// 武器を判別するEnum
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "WeaponType")
+		EWeaponType WeaponType;
+
 
 private:
 
 	// プレイヤーに持たれているかのフラグ
 	bool IsHeld;
 
+	// 飛んでいるかどうか
+	bool IsFalling;
+
+	// フレームカウント用
+	float frames;
+
+	// ジャンプの計算
+	const float radPerFrame = 3.14f / 30.f;
+
+	// 飛ぶ前の位置
+	FVector FlyBeforePos;
 
 	// 被ダメージ時のエフェクト
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Effect", meta = (AllowPrivateAccess = "true"))
 		class UNiagaraSystem* AuraEffect;
-
 };

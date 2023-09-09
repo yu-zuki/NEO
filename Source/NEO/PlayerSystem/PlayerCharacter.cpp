@@ -1,11 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "PlayerCharacter.h"
-#include "NEO/Enemy/EnamyBase.h"
-#include "../OdaBase.h"
-#include "NEO/BackGroundSystem/ObjectBase.h"
-#include "ActionAssistComponent.h"
-#include "NEO/WeaponSystem/WeaponBase.h"
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -93,6 +88,13 @@ void APlayerCharacter::SetupAnimationAsset()
 	}
 
 	{
+		// 空中での攻撃アニメーション
+		TCHAR* AirAttackAnimationAssetPath = TEXT("/Game/0122/Player/Animation/Montage/ChargeAttack_Montage");
+
+		PlayerAnimation.ChargeAttack = GetAnimationAsset(AirAttackAnimationAssetPath);
+	}
+
+	{
 		// 被ダメージアニメーションのパス保管用
 		TCHAR* DamageAnimationAssetPath = TEXT("/Game/0122/Player/Animation/Montage/Damaged_Montage");
 
@@ -122,80 +124,7 @@ void APlayerCharacter::SetupAnimationAsset()
  */
 void APlayerCharacter::SetCollision()
 {
-	//// 自身に当たらないようにする
-	//FCollisionQueryParams CollisionParams;
-	//CollisionParams.AddIgnoredActor(this);
-
-	//TArray<FHitResult> HitResults;
-
-	//// 当たり判定を取る範囲
-	//FVector Start = WeaponCollision->GetComponentLocation();
-	//FVector End = Start;
-	//FQuat Rot = WeaponCollision->GetComponentQuat();
-	//FCollisionShape CollisionShape = FCollisionShape::MakeCapsule(WeaponCollision->GetScaledCapsuleRadius(), WeaponCollision->GetScaledCapsuleHalfHeight());
-
-	//// あたっているか確認
-	//bool isHit = GetWorld()->SweepMultiByChannel(HitResults, Start, End, Rot, ECollisionChannel::ECC_GameTraceChannel1, CollisionShape, CollisionParams);
-
-	//if (isHit)
-	//{
-	//	// 当たったオブジェクトの数だけ繰り返し
-	//	for (const FHitResult HitResult : HitResults)
-	//	{
-	//		// 当たったキャラクターを格納
-	//		AActor* tempActor = HitResult.GetActor();
-
-	//		// 先にオブジェクトに当たったら処理しない
-	//		if (tempActor && tempActor->ActorHasTag("Object"))
-	//		{
-	//			AObjectBase* Object = Cast<AObjectBase>(HitResult.GetActor());
-
-	//			if (Object)
-	//			{
-	//				Object->ReceiveDamage(GetDamageAmount());
-
-	//			}
-	//			break; 
-	//		}
-
-	//		// ヒットしたアクターが"Enemy"タグを持っていたら
-	//		if (tempActor && tempActor->ActorHasTag("Enemy"))
-	//		{
-
-	//			// エネミーのdamage処理
-	//			AEnamyBase* Enemy = Cast<AEnamyBase>(HitResult.GetActor());
-	//			AOdaBase* Oda = Cast<AOdaBase>(HitResult.GetActor());
-
-	//			if (Enemy)
-	//			{
-	//				// ヒットストップ
-	//				ActionAssistComp->HitStop(HitStopTime);
-	//				Enemy->ApplyDamage(GetDamageAmount());
-	//				
-	//			}
-	//			else if (Oda) 
-	//			{
-	//				// ヒットストップ
-	//				ActionAssistComp->HitStop(HitStopTime);
-	//				Oda->ApplyDamage(GetDamageAmount());
-
-	//				if (GetComboIndex() == 2)
-	//				{
-	//					Oda->BossKnockback();
-	//				}
-
-	//			}
-
-	//			// コンボのフィニッシュのみカメラを揺らす
-	//			if (GetComboIndex() == 2)
-	//			{
-	//				ActionAssistComp->CameraShake(ShakePattern);
-
-	//			}
-	//		}
-	//	}
-	//}
-
+	// 武器を持っているとき当たり判定をつける
 	if (Weapon)
 	{
 		Weapon->SetCollision();

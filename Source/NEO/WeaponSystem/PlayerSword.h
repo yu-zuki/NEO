@@ -31,6 +31,9 @@ private:
 
 private:
 
+	// アクションアシストコンポーネント
+	class UActionAssistComponent* ActionAssistComp;
+
 	// 被ダメージ時のエフェクト
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Effect", meta = (AllowPrivateAccess = "true"))
 		class UNiagaraSystem* HitEffect;

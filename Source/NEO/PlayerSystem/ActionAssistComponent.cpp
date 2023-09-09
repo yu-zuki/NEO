@@ -5,14 +5,12 @@
 #include "GameFramework/Character.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/GameplayStatics.h"
-#include "NEO/PlayerSystem/CharacterCamera.h"
 #include "Camera/CameraComponent.h"
-#include "NEO/GameSystem/TGS_GameMode.h"
 #include "Camera/PlayerCameraManager.h"
-#include "GameFramework/CharacterMovementComponent.h"
-#include <Runtime/Engine/Classes/Components/CapsuleComponent.h>
 #include "NiagaraComponent.h"									
 #include "NiagaraFunctionLibrary.h"		
+#include "NEO/PlayerSystem/CharacterCamera.h"
+#include "NEO/GameSystem/TGS_GameMode.h"
 
 #define DIRECTION_Y (90.f)
 
@@ -27,6 +25,7 @@ UActionAssistComponent::UActionAssistComponent()
 	PrimaryComponentTick.bCanEverTick = false;
 
 	RayLength_CorrectAngle = 300.f;
+	MaxCorrectAngle = 10.f;
 }
 
 
@@ -55,21 +54,37 @@ void UActionAssistComponent::CorrectAttackAngle()
 	// 機能のオン・オフ
 	if (!bUseCorrectAttackAngle) { return; }
 
+	// オーナー取得
+	AActor* Owner = GetOwner();
+
 	//　前方にいるエネミー取得
 	AActor* InFrontOfEnemy = GetFrontActor();
 
-	if (InFrontOfEnemy)
+	if (Owner && InFrontOfEnemy)
 	{
 		// プレイヤーと敵の方向を取得する
-		FVector direction = InFrontOfEnemy->GetActorLocation() - GetOwner()->GetActorLocation();
+		FVector direction = InFrontOfEnemy->GetActorLocation() - Owner->GetActorLocation();
 		direction.Normalize();
 
 		// プレイヤーの向きを取得する
-		FRotator CurrentRotation = GetOwner()->GetActorRotation();
+		FRotator CurrentRotation = Owner->GetActorRotation();
+
+		// 補正角度取得
+		float CorrectAngle = direction.Rotation().Yaw;
+
+		// 最大補正角度を超えていたら値を補正
+		if ( (0.f < CorrectAngle && CorrectAngle < CurrentRotation.Yaw - MaxCorrectAngle) || (-180.f < CorrectAngle && CorrectAngle < CurrentRotation.Yaw - MaxCorrectAngle))
+		{
+			CorrectAngle = DIRECTION_Y - MaxCorrectAngle;
+		}
+		else if ( (180.f > CorrectAngle && CorrectAngle > CurrentRotation.Yaw + MaxCorrectAngle) || (0.f > CorrectAngle && CorrectAngle > CurrentRotation.Yaw + MaxCorrectAngle))
+		{
+			CorrectAngle = DIRECTION_Y + MaxCorrectAngle;
+		}
 
 		// プレイヤーの向きを変更する
-		FRotator NewRotation(CurrentRotation.Pitch, direction.Rotation().Yaw, CurrentRotation.Roll);
-		GetOwner()->SetActorRotation(NewRotation);
+		FRotator NewRotation(CurrentRotation.Pitch, CorrectAngle, CurrentRotation.Roll);
+		Owner->SetActorRotation(NewRotation);
 	}
 }
 
@@ -305,13 +320,10 @@ void UActionAssistComponent::OwnerParallelToCamera(bool _lookRight)
 // 壁とのレイキャストを行う関数
 bool UActionAssistComponent::WallCheck(float _lineLength)
 {
+	// オーナー取得
+	AActor* pOwner = GetOwner();
 
-	ACharacter* pOwner = Cast<ACharacter>(GetOwner());
 	if (!pOwner) { return false; }
-
-	// カプセルコンポーネントを取得する
-	UCapsuleComponent* Capsule = pOwner->GetCapsuleComponent();
-
 
 	// レイキャストを実行する際のパラメータを設定する
 	// レイキャストの開始位置はキャラクターの現在位置
@@ -329,22 +341,16 @@ bool UActionAssistComponent::WallCheck(float _lineLength)
 	//UE_LOG(LogTemp, Warning, TEXT("StartLocation : %f"), StartLocation.Z);
 	//UE_LOG(LogTemp, Warning, TEXT("EndLocation : %f"), EndLocation.Z);
 
-	FCollisionQueryParams TraceParams(FName(TEXT("GroundTrace")), true, GetOwner());
-	// レイキャストの命中判定は簡易的に行う
-	TraceParams.bTraceComplex = false;
-	// 物理マテリアルの情報は不要
-	TraceParams.bReturnPhysicalMaterial = false;
 
-
-	// カプセルの大きさを取得する
-	FCollisionShape CapsuleShape = FCollisionShape::MakeCapsule
-	(Capsule->GetScaledCapsuleRadius(), Capsule->GetScaledCapsuleHalfHeight());
+	FCollisionQueryParams CollisionParams;
+	// オーナー自身は除外
+	CollisionParams.AddIgnoredActor(pOwner);
 
 	FHitResult HitResult;
+
 	// レイトレースを行う
-	bool bHit = GetWorld()->SweepSingleByChannel(HitResult, start, end, FQuat::Identity, ECC_Visibility, CapsuleShape, TraceParams);
+	bool IsHit = GetWorld()->LineTraceSingleByChannel(HitResult, start, end, ECC_WorldStatic, CollisionParams);
 
 
-
-	return bHit;
+	return IsHit;
 }

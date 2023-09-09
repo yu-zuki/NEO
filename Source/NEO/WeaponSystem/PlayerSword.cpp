@@ -27,6 +27,11 @@ APlayerSword::APlayerSword()
 	// コリジョン設定
 	SetupCollisionComponent(WeaponCollision);
 
+	// 武器の種類を刀に設定
+	WeaponType = EWeaponType::WeaponType_Sword;
+
+	// アタックアシストコンポーネント作成
+	ActionAssistComp = CreateDefaultSubobject<UActionAssistComponent>(TEXT("AttackAssist"));
 }
 
 // Called when the game starts or when spawned
@@ -46,6 +51,7 @@ void APlayerSword::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 }
+
 
 /*
  * 関数名　　　　：SetCollision()
@@ -178,3 +184,4 @@ void APlayerSword::SetCollision()
 		}
 	}
 }
+

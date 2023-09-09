@@ -2,26 +2,18 @@
 
 
 #include "PlayerBase.h"
-#include "Camera/CameraComponent.h"
-#include "GameFramework/SpringArmComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "Kismet/GameplayStatics.h"
+#include "Misc/DateTime.h"
 #include "Components/InputComponent.h"
+#include "InputMappingContext.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
-#include "InputMappingContext.h"
-#include "Engine/StreamableManager.h"
-#include "Engine/World.h"
-#include "Engine/AssetManager.h"
-#include "Async/Async.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "NEO/GameSystem/TGS_GameMode.h"
-#include "Components/WidgetComponent.h"
 #include "NEO/GameSystem/TGS_GameInstance.h"
 #include "PlayerSpline.h"
-#include "NiagaraComponent.h"
-#include "ActionAssistComponent.h"
-#include "NEO/WeaponSystem/WeaponBase.h"
 
 
 // Sets default values
@@ -30,8 +22,10 @@ APlayerBase::APlayerBase()
 	, IsRunning(false)
 	, IsLookRight(true)
 	, IsJumping(false)
+	, IsCharging(false)
 	, IsHoldWeapon(true)
 	, IsDeath(false)
+	, IsInvincibility(false)
 	, frames(0.f)
 	, IsAttacking(false)
 	, CanCombo(false)
@@ -89,7 +83,7 @@ void APlayerBase::BeginPlay()
 		if (Weapon)
 		{
 			Weapon->AttachToHand(this, "hand_rSocket");
-
+			WeaponType = Weapon->GetWeaponType();
 		}
 	}
 }
@@ -109,7 +103,7 @@ void APlayerBase::Tick(float DeltaTime)
 	// アニメーションに合わせて移動
 	if (EnableRootMotion && !ActionAssistComp->WallCheck(10.f))
 	{
-		//RootMotion(AnimationMoveValue);
+		RootMotion(AnimationMoveValue);
 	}
 }
 
@@ -131,9 +125,18 @@ void APlayerBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 		// ジャンプ
 		EnhancedInputComponent->BindAction(MainActionMapping.JumpAction, ETriggerEvent::Started, this, &APlayerBase::JumpStart);
 
-		// コンボアクション
-		EnhancedInputComponent->BindAction(MainActionMapping.ComboAction1, ETriggerEvent::Started, this, &APlayerBase::Combo1);
-		EnhancedInputComponent->BindAction(MainActionMapping.ComboAction2, ETriggerEvent::Started, this, &APlayerBase::Combo2);
+		// 攻撃アクション
+		EnhancedInputComponent->BindAction(MainActionMapping.ComboAction1, ETriggerEvent::Started, this, &APlayerBase::Attack_Start);
+		EnhancedInputComponent->BindAction(MainActionMapping.ComboAction2, ETriggerEvent::Started, this, &APlayerBase::Attack_Start);
+
+		// チャージ終了
+		EnhancedInputComponent->BindAction(MainActionMapping.ComboAction1, ETriggerEvent::Completed, this, &APlayerBase::Attack1);
+		EnhancedInputComponent->BindAction(MainActionMapping.ComboAction2, ETriggerEvent::Completed, this, &APlayerBase::Attack2);
+
+		
+		// チャージ判定用
+		//EnhancedInputComponent->BindAction(MainActionMapping.ComboAction1, ETriggerEvent::Completed, this, &APlayerBase::ChargeAttack_End);
+		//EnhancedInputComponent->BindAction(MainActionMapping.ComboAction2, ETriggerEvent::Completed, this, &APlayerBase::ChargeAttack_End);
 	}
 }
 
@@ -171,22 +174,27 @@ void APlayerBase::SetupPlayerData()
 /*
  * 関数名　　　　：SetupPlayerStatus()
  * 処理内容　　　：プレイヤーのステータス初期化
- * 引数１　　　　：float _hp・・・・・・・・・HPの初期値
- * 引数２		 ：int _remainingLife ・・・・復活回数
- * 引数３　　　　：float _damageAmount・・・・攻撃力の初期値
- * 引数４　　　　：float _jumpHeight・・・・・ジャンプ力の初期値
- * 引数５　　　　：float _comboDamageFactor・コンボごとのダメージの倍率
- * 引数６　　　　：float _walkSpeed・・・・・歩く速度
- * 引数７　　　　：float _runSpeed ・・・・・走る速度
+ * 引数１　　　　：float _hp・・・・・・・・・・・・・・HPの初期値
+ * 引数２		 ：int _remainingLife ・・・・・・・・・復活回数
+ * 引数３　　　　：float _damageAmount・・・・・・・・・攻撃力の初期値
+ * 引数４		 ：float _invincibilityTime_Short ・・・短い無敵時間
+ * 引数５        ：float _invincibilityTime_Long  ・・・長い無敵時間
+ * 引数６　　　　：float _jumpHeight・・・・・・・・・・ジャンプ力の初期値
+ * 引数７　　　　：float _comboDamageFactor ・・・・・・コンボごとのダメージの倍率
+ * 引数８　　　　：float _walkSpeed ・・・・・・・・・・歩く速度
+ * 引数９　　　　：float _runSpeed  ・・・・・・・・・・走る速度
  * 戻り値　　　　：なし
  */
 void APlayerBase::SetupPlayerStatus(float _hp /*= 100.f*/, int _remainingLife /*= 3.f*/, float _damageAmount /*= 10.f*/,
+									float _invincibilityTime_Short /*= 0.3f*/, float _invincibilityTime_Long /*= 0.5f*/,
 									float _jumpHeight /*= 150.f*/, float _comboDamageFactor /*= 1.f*/, float _walkSpeed /*= 100.f*/, float _runSpeed /*= 300.f*/)
 {
 	PlayerStatus.HP = _hp;
 	PlayerStatus.MaxHP = _hp;
 	PlayerStatus.RemainingLife = _remainingLife;
 	PlayerStatus.DamageAmount = _damageAmount;
+	PlayerStatus.InvincibilityTime_Short = _invincibilityTime_Short;
+	PlayerStatus.InvincibilityTime_Long = _invincibilityTime_Long;
 	PlayerStatus.JumpHeight = _jumpHeight;
 	PlayerStatus.ComboDamageFactor = _comboDamageFactor;
 	PlayerStatus.WalkSpeed = _walkSpeed;
@@ -462,7 +470,7 @@ bool APlayerBase::IsPlayerGrounded() const
 void APlayerBase::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	// オーバーラップした際に実行したいイベント
-	if (OtherActor && (OtherActor != this) && OtherComp)
+	if (OtherActor && (OtherActor != this))
 	{
 		// 当たったのがプレイヤーの時装備させる
 		if (OtherActor->ActorHasTag("Weapon") && !IsHoldWeapon)
@@ -470,27 +478,36 @@ void APlayerBase::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Ot
 			// 新しい武器を作成
 			AWeaponBase* NewWeapon = Cast<AWeaponBase>(OtherActor);
 
-			if (Weapon != NewWeapon)
+			// 武器が空中にいる状態では取れない
+			if (!NewWeapon->GetIsFalling())
 			{
+				// 持っている武器を更新
 				Weapon = NewWeapon;
+
+				// 武器の種類判別
+				WeaponType = Weapon->GetWeaponType();
+
+				// プレイヤーに装備させる
+				Weapon->AttachToHand(this, "hand_rSocket");
+
+				// 武器を落とすまでの回数をリセット
+				PlayerStatus.WeaponDropLimit = PlayerStatus.DefaultWeaponDropLimit;
+
+				// 武器を持っている状態に
+				IsHoldWeapon = true;
 			}
-
-			// プレイヤーに装備させる
-			Weapon->AttachToHand(this, "hand_rSocket");
-
-			IsHoldWeapon = true;
 		}
 	}
 }
 
 
 /*
- * 関数名　　　　：Attack()
+ * 関数名　　　　：ComboAttack()
  * 処理内容　　　：プレイヤーの攻撃処理
  * 引数１　　　　：int _attackNum・・・攻撃アニメーションの種類判別用
  * 戻り値　　　　：なし
  */
-void APlayerBase::Attack(int _attackNum /*= 0*/)
+void APlayerBase::ComboAttack(int _attackNum /*= 0*/)
 {
 	// コントロール不能へ
 	IsControl = false;
@@ -531,33 +548,89 @@ void APlayerBase::Attack(int _attackNum /*= 0*/)
 
 
 /*
- * 関数名　　　　：Combo1()
- * 処理内容　　　：プレイヤーの入力受付(攻撃１つ目)
+ * 関数名　　　　：Attack_Start()
+ * 処理内容　　　：プレイヤーの入力受付(溜め攻撃)
  * 戻り値　　　　：なし
  */
-void APlayerBase::Combo1()
+void APlayerBase::Attack_Start()
 {
 	// 攻撃可能か
 	if (!IsControl || !IsHoldWeapon) { return; }
 
-	// 攻撃
-	Attack(0);
+	ChargeStartTime = UKismetMathLibrary::Now();
+
+	IsControl = false;
+	IsCharging = true;
 }
 
 /*
- * 関数名　　　　：Combo2()
+ * 関数名　　　　：Attack1()
+ * 処理内容　　　：プレイヤーの入力受付(攻撃１つ目)
+ * 戻り値　　　　：なし
+ */
+void APlayerBase::Attack1()
+{
+	if (!IsCharging) { return; }
+
+	IsCharging = false;
+
+	FDateTime ChargeEndTime = UKismetMathLibrary::Now();
+
+	// 差分を計算          
+	FTimespan Span = ChargeEndTime - ChargeStartTime;
+
+	// ボタンを押している時間で攻撃変更
+	if (Span.GetSeconds() <= ChargeTime)
+	{
+		// コンボ攻撃
+		ComboAttack(0);
+	}
+	else
+	{
+		// 溜め攻撃
+		ChargeAttack();
+	}
+}
+
+/*
+ * 関数名　　　　：Attack2()
  * 処理内容　　　：プレイヤーの入力受付(攻撃２つ目)
  * 戻り値　　　　：なし
  */
-void APlayerBase::Combo2()
+void APlayerBase::Attack2()
 {
-	// 攻撃可能か
-	if (!IsControl || !IsHoldWeapon) { return; }
+	if (!IsCharging) { return; }
 
-	// 攻撃
-	Attack(1);
+	IsCharging = false;
+
+	FDateTime ChargeEndTime = UKismetMathLibrary::Now();
+
+	// 差分を計算          
+	FTimespan Span = ChargeEndTime - ChargeStartTime;
+
+	// ボタンを押している時間で攻撃変更
+	if (Span.GetSeconds() <= ChargeTime)
+	{
+		// コンボ攻撃
+		ComboAttack(1);
+	}
+	else
+	{
+		// 溜め攻撃
+		ChargeAttack();
+	}
 }
 
+
+/*
+ * 関数名　　　　：ChargeAttack()
+ * 処理内容　　　：溜め攻撃
+ * 戻り値　　　　：なし
+ */
+void APlayerBase::ChargeAttack()
+{
+	PlayAnimation(PlayerAnimation.ChargeAttack);
+}
 
 /*
  * 関数名　　　　：RotateCharacter()
@@ -613,7 +686,7 @@ void APlayerBase::SlowDownDeathAnimationRate()
 
 	// プレイヤーを削除
 	FTimerManager& TimerManager = GetWorld()->GetTimerManager();
-	TimerManager.SetTimer(TimerHandle_DeathToGameOver, this, &APlayerBase::CallGameModeFunc_DestroyPlayer, DeadToGameOverTime, false);
+	TimerManager.SetTimer(TimerHandle, this, &APlayerBase::CallGameModeFunc_DestroyPlayer, DeadToGameOverTime, false);
 }
 
 
@@ -650,7 +723,7 @@ void APlayerBase::RootMotion(float _distance)
 
 	//FVector newVector = ForwardVector + Vector;
 
-	//AddActorWorldOffset(newVector,false);
+	AddActorWorldOffset(Vector,false);
 }
 
 
@@ -692,6 +765,21 @@ void APlayerBase::CallGameModeFunc_DestroyPlayer()
 			gameMode->DestroyPlayer(this);
 		}
 	}
+}
+
+
+/*
+ * 関数名　　　　：ResetAllAttackFlags()
+ * 処理内容　　　：攻撃に関するフラグをすべてリセット
+ * 戻り値　　　　：なし
+ */void APlayerBase::ResetAllAttackFlags()
+{
+	// 攻撃中のフラグリセット
+	IsAttacking = false;
+	IsCharging = false;
+	CanCombo = false;
+	IsControl = false;
+	ComboIndex = 0;
 }
 
 
@@ -774,7 +862,7 @@ void APlayerBase::ResetCombo()
  */
 void APlayerBase::TakedDamage(float _damage, bool _isLastAttack /*= false*/)
 {
-	if (IsDeath) { return; }
+	if (IsDeath || IsInvincibility) { return; }
 
 	// 武器を持っていないときに攻撃を受けたら死亡
 	if (!IsHoldWeapon && !IsDeath)
@@ -797,17 +885,8 @@ void APlayerBase::TakedDamage(float _damage, bool _isLastAttack /*= false*/)
 	// 武器を持っているとき
 	else
 	{
-		// 攻撃中のフラグリセット
-		if (IsAttacking)
-		{
-			IsAttacking = false;
-			CanCombo = false;
-			IsControl = false;
-			ComboIndex = 0;
-		}
-
-		// ヒットエフェクト発生
-		ActionAssistComp->SpawnEffect(HitEffect, GetActorLocation());
+		// 攻撃中のフラグをすべてリセット
+		ResetAllAttackFlags();
 
 		// 敵のコンボが最終段だった時必ず武器を落とす
 		if (_isLastAttack)
@@ -815,29 +894,47 @@ void APlayerBase::TakedDamage(float _damage, bool _isLastAttack /*= false*/)
 			PlayerStatus.WeaponDropLimit = 0;
 		}
 
+		// 無敵解除時間格納用
+		float InvincibilityReleaseTime;
+
 		// 被ダメージアニメーション
 		if (PlayerStatus.WeaponDropLimit <= 0)
 		{
-			// ノックバックアニメーション再生
-			PlayAnimation(PlayerAnimation.KnockBack);
-
+			// 長い無敵時間を適用
+			InvincibilityReleaseTime = PlayerStatus.InvincibilityTime_Long;
 
 			// 武器を落とす
 			if (Weapon && IsHoldWeapon)
 			{
 				Weapon->DetachToHand();
+				Weapon = nullptr;
 				IsHoldWeapon = false;
-				PlayerStatus.WeaponDropLimit = PlayerStatus.DefaultWeaponDropLimit;
 			}
+
+			// ノックバックアニメーション再生
+			PlayAnimation(PlayerAnimation.KnockBack);
 		}
 		else
 		{
-			// のけぞりアニメーション再生
-			PlayAnimation(PlayerAnimation.TakeDamage);
+			// 短い無敵時間を適用
+			InvincibilityReleaseTime = PlayerStatus.InvincibilityTime_Long;
 
 			// 攻撃を受ける
 			--PlayerStatus.WeaponDropLimit;
+
+			// のけぞりアニメーション再生
+			PlayAnimation(PlayerAnimation.TakeDamage);			
 		}
+
+		// ヒットエフェクト発生
+		ActionAssistComp->SpawnEffect(HitEffect, GetActorLocation());
+
+		// 無敵開始
+		IsInvincibility = true;
+
+		// 任意の時間後無敵解除
+		FTimerManager& TimerManager = GetWorld()->GetTimerManager();
+		TimerManager.SetTimer(TimerHandle, this, &APlayerBase::InvincibilityRelease, InvincibilityReleaseTime, false);
 	}
 }
 

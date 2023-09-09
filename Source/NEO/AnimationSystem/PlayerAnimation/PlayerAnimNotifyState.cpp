@@ -9,6 +9,14 @@
 #include "NEO/PlayerSystem/PlayerBase.h"
 
 
+/*
+ * 関数名　　　　：NotifyAction()
+ * 処理内容　　　：通知時に行う処理
+ * 引数１　　　　：AActor* _Owner・・・オーナー
+ * 引数２　　　　：UAnimSequenceBase* Animation・・・再生するアニメーション
+ * 引数３　　　　：float TotalDuration・・・再生にかかる時間
+ * 戻り値　　　　：なし
+ */
 void UPlayerAnimNotifyState::NotifyBeginAction(AActor* _Owner, UAnimSequenceBase* Animation, float TotalDuration)
 {
     APlayerBase* pPlayer = Cast<APlayerBase>(_Owner);
@@ -37,6 +45,14 @@ void UPlayerAnimNotifyState::NotifyBeginAction(AActor* _Owner, UAnimSequenceBase
     }
 }
 
+
+/*
+ * 関数名　　　　：NotifyAction()
+ * 処理内容　　　：通知時に行う処理
+ * 引数１　　　　：AActor* _Owner・・・オーナー
+ * 引数２　　　　：UAnimSequenceBase* Animation・・・再生するアニメーション
+ * 戻り値　　　　：なし
+ */
 void UPlayerAnimNotifyState::NotifyEndAction(AActor* _Owner, UAnimSequenceBase* Animation)
 {
     APlayerBase* pPlayer = Cast<APlayerBase>(_Owner);

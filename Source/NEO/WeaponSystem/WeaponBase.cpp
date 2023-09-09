@@ -3,14 +3,12 @@
 
 #include "WeaponBase.h"
 #include "GameFramework/Character.h"
-#include "NEO/PlayerSystem/ActionAssistComponent.h"
 #include "NiagaraComponent.h"
-#include "NiagaraFunctionLibrary.h"
-#include "NEO/PlayerSystem/ActionAssistComponent.h"
 
 // Sets default values
 AWeaponBase::AWeaponBase()
 	: IsHeld(true)
+	, IsFalling(false)
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
@@ -18,9 +16,6 @@ AWeaponBase::AWeaponBase()
 
 	// タグ設定
 	Tags.Add("Weapon");
-
-	// アタックアシストコンポーネント作成
-	ActionAssistComp = CreateDefaultSubobject<UActionAssistComponent>(TEXT("AttackAssist"));
 }
 
 // Called when the game starts or when spawned
@@ -35,6 +30,10 @@ void AWeaponBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (IsFalling)
+	{
+		BlowsAway();
+	}
 }
 
 /*
@@ -72,6 +71,9 @@ void AWeaponBase::SetupWeaponMesh(UStaticMeshComponent*& MeshComp, TCHAR* Weapon
  */
 void AWeaponBase::AttachToHand(ACharacter* _owner, FName _socketName)
 {
+	// 飛んでいるときは取れない
+	if (IsFalling) { return; }
+
 	// 持たれている状態にする
 	IsHeld = true;
 
@@ -98,10 +100,17 @@ void AWeaponBase::DetachToHand()
 	// キャラクターから外す
 	DetachFromActor(FDetachmentTransformRules(EDetachmentRule::KeepWorld, EDetachmentRule::KeepWorld, EDetachmentRule::KeepWorld,false));
 
-	// 吹き飛ばす
-	BlowsAway();
-
+	// オーナーがいなくなる
 	OwnerInfo.pOwner = nullptr;
+
+	// 吹き飛ばすフラグを建てる
+	IsFalling = true;
+
+	// 飛ぶ前の場所設定
+	FlyBeforePos = GetActorLocation();
+
+	// Tick処理再開
+	PrimaryActorTick.bCanEverTick = true;
 }
 
 /*
@@ -130,6 +139,42 @@ void AWeaponBase::SetupOwnerData(ACharacter* _owner, FName _ownerTag, FName _soc
  */
 void AWeaponBase::BlowsAway()
 {
-	// 回転
-	SetActorRotation(FRotator(0.f, 0.f, -90.f));
+	// 現在位置
+	FVector NowPos = GetActorLocation();
+
+	// Sinで高さ更新
+	float SinValue = 150.f * FMath::Sin(radPerFrame * frames);
+
+	// ジャンプ前の高さから位置更新
+	const FVector nextPos(FVector(NowPos.X, NowPos.Y, SinValue + FlyBeforePos.Z));
+
+	SetActorLocation(nextPos);
+
+	// フレーム+1
+	frames += 1.f;
+
+	// 回転させる
+	FRotator NowRotation = GetActorRotation();
+
+	// 常に回転
+	SetActorRotation(FRotator(NowRotation.Pitch, NowRotation.Yaw, NowRotation.Roll + 10.0));
+
+	// 元の位置より低くなったら終了
+	if (NowPos.Z < FlyBeforePos.Z)
+	{
+		// 地面に刺さるように位置と角度を補正
+		SetActorLocation(FlyBeforePos);
+		SetActorRotation(FRotator(0.f, 0.f, -90.f));
+
+		// フレームリセット
+		frames = 0.f;
+
+		// Tick処理中断
+		PrimaryActorTick.bCanEverTick = false;
+
+		// 飛んでいる状態のフラグを下ろす
+		IsFalling = false;
+	}
 }
+
+

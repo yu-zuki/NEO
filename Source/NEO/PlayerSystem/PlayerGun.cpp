@@ -22,7 +22,7 @@
 APlayerGun::APlayerGun()
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
 	// キャラクターコンポーネント取得
 	CharacterMovementComp = GetCharacterMovement();
@@ -63,8 +63,6 @@ void APlayerGun::SetupPlayerData()
 	// セット
 	SetupWeaponMesh(WeaponSkeletalMesh, WeaponAssetPath, "WeaponMesh");
 
-	SetupCollisionComponent(WeaponCollision);
-
 	// アニメーションセットアップ
 	TCHAR* AnimationAssetPaths[2];
 
@@ -80,51 +78,51 @@ void APlayerGun::SetupPlayerData()
 	}
 }
 
-// 攻撃
-void APlayerGun::Attack(int AttackNum)
-{
-	//if (!IsAttacking)
-	//{
-	//	// 攻撃中フラグオン
-	//	IsAttacking = true;
-	//}
-	//else
-	//{
-	//	// コンボ可能な時,継続
-	//	if (CanCombo)
-	//	{
-	//		// ラストアタックまでコンボ継続
-	//		if (ComboStartSectionNames[ComboIndex] != ComboStartSectionNames.Last())
-	//		{
-	//			++ComboIndex;
-	//		}
-	//	}
-	//}
-
-	//// 攻撃のアニメーション再生
-	//PlayAnimation(ComboAnimMontages[AttackNum], ComboStartSectionNames[ComboIndex]);
-
-}
-
-// 攻撃
-void APlayerGun::Combo1()
-{
-	//// コントロール可能か
-	//if (!IsControl) { return; }
-
-	//// 攻撃
-	//Attack(0);
-
-}
-
-
-// 攻撃
-void APlayerGun::Combo2()
-{
-	//// コントロール可能か
-	//if (!IsControl) { return; }
-
-	//// 攻撃
-	//Attack(1);
-
-}
+//// 攻撃
+//void APlayerGun::ComboAttack(int AttackNum)
+//{
+//	//if (!IsAttacking)
+//	//{
+//	//	// 攻撃中フラグオン
+//	//	IsAttacking = true;
+//	//}
+//	//else
+//	//{
+//	//	// コンボ可能な時,継続
+//	//	if (CanCombo)
+//	//	{
+//	//		// ラストアタックまでコンボ継続
+//	//		if (ComboStartSectionNames[ComboIndex] != ComboStartSectionNames.Last())
+//	//		{
+//	//			++ComboIndex;
+//	//		}
+//	//	}
+//	//}
+//
+//	//// 攻撃のアニメーション再生
+//	//PlayAnimation(ComboAnimMontages[AttackNum], ComboStartSectionNames[ComboIndex]);
+//
+//}
+//
+//// 攻撃
+//void APlayerGun::Combo1()
+//{
+//	//// コントロール可能か
+//	//if (!IsControl) { return; }
+//
+//	//// 攻撃
+//	//Attack(0);
+//
+//}
+//
+//
+//// 攻撃
+//void APlayerGun::Combo2()
+//{
+//	//// コントロール可能か
+//	//if (!IsControl) { return; }
+//
+//	//// 攻撃
+//	//Attack(1);
+//
+//}

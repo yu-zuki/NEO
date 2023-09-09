@@ -4,8 +4,8 @@
 #include "BackGroundAssist.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/GameplayStatics.h"
-#include "NEO/PlayerSystem/CharacterCamera.h"
 #include "Camera/CameraComponent.h"
+#include "NEO/PlayerSystem/CharacterCamera.h"
 #include "NEO/GameSystem/TGS_GameMode.h"
 
 #define DIRECTION (90.0)
