@@ -4,6 +4,8 @@
 #include "Components/BoxComponent.h"
 #include "GameFramework/Controller.h"
 #include "Kismet/GameplayStatics.h"
+#include "NEO/WeaponSystem/WeaponBase.h"
+
 
 ALancer::ALancer()
 {
@@ -30,7 +32,24 @@ void ALancer::BeginPlay()
     GetWorldTimerManager().SetTimer(TimerHandle_CheckPlayerInFront, this, &ALancer::CheckPlayerInFront, 3.0f, true);
     GetWorld()->GetTimerManager().SetTimer(MoveToTargetTimer, this, &ALancer::ChooseNewTarget, 3.0f, true);
     SpawnTime = GetWorld()->GetTimeSeconds();
+    // •Ší‚ğSpawn
+    if (WeaponClass && !Weapon)
+    {
+        FActorSpawnParameters SpawnParams;
+        SpawnParams.Owner = this;
+        SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+        Weapon = GetWorld()->SpawnActor<AWeaponBase>(WeaponClass, SpawnParams);
+
+        if (Weapon)
+        {
+            Weapon->AttachToHand(this, "enemy_R_handSocket");
+        }
+
+        Weapon->SetOwnerType(EOwnerType::OwnerType_Enemy);
+    }
 }
+
 FVector ALancer::GetSnappedDirection(const FVector& Direction) const
 {
     FVector SnappedDirection = Direction;
@@ -47,7 +66,13 @@ FVector ALancer::GetSnappedDirection(const FVector& Direction) const
     return SnappedDirection.GetSafeNormal();
 }
 
-
+void ALancer::CollisionOn()
+{
+    if (Weapon)
+    {
+        Weapon->SetCollision();
+    }
+}
 void ALancer::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
@@ -118,7 +143,10 @@ void ALancer::Tick(float DeltaTime)
             return; // ‚»‚Ì‘¼‚Ìê‡‚ÍˆÚ“®‚µ‚È‚¢
     }
     }
-   
+    if (Health <= 0)
+    {
+        Weapon->DetachToHand();
+    }
  
     SetActorLocation(GetActorLocation() + MoveVector);
 }

@@ -27,6 +27,8 @@ protected:
     FVector GetSnappedDirection(const FVector& Direction) const;
     
     
+    void CollisionOn();
+
     virtual void Tick(float DeltaTime) override;
     
     
