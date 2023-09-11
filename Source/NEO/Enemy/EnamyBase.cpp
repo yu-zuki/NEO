@@ -162,67 +162,82 @@ void AEnamyBase::Tick(float DeltaTime)
 				bIsRotation = CharacterLocation.Y > MyLocation.Y;
 				bIsRotationTag2 = CharacterLocation.X > MyLocation.X;
 				//bIsRotation‚ªtrue‚È‚ç
-				if (Health >= 0&& ActorHasTag("pattern1"))
+				if (ActorHasTag("pattern1"))
 				{
-					if (bIsRotation)
+					if (Health)
 					{
-					    FRotator NewRotation = GetActorRotation();
-					    NewRotation.Yaw = -90.0f;
-					    SetActorRotation(NewRotation);
 
-					    
+						bool LookRight = false;
 
+						if (ActorHasTag("pattern1"))
+						{
+							if (bIsRotation)
+							{
+								/*FRotator NewRotation = GetActorRotation();
+								NewRotation.Yaw = -90.0f;
+								SetActorRotation(NewRotation);*/
+
+
+								LookRight = true;
+							}
+							else
+							{
+								/*FRotator NewRotation = GetActorRotation();
+								NewRotation.Yaw = 90.0f;
+								SetActorRotation(NewRotation);*/
+
+								LookRight = false;
+							}
+
+							ActionAssistComp->OwnerParallelToCamera(LookRight);
+						}
+						else if (ActorHasTag("pattern2"))
+						{
+							if (bIsRotationTag2)
+							{
+								/*FRotator NewRotation = GetActorRotation();
+								NewRotation.Yaw = -180.0f;
+								SetActorRotation(NewRotation);*/
+
+								LookRight = true;
+
+							}
+							else
+							{
+								/*FRotator NewRotation = GetActorRotation();
+								NewRotation.Yaw = 0.0f;
+								SetActorRotation(NewRotation);*/
+
+								LookRight = false;
+							}
+
+							ActionAssistComp->OwnerParallelToCamera(LookRight);
+
+						}
+						else if (ActorHasTag("pattern3"))
+						{
+							if (bIsRotation)
+							{
+								/*FRotator NewRotation = GetActorRotation();
+								NewRotation.Yaw = -90.0f;
+								SetActorRotation(NewRotation);*/
+
+								LookRight = true;
+
+							}
+							else
+							{
+								/*FRotator NewRotation = GetActorRotation();
+								NewRotation.Yaw = 90.0f;
+								SetActorRotation(NewRotation);*/
+
+								LookRight = false;
+							}
+
+							ActionAssistComp->OwnerParallelToCamera(LookRight);
+						}
 					}
-					else
-					{
-						FRotator NewRotation = GetActorRotation();
-						NewRotation.Yaw = 90.0f;
-						SetActorRotation(NewRotation);
 
-					}
-				}
-				else if (Health >= 0 && ActorHasTag("pattern2"))
-				{
-					if (bIsRotationTag2)
-					{
-						FRotator NewRotation = GetActorRotation();
-						NewRotation.Yaw = -180.0f;
-						SetActorRotation(NewRotation);
-
-
-
-					}
-					else
-					{
-						FRotator NewRotation = GetActorRotation();
-						NewRotation.Yaw = 0.0f;
-						SetActorRotation(NewRotation);
-					}
-				
-					/*bool LookRight = (bIsRotation) ? (true) : (false);
-
-
-					ActionAssistComp->OwnerParallelToCamera(LookRight);*/
-
-				}
-				else if (Health >= 0 && ActorHasTag("pattern3"))
-				{
-					if (bIsRotation)
-					{
-						FRotator NewRotation = GetActorRotation();
-						NewRotation.Yaw = -90.0f;
-						SetActorRotation(NewRotation);
-
-
-
-					}
-					else
-					{
-						FRotator NewRotation = GetActorRotation();
-						NewRotation.Yaw = 90.0f;
-						SetActorRotation(NewRotation);
-
-					}
 				}
 			}
 		}
