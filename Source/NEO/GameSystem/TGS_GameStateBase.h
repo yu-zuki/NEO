@@ -34,7 +34,7 @@ enum class ENextLevel : uint8
 	ENextLevel_Title UMETA(DisplayName = "NextLevel_Title"),				// タイトル画面
 	ENextLevel_Playing UMETA(DisplayName = "NextLevel_Playing"),			// ゲーム中
 	ENextLevel_Over UMETA(DisplayName = "NextLevel_Over"),					// ゲームオーバー
-	ENextLevel_Clear UMETA(DisplayName = "NextLevel_Clear"),							// ゲームクリア
+	ENextLevel_Clear UMETA(DisplayName = "NextLevel_Clear"),				// ゲームクリア
 
 };
 

@@ -716,14 +716,17 @@ void APlayerBase::SetEnableRootMotion(bool _enableRootMotion, float _distance /*
  */
 void APlayerBase::RootMotion(float _distance)
 {
+	// 向いている方向によって値を変換
 	const float Distance = (IsLookRight) ? (-_distance) : (_distance);
-	//FVector ForwardVector = GetForWardVector();
-	const FRotator Rotation = GetActorRotation();
-	const FVector Vector = FVector(0.f, Distance, 0.f);
 
-	//FVector newVector = ForwardVector + Vector;
+	// 前方ベクトル取得
+	FVector ForwardVector = GetActorForwardVector();
 
-	AddActorWorldOffset(Vector,false);
+	// 現在向いている方向に移動する
+	FVector newVector = ForwardVector * _distance;
+
+	// 加算
+	AddActorWorldOffset(newVector,false);
 }
 
 
