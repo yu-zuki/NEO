@@ -27,7 +27,7 @@ AGunMan::AGunMan()
     MaxHealth = 100;
     Health = MaxHealth;
     bIsBulletAlive = false;
-   
+    bCanMove = true;
 }
 
 
@@ -64,31 +64,7 @@ void AGunMan::Tick(float DeltaTime)
 {
  
 	Super::Tick(DeltaTime);
-    // TrajectoryBulletとBulletの両方がワールドに存在しているかどうかを確認
-    TArray<AActor*> FoundTrajectoryBullets;
-    TArray<AActor*> FoundBullets;
-    UGameplayStatics::GetAllActorsOfClass(GetWorld(), ATrajectoryBullet::StaticClass(), FoundTrajectoryBullets);
-    UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABullet::StaticClass(), FoundBullets);
-
-    // 片方が存在している場合
-    if (FoundTrajectoryBullets.Num() > 0 || FoundBullets.Num() > 0)
-    {
-        if (!SavedRotation.IsSet())
-        {
-            SavedRotation = GetActorRotation();
-        }
-    }
-    else
-    {
-        // 存在しない場合、保存された回転をクリア
-        SavedRotation.Reset();
-    }
-
-    // 保存された回転が設定されている場合、その回転を使用してキャラクターの回転を固定
-    if (SavedRotation.IsSet())
-    {
-        SetActorRotation(SavedRotation.GetValue());
-    }
+    
    /* PlayerCharacter = Cast<ACharacter>(GetPlayer());
     
     {
@@ -120,10 +96,7 @@ void AGunMan::Tick(float DeltaTime)
       
     }
 */  
-    if (bIsSpawningBullet)
-    {
-        SetActorRotation(LockedRotation); // 角度を固定
-    }
+   
     if(bIsNowDamage )
     {
         return;
@@ -137,23 +110,26 @@ void AGunMan::Tick(float DeltaTime)
     FVector SnappedDirection;
     FVector MoveVector;
     
+    if (bCanMove == true)
+    {
+        if (CurrentDistance > DesiredDistance)
+        {
+            SnappedDirection = GetSnappedDirection(DirectionToPlayer);
+            MoveVector = SnappedDirection * MoveSpeed * DeltaTime;
+        }
+        else if (CurrentDistance < DesiredDistance + 400)
+        {
+            SnappedDirection = GetSnappedDirection(-DirectionToPlayer);
+            MoveVector = SnappedDirection * MoveSpeed / 3 * DeltaTime;
+        }
+        else
+        {
+            return; // その他の場合は移動しない
+        }
 
-    if (CurrentDistance > DesiredDistance)
-    {
-        SnappedDirection = GetSnappedDirection(DirectionToPlayer);
-        MoveVector = SnappedDirection * MoveSpeed * DeltaTime;
+        SetActorLocation(GetActorLocation() + MoveVector);
     }
-    else if (CurrentDistance < DesiredDistance + 400)
-    {
-        SnappedDirection = GetSnappedDirection(-DirectionToPlayer);
-        MoveVector = SnappedDirection * MoveSpeed/3 * DeltaTime;
-    }
-    else
-    {
-        return; // その他の場合は移動しない
-    }
-
-    SetActorLocation(GetActorLocation() + MoveVector);
+   
 }
 
 
