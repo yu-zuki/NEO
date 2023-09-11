@@ -219,6 +219,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Action")
 		void TakedDamage(float _damage, bool _isLastAttack = false);
 
+	// 武器の種類取得
+	UFUNCTION(BlueprintCallable, Category = "WeaponType")
+		EWeaponType GetWeaponType()const { return WeaponType; }
+
 	// プレイヤーが地面にいるか
 	bool IsPlayerGrounded()const;
 

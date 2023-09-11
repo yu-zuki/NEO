@@ -84,6 +84,7 @@ void APlayerBase::BeginPlay()
 		{
 			Weapon->AttachToHand(this, "hand_rSocket");
 			WeaponType = Weapon->GetWeaponType();
+			Weapon->SetOwnerType(EOwnerType::OwnerType_Player);
 		}
 	}
 }
@@ -486,6 +487,9 @@ void APlayerBase::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Ot
 
 				// 武器の種類判別
 				WeaponType = Weapon->GetWeaponType();
+
+				// オーナーの種類変更
+				Weapon->SetOwnerType(EOwnerType::OwnerType_Player);
 
 				// プレイヤーに装備させる
 				Weapon->AttachToHand(this, "hand_rSocket");
