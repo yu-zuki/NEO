@@ -63,6 +63,23 @@ void APlayerSword::SetCollision()
 	// 持っていないときはスキップ
 	if (!GetIsHeld()) { return; }
 
+	switch (OwnerType)
+	{
+	case EOwnerType::OwnerType_Player:
+		PlyerAttack();
+		break;
+	case EOwnerType::OwnerType_Enemy:
+		EnemyAttack();
+		break;
+	case EOwnerType::OwnerType_Boss:
+		BossAttack();
+		break;
+	}
+}
+
+// プレイヤーの当たり判定
+void APlayerSword::PlyerAttack()
+{
 	// プレイヤーのベースクラスにキャスト
 	APlayerBase* pPlayer = Cast<APlayerCharacter>(OwnerInfo.pOwner);
 
@@ -183,5 +200,67 @@ void APlayerSword::SetCollision()
 			}
 		}
 	}
+
 }
 
+// 敵の当たり判定
+void APlayerSword::EnemyAttack()
+{
+	AEnamyBase* pEnemy = Cast<AEnamyBase>(OwnerInfo.pOwner);
+
+	if (pEnemy)
+	{
+		// 自分とプレイヤーに当たらないようにする
+		FCollisionQueryParams CollisionParams;
+		CollisionParams.AddIgnoredActor(this);
+		CollisionParams.AddIgnoredActor(pEnemy);
+
+		TArray<FHitResult> HitResults;
+
+		// 当たり判定を取る範囲
+		FVector Start = WeaponCollision->GetComponentLocation();
+		FVector End = Start;
+		FQuat Rot = WeaponCollision->GetComponentQuat();
+		FCollisionShape CollisionShape = FCollisionShape::MakeCapsule(WeaponCollision->GetScaledCapsuleRadius(), WeaponCollision->GetScaledCapsuleHalfHeight());
+
+		// あたっているか確認
+		bool isHit = GetWorld()->SweepMultiByChannel(HitResults, Start, End, Rot, ECollisionChannel::ECC_GameTraceChannel1, CollisionShape, CollisionParams);
+
+		if (isHit)
+		{
+			// ダメージ量
+
+			float DamageAmount = 5.f;
+			// 当たったオブジェクトの数だけ繰り返し
+			for (const FHitResult HitResult : HitResults)
+			{
+				// 当たったキャラクターを格納
+				AActor* tempActor = HitResult.GetActor();
+
+				// ヒットしたアクターが"Enemy"タグを持っていたら
+				if (tempActor && tempActor->ActorHasTag("Player"))
+				{
+
+					// Playerのダメージ処理
+					APlayerBase* Player = Cast<APlayerBase>(HitResult.GetActor());
+
+					if (Player)
+					{
+						Player->TakedDamage(DamageAmount);
+
+						pEnemy->ActionAssistComp->HitStop(0.1f, HitStopTime);
+
+						if (EnemyHitSoundObj)
+						{
+							// 斬撃SE再生
+							ActionAssistComp->PlaySound(EnemyHitSoundObj);
+						}
+					}
+
+					break;
+				}
+			}
+		}
+	}
+
+}

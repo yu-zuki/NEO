@@ -81,6 +81,13 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Health")
 		virtual void ApplyDamage(float DamageAmount);
 
+	// 武器のクラス
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "WeaponClass", meta = (AllowPrivateAccess = "true"))
+		TSubclassOf<AWeaponBase> WeaponClass;
+
+	// 武器のクラス
+	class AWeaponBase* Weapon;
+
 	void MaintainDistanceFromEnemy();
 	 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Enemy", meta = (AllowPrivateAccess = "true"))
@@ -100,7 +107,7 @@ public:
 
 	void SpawnDeathTrigger();
 
-	void CheckCollisonOn();
+	virtual void CollisionOn() { return; }
 
 	void CheckCollisonOff();
 

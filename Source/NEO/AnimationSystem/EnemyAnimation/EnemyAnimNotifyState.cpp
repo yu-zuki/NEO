@@ -16,7 +16,7 @@ void UEnemyAnimNotifyState::NotifyBeginAction(AActor* _Owner, UAnimSequenceBase*
     {
         if (NotifyType == EEnemyNotifyType2::NotifyType1)
         {
-            pEnemy->CheckCollisonOn();
+            pEnemy->CollisionOn();
         }
     }
 }

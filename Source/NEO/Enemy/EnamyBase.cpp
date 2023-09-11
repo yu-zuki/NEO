@@ -26,7 +26,7 @@ AEnamyBase::AEnamyBase()
 	PrimaryActorTick.bCanEverTick = true;
 
 	//UI Create
-	
+
 	bIsDeath = false;
 	DamageCollision = CreateDefaultSubobject<UCapsuleComponent>(TEXT("DamageCollision"));
 	if (DamageCollision)
@@ -44,7 +44,7 @@ AEnamyBase::AEnamyBase()
 	bHasPattern3Tag = Tags.Contains("pattern3");
 	bHasWeponTag = Tags.Contains("HasWepon");
 
-	
+
 
 	MoveSpline = CreateDefaultSubobject<USplineComponent>(TEXT("MoveSpline"));
 	MoveSpline->SetupAttachment(RootComponent);
@@ -83,7 +83,7 @@ void AEnamyBase::BeginPlay()
 	for (AActor* Actor : TempBattleAreas) {
 		AGameSystem_BattleArea* BattleArea = Cast<AGameSystem_BattleArea>(Actor);
 		if (BattleArea) {
-			
+
 		}
 	}
 	/*TArray<AActor*> FoundPlayers;
@@ -162,87 +162,84 @@ void AEnamyBase::Tick(float DeltaTime)
 				bIsRotation = CharacterLocation.Y > MyLocation.Y;
 				bIsRotationTag2 = CharacterLocation.X > MyLocation.X;
 				//bIsRotation‚ªtrue‚È‚ç
-				if (ActorHasTag("pattern1"))
+				if (Health >= 0)
 				{
-					if (Health)
+
+					bool LookRight = false;
+
+					if (ActorHasTag("pattern1"))
 					{
-
-						bool LookRight = false;
-
-						if (ActorHasTag("pattern1"))
+						if (bIsRotation)
 						{
-							if (bIsRotation)
-							{
-								/*FRotator NewRotation = GetActorRotation();
-								NewRotation.Yaw = -90.0f;
-								SetActorRotation(NewRotation);*/
+							/*FRotator NewRotation = GetActorRotation();
+							NewRotation.Yaw = -90.0f;
+							SetActorRotation(NewRotation);*/
 
 
-								LookRight = true;
-							}
-							else
-							{
-								/*FRotator NewRotation = GetActorRotation();
-								NewRotation.Yaw = 90.0f;
-								SetActorRotation(NewRotation);*/
-
-								LookRight = false;
-							}
-
-							ActionAssistComp->OwnerParallelToCamera(LookRight);
+							LookRight = true;
 						}
-						else if (ActorHasTag("pattern2"))
+						else
 						{
-							if (bIsRotationTag2)
-							{
-								/*FRotator NewRotation = GetActorRotation();
-								NewRotation.Yaw = -180.0f;
-								SetActorRotation(NewRotation);*/
+							/*FRotator NewRotation = GetActorRotation();
+							NewRotation.Yaw = 90.0f;
+							SetActorRotation(NewRotation);*/
 
-								LookRight = true;
-
-							}
-							else
-							{
-								/*FRotator NewRotation = GetActorRotation();
-								NewRotation.Yaw = 0.0f;
-								SetActorRotation(NewRotation);*/
-
-								LookRight = false;
-							}
-
-							ActionAssistComp->OwnerParallelToCamera(LookRight);
-
+							LookRight = false;
 						}
-						else if (ActorHasTag("pattern3"))
-						{
-							if (bIsRotation)
-							{
-								/*FRotator NewRotation = GetActorRotation();
-								NewRotation.Yaw = -90.0f;
-								SetActorRotation(NewRotation);*/
 
-								LookRight = true;
-
-							}
-							else
-							{
-								/*FRotator NewRotation = GetActorRotation();
-								NewRotation.Yaw = 90.0f;
-								SetActorRotation(NewRotation);*/
-
-								LookRight = false;
-							}
-
-							ActionAssistComp->OwnerParallelToCamera(LookRight);
-						}
+						ActionAssistComp->OwnerParallelToCamera(LookRight);
 					}
+					else if (ActorHasTag("pattern2"))
+					{
+						if (bIsRotationTag2)
+						{
+							/*FRotator NewRotation = GetActorRotation();
+							NewRotation.Yaw = -180.0f;
+							SetActorRotation(NewRotation);*/
 
+							LookRight = true;
+
+						}
+						else
+						{
+							/*FRotator NewRotation = GetActorRotation();
+							NewRotation.Yaw = 0.0f;
+							SetActorRotation(NewRotation);*/
+
+							LookRight = false;
+						}
+
+						ActionAssistComp->OwnerParallelToCamera(LookRight);
+					}
+					else if (ActorHasTag("pattern3"))
+					{
+						if (bIsRotation)
+						{
+							/*FRotator NewRotation = GetActorRotation();
+							NewRotation.Yaw = -90.0f;
+							SetActorRotation(NewRotation);*/
+
+							LookRight = true;
+
+						}
+						else
+						{
+							/*FRotator NewRotation = GetActorRotation();
+							NewRotation.Yaw = 90.0f;
+							SetActorRotation(NewRotation);*/
+
+							LookRight = false;
+						}
+
+						ActionAssistComp->OwnerParallelToCamera(LookRight);
+					}
 				}
+
 			}
 		}
 	}
-	if (bHasPattern1Tag && GetWorld()->GetTimeSeconds() - SpawnTime < 4.5f|| bHasPattern2Tag ||bHasPattern3Tag)	
+
+	if (bHasPattern1Tag && GetWorld()->GetTimeSeconds() - SpawnTime < 4.5f || bHasPattern2Tag || bHasPattern3Tag)
 	{
 		float TimeSinceSpawn = GetWorld()->GetTimeSeconds() - SpawnTime;
 		float SplineDuration = 3.0f;  // ƒXƒvƒ‰ƒCƒ“‚ðŠ®—¹‚·‚é‚Ü‚Å‚ÌŽžŠÔ
@@ -281,16 +278,6 @@ void AEnamyBase::Tick(float DeltaTime)
 	CheckHealth();
 }
 
-void AEnamyBase::CheckCollisonOn()
-{
-	if (DamageCollision && GetMesh())
-	{
-
-		DamageCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-
-
-	}
-}
 void AEnamyBase::CheckCollisonOff()
 {
 	if (DamageCollision && GetMesh())
@@ -302,7 +289,7 @@ void AEnamyBase::CheckCollisonOff()
 }
 void AEnamyBase::SpawnSword()
 {
-	
+
 }
 
 
@@ -372,7 +359,7 @@ void AEnamyBase::AfterDeath()
 		}
 	}
 	DestoryEnemy();
-	
+
 }
 
 void AEnamyBase::DamageReac()
@@ -447,7 +434,7 @@ void AEnamyBase::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* Oth
 		{
 			// Apply damage to the player
 			CastedPlayer->TakedDamage(Damage);
-			ActionAssistComp->HitStop(0.1f,0.3f);
+			ActionAssistComp->HitStop(0.1f, 0.3f);
 
 			DamageCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		}

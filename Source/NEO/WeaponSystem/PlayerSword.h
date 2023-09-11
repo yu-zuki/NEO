@@ -28,6 +28,11 @@ private:
 	// 当たり判定
 	void SetCollision();
 
+	// プレイヤーの当たり判定
+	void PlyerAttack();
+
+	// 敵の当たり判定
+	void EnemyAttack();
 
 private:
 
@@ -43,10 +48,6 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Effect", meta = (AllowPrivateAccess = "true"))
 		class USoundBase* ObjectHitSoundObj;
-
-	// 武器の当たり判定
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SwordCollision", meta = (AllowPrivateAccess = "true"))
-		class UCapsuleComponent* WeaponCollision;
 
 	// 何秒間ヒットストップを起こすか
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = "Action Assist")

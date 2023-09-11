@@ -6,6 +6,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "GameFramework/Controller.h"
 #include "Kismet/GameplayStatics.h"
+#include "NEO/WeaponSystem/WeaponBase.h"
 
 ASoldier::ASoldier()
 {
@@ -22,7 +23,22 @@ void ASoldier::BeginPlay()
 {
     Super::BeginPlay();
 
-    
+    // •Ší‚ðSpawn
+    if (WeaponClass && !Weapon)
+    {
+        FActorSpawnParameters SpawnParams;
+        SpawnParams.Owner = this;
+        SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+        Weapon = GetWorld()->SpawnActor<AWeaponBase>(WeaponClass, SpawnParams);
+
+        if (Weapon)
+        {
+            Weapon->AttachToHand(this, "enemy_R_handSocket");
+        }
+
+        Weapon->SetOwnerType(EOwnerType::OwnerType_Enemy);
+    }
 }
 
 void ASoldier::AttackCombo()
@@ -59,6 +75,15 @@ void ASoldier::ResetCombo()
     ComboCounter = 0;
     bIsAttacking = false;
 }
+
+void ASoldier::CollisionOn()
+{
+    if (Weapon)
+    {
+        Weapon->SetCollision();
+    }
+}
+
 void ASoldier::Tick(float DeltaTime)
 {
     if (bIsNowDamage )

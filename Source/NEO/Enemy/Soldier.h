@@ -24,6 +24,8 @@ protected:
     UFUNCTION(Blueprintcallable)
         void AttackCombo();
     FVector GetSnappedDirection(const FVector& Direction) const;
+
+    void CollisionOn();
 public:
     // Called every frame
     virtual void Tick(float DeltaTime) override;

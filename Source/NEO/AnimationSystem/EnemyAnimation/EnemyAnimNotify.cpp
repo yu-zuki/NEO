@@ -21,13 +21,8 @@ void UEnemyAnimNotify::NotifyAction(AActor* _Owner, UAnimSequenceBase* Animation
     {
         if (NotifyType == EEnemyNotifyType::NotifyType1)
         {
-            pEnemy->CheckCollisonOn();
+            pEnemy->CollisionOn();
         }
-        else if (NotifyType == EEnemyNotifyType::NotifyType2)
-        {
-            pEnemy->CheckCollisonOff();
-        }
-
         else if (NotifyType==EEnemyNotifyType::NotifyType3)
         {
             pGunMan->SpawnTrajectoryBullet();

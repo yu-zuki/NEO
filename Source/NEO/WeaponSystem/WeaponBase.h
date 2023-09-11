@@ -31,6 +31,15 @@ public:
 };
 //----------------------------------------------------------------------------------------
 
+//-----------------所持者の種類-------------------------------------------------------------
+UENUM(BlueprintType)
+enum class EOwnerType :uint8
+{
+	OwnerType_Player   UMETA(DisplayName = "PlayerType"),
+	OwnerType_Enemy    UMETA(DisplayName = "EnemyType"),
+	OwnerType_Boss     UMETA(DisplayName = "BossType"),
+};
+//----------------------------------------------------------------------------------------
 
 //-----------------武器の種類-------------------------------------------------------------
 UENUM(BlueprintType)
@@ -88,7 +97,24 @@ protected:
 	}
 	//---------------------------------------------------------------------------------------------------------------------------------------------------
 
-public:	
+protected:
+
+	// オーナーのデータ初期化
+	void SetupOwnerData(ACharacter* _owner,FName _ownerTag,FName _socketName);
+
+	// 外れた時吹っ飛ぶ
+	void BlowsAway();
+
+	// プレイヤーの攻撃記述用
+	virtual void PlayerAttack() { return; }
+
+	// 敵の攻撃記述用
+	virtual void EnemyAttack() { return; }
+
+	// ボスの攻撃記述用
+	virtual void BossAttack() { return; }
+
+public:
 
 	// プレイヤーの手に付ける
 	void AttachToHand(ACharacter* _owner, FName SocketName);
@@ -101,28 +127,22 @@ public:
 
 	// 持たれている状態か
 	UFUNCTION(BlueprintCallable, Category = "State")
-		bool GetIsHeld()const { return IsHeld;}
+		bool GetIsHeld()const { return IsHeld; }
 
 	// 飛んでいる状態か
 	UFUNCTION(BlueprintCallable, Category = "State")
 		bool GetIsFalling()const { return IsFalling; }
 
+	// オーナーの種類判別用
+	UFUNCTION(BlueprintCallable, Category = "State")
+		EOwnerType GetOwnerType()const { return OwnerType; }
+
+	// オーナーの種類設定
+	UFUNCTION(BlueprintCallable, Category = "State")
+		void SetOwnerType(EOwnerType _ownerType){ OwnerType = _ownerType; }
+
 	// 武器の種類判別用
 	EWeaponType GetWeaponType()const { return WeaponType; }
-
-
-
-protected:
-
-	// オーナーのデータ初期化
-	void SetupOwnerData(ACharacter* _owner,FName _ownerTag,FName _socketName);
-
-	// 外れた時吹っ飛ぶ
-	void BlowsAway();
-
-
-
-protected:
 
 	// オーナーの情報
 	FOwnerInfo OwnerInfo;
@@ -130,6 +150,14 @@ protected:
 	// 武器のメッシュ
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "WeaponMesh")
 		class UStaticMeshComponent* WeaponStaticMesh;
+
+	// 武器のメッシュ
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "WeaponMesh")
+		class UCapsuleComponent* WeaponCollision;
+
+	// 武器を判別するEnum
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "OwnerType")
+		EOwnerType OwnerType;
 
 	// 武器を判別するEnum
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "WeaponType")
