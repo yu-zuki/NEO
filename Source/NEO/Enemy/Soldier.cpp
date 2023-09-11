@@ -126,6 +126,10 @@ void ASoldier::Tick(float DeltaTime)
         }
     }
     SetActorLocation(GetActorLocation() + MoveVector);
+    if (Health <= 0)
+    {
+        Weapon->DetachToHand();
+    }
 }
 
 FVector ASoldier::GetSnappedDirection(const FVector& Direction) const
