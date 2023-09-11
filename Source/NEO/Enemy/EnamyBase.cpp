@@ -183,6 +183,8 @@ void AEnamyBase::Tick(float DeltaTime)
 
 							LookRight = false;
 						}
+
+						ActionAssistComp->OwnerParallelToCamera(LookRight);
 					}
 					else if (ActorHasTag("pattern2"))
 					{
@@ -203,6 +205,8 @@ void AEnamyBase::Tick(float DeltaTime)
 
 							LookRight = false;
 						}
+
+						ActionAssistComp->OwnerParallelToCamera(LookRight);
 					}
 					else if (ActorHasTag("pattern3"))
 					{
@@ -224,9 +228,10 @@ void AEnamyBase::Tick(float DeltaTime)
 							LookRight = false;
 
 						}
+
+						ActionAssistComp->OwnerParallelToCamera(LookRight);
 					}
 
-					ActionAssistComp->OwnerParallelToCamera(LookRight);
 				}
 
 			}

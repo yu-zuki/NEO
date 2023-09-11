@@ -128,7 +128,8 @@ protected:
 	FOwnerInfo OwnerInfo;
 
 	// •Ší‚ÌƒƒbƒVƒ…
-	class UStaticMeshComponent* WeaponStaticMesh;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "WeaponMesh")
+		class UStaticMeshComponent* WeaponStaticMesh;
 
 	// •Ší‚ğ”»•Ê‚·‚éEnum
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "WeaponType")
