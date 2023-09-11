@@ -479,8 +479,8 @@ void APlayerBase::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Ot
 			// V‚µ‚¢•Ší‚ğì¬
 			AWeaponBase* NewWeapon = Cast<AWeaponBase>(OtherActor);
 
-			// •Ší‚ª‹ó’†‚É‚¢‚éó‘Ô‚Å‚Íæ‚ê‚È‚¢
-			if (!NewWeapon->GetIsFalling())
+			// •Ší‚ÉŠÒ‚ª‚¢‚È‚¢‚©‚Â‹ó’†‚É‚¢‚éó‘Ô‚Å‚Íæ‚ê‚È‚¢
+			if (!NewWeapon->GetIsHeld() && !NewWeapon->GetIsFalling())
 			{
 				// ‚Á‚Ä‚¢‚é•Ší‚ğXV
 				Weapon = NewWeapon;
