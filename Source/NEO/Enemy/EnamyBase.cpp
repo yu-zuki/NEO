@@ -302,7 +302,17 @@ void AEnamyBase::CheckCollisonOff()
 }
 void AEnamyBase::SpawnSword()
 {
-	
+	FVector SpawnLocation = GetActorLocation();
+	FRotator SpawnRotation = GetActorRotation();
+
+	if (GetWorld())
+	{
+		if (bHasWeponTag)
+		{
+			AActor* SpawnedEnemySword = GetWorld()->SpawnActor<AActor>(EnemySwordClass, SpawnLocation, SpawnRotation);
+
+		}
+	}
 }
 
 
@@ -327,7 +337,7 @@ void AEnamyBase::ApplyDamage(float DamageAmount)
 		GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 		GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldStatic, ECollisionResponse::ECR_Block);
 
-
+		
 	}
 	else
 	{
@@ -359,18 +369,18 @@ void AEnamyBase::MaintainDistanceFromEnemy()
 }
 void AEnamyBase::AfterDeath()
 {
-	FVector SpawnLocation = GetActorLocation();
-	FRotator SpawnRotation = GetActorRotation();
+	//FVector SpawnLocation = GetActorLocation();
+	//FRotator SpawnRotation = GetActorRotation();
 
 	// ここでnullチェックを入れる
-	if (GetWorld())
+	/*if (GetWorld())
 	{
 		if (bHasWeponTag)
 		{
 			AActor* SpawnedEnemySword = GetWorld()->SpawnActor<AActor>(EnemySwordClass, SpawnLocation, SpawnRotation);
 
 		}
-	}
+	}*/
 	DestoryEnemy();
 	
 }

@@ -118,7 +118,10 @@ void ALancer::Tick(float DeltaTime)
             return; // ‚»‚Ì‘¼‚Ìê‡‚ÍˆÚ“®‚µ‚È‚¢
     }
     }
-   
+    if (Health < 0)
+    {
+        SpawnSword();
+   }
  
     SetActorLocation(GetActorLocation() + MoveVector);
 }
