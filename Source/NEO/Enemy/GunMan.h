@@ -52,6 +52,7 @@ public:
 	FTimerHandle TickEnableTimerHandle;
 	bool bIsSpawningBullet;
 	bool bIsBulletAlive;
+	bool bCanMove;
 	FRotator LockedRotation;
 	void SpawnTrajectoryBullet();
 	void ReplaceWithBullet();

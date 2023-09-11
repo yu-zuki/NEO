@@ -28,7 +28,7 @@ AEnamyBase::AEnamyBase()
 	//UI Create
 	
 	bIsDeath = false;
-	DamageCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("DamageCollision"));
+	DamageCollision = CreateDefaultSubobject<UCapsuleComponent>(TEXT("DamageCollision"));
 	if (DamageCollision)
 	{
 		DamageCollision->SetupAttachment(GetMesh(), TEXT("enemy_R_hand"));
@@ -43,6 +43,8 @@ AEnamyBase::AEnamyBase()
 	bHasPattern2Tag = Tags.Contains("pattern2");
 	bHasPattern3Tag = Tags.Contains("pattern3");
 	bHasWeponTag = Tags.Contains("HasWepon");
+
+	
 
 	MoveSpline = CreateDefaultSubobject<USplineComponent>(TEXT("MoveSpline"));
 	MoveSpline->SetupAttachment(RootComponent);
