@@ -43,10 +43,8 @@ void ALancer::BeginPlay()
 
         if (Weapon)
         {
-            Weapon->AttachToHand(this, "enemy_R_handLance");
+            Weapon->AttachToHand(this, "enemy_R_handLance", EOwnerType::OwnerType_Enemy);
         }
-
-        Weapon->SetOwnerType(EOwnerType::OwnerType_Enemy);
     }
 }
 
