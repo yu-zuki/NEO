@@ -39,6 +39,21 @@ void AGunMan::BeginPlay()
     PlayerCharacter = UGameplayStatics::GetPlayerCharacter(this, 0);
     
     GetWorldTimerManager().SetTimer(AttackTimerHandle, this,&AGunMan::PlayAttackAnim, 5.0f, true);
+
+    // •Ší‚ðSpawn
+    if (WeaponClass && !Weapon)
+    {
+        FActorSpawnParameters SpawnParams;
+        SpawnParams.Owner = this;
+        SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+        Weapon = GetWorld()->SpawnActor<AWeaponBase>(WeaponClass, SpawnParams);
+
+        if (Weapon)
+        {
+            Weapon->AttachToHand(this, "enemy_R_handSocket", EOwnerType::OwnerType_Enemy);
+        }
+    }
 }
 
 FVector AGunMan::GetSnappedDirection(const FVector& Direction) const
@@ -129,7 +144,14 @@ void AGunMan::Tick(float DeltaTime)
 
         SetActorLocation(GetActorLocation() + MoveVector);
     }
-   
+    if (Health <= 0)
+    {
+        if (Weapon)
+        {
+            Weapon->DetachToHand();
+            Weapon = nullptr;
+        }
+    }
 }
 
 

@@ -35,7 +35,7 @@ void ARolling::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Other
 void ARolling::BeginPlay()
 {
 	Super::BeginPlay();
-	SetLifeSpan(8.0f);
+	SetLifeSpan(11.0f);
 }
 
 // Called every frame
