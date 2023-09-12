@@ -120,7 +120,8 @@ void ASoldier::Tick(float DeltaTime)
        
         else
         {
-            return; // ‚»‚Ì‘¼‚Ìê‡‚ÍˆÚ“®‚µ‚È‚¢
+            SnappedDirection = GetSnappedDirection(DirectionToPlayer);
+            MoveVector = SnappedDirection * MoveSpeed * DeltaTime;
         }
     }
     SetActorLocation(GetActorLocation() + MoveVector);

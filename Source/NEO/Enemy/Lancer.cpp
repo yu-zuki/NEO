@@ -119,7 +119,7 @@ void ALancer::Tick(float DeltaTime)
             MoveVector = SnappedDirection * Speed*3 * DeltaTime;
            
         }
-       else if(CurrentDistance < DesiredDistance + 600 && CurrentTarget&& bIsRandMove==true) // DesiredDistance‚æ‚è400m‰“‚¢ê‡
+       else if(CurrentDistance < DesiredDistance + 100 && CurrentTarget&& bIsRandMove==true) // DesiredDistance‚æ‚è400m‰“‚¢ê‡
        {
            FVector DirectionToTarget = (CurrentTarget->GetActorLocation() - GetActorLocation()).GetSafeNormal();
            MoveVector = DirectionToTarget * Speed/2* DeltaTime;
@@ -133,12 +133,8 @@ void ALancer::Tick(float DeltaTime)
         }*/
     else
     {
-            /*FVector RandomDirection = FVector(FMath::RandRange(-1.0f, 1.0f), FMath::RandRange(-1.0f, 1.0f), 0.0f).GetSafeNormal();
-            MoveVector = RandomDirection * MoveSpeed * DeltaTime+10;*/
-
-            // Ÿ‚Ìƒ‰ƒ“ƒ_ƒ€‚ÈˆÚ“®‚Ü‚Å‚Ì‘Ò‹@ŠÔ‚ğİ’è‚·‚é
-          ///* ///* TimeUntilNextRandomMove = FMath::RandRange(MinWaitTime, MaxWaitTime*/);*/
-            return; // ‚»‚Ì‘¼‚Ìê‡‚ÍˆÚ“®‚µ‚È‚¢
+            SnappedDirection = GetSnappedDirection(DirectionToPlayer);
+            MoveVector = SnappedDirection * Speed * 3 * DeltaTime;
     }
     }
     if (Health <= 0)
