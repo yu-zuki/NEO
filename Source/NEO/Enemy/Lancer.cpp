@@ -43,8 +43,10 @@ void ALancer::BeginPlay()
 
         if (Weapon)
         {
-            Weapon->AttachToHand(this, "enemy_R_handSocket",EOwnerType::OwnerType_Enemy);
+            Weapon->AttachToHand(this, "enemy_R_handLance");
         }
+
+        Weapon->SetOwnerType(EOwnerType::OwnerType_Enemy);
     }
 }
 
@@ -143,7 +145,11 @@ void ALancer::Tick(float DeltaTime)
     }
     if (Health <= 0)
     {
-        Weapon->DetachToHand();
+        if (Weapon)
+        {
+            Weapon->DetachToHand();
+            Weapon = nullptr;
+        }
     }
  
     SetActorLocation(GetActorLocation() + MoveVector);
