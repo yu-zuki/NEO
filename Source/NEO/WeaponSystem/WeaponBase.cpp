@@ -4,6 +4,7 @@
 #include "WeaponBase.h"
 #include "GameFramework/Character.h"
 #include "NiagaraComponent.h"
+#include "NEO/PlayerSystem/ActionAssistComponent.h"
 
 // Sets default values
 AWeaponBase::AWeaponBase()
@@ -16,6 +17,9 @@ AWeaponBase::AWeaponBase()
 
 	// タグ設定
 	Tags.Add("Weapon");
+
+	// アタックアシストコンポーネント作成
+	ActionAssistComp = CreateDefaultSubobject<UActionAssistComponent>(TEXT("AttackAssist"));
 }
 
 // Called when the game starts or when spawned

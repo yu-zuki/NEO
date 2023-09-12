@@ -160,6 +160,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "WeaponType")
 		EWeaponType WeaponType;
 
+protected:
+
+		// アクションアシストコンポーネント
+		class UActionAssistComponent* ActionAssistComp;
+
 
 private:
 

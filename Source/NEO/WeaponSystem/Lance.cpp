@@ -9,7 +9,6 @@
 #include "NEO/OdaBase.h"
 #include "NEO/BackGroundSystem/ObjectBase.h"
 #include "Components/CapsuleComponent.h"
-#include "NEO/PlayerSystem/ActionAssistComponent.h"
 
 // Sets default values
 ALance::ALance()
@@ -29,9 +28,6 @@ ALance::ALance()
 
 	// 武器の種類を刀に設定
 	WeaponType = EWeaponType::WeaponType_Lance;
-
-	// アタックアシストコンポーネント作成
-	ActionAssistComp = CreateDefaultSubobject<UActionAssistComponent>(TEXT("AttackAssist"));
 }
 
 // Called when the game starts or when spawned
