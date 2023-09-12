@@ -20,7 +20,7 @@ AGun::AGun()
 
 
 	// 武器のメッシュのパス
-	TCHAR* WeaponAssetPath = TEXT("/Game/0122/Player/Weapon/Lance/Lance");
+	TCHAR* WeaponAssetPath = TEXT("/Game/0122/Player/Weapon/Gun/Gun");
 
 	// 武器のメッシュ設定
 	SetupWeaponMesh(WeaponStaticMesh, WeaponAssetPath);
@@ -29,7 +29,7 @@ AGun::AGun()
 	SetupCollisionComponent(WeaponCollision);
 
 	// 武器の種類を刀に設定
-	WeaponType = EWeaponType::WeaponType_Lance;
+	WeaponType = EWeaponType::WeaponType_Gun;
 }
 
 // Called when the game starts or when spawned

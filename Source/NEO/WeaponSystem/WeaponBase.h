@@ -45,10 +45,10 @@ enum class EOwnerType :uint8
 UENUM(BlueprintType)
 enum class EWeaponType :uint8
 {
-	WeaponType_None	   UMETA(DisplayName = "None"),
 	WeaponType_Sword   UMETA(DisplayName = "Sword"),
 	WeaponType_Lance   UMETA(DisplayName = "Lance"),
-	WeaponType_Gun     UMETA(DisplayName = "Gun")
+	WeaponType_Gun     UMETA(DisplayName = "Gun"),
+	WeaponType_None	   UMETA(DisplayName = "None")
 };
 //----------------------------------------------------------------------------------------
 

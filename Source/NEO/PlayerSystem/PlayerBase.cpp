@@ -82,8 +82,8 @@ void APlayerBase::BeginPlay()
 
 		if (Weapon)
 		{
-			Weapon->AttachToHand(this, "hand_rSocket", EOwnerType::OwnerType_Player);
 			WeaponType = EWeaponType::WeaponType_Sword;
+			Weapon->AttachToHand(this, SocketName[int32(WeaponType)], EOwnerType::OwnerType_Player);
 			WeaponType = Weapon->GetWeaponType();
 		}
 	}
@@ -154,6 +154,11 @@ void APlayerBase::SetupPlayerData()
 
 	// ステータス設定
 	SetupPlayerStatus();
+
+	// 武器種によってソケットを変更
+	SocketName[0] = "hand_rSocket_Sword";
+	SocketName[1] = "hand_rSocket_Lance";
+	SocketName[2] = "hand_rSocket_Gun";
 
 	// コンボの名前格納
 	ComboStartSectionNames = { "First", "Second", "Third","Fourth" };
@@ -489,7 +494,7 @@ void APlayerBase::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Ot
 				WeaponType = Weapon->GetWeaponType();
 
 				// プレイヤーに装備させる
-				Weapon->AttachToHand(this, "hand_rSocket", EOwnerType::OwnerType_Player);
+				Weapon->AttachToHand(this, SocketName[int32(WeaponType)], EOwnerType::OwnerType_Player);
 
 				// 武器を落とすまでの回数をリセット
 				PlayerStatus.WeaponDropLimit = PlayerStatus.DefaultWeaponDropLimit;
@@ -510,40 +515,21 @@ void APlayerBase::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Ot
  */
 void APlayerBase::ComboAttack(int _attackNum /*= 0*/)
 {
-	// コントロール不能へ
-	IsControl = false;
-
-	// プレイヤーの角度修正
-	ActionAssistComp->CorrectAttackAngle();
-
-	if (!IsJumping)
+	switch (WeaponType)
 	{
-		if (!IsAttacking)
-		{
-			// 攻撃中フラグオン
-			IsAttacking = true;
-		}
-		else
-		{
-			// コンボ可能な時,継続
-			if (CanCombo)
-			{
-				// ラストアタックまでコンボ継続
-				if (ComboStartSectionNames[ComboIndex] != ComboStartSectionNames.Last())
-				{
-					++ComboIndex;
-				}
-			}
-		}
-
-		// 攻撃のアニメーション再生
-		PlayAnimation(PlayerAnimation.ComboAttack[_attackNum], ComboStartSectionNames[ComboIndex]);
-	}
-	else
-	{
-		// 攻撃のアニメーション再生
-		PlayAnimation(PlayerAnimation.AirAttack);
-		ComboIndex = 2;
+	case EWeaponType::WeaponType_Sword:
+		SwordAttack(_attackNum);
+		break;
+	case EWeaponType::WeaponType_Lance:
+		LanceAttack(_attackNum);
+		break;
+	case EWeaponType::WeaponType_Gun:
+		GunAttack();
+		break;
+	case EWeaponType::WeaponType_None:
+		break;
+	default:
+		break;
 	}
 }
 
@@ -563,6 +549,7 @@ void APlayerBase::Attack_Start()
 	IsControl = false;
 	IsCharging = true;
 }
+
 
 /*
  * 関数名　　　　：Attack1()
@@ -632,6 +619,108 @@ void APlayerBase::ChargeAttack()
 {
 	PlayAnimation(PlayerAnimation.ChargeAttack);
 }
+
+
+/*
+ * 関数名　　　　：SwordAttack()
+ * 処理内容　　　：溜め攻撃
+ * 戻り値　　　　：なし
+ */
+void APlayerBase::SwordAttack(int _attackNum)
+{
+	// コントロール不能へ
+	IsControl = false;
+
+	// プレイヤーの角度修正
+	ActionAssistComp->CorrectAttackAngle();
+
+	if (!IsJumping)
+	{
+		if (!IsAttacking)
+		{
+			// 攻撃中フラグオン
+			IsAttacking = true;
+		}
+		else
+		{
+			// コンボ可能な時,継続
+			if (CanCombo)
+			{
+				// ラストアタックまでコンボ継続
+				if (ComboStartSectionNames[ComboIndex] != ComboStartSectionNames.Last())
+				{
+					++ComboIndex;
+				}
+			}
+		}
+
+		// 攻撃のアニメーション再生
+		PlayAnimation(PlayerAnimation.ComboAttack[_attackNum], ComboStartSectionNames[ComboIndex]);
+	}
+	else
+	{
+		// 攻撃のアニメーション再生
+		PlayAnimation(PlayerAnimation.AirAttack);
+		ComboIndex = 2;
+	}
+}
+
+
+/*
+ * 関数名　　　　：LanceAttack()
+ * 処理内容　　　：溜め攻撃
+ * 戻り値　　　　：なし
+ */
+void APlayerBase::LanceAttack(int _attackNum)
+{
+	// コントロール不能へ
+	IsControl = false;
+
+	// プレイヤーの角度修正
+	ActionAssistComp->CorrectAttackAngle();
+
+	if (!IsJumping)
+	{
+		if (!IsAttacking)
+		{
+			// 攻撃中フラグオン
+			IsAttacking = true;
+		}
+		else
+		{
+			// コンボ可能な時,継続
+			if (CanCombo)
+			{
+				// ラストアタックまでコンボ継続
+				if (ComboStartSectionNames[ComboIndex] != ComboStartSectionNames.Last())
+				{
+					++ComboIndex;
+				}
+			}
+		}
+
+		// 攻撃のアニメーション再生
+		PlayAnimation(PlayerAnimation.ComboAttack[_attackNum], ComboStartSectionNames[ComboIndex]);
+	}
+	else
+	{
+		// 攻撃のアニメーション再生
+		PlayAnimation(PlayerAnimation.AirAttack);
+		ComboIndex = 2;
+	}
+}
+
+
+/*
+ * 関数名　　　　：GunAttack()
+ * 処理内容　　　：銃の攻撃
+ * 戻り値　　　　：なし
+ */
+void APlayerBase::GunAttack()
+{
+	PlayAnimation(PlayerAnimation.GunAttack);
+}
+
 
 /*
  * 関数名　　　　：RotateCharacter()

@@ -107,6 +107,10 @@ struct FPlayerAnimation
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Animation")
 		TArray<UAnimMontage*> ComboAttack = { nullptr,nullptr };
 
+	// e‚Å‚ÌUŒ‚
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Animation")
+		UAnimMontage* GunAttack = nullptr;
+
 	// ‹ó’†‚É‚¢‚é‚Æ‚«‚ÌUŒ‚
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Animation")
 		UAnimMontage* AirAttack = nullptr;
@@ -166,6 +170,15 @@ protected:
 
 	// ƒ`ƒƒ[ƒWUŒ‚
 	virtual void ChargeAttack();
+
+	// Œ•‚ÌUŒ‚
+	void SwordAttack(int _attackNum);
+
+	// ‘„‚ÌUŒ‚
+	void LanceAttack(int _attackNum);
+
+	// e‚ÌUŒ‚
+	void GunAttack();
 	//-------------------------------------------------------------------
 
 
@@ -370,6 +383,9 @@ private:
 
 	// —­‚ßUŒ‚‚Ì‚½‚ß‚Ì’·‰Ÿ‚µŠÔ
 	const float ChargeTime = 0.5f;
+
+	// •Ší‚»‚ê‚¼‚ê‚Ìƒ\ƒPƒbƒg‚Ì–¼‘O
+	FName SocketName[3];
 
 	// •Ší‚ğ‚Á‚Ä‚¢‚é‚©‚Ç‚¤‚©
 	bool IsHoldWeapon;

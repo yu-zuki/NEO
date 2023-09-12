@@ -95,6 +95,14 @@ void APlayerCharacter::SetupAnimationAsset()
 	}
 
 	{
+		// 空中での攻撃アニメーション
+		TCHAR* AirAttackAnimationAssetPath = TEXT("/Game/0122/Player/Animation/Montage/GunAttack_Montage");
+
+		PlayerAnimation.GunAttack = GetAnimationAsset(AirAttackAnimationAssetPath);
+	}
+
+
+	{
 		// 被ダメージアニメーションのパス保管用
 		TCHAR* DamageAnimationAssetPath = TEXT("/Game/0122/Player/Animation/Montage/Damaged_Montage");
 
