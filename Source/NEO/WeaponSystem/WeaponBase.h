@@ -45,9 +45,10 @@ enum class EOwnerType :uint8
 UENUM(BlueprintType)
 enum class EWeaponType :uint8
 {
+	WeaponType_None	   UMETA(DisplayName = "None"),
 	WeaponType_Sword   UMETA(DisplayName = "Sword"),
 	WeaponType_Lance   UMETA(DisplayName = "Lance"),
-	WeaponType_Gun     UMETA(DisplayName = "Gun"),
+	WeaponType_Gun     UMETA(DisplayName = "Gun")
 };
 //----------------------------------------------------------------------------------------
 
@@ -117,7 +118,7 @@ protected:
 public:
 
 	// プレイヤーの手に付ける
-	void AttachToHand(ACharacter* _owner, FName SocketName);
+	void AttachToHand(ACharacter* _owner, FName _socketName, EOwnerType _ownerType);
 
 	// プレイヤーの手から外れる
 	void DetachToHand();
@@ -137,10 +138,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "State")
 		EOwnerType GetOwnerType()const { return OwnerType; }
 
-	// オーナーの種類設定
-	UFUNCTION(BlueprintCallable, Category = "State")
-		void SetOwnerType(EOwnerType _ownerType){ OwnerType = _ownerType; }
-
 	// 武器の種類判別用
 	EWeaponType GetWeaponType()const { return WeaponType; }
 
@@ -155,7 +152,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "WeaponMesh")
 		class UCapsuleComponent* WeaponCollision;
 
-	// 武器を判別するEnum
+	// オーナーを判別するEnum
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "OwnerType")
 		EOwnerType OwnerType;
 

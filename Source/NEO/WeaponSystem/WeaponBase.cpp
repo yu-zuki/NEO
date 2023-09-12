@@ -69,7 +69,7 @@ void AWeaponBase::SetupWeaponMesh(UStaticMeshComponent*& MeshComp, TCHAR* Weapon
  * 引数２　　　　：FName _socketName ・・・ソケットの名前
  * 戻り値　　　　：なし
  */
-void AWeaponBase::AttachToHand(ACharacter* _owner, FName _socketName)
+void AWeaponBase::AttachToHand(ACharacter* _owner, FName _socketName,EOwnerType _ownerType)
 {
 	// 飛んでいるときは取れない
 	if (IsFalling) { return; }
@@ -77,7 +77,11 @@ void AWeaponBase::AttachToHand(ACharacter* _owner, FName _socketName)
 	// 持たれている状態にする
 	IsHeld = true;
 
+	// オーナーに設定
 	OwnerInfo.pOwner = _owner;
+
+	// オーナーの種類を設定
+	OwnerType = _ownerType;
 	
 	// キャラクターにアタッチ
 	if (OwnerInfo.pOwner)

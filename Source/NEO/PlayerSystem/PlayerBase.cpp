@@ -82,9 +82,9 @@ void APlayerBase::BeginPlay()
 
 		if (Weapon)
 		{
-			Weapon->AttachToHand(this, "hand_rSocket");
+			Weapon->AttachToHand(this, "hand_rSocket", EOwnerType::OwnerType_Player);
+			WeaponType = EWeaponType::WeaponType_Sword;
 			WeaponType = Weapon->GetWeaponType();
-			Weapon->SetOwnerType(EOwnerType::OwnerType_Player);
 		}
 	}
 }
@@ -488,11 +488,8 @@ void APlayerBase::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Ot
 				// 武器の種類判別
 				WeaponType = Weapon->GetWeaponType();
 
-				// オーナーの種類変更
-				Weapon->SetOwnerType(EOwnerType::OwnerType_Player);
-
 				// プレイヤーに装備させる
-				Weapon->AttachToHand(this, "hand_rSocket");
+				Weapon->AttachToHand(this, "hand_rSocket", EOwnerType::OwnerType_Player);
 
 				// 武器を落とすまでの回数をリセット
 				PlayerStatus.WeaponDropLimit = PlayerStatus.DefaultWeaponDropLimit;
@@ -913,6 +910,7 @@ void APlayerBase::TakedDamage(float _damage, bool _isLastAttack /*= false*/)
 			{
 				Weapon->DetachToHand();
 				Weapon = nullptr;
+				WeaponType = EWeaponType::WeaponType_None;
 				IsHoldWeapon = false;
 			}
 
