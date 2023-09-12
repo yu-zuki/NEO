@@ -41,10 +41,7 @@ public:
 	virtual void DestoryEnemy();
 	UPROPERTY()
 		class ACharacter* PlayerCharacter; // プレイヤーキャラクターの参照
-	UFUNCTION()
-		void OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Collision")
-		class UCapsuleComponent* DamageCollision;
+
 	
 	// 攻撃のアシスト用コンポーネント
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = AttackAssist, meta = (AllowPrivateAccess = "true"))

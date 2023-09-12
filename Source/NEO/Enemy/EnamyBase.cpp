@@ -28,17 +28,11 @@ AEnamyBase::AEnamyBase()
 	//UI Create
 
 	bIsDeath = false;
-	DamageCollision = CreateDefaultSubobject<UCapsuleComponent>(TEXT("DamageCollision"));
-	if (DamageCollision)
-	{
-		DamageCollision->SetupAttachment(GetMesh(), TEXT("enemy_R_hand"));
-		DamageCollision->OnComponentBeginOverlap.AddDynamic(this, &AEnamyBase::OnOverlapBegin);
 
-	}
 	// アタックアシストコンポーネント作成
 	ActionAssistComp = CreateDefaultSubobject<UActionAssistComponent>(TEXT("AttackAssist"));
 	Damage = 5.0f;
-	DamageCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
 	bHasPattern1Tag = Tags.Contains("pattern1");
 	bHasPattern2Tag = Tags.Contains("pattern2");
 	bHasPattern3Tag = Tags.Contains("pattern3");
@@ -60,10 +54,7 @@ void AEnamyBase::DestoryEnemy()
 		GameMode->DestroyEnemy(this, IsAreaEnemy);
 
 	}
-	if (DamageCollision && GetMesh())
-	{
-		DamageCollision->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, TEXT("FX_weapon_base"));
-	}
+	
 }
 
 // Called when the game starts or when spawned
@@ -280,12 +271,7 @@ void AEnamyBase::Tick(float DeltaTime)
 
 void AEnamyBase::CheckCollisonOff()
 {
-	if (DamageCollision && GetMesh())
-	{
-
-		DamageCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-
-	}
+	
 }
 void AEnamyBase::SpawnSword()
 {
@@ -424,21 +410,6 @@ void AEnamyBase::OnOverlapBeginWall(UPrimitiveComponent* OverlappedComp, AActor*
 	}
 }
 
-void AEnamyBase::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
 
-	if (Health > 0 && OtherActor == PlayerCharacter && PlayerCharacter)
-	{
-		APlayerBase* CastedPlayer = Cast<APlayerBase>(PlayerCharacter);
-		if (CastedPlayer)
-		{
-			// Apply damage to the player
-			CastedPlayer->TakedDamage(Damage);
-			ActionAssistComp->HitStop(0.1f, 0.3f);
-
-			DamageCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		}
-	}
-}
 
 
