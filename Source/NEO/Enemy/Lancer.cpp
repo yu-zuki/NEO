@@ -116,13 +116,13 @@ void ALancer::Tick(float DeltaTime)
         if (CurrentDistance > DesiredDistance&& bIsRandMove==false)
         {
             SnappedDirection = GetSnappedDirection(DirectionToPlayer);
-            MoveVector = SnappedDirection * Speed * DeltaTime;
+            MoveVector = SnappedDirection * Speed*3 * DeltaTime;
            
         }
-       else if(CurrentDistance < DesiredDistance + 400 && CurrentTarget&& bIsRandMove==true) // DesiredDistance‚æ‚è400m‰“‚¢ê‡
+       else if(CurrentDistance < DesiredDistance + 600 && CurrentTarget&& bIsRandMove==true) // DesiredDistance‚æ‚è400m‰“‚¢ê‡
        {
            FVector DirectionToTarget = (CurrentTarget->GetActorLocation() - GetActorLocation()).GetSafeNormal();
-           MoveVector = DirectionToTarget * Speed * DeltaTime;
+           MoveVector = DirectionToTarget * Speed/2* DeltaTime;
            
        }
 
