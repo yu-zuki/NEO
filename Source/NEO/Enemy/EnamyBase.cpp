@@ -210,7 +210,7 @@ void AEnamyBase::Tick(float DeltaTime)
 							NewRotation.Yaw = -90.0f;
 							SetActorRotation(NewRotation);*/
 
-							LookRight = true;
+							LookRight = false;
 
 						}
 						else
@@ -219,7 +219,7 @@ void AEnamyBase::Tick(float DeltaTime)
 							NewRotation.Yaw = 90.0f;
 							SetActorRotation(NewRotation);*/
 
-							LookRight = false;
+							LookRight = true;
 						}
 
 						ActionAssistComp->OwnerParallelToCamera(LookRight);
