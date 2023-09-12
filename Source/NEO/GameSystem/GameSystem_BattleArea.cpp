@@ -323,6 +323,8 @@ void AGameSystem_BattleArea::IgnoreCollision()
 	LeftMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	RightMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	NearMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+
 }
 
 void AGameSystem_BattleArea::ResetCollision()
