@@ -150,6 +150,20 @@ void AOdaBase::Tick(float DeltaTime)
 		case ECPPOdaEnum::Stay1:
 			OdaStay1(WaitTime);
 			break;
+			//正面ダッシュ
+		case ECPPOdaEnum::Moveflont:
+			if (GetActorLocation().Y < UGameplayStatics::GetPlayerPawn(GetWorld(), 0)->GetActorLocation().Y)
+			{
+				BossMove(OdaSpeed * 2, FVector(0.f, 3.f, 0.f));
+			}
+			else
+			{
+				BossMove(OdaSpeed * 2, FVector(0.f, -3.f, 0.f));
+			}			
+			if (WaitTime % 25 == 0)
+			{
+				OdaMoveEnum = ECPPOdaEnum::Stay1;
+			}
 
 			//攻撃１
 		case ECPPOdaEnum::Attack1:
@@ -197,16 +211,10 @@ void AOdaBase::ToPlayerRotate()
 	if (GetActorLocation().Y < UGameplayStatics::GetPlayerPawn(GetWorld(), 0)->GetActorLocation().Y)
 	{
 		LookRight = true;
-
-		//yを270に向ける(左)
-		//SetActorRotation(FRotator(0.f, 270.f, 0.f));
 	}
 	else
 	{
 		LookRight = false;
-
-		//yを90に向ける(右)
-		//SetActorRotation(FRotator(0.f, 90.f, 0.f));
 	}
 
 	ActionAssistComp->OwnerParallelToCamera(LookRight);
@@ -411,11 +419,11 @@ void AOdaBase::OdaAttack2(int Timer) {
 		isShockWaveSpawnTiming = false;
 	}
 
-	//200フレームたったら
-	if (Timer % 200 == 0)
+	//100フレームたったら
+	if (Timer % 100 == 0)
 	{
-		//待機する関数にもどる
-		OdaMoveEnum = ECPPOdaEnum::Stay1;
+		//前ダッシュしてみる
+		OdaMoveEnum = ECPPOdaEnum::Moveflont;
 
 		//切り替えるにあたって変数を初期化する
 		WaitTime = 0;
@@ -488,7 +496,7 @@ void AOdaBase::OdaUlt(int Timer)
 	if (Timer % 300 == 0)
 	{
 		//ステートを切り替える
-		OdaMoveEnum = ECPPOdaEnum::Stay1;
+		OdaMoveEnum = ECPPOdaEnum::Moveflont;
 		//切り替えるにあたって変数を初期化する
 		WaitTime = 0;
 		isUltShotTiming = false;

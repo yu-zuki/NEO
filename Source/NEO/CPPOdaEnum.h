@@ -10,9 +10,7 @@ UENUM(BlueprintType)
 enum class ECPPOdaEnum : uint8
 {
 	Stay1,
-	Move1,
-	Move2,
-	Back1,
+	Moveflont,
 	Attack1,
 	Attack2,
 	Ultimate
