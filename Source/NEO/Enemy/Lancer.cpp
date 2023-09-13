@@ -92,7 +92,7 @@ void ALancer::Tick(float DeltaTime)
     FVector MoveVector;
     
 
-    if (CurrentDistance <= DesiredDistance + 300)
+    if (CurrentDistance < DesiredDistance+100 )
     {
         bIsRandMove = true;
     }
@@ -119,7 +119,7 @@ void ALancer::Tick(float DeltaTime)
             MoveVector = SnappedDirection * Speed*3 * DeltaTime;
            
         }
-       else if(CurrentDistance < DesiredDistance + 600 && CurrentTarget&& bIsRandMove==true) // DesiredDistanceより400m遠い場合
+       else if(CurrentDistance < DesiredDistance + 100 && CurrentTarget&& bIsRandMove==true) // DesiredDistanceより400m遠い場合
        {
            FVector DirectionToTarget = (CurrentTarget->GetActorLocation() - GetActorLocation()).GetSafeNormal();
            MoveVector = DirectionToTarget * Speed/2* DeltaTime;
@@ -131,14 +131,14 @@ void ALancer::Tick(float DeltaTime)
             SnappedDirection = GetSnappedDirection(-DirectionToPlayer);
             MoveVector = SnappedDirection * MoveSpeed/2 * DeltaTime;
         }*/
+       else if (FMath::Abs(CurrentDistance - DesiredDistance) < 10.0f)
+        {
+            SnappedDirection = GetSnappedDirection(DirectionToPlayer);
+            MoveVector = SnappedDirection * Speed * 3 * DeltaTime;
+        }
     else
     {
-            /*FVector RandomDirection = FVector(FMath::RandRange(-1.0f, 1.0f), FMath::RandRange(-1.0f, 1.0f), 0.0f).GetSafeNormal();
-            MoveVector = RandomDirection * MoveSpeed * DeltaTime+10;*/
-
-            // 次のランダムな移動までの待機時間を設定する
-          ///* ///* TimeUntilNextRandomMove = FMath::RandRange(MinWaitTime, MaxWaitTime*/);*/
-            return; // その他の場合は移動しない
+            return;
     }
     }
     if (Health <= 0)
@@ -151,6 +151,26 @@ void ALancer::Tick(float DeltaTime)
     }
  
     SetActorLocation(GetActorLocation() + MoveVector);
+    TArray<AActor*> FoundEnemies;
+    UGameplayStatics::GetAllActorsWithTag(GetWorld(), FName("Enemy"), FoundEnemies);
+
+    for (AActor* Enemy : FoundEnemies)
+    {
+        // 自分自身はスキップする
+        if (Enemy == this) continue;
+
+        float DistanceToEnemy = FVector::Distance(GetActorLocation(), Enemy->GetActorLocation());
+
+        // 距離が近すぎる場合、遠ざかる
+        if (DistanceToEnemy < SomeMinimumDistance) // SomeMinimumDistanceは設定する値
+        {
+            FVector DirectionAwayFromEnemy = (GetActorLocation() - Enemy->GetActorLocation()).GetSafeNormal();
+            FVector MoveAwayVector = DirectionAwayFromEnemy * Speed * DeltaTime;
+
+            // 実際に移動する
+            SetActorLocation(GetActorLocation() + MoveAwayVector);
+        }
+    }
 }
 void ALancer::ChooseNewTarget()
 {
