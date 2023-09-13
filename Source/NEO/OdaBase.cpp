@@ -151,29 +151,7 @@ void AOdaBase::Tick(float DeltaTime)
 			OdaStay1(WaitTime);
 			break;
 			//正面ダッシュ
-		case ECPPOdaEnum::Moveflont:
-			if (GetActorLocation().Y < UGameplayStatics::GetPlayerPawn(GetWorld(), 0)->GetActorLocation().Y)
-			{
-				BossMove(OdaSpeed * 2, FVector(0.f, 3.f, 0.f));
-			}
-			else
-			{
-				BossMove(OdaSpeed * 2, FVector(0.f, -3.f, 0.f));
-			}			
-			if (WaitTime % 25 == 0)
-			{
-				OdaMoveEnum = ECPPOdaEnum::Stay1;
-			}
-
-			//ボスの動きを止める
-		case ECPPOdaEnum::Stop:
-			//基本は別のところで解除するがされなかった場合自動的に解除する
-			if (WaitTime % 120 == 0)
-			{
-				//待機に戻す
-				BacktoStayCase();
-			}
-			break;
+		
 
 			//正面ダッシュ
 		case ECPPOdaEnum::Moveflont:
