@@ -298,6 +298,10 @@ public:
 	UFUNCTION()
 		void BossHPRock();
 
+	//列挙型をStayに戻す為の関数
+	UFUNCTION()
+		void BacktoStayCase();
+
 
 	//モーション--------------------------------------------------------------------------------------------------
 	//のけぞるモーション
@@ -334,6 +338,8 @@ public:
 		void  DeathMotion();
 
 	FTimerHandle TimerHandle_DeathToGameOver;
+
+	FTimerHandle TimerHandle_KnockbackAnimationFinish;
 
 	//前方移動
 	UFUNCTION()

@@ -34,8 +34,8 @@ AOdaBase::AOdaBase() :
 	Attack1WaitTimer(0),
 	Attack1WaitingTime(60),
 	SwordFirstDamage(5),
-	SwordAddDamage(5),
 	HoldDamageAdd(0),
+	SwordAddDamage(5),
 	bIsAttacked(false),
 	Health(1000.f),
 	MaxHealth(1000.f)
@@ -79,7 +79,7 @@ void AOdaBase::BeginPlay()
 
 
 // Called to bind functionality to input
-void AOdaBase::SetupPlayerInputComponent(UInputComponent * PlayerInputComponent)
+void AOdaBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
@@ -165,6 +165,54 @@ void AOdaBase::Tick(float DeltaTime)
 				OdaMoveEnum = ECPPOdaEnum::Stay1;
 			}
 
+			//ボスの動きを止める
+		case ECPPOdaEnum::Stop:
+			//基本は別のところで解除するがされなかった場合自動的に解除する
+			if (WaitTime % 120 == 0)
+			{
+				//待機に戻す
+				BacktoStayCase();
+			}
+			break;
+
+			//正面ダッシュ
+		case ECPPOdaEnum::Moveflont:
+			//右向きか左向きかで正負を変える
+			if (GetActorLocation().Y < UGameplayStatics::GetPlayerPawn(GetWorld(), 0)->GetActorLocation().Y)
+			{
+				BossMove(OdaSpeed, FVector(0.f, 3.f, 0.f));
+			}
+			else
+			{
+				BossMove(OdaSpeed, FVector(0.f, -3.f, 0.f));
+			}
+			//一定時間たったら
+			if (WaitTime % 25 == 0)
+			{
+				//待機に戻す
+				BacktoStayCase();
+			}
+			break;
+
+			//背面ダッシュ
+		case ECPPOdaEnum::MoveBack:
+			//右向きか左向きかで正負を変える
+			if (GetActorLocation().Y < UGameplayStatics::GetPlayerPawn(GetWorld(), 0)->GetActorLocation().Y)
+			{
+				BossMove(OdaSpeed, FVector(0.f, -3.f, 0.f));
+			}
+			else
+			{
+				BossMove(OdaSpeed, FVector(0.f, 3.f, 0.f));
+			}
+			//一定時間たったら
+			if (WaitTime % 60 == 0)
+			{
+				//待機に戻す
+				BacktoStayCase();
+			}
+			break;
+
 			//攻撃１
 		case ECPPOdaEnum::Attack1:
 			if (Attack1WaitTimer % Attack1WaitingTime == 0)
@@ -191,10 +239,6 @@ void AOdaBase::Tick(float DeltaTime)
 		default:
 			break;
 		}
-
-
-
-
 	}
 }
 
@@ -376,7 +420,7 @@ void AOdaBase::OdaAttack1(int Timer) {
 	if (Timer % 150 == 0)
 	{
 		//ステートを切り替える
-		OdaMoveEnum = ECPPOdaEnum::Stay1;
+		BacktoStayCase();
 		//切り替えるにあたって変数を初期化する
 		WaitTime = 0;
 		//リセット
@@ -555,9 +599,12 @@ void AOdaBase::UltSpawnFlagChange()
  */
 void AOdaBase::ApplyDamage(float Damage)
 {
+	//動きを止める
+	OdaMoveEnum = ECPPOdaEnum::Stop;
 
 	if (isHPLock != true)
 	{
+		//実数回分ダメージを受けたら反撃させる処理
 		if (NotAttackCount < 5)
 		{
 			//タイマーをリセット
@@ -577,17 +624,39 @@ void AOdaBase::ApplyDamage(float Damage)
 			//攻撃のディレイをセット
 			Attack1Delay = 10;
 		}
-		//エフェクトを出す
-		//UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), HitParticles, GetActorLocation());
-		//ActionAssistComp->SpawnEffect(HitParticles, GetActorLocation());
+		//エフェクトはプレイヤーの方でやってくれている
 		if (isMove)
 		{
 			Health -= Damage;
-			//ノックバックのアニメーションを流す
-			PlayAnimMontage(AnimMontage_BossKnockMontage);
+			if (isBossHPRock)
+			{
+				if (FMath::RandRange(0, 100) <= 15)
+				{
+					//ノックバックアニメーションを流す
+					PlayAnimMontage(AnimMontage_BossBlowAway);
+
+					//背面ダッシュに切り替えて仕切り直す
+					OdaMoveEnum = ECPPOdaEnum::MoveBack;
+
+					//アニメーション終了後HPロックを解除してStayに戻す
+					FTimerManager& TimerManager = GetWorld()->GetTimerManager();
+					TimerManager.SetTimer(TimerHandle_KnockbackAnimationFinish, this, &AOdaBase::BossHPRock, AnimMontage_BossBlowAway->GetPlayLength() - 1.1f, false);
+					TimerManager.SetTimer(TimerHandle_KnockbackAnimationFinish, this, &AOdaBase::BacktoStayCase, AnimMontage_BossBlowAway->GetPlayLength(), false);
+
+
+				}
+				else
+				{
+					//ノックバックのアニメーションを流す
+					PlayAnimMontage(AnimMontage_BossKnockMontage);
+					// アニメーション終了後Stayに戻す
+					FTimerManager & TimerManager = GetWorld()->GetTimerManager();
+					TimerManager.SetTimer(TimerHandle_KnockbackAnimationFinish, this, &AOdaBase::BossHPRock, AnimMontage_BossKnockMontage->GetPlayLength() - 1.1f, false);
+					TimerManager.SetTimer(TimerHandle_KnockbackAnimationFinish, this, &AOdaBase::BacktoStayCase, AnimMontage_BossKnockMontage->GetPlayLength(), false);
+
+				}
+			}
 		}
-
-
 
 		//HPが0になったら
 		if (Health <= 0.f)
@@ -595,28 +664,30 @@ void AOdaBase::ApplyDamage(float Damage)
 			//動けるかどうかの変数をfalseにしておく
 			if (isMove == true)
 			{
+				//フラグを使ってダメージを受けるアニメーションを動かさないようにする
 				isMove = false;
+				//一応アニメーションを止めておく
 				this->StopAnimMontage();
 
-
+				//ゲーム全体の速度を遅くする
 				UGameplayStatics::SetGlobalTimeDilation(GetWorld(), .2f);
 
 				//アニメーションを流す(今は仮)
 				PlayAnimMontage(AnimMontage_BossDeath);
-				//一度だけ流したいのでフラグを切り替える
+
+				//アニメーションの長さを判定してその時間が過ぎたら死亡処理の関数に飛ばせる処理
 				FTimerManager& TimerManager2 = GetWorld()->GetTimerManager();
 				TimerManager2.SetTimer(TimerHandle_DeathToGameOver, this, &AOdaBase::Death, AnimMontage_BossDeath->GetPlayLength() - 0.5f, false);
 
-				//
+				//一度だけ流したいのでフラグを切り替える
 				isMotionPlaying = false;
 			}
-
 		}
 	}
 }
 /*
  * 関数名　　　　：WorldTimeReturn()
- * 処理内容　　　：
+ * 処理内容　　　：ずっと遅いままだとストレスがたまるので元の速度に戻す(アニメーション通知で管理)
  * 戻り値　　　　：なし
  */
 void AOdaBase::WorldTimeReturn()
@@ -626,7 +697,7 @@ void AOdaBase::WorldTimeReturn()
 
 /*
  * 関数名　　　　：BossHPRock()
- * 処理内容　　　：
+ * 処理内容　　　：ボスのHPを減らさないようにする処理
  * 戻り値　　　　：なし
  */
 void AOdaBase::BossHPRock()
@@ -635,12 +706,25 @@ void AOdaBase::BossHPRock()
 }
 
 /*
+ * 関数名　　　　：BacktoStayCase()
+ * 処理内容　　　：ボスの行動を待機に戻す処理
+ * 戻り値　　　　：なし
+ */
+void AOdaBase::BacktoStayCase()
+{
+	//待機に戻す
+	OdaMoveEnum = ECPPOdaEnum::Stay1;
+}
+
+
+/*
  * 関数名　　　　：BossKnockback()
  * 処理内容　　　：ボスがノックバックする処理
  * 戻り値　　　　：なし
  */
 void AOdaBase::BossKnockback()
 {
+	//死亡時じゃなかったら
 	if (!isBossHPRock)
 	{
 		//ボスがノックバックする処理
@@ -650,7 +734,7 @@ void AOdaBase::BossKnockback()
 
 /*
  * 関数名　　　　：HPLock()
- * 処理内容　　　：HPロック用のスイッチを切り替える処理
+ * 処理内容　　　：HPロック用のスイッチを切り替える処理(プレイヤー側)
  * 戻り値　　　　：なし
  */
 void AOdaBase::HPLock()
@@ -847,7 +931,7 @@ void AOdaBase::CheckOverlap()
  * 処理内容　　　：プレイヤーが当たったらの処理
  * 戻り値　　　　：なし
  */
-void AOdaBase::PlayerOnOverlap(FHitResult & _HitResult)
+void AOdaBase::PlayerOnOverlap(FHitResult& _HitResult)
 {
 	//Cast
 	APlayerBase* Player = Cast<APlayerBase>(_HitResult.GetActor());
@@ -872,7 +956,7 @@ void AOdaBase::PlayerOnOverlap(FHitResult & _HitResult)
 			UKismetSystemLibrary::PrintString(this, LastAttack() ? TEXT("true") : TEXT("false"), true, true, FColor::Cyan, 2.f, TEXT("None"));
 		}
 		//ヒットストップをかける
-		ActionAssistComp->HitStop(1.f,.2f);
+		ActionAssistComp->HitStop(1.f, .2f);
 
 		//リセット
 		bIsAttacked = true;
