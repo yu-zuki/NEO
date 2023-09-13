@@ -17,7 +17,7 @@ public:
         float DesiredDistance = 100.0f; // プレイヤーからの望ましい距離（3m）
 
    
-    float MoveSpeed = 100.0f;
+    float MoveSpeed = 200.0f;
 protected:
     // Called when the game starts or when spawned
     virtual void BeginPlay() override;
