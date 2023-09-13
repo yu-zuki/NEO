@@ -170,9 +170,29 @@ void AWeaponBase::BlowsAway()
 	// 元の位置より低くなったら終了
 	if (NowPos.Z < FlyBeforePos.Z)
 	{
+		float Pos = 0.f;
+		float Rot_Z = 0.f;
+		
+		switch (WeaponType)
+		{
+		case EWeaponType::WeaponType_Sword:
+			Rot_Z = -90.f;
+			break;
+		case EWeaponType::WeaponType_Lance:
+			Rot_Z = 0.f;
+			Pos = -150.f;
+			break;
+		case EWeaponType::WeaponType_Gun:
+			Rot_Z = 0.f;
+			break;
+		case EWeaponType::WeaponType_None:
+			break;
+		default:
+			break;
+		}
 		// 地面に刺さるように位置と角度を補正
-		SetActorLocation(FlyBeforePos);
-		SetActorRotation(FRotator(0.f, 0.f, -90.f));
+		SetActorLocation(FVector(FlyBeforePos.X,FlyBeforePos.Y,FlyBeforePos.Z + Pos));
+		SetActorRotation(FRotator(0.f, 0.f, Rot_Z));
 
 		// フレームリセット
 		frames = 0.f;
