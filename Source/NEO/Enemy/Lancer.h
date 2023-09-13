@@ -18,6 +18,8 @@ public:
 
     UPROPERTY(EditAnywhere, Category = "AI")
         float MovementSpeed = 100.0f; // ˆÚ“®‘¬“x
+    UPROPERTY(EditAnywhere, Category = "AI")
+        float SomeMinimumDistance = 100.0f; // ˆÚ“®‘¬“x
     float Speed = 100.0f;
     void ChooseNewTarget();
    

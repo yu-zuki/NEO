@@ -61,5 +61,5 @@ public:
 	void PlayAttackAnim();
 	TOptional<FRotator> SavedRotation;
 	void EnableTickAfterDelay();
-
+	void CollisionOn();
 };

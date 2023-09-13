@@ -15,6 +15,7 @@
 #include "NEO/BackGroundSystem/GunFence.h"
 #include "NavigationPath.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "NEO/WeaponSystem/WeaponBase.h"
 
 
 // Sets default values
@@ -24,7 +25,7 @@ AGunMan::AGunMan()
     PrimaryActorTick.bCanEverTick = true;
 
     
-    MaxHealth = 100;
+    MaxHealth = 10;
     Health = MaxHealth;
     bIsBulletAlive = false;
     bCanMove = true;
@@ -39,6 +40,21 @@ void AGunMan::BeginPlay()
     PlayerCharacter = UGameplayStatics::GetPlayerCharacter(this, 0);
     
     GetWorldTimerManager().SetTimer(AttackTimerHandle, this,&AGunMan::PlayAttackAnim, 5.0f, true);
+
+    // ïêäÌÇSpawn
+    if (WeaponClass && !Weapon)
+    {
+        FActorSpawnParameters SpawnParams;
+        SpawnParams.Owner = this;
+        SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+        Weapon = GetWorld()->SpawnActor<AWeaponBase>(WeaponClass, SpawnParams);
+
+        if (Weapon)
+        {
+            Weapon->AttachToHand(this, "enemy_R_handSocket", EOwnerType::OwnerType_Enemy);
+        }
+    }
 }
 
 FVector AGunMan::GetSnappedDirection(const FVector& Direction) const
@@ -58,7 +74,13 @@ FVector AGunMan::GetSnappedDirection(const FVector& Direction) const
 }
     
 
-
+void AGunMan::CollisionOn()
+{
+    if (Weapon)
+    {
+        Weapon->SetCollision();
+    }
+}
 // Called every frame
 void AGunMan::Tick(float DeltaTime)
 {
@@ -128,6 +150,14 @@ void AGunMan::Tick(float DeltaTime)
         }
 
         SetActorLocation(GetActorLocation() + MoveVector);
+    }
+    if (Health <= 0)
+    {
+        if (Weapon)
+        {
+            Weapon->DetachToHand();
+            Weapon = nullptr;
+        }
     }
    
 }
@@ -210,6 +240,7 @@ void AGunMan::PlayAttackAnim()
         PlayAnimMontage(Attack, 1.0f, NAME_None);
        /* SetActorTickEnabled(false);*/
         GetWorldTimerManager().SetTimer(TickEnableTimerHandle, this, &AGunMan::EnableTickAfterDelay, 3.0f, false);
+        MoveSpeed = 0;
     }
    
 }
@@ -217,4 +248,5 @@ void AGunMan::EnableTickAfterDelay()
 {
     // TickÇçƒóLå¯âªÇ∑ÇÈ
     /*SetActorTickEnabled(true);*/
+    MoveSpeed = 100;
 }
