@@ -9,7 +9,7 @@
 #include "NEO/OdaBase.h"
 #include "NEO/BackGroundSystem/ObjectBase.h"
 #include "Components/CapsuleComponent.h"
-#include "NEO/Enemy/Bullet.h"
+#include "PlayerBullet.h"
 
 
 // Sets default values
@@ -83,8 +83,8 @@ void AGun::PlyerAttack()
 
 	if (pPlayer)
 	{
-		FVector SpawnBulletLocation = GetActorLocation(); // ‚Ü‚½‚Í‘¼‚ÌêŠ
-		FRotator SpawnBulletRotation = pPlayer->GetActorRotation(); // ‚Ü‚½‚Í‘¼‚Ì‰ñ“]
+		FVector SpawnBulletLocation = GetActorLocation();
+		FRotator SpawnBulletRotation = pPlayer->GetActorRotation();
 		if (BulletClass)
 		{
 			AActor* SpawnedBullet = GetWorld()->SpawnActor<AActor>(BulletClass, SpawnBulletLocation, SpawnBulletRotation);

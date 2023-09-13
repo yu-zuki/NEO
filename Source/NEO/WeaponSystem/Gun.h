@@ -39,7 +39,7 @@ private:
 private:
 
 	UPROPERTY(EditAnywhere, Category = "Spawning")
-		TSubclassOf<class ABullet> BulletClass;
+		TSubclassOf<class APlayerBullet> BulletClass;
 
 	// 被ダメージ時のエフェクト
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Effect", meta = (AllowPrivateAccess = "true"))

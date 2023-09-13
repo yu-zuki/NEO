@@ -148,8 +148,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "WeaponMesh")
 		class UStaticMeshComponent* WeaponStaticMesh;
 
-	// 武器のメッシュ
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "WeaponMesh")
+	// 武器のコリジョン
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "WeaponCollision")
 		class UCapsuleComponent* WeaponCollision;
 
 	// オーナーを判別するEnum

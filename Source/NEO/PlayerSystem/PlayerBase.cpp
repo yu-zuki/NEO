@@ -631,9 +631,6 @@ void APlayerBase::SwordAttack(int _attackNum)
 	// コントロール不能へ
 	IsControl = false;
 
-	// プレイヤーの角度修正
-	ActionAssistComp->CorrectAttackAngle();
-
 	if (!IsJumping)
 	{
 		if (!IsAttacking)
