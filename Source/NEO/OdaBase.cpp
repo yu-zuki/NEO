@@ -36,6 +36,7 @@ AOdaBase::AOdaBase() :
 	SwordFirstDamage(5),
 	HoldDamageAdd(0),
 	SwordAddDamage(5),
+	EnemyOneTimeSpawn(0),
 	bIsAttacked(false),
 	Health(1000.f),
 	MaxHealth(1000.f)
@@ -659,8 +660,52 @@ void AOdaBase::ApplyDamage(float Damage)
 				isMotionPlaying = false;
 			}
 		}
+		//
+		else if (Health <= 750.f && EnemyOneTimeSpawn == 0)
+		{
+			CallEnemy(GunPath, FVector(6350.f,1800.f,1200.f));
+			CallEnemy(GunPath, FVector(7150.f, 1800.f, 1200.f));
+			//1加算
+			EnemyOneTimeSpawn++;
+		}
+		else if (Health <= 500.f && EnemyOneTimeSpawn == 1)
+		{
+			CallEnemy(GunPath, FVector(6350.f, 1800.f, 1200.f));
+			CallEnemy(GunPath, FVector(7150.f, 1800.f, 1200.f));
+			CallEnemy(LancePath, FVector(6670.f, 1800.f, 1200.f));
+			//1加算
+			EnemyOneTimeSpawn++;
+		}
+		else if (Health <= 250.f && EnemyOneTimeSpawn == 2)
+		{
+			CallEnemy(GunPath, FVector(6350.f, 1800.f, 1200.f));
+			CallEnemy(GunPath, FVector(7150.f, 1800.f, 1200.f));
+			CallEnemy(LancePath, FVector(6670.f, 1800.f, 1200.f));
+			CallEnemy(SwordPath, FVector(6510.f, 1800.f, 1200.f));
+			CallEnemy(SwordPath, FVector(6830.f, 1800.f, 1200.f));
+			//1加算
+			EnemyOneTimeSpawn++;
+		}
 	}
 }
+
+/*
+ * 関数名　　　　：CallEnemy()
+ * 処理内容　　　：敵を呼ぶ処理
+ * 引数１	　　：パスの文字列(敵の種類によって変更)
+ * 引数２	　　：座標の設定
+ * 戻り値　　　　：なし
+ */
+void AOdaBase::CallEnemy(FString path , FVector Location)
+{
+	TSubclassOf<class AActor> Enemy = TSoftClassPtr<AActor>(FSoftObjectPath(*path)).LoadSynchronous(); // 上記で設定したパスに該当するクラスを取得
+	if (Enemy != nullptr)
+	{
+		AActor* a = GetWorld()->SpawnActor<AActor>(Enemy); // スポーン処理
+		a->SetActorLocation(Location); // 確認しやすいように座標を設定
+	}
+}
+
 /*
  * 関数名　　　　：WorldTimeReturn()
  * 処理内容　　　：ずっと遅いままだとストレスがたまるので元の速度に戻す(アニメーション通知で管理)

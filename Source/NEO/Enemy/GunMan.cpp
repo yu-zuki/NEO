@@ -52,7 +52,7 @@ void AGunMan::BeginPlay()
 
         if (Weapon)
         {
-            Weapon->AttachToHand(this, "enemy_R_handSocket", EOwnerType::OwnerType_Enemy);
+            Weapon->AttachToHand(this, "enemy_R_handGun", EOwnerType::OwnerType_Enemy);
         }
     }
 }
@@ -86,7 +86,6 @@ void AGunMan::Tick(float DeltaTime)
 {
  
 	Super::Tick(DeltaTime);
-    
     if (Health <= 0)
     {
         if (Weapon)
@@ -131,7 +130,6 @@ void AGunMan::Tick(float DeltaTime)
     {
         return;
     }
-    Super::Tick(DeltaTime);
     PlayerCharacter = Cast<ACharacter>(GetPlayer());
     if (!PlayerCharacter) return;
 

@@ -352,8 +352,21 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Damage")
 		float SwordAddDamage;
 
-	//ボスを消すための関数
+	//雑魚敵を呼ぶ処理
+	UFUNCTION(BlueprintCallable)
+		void CallEnemy(FString path , FVector Location);
 
+	//雑魚敵を呼ぶ処理を一回だけ動かす為の変数
+	int EnemyOneTimeSpawn;
+
+	//銃持った敵のパス
+	FString GunPath = "/Game/0102/Enemy/Gunman/MyGunMan3.MyGunMan3_C"; // /Content 以下のパスが /Game 以下のパスに置き換わる
+
+	//やり持った敵のパス
+	FString LancePath = "/Game/0102/Enemy/Lancer/BP_LancerTag3.BP_LancerTag3_C"; // /Content 以下のパスが /Game 以下のパスに置き換わる
+
+	//剣持った敵のパス
+	FString SwordPath = "/Game/0102/Enemy/Soldier/BP_SoldierTag3.BP_SoldierTag3_C"; // /Content 以下のパスが /Game 以下のパスに置き換わる
 
 	//ボックスコンポーネントのオーバーラップ処理
 	UFUNCTION()
