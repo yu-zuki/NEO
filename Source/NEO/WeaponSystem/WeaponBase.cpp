@@ -8,7 +8,7 @@
 
 // Sets default values
 AWeaponBase::AWeaponBase()
-	: IsHeld(true)
+	: IsHeld(false)
 	, IsFalling(false)
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
@@ -76,7 +76,7 @@ void AWeaponBase::SetupWeaponMesh(UStaticMeshComponent*& MeshComp, TCHAR* Weapon
 void AWeaponBase::AttachToHand(ACharacter* _owner, FName _socketName,EOwnerType _ownerType)
 {
 	// ”ò‚ñ‚Å‚¢‚é‚Æ‚«‚Íæ‚ê‚È‚¢
-	if (IsFalling) { return; }
+	if (IsFalling || IsHeld) { return; }
 
 	// ‚½‚ê‚Ä‚¢‚éó‘Ô‚É‚·‚é
 	IsHeld = true;

@@ -242,6 +242,14 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "WeaponType")
 		EWeaponType GetWeaponType()const { return WeaponType; }
 
+	// ダメージを受ける処理
+	UFUNCTION(BlueprintCallable, Category = "Invincible")
+		void SetAbsolutelyInvincible(bool _absolutelyInvincible) { AbsolutelyInvincible = _absolutelyInvincible; }
+
+	// ダメージを受ける処理
+	UFUNCTION(BlueprintCallable, Category = "SetStatus")
+		void SetDeath();
+
 	// プレイヤーが地面にいるか
 	bool IsPlayerGrounded()const;
 
@@ -375,6 +383,7 @@ private:
 	// 右を向いているか
 	bool IsLookRight;
 
+	// 蹴り攻撃中かどうか
 	bool IsKicking;
 
 	// ジャンプ中かどうか
@@ -388,6 +397,9 @@ private:
 
 	// 溜めているかどうか
 	bool IsCharging;
+
+	// 絶対無敵
+	bool AbsolutelyInvincible = false;
 
 	// 溜め攻撃のための長押し時間
 	const float ChargeTime = 0.5f;

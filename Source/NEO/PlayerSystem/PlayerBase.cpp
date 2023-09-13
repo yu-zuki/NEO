@@ -84,7 +84,6 @@ void APlayerBase::BeginPlay()
 		{
 			WeaponType = Weapon->GetWeaponType();
 			Weapon->AttachToHand(this, SocketName[int32(WeaponType)], EOwnerType::OwnerType_Player);
-			WeaponType = Weapon->GetWeaponType();
 		}
 	}
 }
@@ -481,26 +480,25 @@ void APlayerBase::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Ot
 		// 当たったのがプレイヤーの時装備させる
 		if (OtherActor->ActorHasTag("Weapon") && !IsHoldWeapon)
 		{
-			// 新しい武器を作成
-			AWeaponBase* NewWeapon = Cast<AWeaponBase>(OtherActor);
+				// 新しい武器を作成
+				AWeaponBase* NewWeapon = Cast<AWeaponBase>(OtherActor);
 
-			// 武器に所持者がいないかつ空中にいる状態では取れない
-			if (!NewWeapon->GetIsHeld() && !NewWeapon->GetIsFalling())
-			{
-				// 持っている武器を更新
-				Weapon = NewWeapon;
-
-				// 武器の種類判別
-				WeaponType = Weapon->GetWeaponType();
-
-				// プレイヤーに装備させる
-				Weapon->AttachToHand(this, SocketName[int32(WeaponType)], EOwnerType::OwnerType_Player);
-
-				// 武器を落とすまでの回数をリセット
-				PlayerStatus.WeaponDropLimit = PlayerStatus.DefaultWeaponDropLimit;
-
-				// 武器を持っている状態に
-				IsHoldWeapon = true;
+				if (!NewWeapon->GetIsHeld() && !NewWeapon->GetIsFalling())
+				{
+					// 持っている武器を更新
+					Weapon = NewWeapon;
+					
+					// 武器の種類判別
+					WeaponType = Weapon->GetWeaponType();
+					
+					// プレイヤーに装備させる
+					Weapon->AttachToHand(this, SocketName[int32(WeaponType)], EOwnerType::OwnerType_Player);
+					
+					// 武器を落とすまでの回数をリセット
+					PlayerStatus.WeaponDropLimit = PlayerStatus.DefaultWeaponDropLimit;
+					
+					// 武器を持っている状態に
+					IsHoldWeapon = true;
 			}
 		}
 	}
@@ -1036,6 +1034,16 @@ void APlayerBase::TakedDamage(float _damage, bool _isLastAttack /*= false*/)
 	}
 }
 
+/*
+ * 関数名　　　　：SetDeath()
+ * 処理内容　　　：死ぬ
+ * 戻り値　　　　：なし
+ */
+void APlayerBase::SetDeath()
+{
+	// 死亡アニメーション再生
+	PlayAnimation(PlayerAnimation.Death);
+}
 
 /*
  * 関数名　　　　：PlayAnimation()
