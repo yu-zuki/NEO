@@ -9,28 +9,6 @@
 
 class ACharacter;
 
-//-----------------OwnerInformation-------------------------------------------------------
-USTRUCT(BlueprintType)
-struct FOwnerInfo
-{
-	GENERATED_BODY()
-
-public:
-
-	// オーナーになるキャラクターの情報
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		class ACharacter* pOwner = nullptr;
-
-	// オーナーのタグ
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		FName OwnerTag = "None";
-
-	// アタッチするソケットの名前
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		FName SocketName = "None";
-};
-//----------------------------------------------------------------------------------------
-
 //-----------------所持者の種類-------------------------------------------------------------
 UENUM(BlueprintType)
 enum class EOwnerType :uint8
@@ -100,9 +78,6 @@ protected:
 
 protected:
 
-	// オーナーのデータ初期化
-	void SetupOwnerData(ACharacter* _owner,FName _ownerTag,FName _socketName);
-
 	// 外れた時吹っ飛ぶ
 	void BlowsAway();
 
@@ -141,9 +116,6 @@ public:
 	// 武器の種類判別用
 	EWeaponType GetWeaponType()const { return WeaponType; }
 
-	// オーナーの情報
-	FOwnerInfo OwnerInfo;
-
 	// 武器のメッシュ
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "WeaponMesh")
 		class UStaticMeshComponent* WeaponStaticMesh;
@@ -164,6 +136,9 @@ protected:
 
 		// アクションアシストコンポーネント
 		class UActionAssistComponent* ActionAssistComp;
+
+		// オーナーになるキャラクターの情報
+		class ACharacter* pOwner = nullptr;
 
 
 private:

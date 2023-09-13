@@ -87,6 +87,14 @@ void AGunMan::Tick(float DeltaTime)
  
 	Super::Tick(DeltaTime);
     
+    if (Health <= 0)
+    {
+        if (Weapon)
+        {
+            Weapon->DetachToHand();
+            Weapon = nullptr;
+        }
+    }
    /* PlayerCharacter = Cast<ACharacter>(GetPlayer());
     
     {
@@ -150,14 +158,6 @@ void AGunMan::Tick(float DeltaTime)
         }
 
         SetActorLocation(GetActorLocation() + MoveVector);
-    }
-    if (Health <= 0)
-    {
-        if (Weapon)
-        {
-            Weapon->DetachToHand();
-            Weapon = nullptr;
-        }
     }
    
 }

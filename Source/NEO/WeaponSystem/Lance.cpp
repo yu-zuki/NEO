@@ -36,9 +36,6 @@ void ALance::BeginPlay()
 	Super::BeginPlay();
 
 
-	ACharacter* pPlayer = UGameplayStatics::GetPlayerCharacter(this, 0);
-
-	SetupOwnerData(pPlayer, "Player", "hand_rSocket");
 }
 
 // Called every frame
@@ -77,7 +74,7 @@ void ALance::SetCollision()
 void ALance::PlyerAttack()
 {
 	// プレイヤーのベースクラスにキャスト
-	APlayerBase* pPlayer = Cast<APlayerCharacter>(OwnerInfo.pOwner);
+	APlayerBase* pPlayer = Cast<APlayerCharacter>(pOwner);
 
 	if (pPlayer)
 	{
@@ -196,13 +193,12 @@ void ALance::PlyerAttack()
 			}
 		}
 	}
-
 }
 
 // 敵の当たり判定
 void ALance::EnemyAttack()
 {
-	AEnamyBase* pEnemy = Cast<AEnamyBase>(OwnerInfo.pOwner);
+	AEnamyBase* pEnemy = Cast<AEnamyBase>(pOwner);
 
 	if (pEnemy)
 	{

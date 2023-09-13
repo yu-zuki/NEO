@@ -82,15 +82,15 @@ void AWeaponBase::AttachToHand(ACharacter* _owner, FName _socketName,EOwnerType 
 	IsHeld = true;
 
 	// オーナーに設定
-	OwnerInfo.pOwner = _owner;
+	pOwner = _owner;
 
 	// オーナーの種類を設定
 	OwnerType = _ownerType;
 	
 	// キャラクターにアタッチ
-	if (OwnerInfo.pOwner)
+	if (pOwner)
 	{
-		AttachToComponent(OwnerInfo.pOwner->GetMesh(), FAttachmentTransformRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, false), _socketName);
+		AttachToComponent(pOwner->GetMesh(), FAttachmentTransformRules(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, false), _socketName);
 	}
 }
 
@@ -109,7 +109,7 @@ void AWeaponBase::DetachToHand()
 	DetachFromActor(FDetachmentTransformRules(EDetachmentRule::KeepWorld, EDetachmentRule::KeepWorld, EDetachmentRule::KeepWorld,false));
 
 	// オーナーがいなくなる
-	OwnerInfo.pOwner = nullptr;
+	pOwner = nullptr;
 
 	// 吹き飛ばすフラグを建てる
 	IsFalling = true;
@@ -120,25 +120,6 @@ void AWeaponBase::DetachToHand()
 	// Tick処理再開
 	PrimaryActorTick.bCanEverTick = true;
 }
-
-/*
- * 関数名　　　　：SetupOwnerData()
- * 引数１　　　　：ACharacter* _owner・・・親になるキャラクター
- * 引数２　　　　：FName _ownerTag ・・・・オーナーについているタグ
- * 引数３　　　　：FName _socketName ・・・ソケットの名前
- * 処理内容　　　：オーナーの情報初期化
- * 戻り値　　　　：なし
- */
-void AWeaponBase::SetupOwnerData(ACharacter* _owner, FName _ownerTag, FName _socketName)
-{
-	if (_owner)
-	{
-		OwnerInfo.pOwner = _owner;
-		OwnerInfo.OwnerTag = _ownerTag;
-		OwnerInfo.SocketName = _socketName;
-	}
-}
-
 
 /*
  * 関数名　　　　：BlowsAway()
@@ -183,7 +164,7 @@ void AWeaponBase::BlowsAway()
 			Pos = -150.f;
 			break;
 		case EWeaponType::WeaponType_Gun:
-			Rot_Z = 0.f;
+			Rot_Z = -90.f;
 			break;
 		case EWeaponType::WeaponType_None:
 			break;

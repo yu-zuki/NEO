@@ -38,9 +38,6 @@ void AGun::BeginPlay()
 	Super::BeginPlay();
 
 
-	ACharacter* pPlayer = UGameplayStatics::GetPlayerCharacter(this, 0);
-
-	SetupOwnerData(pPlayer, "Player", "hand_rSocket");
 }
 
 // Called every frame
@@ -79,15 +76,88 @@ void AGun::SetCollision()
 void AGun::PlyerAttack()
 {
 	// プレイヤーのベースクラスにキャスト
-	APlayerBase* pPlayer = Cast<APlayerCharacter>(OwnerInfo.pOwner);
+	APlayerBase* pPlayer = Cast<APlayerCharacter>(pOwner);
 
 	if (pPlayer)
 	{
-		FVector SpawnBulletLocation = GetActorLocation();
-		FRotator SpawnBulletRotation = pPlayer->GetActorRotation();
-		if (BulletClass)
+		// 蹴り攻撃かどうか
+		const bool Kicking = pPlayer->GetKicking();
+
+		if (!Kicking)
 		{
-			AActor* SpawnedBullet = GetWorld()->SpawnActor<AActor>(BulletClass, SpawnBulletLocation, SpawnBulletRotation);
+			FActorSpawnParameters SpawnParams;
+			SpawnParams.Owner = this;
+			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+			FVector SpawnBulletLocation = GetActorLocation();
+			FRotator SpawnBulletRotation = pOwner->GetActorRotation();
+
+			GetWorld()->SpawnActor<AActor>(BulletClass, SpawnBulletLocation, SpawnBulletRotation, SpawnParams);
+		}
+		else
+		{
+			// 自分とプレイヤーに当たらないようにする
+			FCollisionQueryParams CollisionParams;
+			CollisionParams.AddIgnoredActor(this);
+			CollisionParams.AddIgnoredActor(pPlayer);
+
+			TArray<FHitResult> HitResults;
+
+			float DamageAmount = pPlayer->GetDamageAmount();
+
+			// 当たり判定を取る範囲
+			FVector Start = WeaponCollision->GetComponentLocation();
+			FVector End = Start;
+			FQuat Rot = WeaponCollision->GetComponentQuat();
+			FCollisionShape CollisionShape = FCollisionShape::MakeCapsule(WeaponCollision->GetScaledCapsuleRadius(), WeaponCollision->GetScaledCapsuleHalfHeight());
+
+			// あたっているか確認
+			bool isHit = GetWorld()->SweepMultiByChannel(HitResults, Start, End, Rot, ECollisionChannel::ECC_GameTraceChannel1, CollisionShape, CollisionParams);
+
+			if (isHit)
+			{
+				// 当たったオブジェクトの数だけ繰り返し
+				for (const FHitResult HitResult : HitResults)
+				{
+					// 当たったキャラクターを格納
+					AActor* tempActor = HitResult.GetActor();
+
+					// 先にオブジェクトに当たったら処理しない
+					if (tempActor && tempActor->ActorHasTag("Object"))
+					{
+						AObjectBase* Object = Cast<AObjectBase>(HitResult.GetActor());
+
+						if (Object)
+						{
+							Object->ReceiveDamage(DamageAmount);
+
+							// オブジェクト破壊用のサウンド再生
+							ActionAssistComp->PlaySound(ObjectHitSoundObj);
+						}
+					}
+
+					// ヒットしたアクターが"Enemy"タグを持っていたら
+					if (tempActor && tempActor->ActorHasTag("Enemy"))
+					{
+
+						// エネミーのdamage処理
+						AEnamyBase* Enemy = Cast<AEnamyBase>(HitResult.GetActor());
+						AOdaBase* Oda = Cast<AOdaBase>(HitResult.GetActor());
+
+						if (Enemy)
+						{
+							Enemy->ApplyDamage(10.f);
+
+							// ノックバック
+							Enemy->AddActorLocalOffset(FVector(-50.f, 0.f, 0.f));
+						}
+						else if (Oda)
+						{
+							Oda->ApplyDamage(10.f);
+							Oda->BossKnockback();
+						}
+					}
+				}
+			}
 		}
 	}
 }
@@ -96,7 +166,7 @@ void AGun::PlyerAttack()
 void AGun::EnemyAttack()
 {
 	FVector SpawnBulletLocation = GetActorLocation(); // または他の場所
-	FRotator SpawnBulletRotation = OwnerInfo.pOwner->GetActorRotation(); // または他の回転
+	FRotator SpawnBulletRotation = pOwner->GetActorRotation(); // または他の回転
 	if (BulletClass)
 	{
 		AActor* SpawnedBullet = GetWorld()->SpawnActor<AActor>(BulletClass, SpawnBulletLocation, SpawnBulletRotation);

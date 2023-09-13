@@ -111,6 +111,10 @@ struct FPlayerAnimation
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Animation")
 		UAnimMontage* GunAttack = nullptr;
 
+	// e‚Å‚ÌUŒ‚‚Q
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Animation")
+		UAnimMontage* GunAttack2 = nullptr;
+
 	// ‹ó’†‚É‚¢‚é‚Æ‚«‚ÌUŒ‚
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Animation")
 		UAnimMontage* AirAttack = nullptr;
@@ -178,7 +182,7 @@ protected:
 	void LanceAttack(int _attackNum);
 
 	// e‚ÌUŒ‚
-	void GunAttack();
+	void GunAttack(int _attackNum);
 	//-------------------------------------------------------------------
 
 
@@ -192,6 +196,8 @@ public:
 	void ResetCombo();
 
 	int GetComboIndex()const { return ComboIndex; }
+
+	bool GetKicking()const { return IsKicking; }
 
 	// ƒ_ƒ[ƒW‚ğ—^‚¦‚éˆ—
 	virtual void SetCollision() { return; }
@@ -368,6 +374,8 @@ private:
 
 	// ‰E‚ğŒü‚¢‚Ä‚¢‚é‚©
 	bool IsLookRight;
+
+	bool IsKicking;
 
 	// ƒWƒƒƒ“ƒv’†‚©‚Ç‚¤‚©
 	bool IsJumping;

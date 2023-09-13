@@ -18,7 +18,6 @@ void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-
 }
 
 // Called every frame
@@ -89,17 +88,24 @@ void APlayerCharacter::SetupAnimationAsset()
 
 	{
 		// 空中での攻撃アニメーション
-		TCHAR* AirAttackAnimationAssetPath = TEXT("/Game/0122/Player/Animation/Montage/ChargeAttack_Montage");
+		TCHAR* ChargeAttackAnimationAssetPath = TEXT("/Game/0122/Player/Animation/Montage/ChargeAttack_Montage");
 
-		PlayerAnimation.ChargeAttack = GetAnimationAsset(AirAttackAnimationAssetPath);
+		PlayerAnimation.ChargeAttack = GetAnimationAsset(ChargeAttackAnimationAssetPath);
 	}
 
 	{
 		// 空中での攻撃アニメーション
-		TCHAR* AirAttackAnimationAssetPath = TEXT("/Game/0122/Player/Animation/Montage/GunAttack_Montage");
+		TCHAR* GunAttackAnimationAssetPath = TEXT("/Game/0122/Player/Animation/Montage/GunAttack_Montage");
 
-		PlayerAnimation.GunAttack = GetAnimationAsset(AirAttackAnimationAssetPath);
+		PlayerAnimation.GunAttack = GetAnimationAsset(GunAttackAnimationAssetPath);
 	}
+
+	{
+		// 銃撃アニメーション
+		TCHAR* GunAttack2AnimationAssetPath = TEXT("/Game/0122/Player/Animation/Montage/Kick_Montage");
+
+		PlayerAnimation.GunAttack2 = GetAnimationAsset(GunAttack2AnimationAssetPath);
+	}	
 
 
 	{

@@ -82,7 +82,7 @@ void APlayerBase::BeginPlay()
 
 		if (Weapon)
 		{
-			WeaponType = EWeaponType::WeaponType_Sword;
+			WeaponType = Weapon->GetWeaponType();
 			Weapon->AttachToHand(this, SocketName[int32(WeaponType)], EOwnerType::OwnerType_Player);
 			WeaponType = Weapon->GetWeaponType();
 		}
@@ -524,7 +524,7 @@ void APlayerBase::ComboAttack(int _attackNum /*= 0*/)
 		LanceAttack(_attackNum);
 		break;
 	case EWeaponType::WeaponType_Gun:
-		GunAttack();
+		GunAttack(_attackNum);
 		break;
 	case EWeaponType::WeaponType_None:
 		break;
@@ -713,9 +713,17 @@ void APlayerBase::LanceAttack(int _attackNum)
  * 処理内容　　　：銃の攻撃
  * 戻り値　　　　：なし
  */
-void APlayerBase::GunAttack()
+void APlayerBase::GunAttack(int _attackNum)
 {
-	PlayAnimation(PlayerAnimation.GunAttack);
+	if (_attackNum == 0)
+	{
+		PlayAnimation(PlayerAnimation.GunAttack);
+	}
+	else
+	{
+		IsKicking = true;
+		PlayAnimation(PlayerAnimation.GunAttack2);
+	}
 }
 
 
@@ -869,6 +877,7 @@ void APlayerBase::CallGameModeFunc_DestroyPlayer()
 	IsCharging = false;
 	CanCombo = false;
 	IsControl = false;
+	IsKicking = false;
 	ComboIndex = 0;
 }
 

@@ -35,10 +35,6 @@ void APlayerSword::BeginPlay()
 {
 	Super::BeginPlay();
 
-
-	ACharacter* pPlayer = UGameplayStatics::GetPlayerCharacter(this, 0);
-
-	SetupOwnerData(pPlayer, "Player", "hand_rSocket");
 }
 
 // Called every frame
@@ -77,7 +73,7 @@ void APlayerSword::SetCollision()
 void APlayerSword::PlyerAttack()
 {
 	// プレイヤーのベースクラスにキャスト
-	APlayerBase* pPlayer = Cast<APlayerCharacter>(OwnerInfo.pOwner);
+	APlayerBase* pPlayer = Cast<APlayerCharacter>(pOwner);
 
 	if (pPlayer)
 	{
@@ -206,7 +202,7 @@ void APlayerSword::PlyerAttack()
 // 敵の当たり判定
 void APlayerSword::EnemyAttack()
 {
-	AEnamyBase* pEnemy = Cast<AEnamyBase>(OwnerInfo.pOwner);
+	AEnamyBase* pEnemy = Cast<AEnamyBase>(pOwner);
 
 	if (pEnemy)
 	{

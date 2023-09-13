@@ -35,7 +35,7 @@ APlayerBullet::APlayerBullet()
 		if (weaponMesh.Succeeded())
 		{
 			BulletStaticMesh->SetStaticMesh(weaponMesh.Object);
-			BulletStaticMesh->SetupAttachment(RootComponent);
+			BulletStaticMesh->SetupAttachment(BulletCollision);
 		}
 	}
 
@@ -117,9 +117,9 @@ void APlayerBullet::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* 
 			{
 				pBoss->ApplyDamage(50);
 			}
-		}
 
-		// ’eŠÛíœ
-		DestroyBullet(true);
+			// ’eŠÛíœ
+			DestroyBullet(true);
+		}
 	}
 }
