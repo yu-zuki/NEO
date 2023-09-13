@@ -57,7 +57,7 @@ void ASoldier::AttackCombo()
     {
         PlayAnimMontage(Attack3, 1, NAME_None);
         bIsOnCooldown = true;
-        GetWorld()->GetTimerManager().SetTimer(ComboCooldownTimer, this, &ASoldier::EndComboCooldown, 3.0f, false);
+        GetWorld()->GetTimerManager().SetTimer(ComboCooldownTimer, this, &ASoldier::EndComboCooldown, 1.5f, false);
         Damage = 15.f;
         ComboCounter = 0;
     }
@@ -95,7 +95,7 @@ void ASoldier::Tick(float DeltaTime)
         FVector PlayerLocation = PlayerCharacter->GetActorLocation();
         FVector EnemyLocation = GetActorLocation();
         float DistanceOnY = FMath::Abs(PlayerLocation.Y - EnemyLocation.Y);
-        if(DistanceOnY <= 200.0f && GetWorld()->GetTimeSeconds() - LastAttackTime >= AttackCooldown&&Health>0)
+        if(DistanceOnY <= 100.0f && GetWorld()->GetTimeSeconds() - LastAttackTime >= AttackCooldown&&Health>0)
         {
             AttackCombo();
             LastAttackTime = GetWorld()->GetTimeSeconds();
