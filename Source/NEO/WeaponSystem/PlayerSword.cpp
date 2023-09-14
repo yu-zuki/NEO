@@ -73,18 +73,18 @@ void APlayerSword::SetCollision()
 void APlayerSword::PlyerAttack()
 {
 	// プレイヤーのベースクラスにキャスト
-	APlayerBase* pPlayer = Cast<APlayerCharacter>(pOwner);
+	APlayerBase* Player = Cast<APlayerCharacter>(pOwner);
 
-	if (pPlayer)
+	if (Player)
 	{
 		// 自分とプレイヤーに当たらないようにする
 		FCollisionQueryParams CollisionParams;
 		CollisionParams.AddIgnoredActor(this);
-		CollisionParams.AddIgnoredActor(pPlayer);
+		CollisionParams.AddIgnoredActor(Player);
 
 		TArray<FHitResult> HitResults;
 
-		float DamageAmount = pPlayer->GetDamageAmount();
+		float DamageAmount = Player->GetDamageAmount();
 
 		// 当たり判定を取る範囲
 		FVector Start = WeaponCollision->GetComponentLocation();
@@ -125,7 +125,7 @@ void APlayerSword::PlyerAttack()
 					AEnamyBase* Enemy = Cast<AEnamyBase>(HitResult.GetActor());
 					AOdaBase* Oda = Cast<AOdaBase>(HitResult.GetActor());
 
-					int ComboNum = pPlayer->GetComboIndex();
+					int ComboNum = Player->GetComboIndex();
 
 					if (ComboNum < 2)
 					{
@@ -142,12 +142,12 @@ void APlayerSword::PlyerAttack()
 
 
 					// ヒットストップ
-					pPlayer->HitStop(0.1f, HitStopTime);
+					Player->HitStop(0.1f, HitStopTime);
 
 					// コンボのフィニッシュのみカメラを揺らす
 					if (ComboNum == 3)
 					{
-						pPlayer->CameraShake();
+						Player->CameraShake();
 					}
 
 					if (EnemyHitSoundObj)
@@ -179,7 +179,7 @@ void APlayerSword::PlyerAttack()
 					{
 						Oda->ApplyDamage(DamageAmount);
 
-						if (pPlayer->GetComboIndex() == 3)
+						if (Player->GetComboIndex() == 3)
 						{
 							Oda->BossKnockback();
 						}

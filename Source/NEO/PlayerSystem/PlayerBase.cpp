@@ -52,8 +52,14 @@ APlayerBase::APlayerBase()
 	// アタックアシストコンポーネント作成
 	ActionAssistComp = CreateDefaultSubobject<UActionAssistComponent>(TEXT("AttackAssist"));
 
+	//WeaponPickUpArea = CreateDefaultSubobject<UBoxComponent>(TEXT("WeaponArea"));
+
 	// コリジョンイベントを設定
 	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &APlayerBase::OnOverlap);
+
+	//GetCapsuleComponent()->OnComponentEndOverlap.AddDynamic(this, &APlayerBase::EndOverlap);
+
+	//WeaponPickUpArea->OnComponentBeginOverlap.AddDynamic(this, &APlayerBase::OnOverlap);
 }
 
 
@@ -480,26 +486,26 @@ void APlayerBase::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Ot
 		// 当たったのがプレイヤーの時装備させる
 		if (OtherActor->ActorHasTag("Weapon") && !IsHoldWeapon)
 		{
-				// 新しい武器を作成
-				AWeaponBase* NewWeapon = Cast<AWeaponBase>(OtherActor);
+				//// 新しい武器を作成
+				//AWeaponBase* NewWeapon = Cast<AWeaponBase>(OtherActor);
 
-				if (!NewWeapon->GetIsHeld() && !NewWeapon->GetIsFalling())
-				{
-					// 持っている武器を更新
-					Weapon = NewWeapon;
-					
-					// 武器の種類判別
-					WeaponType = Weapon->GetWeaponType();
-					
-					// プレイヤーに装備させる
-					Weapon->AttachToHand(this, SocketName[int32(WeaponType)], EOwnerType::OwnerType_Player);
-					
-					// 武器を落とすまでの回数をリセット
-					PlayerStatus.WeaponDropLimit = PlayerStatus.DefaultWeaponDropLimit;
-					
-					// 武器を持っている状態に
-					IsHoldWeapon = true;
-			}
+				//if (!NewWeapon->GetIsHeld() && !NewWeapon->GetIsFalling())
+				//{
+				//	// 持っている武器を更新
+				//	Weapon = NewWeapon;
+				//	
+				//	// 武器の種類判別
+				//	WeaponType = Weapon->GetWeaponType();
+				//	
+				//	// プレイヤーに装備させる
+				//	Weapon->AttachToHand(this, SocketName[int32(WeaponType)], EOwnerType::OwnerType_Player);
+				//	
+				//	// 武器を落とすまでの回数をリセット
+				//	PlayerStatus.WeaponDropLimit = PlayerStatus.DefaultWeaponDropLimit;
+				//	
+				//	// 武器を持っている状態に
+				//	IsHoldWeapon = true;
+				//}
 		}
 	}
 }
@@ -525,6 +531,7 @@ void APlayerBase::ComboAttack(int _attackNum /*= 0*/)
 		GunAttack(_attackNum);
 		break;
 	case EWeaponType::WeaponType_None:
+		IsControl = true;
 		break;
 	default:
 		break;
@@ -540,7 +547,7 @@ void APlayerBase::ComboAttack(int _attackNum /*= 0*/)
 void APlayerBase::Attack_Start()
 {
 	// 攻撃可能か
-	if (!IsControl || !IsHoldWeapon) { return; }
+	if (!IsControl) { return; }
 
 	ChargeStartTime = UKismetMathLibrary::Now();
 
@@ -556,7 +563,7 @@ void APlayerBase::Attack_Start()
  */
 void APlayerBase::Attack1()
 {
-	if (!IsCharging) { return; }
+	if (!IsCharging || ChargeStartTime == 0.f) { return; }
 
 	IsCharging = false;
 
@@ -564,6 +571,9 @@ void APlayerBase::Attack1()
 
 	// 差分を計算          
 	FTimespan Span = ChargeEndTime - ChargeStartTime;
+
+	// 時間をもとに
+	ChargeStartTime = 0.f;
 
 	// ボタンを押している時間で攻撃変更
 	if (Span.GetSeconds() <= ChargeTime)
@@ -589,21 +599,49 @@ void APlayerBase::Attack2()
 
 	IsCharging = false;
 
-	FDateTime ChargeEndTime = UKismetMathLibrary::Now();
-
-	// 差分を計算          
-	FTimespan Span = ChargeEndTime - ChargeStartTime;
-
-	// ボタンを押している時間で攻撃変更
-	if (Span.GetSeconds() <= ChargeTime)
+	if (IsPickUpWeapon && CanPickUpWeapon)
 	{
-		// コンボ攻撃
-		ComboAttack(1);
+		if (Weapon != nullptr)
+		{
+			Weapon->DetachToHand();
+			Weapon = nullptr;
+		}
+		else
+		{
+			IsHoldWeapon = true;
+			// 武器を落とすまでの回数をリセット
+			PlayerStatus.WeaponDropLimit = PlayerStatus.DefaultWeaponDropLimit;
+		}
+
+		if (!CanPickUpWeapon->GetIsHeld() && !CanPickUpWeapon->GetIsFalling())
+		{
+			Weapon = CanPickUpWeapon;
+			WeaponType = Weapon->GetWeaponType();
+			Weapon->AttachToHand(this, SocketName[int32(WeaponType)], EOwnerType::OwnerType_Player);
+
+			CanPickUpWeapon = nullptr;
+		}
+
+		IsControl = true;
 	}
 	else
 	{
-		// 溜め攻撃
-		ChargeAttack();
+		FDateTime ChargeEndTime = UKismetMathLibrary::Now();
+
+		// 差分を計算          
+		FTimespan Span = ChargeEndTime - ChargeStartTime;
+
+		// ボタンを押している時間で攻撃変更
+		if (Span.GetSeconds() <= ChargeTime)
+		{
+			// コンボ攻撃
+			ComboAttack(1);
+		}
+		else
+		{
+			// 溜め攻撃
+			ChargeAttack();
+		}
 	}
 }
 
@@ -715,12 +753,12 @@ void APlayerBase::GunAttack(int _attackNum)
 {
 	if (_attackNum == 0)
 	{
-		PlayAnimation(PlayerAnimation.GunAttack);
+		IsKicking = true;
+		PlayAnimation(PlayerAnimation.GunAttack2);
 	}
 	else
 	{
-		IsKicking = true;
-		PlayAnimation(PlayerAnimation.GunAttack2);
+		PlayAnimation(PlayerAnimation.GunAttack);
 	}
 }
 

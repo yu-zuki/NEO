@@ -256,7 +256,20 @@ public:
 	// 接触開始時に行う処理
 	UFUNCTION()
 		virtual void OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	// 接触開始時に行う処理
+	//UFUNCTION()
+	//	virtual void EndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	//---------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+	void SetIsPickUpWeapon(bool _isPickUp) { IsPickUpWeapon = _isPickUp; }
+
+	//
+	void SetPickUpWeapon(class AWeaponBase* _pickupWeapon = nullptr) { CanPickUpWeapon = _pickupWeapon; }
+
+	UFUNCTION(BlueprintCallable, Category = "SetStatus")
+		class AWeaponBase* GetPickUpWeapon()const { return CanPickUpWeapon; }
 
 
 private:
@@ -345,6 +358,10 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Action Assist", meta = (AllowPrivateAccess = "true"))
 		UActionAssistComponent* ActionAssistComp;
 
+	//// プレイやーのアクション管理用
+	//UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	//	UBoxComponent* WeaponPickUpArea;
+
 	// 被ダメージ時のエフェクト
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Effect", meta = (AllowPrivateAccess = "true"))
 		class UNiagaraSystem* HitEffect;
@@ -372,6 +389,8 @@ protected:
 	// 武器のクラス
 	class AWeaponBase* Weapon;
 
+	class AWeaponBase* CanPickUpWeapon = nullptr;
+
 private:
 
 	// 入力可能かどうか
@@ -385,6 +404,9 @@ private:
 
 	// 蹴り攻撃中かどうか
 	bool IsKicking;
+
+	// 武器を拾えるかどうか
+	bool IsPickUpWeapon;
 
 	// ジャンプ中かどうか
 	bool IsJumping;

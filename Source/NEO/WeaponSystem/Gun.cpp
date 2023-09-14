@@ -76,12 +76,12 @@ void AGun::SetCollision()
 void AGun::PlyerAttack()
 {
 	// プレイヤーのベースクラスにキャスト
-	APlayerBase* pPlayer = Cast<APlayerCharacter>(pOwner);
+	APlayerBase* Player = Cast<APlayerCharacter>(pOwner);
 
-	if (pPlayer)
+	if (Player)
 	{
 		// 蹴り攻撃かどうか
-		const bool Kicking = pPlayer->GetKicking();
+		const bool Kicking = Player->GetKicking();
 
 		if (!Kicking)
 		{
@@ -98,11 +98,11 @@ void AGun::PlyerAttack()
 			// 自分とプレイヤーに当たらないようにする
 			FCollisionQueryParams CollisionParams;
 			CollisionParams.AddIgnoredActor(this);
-			CollisionParams.AddIgnoredActor(pPlayer);
+			CollisionParams.AddIgnoredActor(Player);
 
 			TArray<FHitResult> HitResults;
 
-			float DamageAmount = pPlayer->GetDamageAmount();
+			float DamageAmount = Player->GetDamageAmount();
 
 			// 当たり判定を取る範囲
 			FVector Start = WeaponCollision->GetComponentLocation();
@@ -148,7 +148,7 @@ void AGun::PlyerAttack()
 							Enemy->ApplyDamage(10.f);
 
 							// ノックバック
-							Enemy->AddActorLocalOffset(FVector(-50.f, 0.f, 0.f));
+							Enemy->AddActorLocalOffset(FVector(-100.f, 0.f, 0.f));
 						}
 						else if (Oda)
 						{

@@ -90,6 +90,9 @@ protected:
 	// ボスの攻撃記述用
 	virtual void BossAttack() { return; }
 
+private:
+
+
 public:
 
 	// プレイヤーの手に付ける
@@ -105,6 +108,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "State")
 		bool GetIsHeld()const { return IsHeld; }
 
+	// オーナーの種類判別用
+	UFUNCTION(BlueprintCallable, Category = "State")
+		bool GetIsHoldDistance()const { return IsHoldDistance; }
+
 	// 飛んでいる状態か
 	UFUNCTION(BlueprintCallable, Category = "State")
 		bool GetIsFalling()const { return IsFalling; }
@@ -116,21 +123,8 @@ public:
 	// 武器の種類判別用
 	EWeaponType GetWeaponType()const { return WeaponType; }
 
-	// 武器のメッシュ
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "WeaponMesh")
-		class UStaticMeshComponent* WeaponStaticMesh;
-
-	// 武器のコリジョン
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "WeaponCollision")
-		class UCapsuleComponent* WeaponCollision;
-
-	// オーナーを判別するEnum
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "OwnerType")
-		EOwnerType OwnerType;
-
-	// 武器を判別するEnum
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "WeaponType")
-		EWeaponType WeaponType;
+	// プレイヤーとの距離計測
+	void DistanceCalculationToPlayer();
 
 protected:
 
@@ -140,6 +134,25 @@ protected:
 		// オーナーになるキャラクターの情報
 		class ACharacter* pOwner = nullptr;
 
+		// 武器のメッシュ
+		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "WeaponMesh")
+			class UStaticMeshComponent* WeaponStaticMesh;
+
+		// 武器のコリジョン
+		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "WeaponCollision")
+			class UCapsuleComponent* WeaponCollision;
+
+		// オーナーを判別するEnum
+		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "OwnerType")
+			EOwnerType OwnerType;
+
+		// 武器を判別するEnum
+		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "WeaponType")
+			EWeaponType WeaponType;
+
+		// 武器を判別するEnum
+		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "DropAngle")
+			FRotator DropAngle;
 
 private:
 
@@ -148,6 +161,9 @@ private:
 
 	// 飛んでいるかどうか
 	bool IsFalling;
+
+	// 拾える距離にいるかどうか
+	bool IsHoldDistance;
 
 	// フレームカウント用
 	float frames;
@@ -161,4 +177,6 @@ private:
 	// 被ダメージ時のエフェクト
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Effect", meta = (AllowPrivateAccess = "true"))
 		class UNiagaraSystem* AuraEffect;
+
+	class APlayerBase* pPlayer = nullptr;
 };

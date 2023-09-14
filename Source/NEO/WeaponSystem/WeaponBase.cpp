@@ -3,8 +3,10 @@
 
 #include "WeaponBase.h"
 #include "GameFramework/Character.h"
+#include "Kismet/GameplayStatics.h"
 #include "NiagaraComponent.h"
 #include "NEO/PlayerSystem/ActionAssistComponent.h"
+#include "NEO/PlayerSystem/PlayerBase.h"
 
 // Sets default values
 AWeaponBase::AWeaponBase()
@@ -12,7 +14,7 @@ AWeaponBase::AWeaponBase()
 	, IsFalling(false)
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
 	
 
 	// タグ設定
@@ -26,13 +28,17 @@ AWeaponBase::AWeaponBase()
 void AWeaponBase::BeginPlay()
 {
 	Super::BeginPlay();
-
+	
+	// プレイヤー取得
+	pPlayer = Cast<APlayerBase>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
 }
 
 // Called every frame
 void AWeaponBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	DistanceCalculationToPlayer();
 
 	if (IsFalling)
 	{
@@ -81,6 +87,8 @@ void AWeaponBase::AttachToHand(ACharacter* _owner, FName _socketName,EOwnerType 
 	// 持たれている状態にする
 	IsHeld = true;
 
+	IsHoldDistance = false;
+
 	// オーナーに設定
 	pOwner = _owner;
 
@@ -116,10 +124,51 @@ void AWeaponBase::DetachToHand()
 
 	// 飛ぶ前の場所設定
 	FlyBeforePos = GetActorLocation();
-
-	// Tick処理再開
-	PrimaryActorTick.bCanEverTick = true;
 }
+
+
+/*
+ * 関数名　　　　：DistanceCalculationToPlayer()
+ * 処理内容　　　：プレイヤーとの距離計算
+ * 戻り値　　　　：なし
+ */
+void AWeaponBase::DistanceCalculationToPlayer()
+{
+	if (IsHeld || IsFalling) { return; }
+
+	APlayerBase* Player = Cast<APlayerBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
+
+	if (Player)
+	{
+		FVector PlayerPos = Player->GetActorLocation();
+		// プレイヤーと距離計算
+		float Distance = FVector::Dist(PlayerPos, GetActorLocation());
+
+
+		if (Distance <= 120.f)
+		{
+			IsHoldDistance = true;
+
+			if (Cast<APlayerBase>(Player)->GetPickUpWeapon() == nullptr)
+			{
+				Cast<APlayerBase>(Player)->SetPickUpWeapon(this);
+				Cast<APlayerBase>(Player)->SetIsPickUpWeapon(true);
+			}
+
+		}
+		else
+		{
+			IsHoldDistance = false;
+			if (Cast<APlayerBase>(Player)->GetPickUpWeapon() == this)
+			{
+				Cast<APlayerBase>(Player)->SetPickUpWeapon(nullptr);
+				Cast<APlayerBase>(Player)->SetIsPickUpWeapon(false);
+			}
+		}
+	}
+
+}
+
 
 /*
  * 関数名　　　　：BlowsAway()
@@ -151,20 +200,16 @@ void AWeaponBase::BlowsAway()
 	// 元の位置より低くなったら終了
 	if (NowPos.Z < FlyBeforePos.Z)
 	{
-		float Pos = 0.f;
-		float Rot_Z = 0.f;
+		FVector Pos = FVector::ZeroVector;
 		
 		switch (WeaponType)
 		{
 		case EWeaponType::WeaponType_Sword:
-			Rot_Z = -90.f;
 			break;
 		case EWeaponType::WeaponType_Lance:
-			Rot_Z = 0.f;
-			Pos = -150.f;
+			Pos.Z = -70.f;
 			break;
 		case EWeaponType::WeaponType_Gun:
-			Rot_Z = -90.f;
 			break;
 		case EWeaponType::WeaponType_None:
 			break;
@@ -172,14 +217,11 @@ void AWeaponBase::BlowsAway()
 			break;
 		}
 		// 地面に刺さるように位置と角度を補正
-		SetActorLocation(FVector(FlyBeforePos.X,FlyBeforePos.Y,FlyBeforePos.Z + Pos));
-		SetActorRotation(FRotator(0.f, 0.f, Rot_Z));
+		SetActorLocation(FlyBeforePos + Pos);
+		SetActorRotation(DropAngle);
 
 		// フレームリセット
 		frames = 0.f;
-
-		// Tick処理中断
-		PrimaryActorTick.bCanEverTick = false;
 
 		// 飛んでいる状態のフラグを下ろす
 		IsFalling = false;
