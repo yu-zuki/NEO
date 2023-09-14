@@ -17,6 +17,7 @@ ASoldier::ASoldier()
     LastAttackTime = -AttackCooldown;
     bIsAttacking = false;
     bIsOnCooldown = false;
+    
 }
 
 void ASoldier::BeginPlay()
@@ -65,7 +66,7 @@ void ASoldier::AttackCombo()
     GetWorld()->GetTimerManager().ClearTimer(ComboResetTimer);
 
     GetWorld()->GetTimerManager().SetTimer(ComboResetTimer, this, &ASoldier::ResetCombo, 2.0f, false);
-    bIsRunning = false;
+    IsRunning = false;
     bIsAttacking = true;
 }
 void ASoldier::ResetCombo()

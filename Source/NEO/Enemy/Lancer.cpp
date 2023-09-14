@@ -17,7 +17,8 @@ ALancer::ALancer()
     GetCharacterMovement()->bOrientRotationToMovement = true;
     GetCharacterMovement()->RotationRate = FRotator(0.0f, 540.0f, 0.0f);
     GetCharacterMovement()->MaxWalkSpeed = MovementSpeed;
-  
+    IsRunning = false;
+    IsIdol = true;
 }
 
 
@@ -117,12 +118,16 @@ void ALancer::Tick(float DeltaTime)
         {
             SnappedDirection = GetSnappedDirection(DirectionToPlayer);
             MoveVector = SnappedDirection * Speed*3 * DeltaTime;
+            IsRunning = true;
+            IsIdol = false;
            
         }
        else if(CurrentDistance < DesiredDistance + 100 && CurrentTarget&& bIsRandMove==true) // DesiredDistance‚æ‚è400m‰“‚¢ê‡
        {
            FVector DirectionToTarget = (CurrentTarget->GetActorLocation() - GetActorLocation()).GetSafeNormal();
            MoveVector = DirectionToTarget * Speed/2* DeltaTime;
+           IsRunning = true;
+           IsIdol = false;
            
        }
 
@@ -205,7 +210,8 @@ void ALancer::CheckPlayerInFront()
 {
     // Ž©•ª‚ÌˆÊ’u‚ðŽæ“¾
     FVector MyLocation = GetActorLocation();
-    
+    IsRunning = true;
+    IsIdol = false;
     if (bIsNowDamage || bShouldSkipNextMovement)
     {
         bShouldSkipNextMovement = false;
