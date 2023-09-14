@@ -1,4 +1,4 @@
-// XV“úF2023/6/5		XVÒF“Ÿ		XV“à—eFƒQ[ƒ€‚Ìó‘Ô‚ğŠÇ—‚·‚éƒNƒ‰ƒX‚ğì¬
+ï»¿// æ›´æ–°æ—¥ï¼š2023/6/5		æ›´æ–°è€…ï¼šè‘£		æ›´æ–°å†…å®¹ï¼šã‚²ãƒ¼ãƒ ã®çŠ¶æ…‹ã‚’ç®¡ç†ã™ã‚‹ã‚¯ãƒ©ã‚¹ã‚’ä½œæˆ
 
 #include "TGS_GameStateBase.h"
 #include "TGS_GameMode.h"
@@ -12,7 +12,7 @@
 #include "JumpModuleActor.h"
 #include "Ingame_WG.h"
 
-//Game‚ÌDebugƒL[
+//Gameã®Debugã‚­ãƒ¼
 #define PLAYINGDEBUG true
 
 ATGS_GameStateBase::ATGS_GameStateBase()
@@ -22,20 +22,20 @@ ATGS_GameStateBase::ATGS_GameStateBase()
 
 }
 
-//ƒQ[ƒ€‚Ìó‘Ô‚ğ‰Šú‰»‚·‚é
+//ã‚²ãƒ¼ãƒ ã®çŠ¶æ…‹ã‚’åˆæœŸåŒ–ã™ã‚‹
 void ATGS_GameStateBase::InitGameState()
 {
 	PlayerCharacter = Cast<ACharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
 
 	//ECurrentPlayerType = EPlayerType::EPlayerType_1;
 	
-	//ƒoƒgƒ‹ƒGƒŠƒA‚Ì‰Šú‰»
+	//ãƒãƒˆãƒ«ã‚¨ãƒªã‚¢ã®åˆæœŸåŒ–
 	InitBattleArea();
 
-	//ƒQ[ƒ€‚Ìó‘Ô‚ğ‰Šú‰»‚·‚é
+	//ã‚²ãƒ¼ãƒ ã®çŠ¶æ…‹ã‚’åˆæœŸåŒ–ã™ã‚‹
 	InitCurrentState();
 
-	//PlayerType‚ğ‰Šú‰»‚·‚é
+	//PlayerTypeã‚’åˆæœŸåŒ–ã™ã‚‹
 	InitPlayerType();
 
 	//ECurrentTitleState = ETitleState::ETitle_None;
@@ -50,6 +50,9 @@ void ATGS_GameStateBase::UpdateGameState(float DeltaTime)
 		break;
 	case EGameState::EGame_Title:
 		OnGameTitle();
+		break;
+	case EGameState::EGame_Opening:
+		OnGameOpening();
 		break;
 	case EGameState::EGame_Playing:
 		OnGamePlaying(DeltaTime);
@@ -105,7 +108,7 @@ TArray<class AActor*> ATGS_GameStateBase::GetEnemies() const
 
 void ATGS_GameStateBase::ClearEnemies()
 {
-	//«”\‚ª—Ç‚­‚È‚¢ê‡‚ÍA‰º‹L‚ÌFor•¶‚ğg‚¤
+	//æ€§èƒ½ãŒè‰¯ããªã„å ´åˆã¯ã€ä¸‹è¨˜ã®Foræ–‡ã‚’ä½¿ã†
 	for (auto Enemy : Enemies)
 	{
 		RemoveEnemy(Enemy);
@@ -119,9 +122,9 @@ void ATGS_GameStateBase::ClearEnemies()
 
 void ATGS_GameStateBase::InitCurrentState()
 {
-	//¡‚ÌƒŒƒxƒ‹‚Ì–¼‘O‚ğæ“¾
+	//ä»Šã®ãƒ¬ãƒ™ãƒ«ã®åå‰ã‚’å–å¾—
 	FString CurrentLevelName = GetWorld()->GetMapName();
-	//ƒŒƒxƒ‹–¼‚Ìæ“ª‚É‚ ‚é"/Game/"‚ğíœ
+	//ãƒ¬ãƒ™ãƒ«åã®å…ˆé ­ã«ã‚ã‚‹"/Game/"ã‚’å‰Šé™¤
 	CurrentLevelName.RemoveFromStart(GetWorld()->StreamingLevelsPrefix);
 
 	if ((FName)CurrentLevelName == GameTitleLevelName)
@@ -141,7 +144,7 @@ void ATGS_GameStateBase::InitCurrentState()
 		ECurrentState = EGameState::EGame_Clear;
 	}
 
-	//ƒCƒ“ƒXƒ^ƒ“ƒX‚©‚çƒQ[ƒ€‚Ìó‘Ô‚ğ“Ç‚İ‚Ş
+	//ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã‹ã‚‰ã‚²ãƒ¼ãƒ ã®çŠ¶æ…‹ã‚’èª­ã¿è¾¼ã‚€
 	if (ECurrentState != GetGameInstance()->LoadGameStateData()) {
 		GetGameInstance()->SaveGameStateData(ECurrentState);
 		UE_LOG(LogTemp, Warning, TEXT("Not starting from GameTitle"));
@@ -153,7 +156,7 @@ void ATGS_GameStateBase::InitCurrentState()
 		//		UUserWidget* Widget_PlayerStatus = CreateWidget<UUserWidget>(GetWorld(), Widget_PlayerStatusClass, "PlayerStatus");
 
 		//		if (Widget_PlayerStatus) {
-		//			Widget_PlayerStatus->AddToViewport(1);		//ƒvƒŒƒCƒ„[‚ÌƒXƒe[ƒ^ƒX‚ğ•\¦‚·‚é
+		//			Widget_PlayerStatus->AddToViewport(1);		//ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹ã‚’è¡¨ç¤ºã™ã‚‹
 		//			bool test = Widget_PlayerStatus->IsInViewport();
 		//			
 		//			//print test
@@ -178,7 +181,7 @@ void ATGS_GameStateBase::InitPlayerType()
 
 bool ATGS_GameStateBase::IsGameOver()
 {
-	// —áF@/*if (player.hp < 0) { return true }*/
+	// ä¾‹ï¼šã€€/*if (player.hp < 0) { return true }*/
 
 	return bIsGameOver;
 }
@@ -190,43 +193,67 @@ bool ATGS_GameStateBase::IsGameClear()
 
 void ATGS_GameStateBase::OnGameTitle()
 {
-	if (EchangeLevel == EChangeLevel::EChangeLevel_Playing)			//ƒŒƒxƒ‹‚ğ•ÏX‚Å‚«‚é‚©‚Ç‚¤‚©
-	{
-		SetCurrentState(EGameState::EGame_Playing);					//ˆÓ–¡‚È‚¢‚©‚à
-		GetGameInstance()->SaveGameStateData(ECurrentState);		//ƒCƒ“ƒXƒ^ƒ“ƒX‚ÉƒQ[ƒ€‚Ìó‘Ô‚ğ•Û‘¶
-		GetGameInstance()->SavePlayerType(ECurrentPlayerType);		//ƒCƒ“ƒXƒ^ƒ“ƒX‚ÉPlayerType‚ğ•Û‘¶
+	ESubAction currentSubAction = UseSubAction();					//SubActionï¿½ï¿½ï¿½æ“¾
+
+
+	if (currentSubAction != ESubAction::ESubAction_None) {
+
+		SetCurrentState(EGameState::EGame_Opening);
+		GetGameInstance()->SaveGameStateData(ECurrentState);		//ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã«ã‚²ãƒ¼ãƒ ã®çŠ¶æ…‹ã‚’ä¿å­˜
+		GetGameInstance()->SavePlayerType(ECurrentPlayerType);		//ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã«PlayerTypeã‚’ä¿å­˜
 
 		GetGameInstance()->SaveRemainingLife(Life);					//PlayerLifeReset
 
-		ChangeNextLevel(ENextLevel::ENextLevel_Playing);			//ƒŒƒxƒ‹‚ğ•ÏX
+		ChangeNextLevel(ENextLevel::ENextLevel_Opening);
 	}
 
-	ESubAction currentSubAction = UseSubAction();					//SubAction‚ğæ“¾
-	//EnterƒL[‚ğ‰Ÿ‚µ‚½‚çAƒQ[ƒ€‚ğŠJn‚·‚é
-	//if (currentSubAction == ESubAction::ESubAction_Enter) {
-	//	EchangeLevel = EChangeLevel::EChangeLevel_Playing;
-	//}
-
-	if (currentSubAction != ESubAction::ESubAction_None) {
-		EchangeLevel = EChangeLevel::EChangeLevel_Playing;
-	}
-
-	//PlayerType‚ğ‘I‘ğ
+	//PlayerTypeã‚’é¸æŠ
 	//else if (currentSubAction == ESubAction::ESubAction_Right) {
-	//	//PlayerType‚ğ•ÏX‚·‚é
+	//	//PlayerTypeã‚’å¤‰æ›´ã™ã‚‹
 	//	NextPlayerType();
 	//}
 	//else if (currentSubAction == ESubAction::ESubAction_Left) {
-	//	//PlayerType‚ğ•ÏX‚·‚é
+	//	//PlayerTypeã‚’å¤‰æ›´ã™ã‚‹
 	//	BackPlayerType();
 	//}
 
 }
 
+void ATGS_GameStateBase::OnGameOpening()
+{
+	if (PLAYINGDEBUG) {
+		//Enterï¿½Lï¿½[ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ê‚½ï¿½ï¿½Aï¿½Qï¿½[ï¿½ï¿½ï¿½ï¿½GameOverï¿½É‚ï¿½ï¿½ï¿½
+		if (UseSubAction() != ESubAction::ESubAction_None) {
+
+			MoveToIngameLevel();
+		}
+	}
+
+	//Enterã‚­ãƒ¼ãŒæŠ¼ã•ã‚ŒãŸã‚‰ã€ã‚¤ãƒ³ã‚²ãƒ¼ãƒ ã«è¡Œã
+	if (UseSubAction() == ESubAction::ESubAction_Enter) {
+
+		SetCurrentState(EGameState::EGame_Playing);
+		ChangeNextLevel(ENextLevel::ENextLevel_Playing);
+	}
+	//ESubAction currentSubAction = UseSubAction();					//SubActionï¿½ï¿½ï¿½æ“¾
+
+	//if (currentSubAction != ESubAction::ESubAction_None) {
+
+	//	SetCurrentState(EGameState::EGame_Playing);
+	//	GetGameInstance()->SaveGameStateData(ECurrentState);		//ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã«ã‚²ãƒ¼ãƒ ã®çŠ¶æ…‹ã‚’ä¿å­˜
+	//	GetGameInstance()->SavePlayerType(ECurrentPlayerType);		//ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã«PlayerTypeã‚’ä¿å­˜
+
+	//	GetGameInstance()->SaveRemainingLife(Life);					//PlayerLifeReset
+
+	//	ChangeNextLevel(ENextLevel::ENextLevel_Playing);
+	//}
+
+
+}
 
 void ATGS_GameStateBase::OnGamePlaying(float DeltaTime)
 {
-	//Debug—p
+	//Debugç”¨
 	if (bIsOnBattleArea)	{
 		EnterBattleArea();
 		SetCurrentState(EGameState::EGame_InBattleArea);
@@ -238,14 +265,14 @@ void ATGS_GameStateBase::OnGamePlaying(float DeltaTime)
 		SetCurrentState(EGameState::EGame_Over);
 		GameEndTime = FDateTime::Now();
 
-		GetGameInstance()->SaveGameStateData(ECurrentState);		//ƒCƒ“ƒXƒ^ƒ“ƒX‚ÉƒQ[ƒ€‚Ìó‘Ô‚ğ•Û‘¶
+		GetGameInstance()->SaveGameStateData(ECurrentState);		//ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã«ã‚²ãƒ¼ãƒ ã®çŠ¶æ…‹ã‚’ä¿å­˜
 		ChangeNextLevel(ENextLevel::ENextLevel_Over);
 	}
 	else if(IsGameClear()){
 		SetCurrentState(EGameState::EGame_Clear);
 		GameEndTime = FDateTime::Now();
 
-		GetGameInstance()->SaveGameStateData(ECurrentState);		//ƒCƒ“ƒXƒ^ƒ“ƒX‚ÉƒQ[ƒ€‚Ìó‘Ô‚ğ•Û‘¶
+		GetGameInstance()->SaveGameStateData(ECurrentState);		//ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã«ã‚²ãƒ¼ãƒ ã®çŠ¶æ…‹ã‚’ä¿å­˜
 		ChangeNextLevel(ENextLevel::ENextLevel_Clear);
 	}
 	else if (false) {
@@ -263,7 +290,7 @@ void ATGS_GameStateBase::OnGamePlaying(float DeltaTime)
 	}
 
 	if (PLAYINGDEBUG) {
-		//EnterƒL[‚ª‰Ÿ‚³‚ê‚½‚çAƒQ[ƒ€‚ğGameOver‚É‚·‚é
+		//Enterã‚­ãƒ¼ãŒæŠ¼ã•ã‚ŒãŸã‚‰ã€ã‚²ãƒ¼ãƒ ã‚’GameOverã«ã™ã‚‹
 		if (UseSubAction() == ESubAction::ESubAction_Enter) {
 			EchangeLevel = EChangeLevel::EChangeLevel_Over;
 		}
@@ -278,11 +305,11 @@ void ATGS_GameStateBase::OnGameOver()
 	else if (EchangeLevel == EChangeLevel::EChangeLevel_Title) {
 		SetCurrentState(EGameState::EGame_Title);
 
-		GetGameInstance()->SaveGameStateData(ECurrentState);		//ƒCƒ“ƒXƒ^ƒ“ƒX‚ÉƒQ[ƒ€‚Ìó‘Ô‚ğ•Û‘¶
+		GetGameInstance()->SaveGameStateData(ECurrentState);		//ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã«ã‚²ãƒ¼ãƒ ã®çŠ¶æ…‹ã‚’ä¿å­˜
 		ChangeNextLevel(ENextLevel::ENextLevel_Title);
 	}
 
-	//EnterƒL[‚ª‰Ÿ‚³‚ê‚½‚çAƒ^ƒCƒgƒ‹‚É–ß‚é
+	//Enterã‚­ãƒ¼ãŒæŠ¼ã•ã‚ŒãŸã‚‰ã€ã‚¿ã‚¤ãƒˆãƒ«ã«æˆ»ã‚‹
 	if (UseSubAction() == ESubAction::ESubAction_Enter) {
 		EchangeLevel = EChangeLevel::EChangeLevel_Title;
 	}
@@ -293,11 +320,11 @@ void ATGS_GameStateBase::OnGameClear()
 	if (EchangeLevel == EChangeLevel::EChangeLevel_Title) {
 		SetCurrentState(EGameState::EGame_Title);
 
-		GetGameInstance()->SaveGameStateData(ECurrentState);		//ƒCƒ“ƒXƒ^ƒ“ƒX‚ÉƒQ[ƒ€‚Ìó‘Ô‚ğ•Û‘¶
+		GetGameInstance()->SaveGameStateData(ECurrentState);		//ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã«ã‚²ãƒ¼ãƒ ã®çŠ¶æ…‹ã‚’ä¿å­˜
 		ChangeNextLevel(ENextLevel::ENextLevel_Title);
 	}
 
-	//EnterƒL[‚ª‰Ÿ‚³‚ê‚½‚çAƒ^ƒCƒgƒ‹‚É–ß‚é
+	//Enterã‚­ãƒ¼ãŒæŠ¼ã•ã‚ŒãŸã‚‰ã€ã‚¿ã‚¤ãƒˆãƒ«ã«æˆ»ã‚‹
 	if (UseSubAction() == ESubAction::ESubAction_Enter) {
 		EchangeLevel = EChangeLevel::EChangeLevel_Title;
 	}
@@ -319,11 +346,11 @@ void ATGS_GameStateBase::OnGameMenu()
 	else if (true) {
 		SetCurrentState(EGameState::EGame_Title);
 
-		GetGameInstance()->SaveGameStateData(ECurrentState);		//ƒCƒ“ƒXƒ^ƒ“ƒX‚ÉƒQ[ƒ€‚Ìó‘Ô‚ğ•Û‘¶
+		GetGameInstance()->SaveGameStateData(ECurrentState);		//ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã«ã‚²ãƒ¼ãƒ ã®çŠ¶æ…‹ã‚’ä¿å­˜
 		ChangeNextLevel(ENextLevel::ENextLevel_Title);
 	}
 
-	//Menu‰æ–Ê‚ğ’Ç‰Á
+	//Menuç”»é¢ã‚’è¿½åŠ 
 }
 
 void ATGS_GameStateBase::OnGamePause()
@@ -335,9 +362,9 @@ void ATGS_GameStateBase::OnGamePause()
 
 void ATGS_GameStateBase::OnInBattleArea()
 {
-	//Debug—p BattleArea‚©‚ço‚é
+	//Debugç”¨ BattleAreaã‹ã‚‰å‡ºã‚‹
 	if ( (UseSubAction() == ESubAction::ESubAction_Enter  && PLAYINGDEBUG) || BattleAreaEnemyCount <= 0) {
-		//ƒoƒgƒ‹ƒGƒŠƒA‚©‚ço‚é
+		//ãƒãƒˆãƒ«ã‚¨ãƒªã‚¢ã‹ã‚‰å‡ºã‚‹
 		ExitBattleArea();
 		SetCurrentState(EGameState::EGame_Playing);
 	}
@@ -345,7 +372,7 @@ void ATGS_GameStateBase::OnInBattleArea()
 		SetCurrentState(EGameState::EGame_Over);
 		GameEndTime = FDateTime::Now();
 
-		GetGameInstance()->SaveGameStateData(ECurrentState);		//ƒCƒ“ƒXƒ^ƒ“ƒX‚ÉƒQ[ƒ€‚Ìó‘Ô‚ğ•Û‘¶
+		GetGameInstance()->SaveGameStateData(ECurrentState);		//ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã«ã‚²ãƒ¼ãƒ ã®çŠ¶æ…‹ã‚’ä¿å­˜
 		ChangeNextLevel(ENextLevel::ENextLevel_Over);
 	}
 
@@ -353,11 +380,11 @@ void ATGS_GameStateBase::OnInBattleArea()
 
 void ATGS_GameStateBase::EnterBattleArea()
 {
-	//ƒoƒgƒ‹ƒGƒŠƒA‚ğ—LŒø‰»
+	//ãƒãƒˆãƒ«ã‚¨ãƒªã‚¢ã‚’æœ‰åŠ¹åŒ–
 	for (auto Mesh : BattleAreaMeshs)	{
 		if (Mesh)		{
 			Mesh->SetCollisionEnabled(ECollisionEnabled::QueryOnly);;
-			//-------------------ƒRƒŠƒWƒ‡ƒ“‚ğ—LŒø‰»----------------------
+			//-------------------ã‚³ãƒªã‚¸ãƒ§ãƒ³ã‚’æœ‰åŠ¹åŒ–----------------------
 			NowBattleArea = true;
 
 		}
@@ -366,11 +393,11 @@ void ATGS_GameStateBase::EnterBattleArea()
 		}
 	}
 
-	//ƒvƒŒƒCƒ„[‚ÌƒJƒƒ‰‚ğŒÅ’èƒJƒƒ‰‚É•ÏX
+	//ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®ã‚«ãƒ¡ãƒ©ã‚’å›ºå®šã‚«ãƒ¡ãƒ©ã«å¤‰æ›´
 	if (GetBattleAreaCamera()) {
 		ATGS_GameMode* GameMode = Cast<ATGS_GameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 		if (GameMode) {
-			//ƒRƒƒ“ƒgƒAƒEƒg‚µ‚Ä‚¨‚­
+			//ã‚³ãƒ¡ãƒ³ãƒˆã‚¢ã‚¦ãƒˆã—ã¦ãŠã
 			GameMode->SetViewTargetWithBlend(GetBattleAreaCamera());
 		}
 		else {
@@ -378,7 +405,7 @@ void ATGS_GameStateBase::EnterBattleArea()
 		}
 	}
 
-	//GameMode‚ğg‚Á‚ÄAƒoƒgƒ‹ƒGƒŠƒA‚É“G‚ğƒXƒ|[ƒ“‚³‚¹‚éB@ƒİŒv‚ªˆ«‚¢„
+	//GameModeã‚’ä½¿ã£ã¦ã€ãƒãƒˆãƒ«ã‚¨ãƒªã‚¢ã«æ•µã‚’ã‚¹ãƒãƒ¼ãƒ³ã•ã›ã‚‹ã€‚ã€€ï¼œè¨­è¨ˆãŒæ‚ªã„ï¼
 	ATGS_GameMode* GameMode = Cast<ATGS_GameMode>(GetWorld()->GetAuthGameMode());
 	if (GameMode) {
 		GameMode->SpawnEnemyInBattleArea();
@@ -391,12 +418,12 @@ void ATGS_GameStateBase::EnterBattleArea()
 void ATGS_GameStateBase::ExitBattleArea()
 {
 	bIsOnBattleArea = false;
-	//ƒoƒgƒ‹ƒGƒŠƒA‚ğ–³Œø‰»
+	//ãƒãƒˆãƒ«ã‚¨ãƒªã‚¢ã‚’ç„¡åŠ¹åŒ–
 	for (auto Mesh : BattleAreaMeshs) {
 		if (Mesh) {
 			Mesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
-			//-------------------ƒRƒŠƒWƒ‡ƒ“‚ğ–³Œø‚©----------------------
+			//-------------------ã‚³ãƒªã‚¸ãƒ§ãƒ³ã‚’ç„¡åŠ¹ã‹----------------------
 			NowBattleArea = false;
 		}
 		else {
@@ -404,12 +431,12 @@ void ATGS_GameStateBase::ExitBattleArea()
 		}
 	}
 
-	//ŒÅ’èƒJƒƒ‰‚ğƒvƒŒƒCƒ„[‚ÌƒJƒƒ‰‚É•ÏX
+	//å›ºå®šã‚«ãƒ¡ãƒ©ã‚’ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®ã‚«ãƒ¡ãƒ©ã«å¤‰æ›´
 	if (PlayerCharacter) {
 		ATGS_GameMode* GameMode = Cast<ATGS_GameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 		if (GameMode) {
 			if (SplineCamera)			{
-				//ƒJƒƒ‰‚ğƒvƒŒƒCƒ„[‚ÌƒJƒƒ‰‚É•ÏX
+				//ã‚«ãƒ¡ãƒ©ã‚’ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®ã‚«ãƒ¡ãƒ©ã«å¤‰æ›´
 				GameMode->SetViewTargetWithBlend(SplineCamera, 1.f);
 			}
 			else {
@@ -427,7 +454,7 @@ void ATGS_GameStateBase::ExitBattleArea()
 
 void ATGS_GameStateBase::InitBattleArea()
 {
-	//ƒoƒgƒ‹ƒGƒŠƒA‚ğ–³Œø‰»
+	//ãƒãƒˆãƒ«ã‚¨ãƒªã‚¢ã‚’ç„¡åŠ¹åŒ–
 	ExitBattleArea();
 }
 
@@ -455,8 +482,8 @@ UTGS_GameInstance* ATGS_GameStateBase::GetGameInstance()
 }
 
 /**
-* w’è‚³‚ê‚½NextLevelƒpƒ‰ƒ[ƒ^‚ÉŠî‚Ã‚¢‚ÄƒŒƒxƒ‹‚ğ•ÏX‚µ‚Ü‚·B
-* @param NextLevel Ÿ‚É•ÏX‚·‚éƒŒƒxƒ‹‚ğŒˆ’è‚·‚é—ñ‹“’lB
+* æŒ‡å®šã•ã‚ŒãŸNextLevelãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã«åŸºã¥ã„ã¦ãƒ¬ãƒ™ãƒ«ã‚’å¤‰æ›´ã—ã¾ã™ã€‚
+* @param NextLevel æ¬¡ã«å¤‰æ›´ã™ã‚‹ãƒ¬ãƒ™ãƒ«ã‚’æ±ºå®šã™ã‚‹åˆ—æŒ™å€¤ã€‚
 */
 void ATGS_GameStateBase::ChangeNextLevel(ENextLevel NextLevel)
 {
@@ -466,6 +493,9 @@ void ATGS_GameStateBase::ChangeNextLevel(ENextLevel NextLevel)
 		break;
 	case ENextLevel::ENextLevel_Title:
 		ChangeLevel(GameTitleLevelName);
+		break;
+	case ENextLevel::ENextLevel_Opening:
+		ChangeLevel(GameOpeningLevelName);
 		break;
 	case ENextLevel::ENextLevel_Playing:
 		ChangeLevel(GamePlayLevelName);
@@ -481,15 +511,15 @@ void ATGS_GameStateBase::ChangeNextLevel(ENextLevel NextLevel)
 
 void ATGS_GameStateBase::ChangeLevel(FName NextLevelName)
 {
-	//Ÿ‚ÌƒŒƒxƒ‹‚ÉˆÚ“®‚·‚é
+	//æ¬¡ã®ãƒ¬ãƒ™ãƒ«ã«ç§»å‹•ã™ã‚‹
 	if (NextLevelName != NAME_None) {
 		UGameplayStatics::OpenLevel(GetWorld(), NextLevelName);
 	}
 }
 
 /**
-* w’è‚³‚ê‚½NextLevelƒpƒ‰ƒ[ƒ^‚ÉŠî‚Ã‚¢‚ÄƒŒƒxƒ‹‚ğ•ÏX‚µ‚Ü‚·B
-* @param NextLevel Ÿ‚É•ÏX‚·‚éƒŒƒxƒ‹‚ğŒˆ’è‚·‚é—ñ‹“’lB
+* æŒ‡å®šã•ã‚ŒãŸNextLevelãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã«åŸºã¥ã„ã¦ãƒ¬ãƒ™ãƒ«ã‚’å¤‰æ›´ã—ã¾ã™ã€‚
+* @param NextLevel æ¬¡ã«å¤‰æ›´ã™ã‚‹ãƒ¬ãƒ™ãƒ«ã‚’æ±ºå®šã™ã‚‹åˆ—æŒ™å€¤ã€‚
 */
 //EChangeLevel ATGS_GameStateBase::GetChangeLevel()
 //{
@@ -543,13 +573,22 @@ void ATGS_GameStateBase::BackPlayerType()
 	}
 }
 
+void ATGS_GameStateBase::MoveToIngameLevel()
+{
+	SetCurrentState(EGameState::EGame_Playing);
+
+	GetGameInstance()->SaveGameStateData(ECurrentState);		//ï¿½Cï¿½ï¿½ï¿½Xï¿½^ï¿½ï¿½ï¿½Xï¿½ÉƒQï¿½[ï¿½ï¿½ï¿½Ìï¿½Ô‚ï¿½Û‘ï¿½
+	ChangeNextLevel(ENextLevel::ENextLevel_Playing);
+}
+
+
 /**
- * @brief ƒTƒuƒAƒNƒVƒ‡ƒ“‚ğg—p‚·‚é‚½‚ß‚ÌŠÖ”
+ * @brief ã‚µãƒ–ã‚¢ã‚¯ã‚·ãƒ§ãƒ³ã‚’ä½¿ç”¨ã™ã‚‹ãŸã‚ã®é–¢æ•°
  *
- * @details Œ»İİ’è‚³‚ê‚Ä‚¢‚éƒTƒuƒAƒNƒVƒ‡ƒ“‚ğ•Ô‚µA
- *          Œ»İ‚ÌƒTƒuƒAƒNƒVƒ‡ƒ“‚ğƒŠƒZƒbƒg‚·‚éB
+ * @details ç¾åœ¨è¨­å®šã•ã‚Œã¦ã„ã‚‹ã‚µãƒ–ã‚¢ã‚¯ã‚·ãƒ§ãƒ³ã‚’è¿”ã—ã€
+ *          ç¾åœ¨ã®ã‚µãƒ–ã‚¢ã‚¯ã‚·ãƒ§ãƒ³ã‚’ãƒªã‚»ãƒƒãƒˆã™ã‚‹ã€‚
  *
- * @return ESubAction Œ»İİ’è‚³‚ê‚Ä‚¢‚éƒTƒuƒAƒNƒVƒ‡ƒ“
+ * @return ESubAction ç¾åœ¨è¨­å®šã•ã‚Œã¦ã„ã‚‹ã‚µãƒ–ã‚¢ã‚¯ã‚·ãƒ§ãƒ³
  */
 ESubAction ATGS_GameStateBase::UseSubAction()
 {
