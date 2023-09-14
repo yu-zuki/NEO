@@ -25,7 +25,7 @@ AGunMan::AGunMan()
     PrimaryActorTick.bCanEverTick = true;
 
     
-    MaxHealth = 10;
+    MaxHealth = 60;
     Health = MaxHealth;
     bIsBulletAlive = false;
     bCanMove = true;
