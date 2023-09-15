@@ -30,6 +30,7 @@ ASplineCamera::ASplineCamera()
 
 	//Box
 	BoxComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxComponent"));
+	BoxComponent->SetupAttachment(CameraComponent);
 
 	bMoveFlag = false;
 	CameraSpeed = 300.0f;
