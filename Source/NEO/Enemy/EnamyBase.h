@@ -122,24 +122,13 @@ public:
 	bool bIsDeath;
 	
 	bool IsAnimationAttacking() const;
-	UFUNCTION(BlueprintCallable)
-	bool IsIdol() const { return bIsIdol; }
-	bool IsWalking() const { return bIsWalking; }
-	UFUNCTION(BlueprintCallable)
-	bool IsRunning ()const { return bIsRunning; }
-	bool IsAttacking() const { return bIsAttacking; }
-	bool IsReactingToDamage() const { return bIsReactingToDamage; }
-	bool IsDead() const { return bIsDead; }
-	bool IsAir() const{ return bIsAir; }
+	UPROPERTY(BlueprintReadWrite)
+		bool IsIdol;
 
+	UPROPERTY(BlueprintReadWrite)
+		bool IsRunning;
 
-	bool bIsIdol;
-	bool bIsWalking;
-	bool bIsRunning;
-	bool bIsAttacking;
-	bool bIsReactingToDamage;
-	bool bIsDead;
-	bool bIsAir;
+	
 	///UI
 public:
 
