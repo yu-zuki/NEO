@@ -127,7 +127,8 @@ public:
 
 	UPROPERTY(BlueprintReadWrite)
 		bool IsRunning;
-
+	UPROPERTY(BlueprintReadWrite)
+		bool IsDamage;
 	
 	///UI
 public:

@@ -37,7 +37,7 @@ AEnamyBase::AEnamyBase()
 	bHasPattern2Tag = Tags.Contains("pattern2");
 	bHasPattern3Tag = Tags.Contains("pattern3");
 	bHasWeponTag = Tags.Contains("HasWepon");
-
+	IsDamage = false;
 
 
 	MoveSpline = CreateDefaultSubobject<USplineComponent>(TEXT("MoveSpline"));
@@ -296,12 +296,12 @@ void AEnamyBase::ApplyDamage(float DamageAmount)
 		GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 		GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldStatic, ECollisionResponse::ECR_Block);
 
-
+		IsDamage = false;
 	}
 	else
 	{
-		PlayAnimMontage(Damage_Reaction, 0.8, NAME_None);
-
+		/*PlayAnimMontage(Damage_Reaction, 0.8, NAME_None);*/
+		IsDamage = true;
 		ActionAssistComp->SpawnEffect(NiagaraEffect, GetActorLocation());
 
 	}
