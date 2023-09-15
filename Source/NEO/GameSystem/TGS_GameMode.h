@@ -130,9 +130,13 @@ public:
 
 	void SetSplineCamera(AActor* _splineCamera);
 
+	//UFUNCTION(BlueprintCallable, Category = "GameSystem")
+	//	AActor* SetSplineCamera(AActor* _splineCamera);
+
 //égÇ¢ï˚
 //Å@ATGS_GameMode* GameMode = Cast<ATGS_GameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 //Å@GameMode->SetViewTargetWithBlend(Actor, 0.5f);
+	UFUNCTION(BlueprintCallable, Category = "GameSystem")
 void SetViewTargetWithBlend(class AActor* NewViewTarget, float BlendTime = 0, enum EViewTargetBlendFunction BlendFunc = VTBlend_Linear, float BlendExp = 0, bool bLockOutgoing = false);
 
 protected:

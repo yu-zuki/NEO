@@ -36,6 +36,7 @@ AGameSystem_BattleArea::AGameSystem_BattleArea()
 	StaticMeshComponent->SetupAttachment(RootComponent);
 	StaticMeshComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	StaticMeshComponent->SetCollisionResponseToAllChannels(ECR_Overlap);
+	StaticMeshComponent->SetVisibility(false);
 
 	//Meshの生成
 	LeftMesh = CreateDefaultSubobject<UProceduralMeshComponent>(TEXT("LeftProceduralMesh"));
@@ -248,7 +249,10 @@ void AGameSystem_BattleArea::BeginOverlap(UPrimitiveComponent* OverlappedCompone
 		if (Character->ActorHasTag(EnterActorTag))		{
 			StaticMeshComponent->DestroyComponent();	// コンポーネントを破壊
 
+			BPFunction();
+
 			EnterBattleArea();
+
 			//NowBattleArea = true;
 		}
 	}
@@ -334,4 +338,16 @@ void AGameSystem_BattleArea::ResetCollision()
 	LeftMesh->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	RightMesh->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	NearMesh->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+}
+
+//void AGameSystem_BattleArea::BPFunction()
+//{
+//}
+
+void AGameSystem_BattleArea::BPFunction_Implementation()
+{
+}
+
+void AGameSystem_BattleArea::ExitAreaEvent_Implementation()
+{
 }

@@ -271,6 +271,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "SetStatus")
 		class AWeaponBase* GetPickUpWeapon()const { return CanPickUpWeapon; }
 
+	bool GetPlayerMoveRight()const { return MoveRight; }
+
 
 private:
 
@@ -401,6 +403,9 @@ private:
 
 	// ‰E‚ğŒü‚¢‚Ä‚¢‚é‚©
 	bool IsLookRight;
+
+	// 
+	bool MoveRight = false;
 
 	// R‚èUŒ‚’†‚©‚Ç‚¤‚©
 	bool IsKicking;

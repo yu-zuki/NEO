@@ -118,6 +118,23 @@ public:
 	// ƒRƒŠƒWƒ‡ƒ“‚ğŒ³‚É–ß‚·ŠÖ”
 	void ResetCollision();
 
+	UFUNCTION(BlueprintNativeEvent,BlueprintCallable, Category = "BattleArea")
+		void BPFunction();
+
+	virtual void BPFunction_Implementation();
+	
+	UFUNCTION(BlueprintNativeEvent,BlueprintCallable, Category = "BattleArea")
+		void ExitAreaEvent();
+
+	virtual void ExitAreaEvent_Implementation();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BattleArea")
+		int32 LSNum = 0;	
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BattleArea")
+		int32 ExitEventNum = 0;
+
+	
 	//////////////////////////////////•Ç‚Ì“–‚½‚è”»’è‚ğ¶¬//////////////////////////////////////////////////
 
 

@@ -33,6 +33,7 @@ ASplineCamera::ASplineCamera()
 
 	bMoveFlag = false;
 	CameraSpeed = 300.0f;
+	CurrentRatio = 0;
 
 }
 
@@ -75,10 +76,13 @@ void ASplineCamera::Tick(float DeltaTime)
 
 	if (bMoveFlag != true) return;
 
+
 	// プレイヤーを取得
-	ACharacter* PlayerCharacter = UGameplayStatics::GetPlayerCharacter(this, 0);
+	APlayerBase* PlayerCharacter = Cast<APlayerBase> ( UGameplayStatics::GetPlayerCharacter(this, 0) );
 	if (PlayerCharacter && SplineComponent)
 	{
+		//if (PlayerCharacter->GetPlayerMoveRight() != true) { return; }
+
 		// プレイヤーの位置を取得
 		FVector PlayerLocation = PlayerCharacter->GetActorLocation();
 
