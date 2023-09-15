@@ -595,7 +595,7 @@ void APlayerBase::Attack1()
  */
 void APlayerBase::Attack2()
 {
-	if (!IsControl || !IsCharging) { return; }
+	if (!IsCharging) { return; }
 
 	IsCharging = false;
 
@@ -776,6 +776,7 @@ void APlayerBase::RotateCharacter(float _nowInput_X)
 
 	// ‰E‚ðŒü‚¢‚Ä‚¢‚é‚©Šm”F
 	IsLookRight = (_nowInput_X != 1.f) ? (true) : (false);
+	MoveRight = (_nowInput_X == 1.f);
 
 	// ‰ñ“]
 	ActionAssistComp->OwnerParallelToCamera(IsLookRight);

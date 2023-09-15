@@ -46,6 +46,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
 		float CurrentDistance;
 
+	float CurrentRatio;
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

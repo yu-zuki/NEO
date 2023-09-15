@@ -12,6 +12,8 @@
 #include "JumpModuleActor.h"
 #include "Ingame_WG.h"
 
+#include "GameSystem_BattleArea.h"
+
 //GameのDebugキー
 #define PLAYINGDEBUG true
 
@@ -431,9 +433,20 @@ void ATGS_GameStateBase::ExitBattleArea()
 		}
 	}
 
+	//ExitEvent
+	ATGS_GameMode* GameMode = Cast<ATGS_GameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	if (GameMode)
+	{
+		AGameSystem_BattleArea* Area = Cast<AGameSystem_BattleArea>( GameMode->GetCameraActor() );
+		if (Area) {
+			Area->ExitAreaEvent();
+		}
+	}
+
+
 	//固定カメラをプレイヤーのカメラに変更
 	if (PlayerCharacter) {
-		ATGS_GameMode* GameMode = Cast<ATGS_GameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+		//ATGS_GameMode* GameMode = Cast<ATGS_GameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 		if (GameMode) {
 			if (SplineCamera)			{
 				//カメラをプレイヤーのカメラに変更
@@ -455,7 +468,7 @@ void ATGS_GameStateBase::ExitBattleArea()
 void ATGS_GameStateBase::InitBattleArea()
 {
 	//バトルエリアを無効化
-	ExitBattleArea();
+	//ExitBattleArea();
 }
 
 AActor* ATGS_GameStateBase::GetBattleAreaCamera()
