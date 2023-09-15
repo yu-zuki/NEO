@@ -124,15 +124,11 @@ AActor* AEnamyBase::GetPlayer()
 // Called every frame
 void AEnamyBase::Tick(float DeltaTime)
 {
-
+	Super::Tick(DeltaTime);
 	if (bIsNowDamage)
 	{
 		return;
 	}
-
-	Super::Tick(DeltaTime);
-
-
 
 
 	//キャラクターの位置を取得

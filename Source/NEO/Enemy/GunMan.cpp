@@ -24,7 +24,7 @@ AGunMan::AGunMan()
     // Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
     PrimaryActorTick.bCanEverTick = true;
 
-    
+
     MaxHealth = 60;
     Health = MaxHealth;
     bIsBulletAlive = false;
@@ -35,11 +35,11 @@ AGunMan::AGunMan()
 // Called when the game starts or when spawned
 void AGunMan::BeginPlay()
 {
-	Super::BeginPlay();
+    Super::BeginPlay();
     // プレイヤーキャラクターの参照を取得
     PlayerCharacter = UGameplayStatics::GetPlayerCharacter(this, 0);
-    
-    GetWorldTimerManager().SetTimer(AttackTimerHandle, this,&AGunMan::PlayAttackAnim, 5.0f, true);
+
+    GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &AGunMan::PlayAttackAnim, 5.0f, true);
 
     // 武器をSpawn
     if (WeaponClass && !Weapon)
@@ -72,7 +72,7 @@ FVector AGunMan::GetSnappedDirection(const FVector& Direction) const
 
     return SnappedDirection.GetSafeNormal();
 }
-    
+
 
 void AGunMan::CollisionOn()
 {
@@ -84,8 +84,8 @@ void AGunMan::CollisionOn()
 // Called every frame
 void AGunMan::Tick(float DeltaTime)
 {
- 
-	Super::Tick(DeltaTime);
+
+    Super::Tick(DeltaTime);
     if (Health <= 0)
     {
         if (Weapon)
@@ -94,39 +94,39 @@ void AGunMan::Tick(float DeltaTime)
             Weapon = nullptr;
         }
     }
-   /* PlayerCharacter = Cast<ACharacter>(GetPlayer());
-    
-    {
-        if (PlayerCharacter)
-        {
-            // プレイヤーとの距離を取得
-            float DistanceToPlayer = GetDistanceToPlayer();
+    /* PlayerCharacter = Cast<ACharacter>(GetPlayer());
 
-            // プレイヤーとの距離が望ましい距離よりも離れている場合、プレイヤーに近づく
-            if (DistanceToPlayer > DesiredDistance)
-            {
-                FVector PlayerDirection = GetPlayerDirection();
-                AddMovementInput(PlayerDirection);
+     {
+         if (PlayerCharacter)
+         {
+             // プレイヤーとの距離を取得
+             float DistanceToPlayer = GetDistanceToPlayer();
 
-            }
-            else if (DistanceToPlayer < DesiredDistance - 150.0f) // プレイヤーが望ましい距離-100以下に入った場合
-            {
-                // プレイヤーから離れる
-                FVector PlayerDirection = GetPlayerDirection();
-                AddMovementInput(-PlayerDirection);
-            }
-        }
+             // プレイヤーとの距離が望ましい距離よりも離れている場合、プレイヤーに近づく
+             if (DistanceToPlayer > DesiredDistance)
+             {
+                 FVector PlayerDirection = GetPlayerDirection();
+                 AddMovementInput(PlayerDirection);
+
+             }
+             else if (DistanceToPlayer < DesiredDistance - 150.0f) // プレイヤーが望ましい距離-100以下に入った場合
+             {
+                 // プレイヤーから離れる
+                 FVector PlayerDirection = GetPlayerDirection();
+                 AddMovementInput(-PlayerDirection);
+             }
+         }
 
 
 
-        // キャラクターの位置を取得
-        FVector CharacterLocation = GetActorLocation();
+         // キャラクターの位置を取得
+         FVector CharacterLocation = GetActorLocation();
 
-      
-    }
-*/  
-   
-    if(bIsNowDamage )
+
+     }
+ */
+
+    if (bIsNowDamage)
     {
         return;
     }
@@ -137,18 +137,22 @@ void AGunMan::Tick(float DeltaTime)
     FVector DirectionToPlayer = GetPlayerDirection();
     FVector SnappedDirection;
     FVector MoveVector;
-    
+
     if (bCanMove == true)
     {
         if (CurrentDistance > DesiredDistance)
         {
             SnappedDirection = GetSnappedDirection(DirectionToPlayer);
             MoveVector = SnappedDirection * MoveSpeed * DeltaTime;
+            IsRunning = true;
+            IsIdol = false;
         }
         else if (CurrentDistance < DesiredDistance + 400)
         {
             SnappedDirection = GetSnappedDirection(-DirectionToPlayer);
             MoveVector = SnappedDirection * MoveSpeed / 3 * DeltaTime;
+            IsRunning = true;
+            IsIdol = false;
         }
         else
         {
@@ -157,7 +161,41 @@ void AGunMan::Tick(float DeltaTime)
 
         SetActorLocation(GetActorLocation() + MoveVector);
     }
-   
+    FVector Start = GetActorLocation();
+    FVector ForwardVector = GetActorForwardVector();
+    FVector End = ((ForwardVector * 15.f) + Start);  // 200 はトレースの距離、適宜調整すること
+
+    FHitResult HitResult;
+
+    // トレースの設定
+    FCollisionQueryParams CollisionParams;
+    CollisionParams.AddIgnoredActor(this);  // 自分自身は無視する
+
+    // Line Trace 実行
+    bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility, CollisionParams);
+
+    // ヒットした場合
+    if (bHit)
+    {
+        AActor* HitActor = HitResult.GetActor();
+        if (HitActor && HitActor->Tags.Contains("Fence"))
+        {
+            // Fence タグを持つオブジェクトが目の前にある！
+            // 何か処理をする
+            IsRunning = false;
+            IsIdol = true;
+            bCanMove = false;
+            MoveSpeed = 0;
+        }
+       
+    }
+    else
+    {
+        IsRunning = true;
+        IsIdol = false;
+        bCanMove = true;
+        MoveSpeed = 100;
+    }
 }
 
 
@@ -177,8 +215,8 @@ float AGunMan::GetDistanceToPlayer() const
 }
 void AGunMan::SpawnTrajectoryBullet()
 {
-    
-   
+
+
     USkeletalMeshComponent* CharacterMesh = GetMesh();
     FVector SpawnLocation = CharacterMesh->GetSocketLocation("enemy_root");
     FRotator SpawnRotation = CharacterMesh->GetSocketRotation("enemy_root");
@@ -188,7 +226,7 @@ void AGunMan::SpawnTrajectoryBullet()
         if (SpawnedTrajectoryBullet)
         {
             SpawnedTrajectoryBullet->AttachToComponent(CharacterMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, "enemy_root");
-         }
+        }
     }
 }
 
@@ -224,7 +262,7 @@ void AGunMan::ResumeMovement()
 {
     // Resume movement
     GetCharacterMovement()->Activate(true);
-   
+
 }
 void AGunMan::UnlockRotation()
 {
@@ -236,11 +274,13 @@ void AGunMan::PlayAttackAnim()
     if (Health > 0)
     {
         PlayAnimMontage(Attack, 1.0f, NAME_None);
-       /* SetActorTickEnabled(false);*/
+        /* SetActorTickEnabled(false);*/
         GetWorldTimerManager().SetTimer(TickEnableTimerHandle, this, &AGunMan::EnableTickAfterDelay, 3.0f, false);
         MoveSpeed = 0;
+        IsRunning = false;
+        IsIdol = true;
     }
-   
+
 }
 void AGunMan::EnableTickAfterDelay()
 {

@@ -82,7 +82,7 @@ void ALancer::Tick(float DeltaTime)
     }
     
    
-
+    
    
     PlayerCharacter = Cast<ACharacter>(GetPlayer());
     if (!PlayerCharacter) return;
@@ -140,10 +140,13 @@ void ALancer::Tick(float DeltaTime)
         {
             SnappedDirection = GetSnappedDirection(DirectionToPlayer);
             MoveVector = SnappedDirection * Speed * 3 * DeltaTime;
+            IsRunning = false;
+            IsIdol = true;
         }
     else
     {
-            return;
+            IsRunning = false;
+            IsIdol = true;
     }
     }
     if (Health <= 0)
