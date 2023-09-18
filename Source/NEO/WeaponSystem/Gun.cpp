@@ -92,6 +92,12 @@ void AGun::PlyerAttack()
 			FRotator SpawnBulletRotation = pOwner->GetActorRotation();
 
 			GetWorld()->SpawnActor<AActor>(BulletClass, SpawnBulletLocation, SpawnBulletRotation, SpawnParams);
+
+			if (ShootSoundObj)
+			{
+				// オブジェクト破壊用のサウンド再生
+				ActionAssistComp->PlaySound(ShootSoundObj);
+			}
 		}
 		else
 		{
@@ -130,8 +136,11 @@ void AGun::PlyerAttack()
 						{
 							Object->ReceiveDamage(DamageAmount);
 
-							// オブジェクト破壊用のサウンド再生
-							ActionAssistComp->PlaySound(ObjectHitSoundObj);
+							if (ObjectHitSoundObj)
+							{
+								// オブジェクト破壊用のサウンド再生
+								ActionAssistComp->PlaySound(ObjectHitSoundObj);
+							}
 						}
 					}
 
@@ -145,16 +154,33 @@ void AGun::PlyerAttack()
 
 						if (Enemy)
 						{
+							if (EnemyHitSoundObj)
+							{
+								// サウンド再生
+								ActionAssistComp->PlaySound(EnemyHitSoundObj);
+							}
+
+							// 敵のダメージ処理
 							Enemy->ApplyDamage(10.f);
 
 							// ノックバック
 							Enemy->AddActorLocalOffset(FVector(-100.f, 0.f, 0.f));
+
 						}
 						else if (Oda)
 						{
+							if (EnemyHitSoundObj)
+							{
+								// サウンド再生
+								ActionAssistComp->PlaySound(EnemyHitSoundObj);
+							}
+
+							// ボスのダメージ処理
 							Oda->ApplyDamage(10.f);
 							Oda->BossKnockback();
+
 						}
+
 					}
 				}
 			}
