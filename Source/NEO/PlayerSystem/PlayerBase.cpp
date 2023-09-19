@@ -448,7 +448,7 @@ void APlayerBase::Jump()
 	SetActorLocation(nextPos);
 
 	// 着地処理 下降開始から判定開始
-	if (IsPlayerGrounded() && frames >= 20.f)
+	if (IsPlayerGrounded() && frames >= 10.f)
 	{
 		IsJumping = false;
 	}

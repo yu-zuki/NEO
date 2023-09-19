@@ -223,6 +223,13 @@ void AWeaponBase::BlowsAway()
 		// フレームリセット
 		frames = 0.f;
 
+		// 落下音再生
+		if (DropWeaponSoundObj)
+		{
+			// 斬撃SE再生
+			ActionAssistComp->PlaySound(DropWeaponSoundObj);
+		}
+
 		// 飛んでいる状態のフラグを下ろす
 		IsFalling = false;
 	}

@@ -178,5 +178,8 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Effect", meta = (AllowPrivateAccess = "true"))
 		class UNiagaraSystem* AuraEffect;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Sound", meta = (AllowPrivateAccess = "true"))
+		class USoundBase* DropWeaponSoundObj;
+
 	class APlayerBase* pPlayer = nullptr;
 };
