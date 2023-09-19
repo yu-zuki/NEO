@@ -19,6 +19,7 @@
 // Sets default values
 APlayerBase::APlayerBase()
 	: IsControl(true)
+	, IsAIPlayer(true)
 	, IsRunning(false)
 	, IsLookRight(true)
 	, IsJumping(false)
@@ -52,14 +53,11 @@ APlayerBase::APlayerBase()
 	// アタックアシストコンポーネント作成
 	ActionAssistComp = CreateDefaultSubobject<UActionAssistComponent>(TEXT("AttackAssist"));
 
-	//WeaponPickUpArea = CreateDefaultSubobject<UBoxComponent>(TEXT("WeaponArea"));
-
 	// コリジョンイベントを設定
 	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &APlayerBase::OnOverlap);
 
-	//GetCapsuleComponent()->OnComponentEndOverlap.AddDynamic(this, &APlayerBase::EndOverlap);
-
-	//WeaponPickUpArea->OnComponentBeginOverlap.AddDynamic(this, &APlayerBase::OnOverlap);
+	// Playerのセットアップ
+	SetupPlayerData();
 }
 
 
@@ -171,14 +169,8 @@ void APlayerBase::SetupPlayerData()
 	// ゲームモード取得
 	pGameMode = Cast<ATGS_GameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 
-	// スプラインを検索して格納
-	AActor* tempSplineActor = GetSplineActor("PlayerLoad");
-
-	// アクターをスプラインにキャスト
-	if(tempSplineActor)
-	{
-		SplineActor = Cast<APlayerSpline>(tempSplineActor);
-	}
+	// アニメーションアセット設定
+	SetupAnimationAssets();
 }
 
 
@@ -261,6 +253,79 @@ void APlayerBase::SetupMainActionMapping()
 			UE_LOG(LogTemp, Error, TEXT("InputAction Array reference error"));
 			break;
 		}
+	}
+}
+
+
+/*
+ * 関数名　　　　：SetupAnimationAssets()
+ * 処理内容　　　：アニメーションアセットのセットアップ
+ * 戻り値　　　　：なし
+ */
+void APlayerBase::SetupAnimationAssets()
+{
+	// コンボアニメーションのパス保管用
+	{
+		TCHAR* ComboAnimationAssetPaths[2];
+
+		// アニメーションアセットのパス
+		ComboAnimationAssetPaths[0] = TEXT("/Game/0122/Player/Animation/Montage/Combo/Combo1");
+		ComboAnimationAssetPaths[1] = TEXT("/Game/0122/Player/Animation/Montage/Combo/Combo2");
+
+		for (int i = 0; i < 2; ++i)
+		{
+			PlayerAnimation.ComboAttack[i] = GetAnimationAsset(ComboAnimationAssetPaths[i]);
+		}
+	}
+
+	{
+		// 空中での攻撃アニメーション
+		TCHAR* AirAttackAnimationAssetPath = TEXT("/Game/0122/Player/Animation/Montage/Combo/JumpAttack_Montage");
+
+		PlayerAnimation.AirAttack = GetAnimationAsset(AirAttackAnimationAssetPath);
+	}
+
+	{
+		// 空中での攻撃アニメーション
+		TCHAR* ChargeAttackAnimationAssetPath = TEXT("/Game/0122/Player/Animation/Montage/ChargeAttack_Montage");
+
+		PlayerAnimation.ChargeAttack = GetAnimationAsset(ChargeAttackAnimationAssetPath);
+	}
+
+	{
+		// 空中での攻撃アニメーション
+		TCHAR* GunAttackAnimationAssetPath = TEXT("/Game/0122/Player/Animation/Montage/GunAttack_Montage");
+
+		PlayerAnimation.GunAttack = GetAnimationAsset(GunAttackAnimationAssetPath);
+	}
+
+	{
+		// 銃撃アニメーション
+		TCHAR* GunAttack2AnimationAssetPath = TEXT("/Game/0122/Player/Animation/Montage/Kick_Montage");
+
+		PlayerAnimation.GunAttack2 = GetAnimationAsset(GunAttack2AnimationAssetPath);
+	}
+
+
+	{
+		// 被ダメージアニメーションのパス保管用
+		TCHAR* DamageAnimationAssetPath = TEXT("/Game/0122/Player/Animation/Montage/Damaged_Montage");
+
+		PlayerAnimation.TakeDamage = GetAnimationAsset(DamageAnimationAssetPath);
+	}
+
+	{
+		// 被ダメージアニメーションのパス保管用
+		TCHAR* KnockBackAnimationAssetPath = TEXT("/Game/0122/Player/Animation/Montage/KnockBack_Montage");
+
+		PlayerAnimation.KnockBack = GetAnimationAsset(KnockBackAnimationAssetPath);
+	}
+
+	{
+		// 死亡時アニメーションのパス保管
+		TCHAR* DeathAnimationAssetPath = TEXT("/Game/0122/Player/Animation/Montage/Death_Montage");
+
+		PlayerAnimation.Death = GetAnimationAsset(DeathAnimationAssetPath);
 	}
 }
 
@@ -378,6 +443,38 @@ void APlayerBase::Move(const FInputActionValue& _value)
 		// 移動方向に回転
 		RotateCharacter(MovementVector.Y);
 	}
+}
+
+
+/*
+ * 関数名　　　　：AIMove()
+ * 処理内容　　　：プレイヤーの移動処理(デモ画面)
+ * 戻り値　　　　：なし
+ */
+void APlayerBase::AIMove()
+{
+
+}
+
+/*
+ * 関数名　　　　：AIAttack()
+ * 処理内容　　　：プレイヤーの攻撃処理(デモ画面)
+ * 戻り値　　　　：なし
+ */
+void APlayerBase::AIAttack()
+{
+
+}
+
+
+/*
+ * 関数名　　　　：AIPickUpWeapon()
+ * 処理内容　　　：プレイヤーの武器を拾う処理(デモ画面)
+ * 戻り値　　　　：なし
+ */
+void APlayerBase::AIPickUpWeapon()
+{
+
 }
 
 
@@ -920,47 +1017,6 @@ void APlayerBase::CallGameModeFunc_DestroyPlayer()
 
 
 /*
- * 関数名　　　　：GetSplineActor()
- * 処理内容　　　：SplineActor検索
- * 引数１　　　　：FName _tag・・・このタグを持ったActorを検索
- * 戻り値　　　　：なし
- */
-AActor* APlayerBase::GetSplineActor(const FName _tag)
-{
-	//ゲーム全体に対するActorの検索コストが高いため、一回保存しておくだけにする
-	//検索対象は全てのActor
-	TSubclassOf<AActor> findClass;
-	findClass = AActor::StaticClass();
-	TArray<AActor*> actors;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), findClass, actors);
-
-	//検索結果、Actorがあれば
-	if (actors.Num() > 0)
-	{
-		// そのActorの中を順番に検索
-		for (int idx = 0; idx < actors.Num(); idx++)
-		{
-			AActor* pActor = Cast<AActor>(actors[idx]);
-
-			// タグ名で判断
-			if (pActor->ActorHasTag(_tag))
-			{
-				//デバッグ確認
-				FString message = FString("Founded Actor	:") + pActor->GetName();
-				UE_LOG(LogTemp, Warning, TEXT("%s"), *message);
-
-
-				return pActor;
-			}
-		}
-	}
-
-
-	return NULL;
-}
-
-
-/*
  * 関数名　　　　：ContinuationCombo()
  * 処理内容　　　：コンボの継続
  * 戻り値　　　　：なし
@@ -986,6 +1042,19 @@ void APlayerBase::ResetCombo()
 	IsControl = true;
 }
 
+/*
+ * 関数名　　　　：SetCollision()
+ * 処理内容　　　：攻撃判定
+ * 戻り値　　　　：なし
+ */
+void APlayerBase::SetCollision()
+{
+	// 武器を持っているとき当たり判定をつける
+	if (Weapon)
+	{
+		Weapon->SetCollision();
+	}
+}
 
 /*
  * 関数名　　　　：TakedDamage()

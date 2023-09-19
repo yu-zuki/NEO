@@ -22,20 +22,4 @@ private:
 
 	// 毎フレーム呼び出される処理
 	virtual void Tick(float DeltaTime) override;
-
-	// 入力のセットアップ
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
-	// プレイヤーのデータを初期化
-	virtual void SetupPlayerData() override;
-
-	// アニメーションアセットを設定
-	void SetupAnimationAsset();
-
-public:
-
-	// AnimNotifyで呼び出す
-	// コリジョン判定
-	void SetCollision();
-
 };
