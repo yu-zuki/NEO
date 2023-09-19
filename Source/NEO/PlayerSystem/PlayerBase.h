@@ -3,9 +3,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameFramework/Character.h"
+#include "EnhancedInputComponent.h"
 #include "InputActionValue.h"
 #include <type_traits>
-#include "NEO/GameSystem/InputCharacter.h"
 #include "NEO/WeaponSystem/WeaponBase.h"
 #include "ActionAssistComponent.h"
 #include <Runtime/Engine/Classes/Components/CapsuleComponent.h>
@@ -138,7 +139,7 @@ struct FPlayerAnimation
 //----------------------------------------------------------------------------------------
 
 UCLASS()
-class NEO_API APlayerBase : public AInputCharacter
+class NEO_API APlayerBase : public ACharacter
 {
 	GENERATED_BODY()
 
@@ -488,11 +489,8 @@ private:
 	// ハンドル
 	FTimerHandle TimerHandle;		
 
-	// プレイヤーが通るスプライン
-	class APlayerSpline* SplineActor;		
-
 	// ゲームモード保存
-	class ATGS_GameMode* pGameMode;
+	class ANEOGameMode* pGameMode;
 
-	class UTGS_GameInstance* GetGameInstance();
+	class ANEOPlayerController* PlayerController;
 };

@@ -12,6 +12,7 @@
 #include "DrawDebugHelpers.h"
 #include "TGS_GameMode.h"
 #include "Components/BoxComponent.h"							//ボックスコンポーネントを使うため
+#include "NEO/PlayerSystem/NEOGameMode.h"
 
 
 // Sets default values
@@ -50,15 +51,9 @@ void ASplineCamera::BeginPlay()
 	}
 
 	//SetViewTarget
-	ATGS_GameMode* GameMode = Cast<ATGS_GameMode>(UGameplayStatics::GetGameMode(this));
+	ANEOGameMode* GameMode = Cast<ANEOGameMode>(UGameplayStatics::GetGameMode(this));
 	if (GameMode) {
 		GameMode->SetViewTargetWithBlend(this);
-	}
-
-	//CastTGSGameMode
-	ATGS_GameMode* TGSGameMode = Cast<ATGS_GameMode>(UGameplayStatics::GetGameMode(this));
-	if (TGSGameMode) {
-		TGSGameMode->SetSplineCamera(this);
 	}
 
 	ACharacter* PlayerCharacter = UGameplayStatics::GetPlayerCharacter(this, 0);

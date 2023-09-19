@@ -13,8 +13,8 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "NEO/GameSystem/TGS_GameMode.h"
 #include "NEO/GameSystem/TGS_GameInstance.h"
-#include "PlayerSpline.h"
-
+#include "NEOPlayerController.h"
+#include "NEOGameMode.h"
 
 // Sets default values
 APlayerBase::APlayerBase()
@@ -66,12 +66,15 @@ void APlayerBase::BeginPlay()
 {
 	Super::BeginPlay();
 
-	//Add Input Mapping Context
-	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
+	// コントローラー取得
+	PlayerController = Cast<ANEOPlayerController>(Controller);
+
+	// 入力の設定
+	if (PlayerController)
 	{
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 		{
-			Subsystem->AddMappingContext(MainActionMapping.DefaultMappingContext, 1);
+			Subsystem->AddMappingContext(MainActionMapping.DefaultMappingContext, 0);
 		}
 	}
 
@@ -167,7 +170,7 @@ void APlayerBase::SetupPlayerData()
 	ComboStartSectionNames = { "First", "Second", "Third","Fourth" };
 
 	// ゲームモード取得
-	pGameMode = Cast<ATGS_GameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	pGameMode = Cast<ANEOGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 
 	// アニメーションアセット設定
 	SetupAnimationAssets();
@@ -970,13 +973,13 @@ void APlayerBase::CallGameModeFunc_DestroyPlayer()
 
 	// ゲームモード作成
 	ATGS_GameMode* gameMode = Cast<ATGS_GameMode>(GetWorld()->GetAuthGameMode());
-	UTGS_GameInstance* GameInstance = GetGameInstance();
+	//UTGS_GameInstance* GameInstance = GetGameInstance();
 
 	if (gameMode)
 	{
 		gameMode->DestroyPlayer(this);
 
-		PlayerStatus.RemainingLife = GameInstance->LoadRemainingLife();
+		//PlayerStatus.RemainingLife = GameInstance->LoadRemainingLife();
 
 		// 残機があるうちはリスポーン
 		if (PlayerStatus.RemainingLife > 0)
@@ -985,7 +988,7 @@ void APlayerBase::CallGameModeFunc_DestroyPlayer()
 			gameMode->RespawnPlayer();
 
 			// 残機-１
-			GameInstance->SaveRemainingLife( --PlayerStatus.RemainingLife );
+			//GameInstance->SaveRemainingLife( --PlayerStatus.RemainingLife );
 		}
 		// それ以外はゲームオーバー
 		else
@@ -1171,21 +1174,6 @@ void APlayerBase::PlayAnimation(UAnimMontage* _toPlayAnimMontage, FName _startSe
 	{
 		ActionAssistComp->PlayAnimation(_toPlayAnimMontage, _startSectionName, _playRate);
 	}
-}
-
-UTGS_GameInstance* APlayerBase::GetGameInstance()
-{
-	UWorld* World = GetWorld();
-	if (!World) return nullptr;
-
-	UTGS_GameInstance* GameInstance = Cast<UTGS_GameInstance>(GetWorld()->GetGameInstance());
-	if (GameInstance) {
-		return GameInstance;
-	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("GameInstance is not Found"));
-	}
-	return nullptr;
 }
 
 

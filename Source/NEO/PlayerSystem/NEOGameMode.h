@@ -6,9 +6,6 @@
 #include "GameFramework/GameModeBase.h"
 #include "NEOGameMode.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class NEO_API ANEOGameMode : public AGameModeBase
 {
@@ -16,19 +13,31 @@ class NEO_API ANEOGameMode : public AGameModeBase
 
 	ANEOGameMode();
 
+	// ゲーム開始時の処理
+	void BeginPlay() override;
+
+	// 毎フレーム更新
+	void Tick(float DeltaTime) override;
+
 public:
 
 	UFUNCTION(BlueprintCallable, Category = "UpdateState")
 		class ANEOGameState* GetGameState() { return pGameState; }
-	
 
-protected:
+	// プレイヤーのカメラ変更
+	void SetViewTargetWithBlend(AActor* _newViewTarget, float _blendTime = 0.f, EViewTargetBlendFunction _blendFunc = VTBlend_Linear, float _blendExp = 0.f, bool _bLockOutgoing = false);
 
-	void BeginPlay() override;
+	// 現在のカメラ取得
+	AActor* GetPlayerCamera()const { return PlayerCamera; }
 
-	void Tick(float DeltaTime) override;
+	FRotator GetCameraRotation()const;
 
 private:
+	AActor* PlayerCamera;
 
 	class ANEOGameState* pGameState;
+
+	class APlayerController* PlayerController;
+
+	class ACharacter* pPlayer;
 };
