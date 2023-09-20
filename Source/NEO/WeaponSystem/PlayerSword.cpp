@@ -162,15 +162,24 @@ void APlayerSword::PlyerAttack()
 
 						if (ComboNum == 1)
 						{
-							Enemy->AddActorLocalOffset(FVector(-100.f, 0.f, 0.f));
+							if (!Enemy->ActionAssistComp->WallCheck(-100.f))
+							{
+								Enemy->AddActorLocalOffset(FVector(-100.f, 0.f, 0.f));
+							}
 						}
 						else if (ComboNum == 2)
 						{
-							Enemy->AddActorLocalOffset(FVector(-100.f, 0.f, 0.f));
+							if (!Enemy->ActionAssistComp->WallCheck(-100.f))
+							{
+								Enemy->AddActorLocalOffset(FVector(-100.f, 0.f, 0.f));
+							}
 						}
 						else if (ComboNum == 3)
 						{
-							Enemy->AddActorLocalOffset(FVector(-250.f, 0.f, 0.f));
+							if (!Enemy->ActionAssistComp->WallCheck(-250.f))
+							{
+								Enemy->AddActorLocalOffset(FVector(-250.f, 0.f, 0.f));
+							}
 						}
 
 						Enemy->ActionAssistComp->HitStop(0.1f, HitStopTime);

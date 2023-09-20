@@ -107,7 +107,7 @@ void APlayerBase::Tick(float DeltaTime)
 	}
 
 	// アニメーションに合わせて移動
-	if (EnableRootMotion && !ActionAssistComp->WallCheck(10.f))
+	if (EnableRootMotion && !ActionAssistComp->WallCheck(50.f) && !ActionAssistComp->WallCheck(-30.f))
 	{
 		RootMotion(AnimationMoveValue);
 	}
@@ -996,7 +996,7 @@ void APlayerBase::ResetCombo()
  */
 void APlayerBase::TakedDamage(float _damage, bool _isLastAttack /*= false*/)
 {
-	if (IsDeath || IsInvincibility) { return; }
+	if (IsDeath || IsInvincibility || AbsolutelyInvincible) { return; }
 
 	// 武器を持っていないときに攻撃を受けたら死亡
 	if (!IsHoldWeapon && !IsDeath)
