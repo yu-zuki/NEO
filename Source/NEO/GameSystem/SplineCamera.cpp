@@ -51,8 +51,10 @@ void ASplineCamera::BeginPlay()
 	}
 
 	//SetViewTarget
-	ANEOGameMode* GameMode = Cast<ANEOGameMode>(UGameplayStatics::GetGameMode(this));
-	if (GameMode) {
+	ANEOGameMode* GameMode = Cast<ANEOGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	if (GameMode) 
+	{
+		GameMode->SetPlayerCamera(this);
 		GameMode->SetViewTargetWithBlend(this);
 	}
 

@@ -12,7 +12,6 @@ ANEOGameState::ANEOGameState()
 	GameState = EGameState_NEO::OnTitle;
 }
 
-
 /*
  * 関数名　　　　：InitGameState()
  * 処理内容　　　：ゲームの状態を初期化
@@ -66,28 +65,19 @@ void ANEOGameState::UpdateGameState(float DeltaTime)
  */
 void ANEOGameState::OnGameTitle()
 {
-	// 次のステートへ移動するフラグが立ってない間スキップ
-	if (!IsUpdateState) { return; }
-
 	// ゲームの状態初期化
 	InitGameState();
 
-	// オープニングへ
-	SetNextGameState(EGameState_NEO::OnOpening);
 }
 
 /*
  * 関数名　　　　：OnOpening()
- * 処理内容　　　：タオープニングの処理
+ * 処理内容　　　：オープニングの処理
  * 戻り値　　　　：なし
  */
 void ANEOGameState::OnOpening()
 {
-	// 次のステートへ移動するフラグが立ってない間スキップ
-	if (!IsUpdateState) { return; }
 
-	// インゲームへ
-	SetNextGameState(EGameState_NEO::OnGamePlaying);
 }
 
 
@@ -98,22 +88,7 @@ void ANEOGameState::OnOpening()
  */
 void ANEOGameState::OnGamePlaying()
 {
-	// 次のステートへ移動するフラグが立ってない間スキップ
-	if (!IsUpdateState) { return; }
 
-	// プレイヤーが生きていたらクリア
-	if (!PlayerController->GetPlayerIsDead())
-	{
-		// クリアへ
-		SetNextGameState(EGameState_NEO::OnGameClear);
-	}
-	// それ以外はオーバー
-	else
-	{
-		// オーバーへ
-		SetNextGameState(EGameState_NEO::OnGameOver);
-	}
-	
 }
 
 /*
@@ -123,13 +98,10 @@ void ANEOGameState::OnGamePlaying()
  */
 void ANEOGameState::OnGameClear()
 {
-	// 次のステートへ移動するフラグが立ってない間スキップ
-	if (!IsUpdateState) { return; }
 
 
-	// タイトルへ
-	SetNextGameState(EGameState_NEO::OnTitle);
 }
+
 
 /*
  * 関数名　　　　：OnGameOver()
@@ -138,21 +110,19 @@ void ANEOGameState::OnGameClear()
  */
 void ANEOGameState::OnGameOver()
 {
-	// 次のステートへ移動するフラグが立ってない間スキップ
-	if (!IsUpdateState) { return; }
 
 
-	// タイトルへ
-	SetNextGameState(EGameState_NEO::OnTitle);
 }
 
 
-// 次の状態へ更新
+/*
+ * 関数名　　　　：SetNextGameState()
+ * 処理内容　　　：ゲームを指定された状態へ
+ * 戻り値　　　　：なし
+ */
 void ANEOGameState::SetNextGameState(EGameState_NEO _nextGameState)
 {
 	// 指定されたステートへ移動
 	GameState = _nextGameState;
 
-	// 次回のアップデートが発動しないようにフラグを下げておく
-	IsUpdateState = false;
 }

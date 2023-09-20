@@ -30,15 +30,14 @@ class NEO_API ANEOGameState : public AGameStateBase
 
 public:
 
-	// 次の状態へいく時に使用
-	UFUNCTION(BlueprintCallable, Category = "UpdateState")
-		void UpdateState() { IsUpdateState = true; }
-
 	// ゲームの状態を更新
 	void UpdateGameState(float DeltaTime);
 
 	UFUNCTION(BlueprintCallable, Category = "UpdateState")
-		EGameState_NEO GetGameState() { return GameState; }
+		EGameState_NEO GetGameState()const { return GameState; }
+
+	// ゲームを任意の状態へ
+	void SetNextGameState(EGameState_NEO _nextGameState);
 
 private:
 
@@ -61,16 +60,10 @@ private:
 	// オーバーの処理
 	void OnGameOver();	
 
-	// 次の状態へ更新
-	void SetNextGameState(EGameState_NEO _nextGameState);
-
 private:
 
 	// ゲームの状態を管理
 	EGameState_NEO GameState;
-
-	// 次の状態へ更新するかどうか
-	bool IsUpdateState;
 
 	// プレイヤーのコントローラー格納用
 	class ANEOPlayerController* PlayerController;

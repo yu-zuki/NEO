@@ -10,7 +10,7 @@
 #include "NiagaraComponent.h"									
 #include "NiagaraFunctionLibrary.h"		
 #include "NEO/PlayerSystem/CharacterCamera.h"
-#include "NEO/GameSystem/TGS_GameMode.h"
+#include "NEOGameMode.h"
 
 #define DIRECTION_Y (90.f)
 
@@ -285,7 +285,7 @@ void UActionAssistComponent::OwnerParallelToCamera(bool _lookRight)
 	if (!bUseFaceCamera) { return; }
 
 	// ÉQÅ[ÉÄÉÇÅ[ÉhçÏê¨
-	ATGS_GameMode* GameMode = Cast<ATGS_GameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	ANEOGameMode* GameMode = Cast<ANEOGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 	if (!GameMode) { return; }
 
 

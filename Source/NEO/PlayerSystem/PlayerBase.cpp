@@ -972,32 +972,25 @@ void APlayerBase::CallGameModeFunc_DestroyPlayer()
 {
 
 	// ゲームモード作成
-	ATGS_GameMode* gameMode = Cast<ATGS_GameMode>(GetWorld()->GetAuthGameMode());
+	pGameMode = Cast<ANEOGameMode>(GetWorld()->GetAuthGameMode());
 	//UTGS_GameInstance* GameInstance = GetGameInstance();
 
-	if (gameMode)
+	if (pGameMode)
 	{
-		gameMode->DestroyPlayer(this);
-
-		//PlayerStatus.RemainingLife = GameInstance->LoadRemainingLife();
-
 		// 残機があるうちはリスポーン
-		if (PlayerStatus.RemainingLife > 0)
+		if (PlayerController->GetRemainingLives() > 0)
 		{
 			// プレイヤーリスポーン
-			gameMode->RespawnPlayer();
+			pGameMode->RespawnPlayer(this);
 
 			// 残機-１
-			//GameInstance->SaveRemainingLife( --PlayerStatus.RemainingLife );
+			PlayerController->ReduceRemainingLives();
 		}
 		// それ以外はゲームオーバー
 		else
 		{
 			// ゲームオーバーへ
-			gameMode->SetState_GameOver();
-
-			// プレイヤー削除
-			gameMode->DestroyPlayer(this);
+			pGameMode->DestroyPlayer(this);
 		}
 	}
 }

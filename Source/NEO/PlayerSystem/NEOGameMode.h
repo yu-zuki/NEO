@@ -27,17 +27,69 @@ public:
 	// プレイヤーのカメラ変更
 	void SetViewTargetWithBlend(AActor* _newViewTarget, float _blendTime = 0.f, EViewTargetBlendFunction _blendFunc = VTBlend_Linear, float _blendExp = 0.f, bool _bLockOutgoing = false);
 
+	// プレイヤーのカメラ設定
+	void SetPlayerCamera(AActor* _playerCamera) { PlayerCamera = _playerCamera; }
+	
 	// 現在のカメラ取得
-	AActor* GetPlayerCamera()const { return PlayerCamera; }
+	AActor* GetPlayerCamera()const { return pCamera; }
 
 	FRotator GetCameraRotation()const;
 
+	UFUNCTION(BlueprintCallable, Category = "Area")
+		void SetIsOnBattleArea(bool _IsBattleArea,TArray<class ASpawnPoint*> SpawnPoints,
+			AActor* Camera,
+			class UProceduralMeshComponent* LeftMesh,
+			class UProceduralMeshComponent* RightMesh,
+			class UProceduralMeshComponent* NearMesh
+		);
+
+
+	void ExitBattleArea();
+
+	//バトルエリアのカメラ
+	AActor* BattleAreaCamera;
+
+	TArray<class UProceduralMeshComponent*> BattleAreaMeshs;
+
+	TArray<class ASpawnPoint*> BattleAreaSpawnPoints;
+
+	// バトルエリアのフラグ
+	bool bIsOnBattleArea;
+
+	// バトルエリアにいる敵をスポーンする
+	AActor* SpawnEnemy(ASpawnPoint* spawnPoint);
+
+	// 
+	void SpawnEnemyInBattleArea();
+
+	// プレイヤーの削除
+	void DestroyPlayer(AActor* _player);
+
+	// プレイヤーの削除
+	void RespawnPlayer(AActor* _player);
+
+
+	// エネミーの削除
+	void DestroyEnemy(AActor* _enemy, bool _bBattleAreaEnemy);
+
+
 private:
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		int32 BattleAreaEnemyCount = 0;
+
+	// プレイヤーのカメラ
 	AActor* PlayerCamera;
 
+	// 
+	AActor* pCamera;
+
+	// ゲームステートのポインタ
 	class ANEOGameState* pGameState;
 
+	// プレイヤーコントローラーのポインタ
 	class APlayerController* PlayerController;
 
-	class ACharacter* pPlayer;
+	// プレイヤーのポインタ
+	class APlayerBase* pPlayer;
 };

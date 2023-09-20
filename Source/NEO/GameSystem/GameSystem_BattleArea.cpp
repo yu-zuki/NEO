@@ -17,6 +17,7 @@
 #include "ProceduralMeshComponent.h"
 #include "TGS_GameMode.h"
 #include "SpawnPoint.h"
+#include "NEO/PlayerSystem/NEOGameMode.h"
 
 // Sets default values
 AGameSystem_BattleArea::AGameSystem_BattleArea()
@@ -266,10 +267,10 @@ int32 AGameSystem_BattleArea::CheckEnemyCount()
 void AGameSystem_BattleArea::EnterBattleArea()
 {
 	//カメラをコンポーネントを別のカメラに設定
-	ATGS_GameMode* GameMode = GetWorld()->GetAuthGameMode<ATGS_GameMode>();
+	ANEOGameMode* GameMode = GetWorld()->GetAuthGameMode<ANEOGameMode>();
 
 	//Transformを設定
-	UCameraComponent* NowCamera = GameMode->GetCameraActor()->FindComponentByClass<UCameraComponent>();
+	UCameraComponent* NowCamera = GameMode->GetPlayerCamera()->FindComponentByClass<UCameraComponent>();
 	CameraComponent->SetWorldTransform(NowCamera->GetComponentTransform());
 	CameraComponent->FieldOfView = NowCamera->FieldOfView;
 	CameraComponent->AspectRatio = NowCamera->AspectRatio;
@@ -294,7 +295,7 @@ void AGameSystem_BattleArea::EnterBattleArea()
 			return;
 		}
 
-		GameMode->SetIsOnBattleArea(bIsInBattleArea, SpawnPoints, this, LeftMesh, RightMesh, NearMesh);
+		GameMode->SetIsOnBattleArea(bIsInBattleArea,SpawnPoints, this, LeftMesh, RightMesh, NearMesh);
 
 	}
 }
