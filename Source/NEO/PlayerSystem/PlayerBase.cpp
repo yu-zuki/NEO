@@ -595,7 +595,7 @@ void APlayerBase::Attack1()
  */
 void APlayerBase::Attack2()
 {
-	if (!IsCharging) { return; }
+	if (!IsControl || !IsCharging) { return; }
 
 	IsCharging = false;
 

@@ -152,6 +152,15 @@ void AOdaBase::Tick(float DeltaTime)
 			OdaStay1(WaitTime);
 			break;
 
+			//待機,動き
+		case ECPPOdaEnum::Stop:
+			
+			if (FlameCounter > 30)
+			{
+				OdaMoveEnum = ECPPOdaEnum::Stay1;
+			}
+			break;
+
 			//正面ダッシュ
 		case ECPPOdaEnum::Moveflont:
 			//右向きか左向きかで正負を変える
@@ -372,6 +381,7 @@ void AOdaBase::OdaMove1(int DeltaTime, int StopTimer)
  */
 void AOdaBase::OdaAttack1(int Timer) {
 	//UKismetSystemLibrary::PrintString(this, "Attack1", true, true, FColor::Cyan, 2.f, TEXT("None"));
+	
 	if (Attack1Delay == 0)
 	{
 		//0だと割り切れないので1を代入しておく
@@ -386,20 +396,29 @@ void AOdaBase::OdaAttack1(int Timer) {
 		{
 			//アニメーションを流す(今は仮)
 			PlayAnimMontage(AnimMontage_BossAttack1);
+			//ボスがノックバックしないようにする
+			BossHPRock();
 			//一度だけ流したいのでフラグを切り替える
 			isMotionPlaying = false;
 			//ディレイをリセットする
 			Attack1Delay = 0;
 		}
 	}
+	if (Timer > 150)
+	{
+		//もしHPロックが外れていたら
+		if (isBossHPRock != true)
+		{
+			//ダメージを受けた時ノックバックするように
+			BossHPRock();
+		}
+	}
 
-	//150フレームたったら
-	if (Timer % 150 == 0)
+	//アニメーションが終了したら
+	if (Timer > 300)
 	{
 		//ステートを切り替える
 		BacktoStayCase();
-		//切り替えるにあたって変数を初期化する
-		WaitTime = 0;
 		//リセット
 		NotAttackCount = 0;
 		//ノックバック中に攻撃モーションに入るとHPロックが作動し続けてしまうのでここで切り替える
@@ -487,6 +506,8 @@ void AOdaBase::OdaUlt(int Timer)
 	{
 		//アニメーションを流す(今は仮)
 		PlayAnimMontage(AnimMontage_BossUltimate);
+		//ボスがノックバックしないようにする
+		BossHPRock();
 		//一度だけ流したいのでフラグを切り替える
 		isMotionPlaying = false;
 	}
@@ -513,8 +534,8 @@ void AOdaBase::OdaUlt(int Timer)
 
 
 
-	//300フレームたったら
-	if (Timer % 300 == 0)
+	//200フレームたったら
+	if (Timer > 200)
 	{
 		//ステートを切り替える
 		OdaMoveEnum = ECPPOdaEnum::Moveflont;
@@ -601,7 +622,7 @@ void AOdaBase::ApplyDamage(float Damage)
 			//攻撃のディレイをセット
 			Attack1Delay = 10;
 		}
-		//エフェクトはプレイヤーの方でやってくれている
+		
 		if (isMove)
 		{
 			Health -= Damage;
@@ -718,13 +739,15 @@ void AOdaBase::WorldTimeReturn()
 
 /*
  * 関数名　　　　：BossHPRock()
- * 処理内容　　　：ボスのHPを減らさないようにする処理
+ * 処理内容　　　：ボスをノックバックさせないようにする処理
  * 戻り値　　　　：なし
  */
 void AOdaBase::BossHPRock()
 {
 	isBossHPRock = !isBossHPRock;
 }
+
+
 
 /*
  * 関数名　　　　：BacktoStayCase()
@@ -735,20 +758,21 @@ void AOdaBase::BacktoStayCase()
 {
 	//待機に戻す
 	OdaMoveEnum = ECPPOdaEnum::Stay1;
+	//切り替えるにあたって変数を初期化する
+	WaitTime = 0;
+	//もしHPロックが外れていたら
+	if (isBossHPRock != true)
+	{
+		//ダメージを受けた時ノックバックするように
+		BossHPRock();
+	}
 }
 
-
-/*
- * 関数名　　　　：BossKnockback()
- * 処理内容　　　：ボスがノックバックする処理
- * 戻り値　　　　：なし
- */
 void AOdaBase::BossKnockback()
 {
-	//死亡時じゃなかったら
+	//
 	if (!isBossHPRock)
 	{
-		//ボスがノックバックする処理
 		PlayAnimMontage(AnimMontage_BossBlowAway);
 	}
 }
