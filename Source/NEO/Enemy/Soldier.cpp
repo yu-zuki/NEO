@@ -73,6 +73,7 @@ void ASoldier::ResetCombo()
 {
     ComboCounter = 0;
     bIsAttacking = false;
+    IsRunning = true;
 }
 
 void ASoldier::CollisionOn()
