@@ -17,7 +17,8 @@ ASoldier::ASoldier()
     LastAttackTime = -AttackCooldown;
     bIsAttacking = false;
     bIsOnCooldown = false;
-    
+    IsIdol = false;
+    IsRunning = true;
 }
 
 void ASoldier::BeginPlay()
@@ -74,6 +75,7 @@ void ASoldier::ResetCombo()
     ComboCounter = 0;
     bIsAttacking = false;
     IsRunning = true;
+    IsIdol = false;
 }
 
 void ASoldier::CollisionOn()
@@ -180,7 +182,8 @@ float ASoldier::GetDistanceToPlayer() const
 void ASoldier::EndComboCooldown()
 {
     bIsOnCooldown = false;
-   
+    IsRunning = true;
+    IsIdol = false;
 }
 
 
