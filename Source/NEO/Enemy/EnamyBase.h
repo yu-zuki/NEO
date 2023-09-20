@@ -7,6 +7,7 @@
 #include "DeathTrigger.h"
 #include "NEO/GameSystem/GameSystem_BattleArea.h"
 #include "NiagaraComponent.h"
+#include "Animation/AnimInstance.h"
 #include "NEO/WeaponSystem/EnemySword.h"
 #include "Components/SplineComponent.h"
 #include "EnamyBase.generated.h"
@@ -123,24 +124,15 @@ public:
 	
 	bool IsAnimationAttacking() const;
 	UFUNCTION(BlueprintCallable)
-	bool IsIdol() const { return bIsIdol; }
-	bool IsWalking() const { return bIsWalking; }
+		bool IsIdol;
+	
 	UFUNCTION(BlueprintCallable)
-	bool IsRunning ()const { return bIsRunning; }
-	bool IsAttacking() const { return bIsAttacking; }
-	bool IsReactingToDamage() const { return bIsReactingToDamage; }
-	bool IsDead() const { return bIsDead; }
-	bool IsAir() const{ return bIsAir; }
+		bool IsRunning;
+	
 
 
-	bool bIsIdol;
-	bool bIsWalking;
-	bool bIsRunning;
-	bool bIsAttacking;
-	bool bIsReactingToDamage;
-	bool bIsDead;
-	bool bIsAir;
-	///UI
+	
+
 public:
 
 	AActor* GetEnemyActor() const;
