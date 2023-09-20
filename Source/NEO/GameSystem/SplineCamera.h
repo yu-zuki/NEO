@@ -46,6 +46,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
 		float CurrentDistance;
 
+	//CurrentDistance
+	UFUNCTION(BlueprintCallable, Category = "Camera")
+		void SetCamera();
+
 	float CurrentRatio;
 public:
 	// Called every frame
