@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
+#include "NEOGameState.h"
 #include "NEOGameMode.generated.h"
 
 UCLASS()
@@ -31,9 +32,7 @@ public:
 	void SetPlayerCamera(AActor* _playerCamera) { PlayerCamera = _playerCamera; }
 	
 	// 現在のカメラ取得
-	AActor* GetPlayerCamera()const { return pCamera; }
-
-	FRotator GetCameraRotation()const;
+	AActor* GetNowPlayerCamera()const;
 
 	UFUNCTION(BlueprintCallable, Category = "Area")
 		void SetIsOnBattleArea(bool _IsBattleArea,TArray<class ASpawnPoint*> SpawnPoints,
@@ -44,6 +43,7 @@ public:
 		);
 
 
+	// バトルエリアから出る
 	void ExitBattleArea();
 
 	//バトルエリアのカメラ
@@ -53,42 +53,44 @@ public:
 
 	TArray<class ASpawnPoint*> BattleAreaSpawnPoints;
 
-	// バトルエリアのフラグ
-	bool bIsOnBattleArea;
 
-	// バトルエリアにいる敵をスポーンする
+	// 敵の出現処理
 	AActor* SpawnEnemy(ASpawnPoint* spawnPoint);
 
-	// 
+	// バトルエリア内に敵を出現させる
 	void SpawnEnemyInBattleArea();
 
 	// プレイヤーの削除
-	void DestroyPlayer(AActor* _player);
+	void SetNextGameState(EGameState_NEO _nextState);
 
-	// プレイヤーの削除
-	void RespawnPlayer(AActor* _player);
-
+	// プレイヤーにカメラを設定する
+	void SetCameraOnPlayer();
 
 	// エネミーの削除
 	void DestroyEnemy(AActor* _enemy, bool _bBattleAreaEnemy);
 
+	// デフォルトポーンクラスを取得
+	TSubclassOf<APawn> GetDefaultPawnClass()const { return DefaultPawnClass; }
 
 private:
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		int32 BattleAreaEnemyCount = 0;
+	// バトルエリアのフラグ
+	bool bIsOnBattleArea;
 
-	// プレイヤーのカメラ
+	// バトルエリア内の敵のカウンター
+	int32 BattleAreaEnemyCount = 0;
+
+	// プレイヤーのカメラ格納用(移動するカメラ)
 	AActor* PlayerCamera;
 
-	// 
+	// プレイヤーのカメラ(カメラ固定時)
 	AActor* pCamera;
 
 	// ゲームステートのポインタ
 	class ANEOGameState* pGameState;
 
 	// プレイヤーコントローラーのポインタ
-	class APlayerController* PlayerController;
+	class ANEOPlayerController* PlayerController;
 
 	// プレイヤーのポインタ
 	class APlayerBase* pPlayer;

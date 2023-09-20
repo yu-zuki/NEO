@@ -7,6 +7,7 @@
 
 // コンストラクタ
 ANEOGameState::ANEOGameState()
+	: IsReadyToUpdateGame(false)
 {
 	// タイトル状態に設定
 	GameState = EGameState_NEO::OnTitle;
@@ -36,7 +37,7 @@ void ANEOGameState::UpdateGameState(float DeltaTime)
 	switch (GameState)
 	{
 	case EGameState_NEO::OnTitle:
-		OnGameTitle();
+		OnTitle();
 		break;
 	case EGameState_NEO::OnOpening:
 		OnOpening();
@@ -55,19 +56,31 @@ void ANEOGameState::UpdateGameState(float DeltaTime)
 		break;
 
 	}
+
 }
 
 
 /*
- * 関数名　　　　：OnGameTitle()
+ * 関数名　　　　：OnTitle()
  * 処理内容　　　：タイトル画面にいるときの処理
  * 戻り値　　　　：なし
  */
-void ANEOGameState::OnGameTitle()
+void ANEOGameState::OnTitle()
 {
-	// ゲームの状態初期化
-	InitGameState();
+	// いずれかのキーが押されているか取得
+	if (PlayerController->GetIsAnyKeyPressed() && IsReadyToUpdateGame)
+	{
+		// 次のステートへ
+		SetNextGameState(EGameState_NEO::OnTitle);
 
+		// 長押しなどで一気に飛ばないようにフラグを下げておく
+		IsReadyToUpdateGame = false;
+	}
+	else
+	{
+		// タイトル画面を表示
+		DisplayTitleScreen();
+	}
 }
 
 /*
@@ -88,6 +101,8 @@ void ANEOGameState::OnOpening()
  */
 void ANEOGameState::OnGamePlaying()
 {
+	// ゲームの状態初期化
+	InitGameState();
 
 }
 

@@ -428,11 +428,12 @@ void APlayerBase::Move(const FInputActionValue& _value)
 	// 2軸で入力取得
 	FVector2D MovementVector = _value.Get<FVector2D>();
 
-	if (pGameMode)
+	if (PlayerController)
 	{
 		// カメラの角度取得
-		const FRotator Rotation = pGameMode->GetCameraRotation();
+		const FRotator Rotation = PlayerController->GetNowCameraRotation();
 
+		// 回転設定
 		const FRotator YawRotation(0.f, Rotation.Yaw, 0.f);
 
 		// スプラインに沿った移動方向取得(X,Y)
@@ -970,27 +971,20 @@ void APlayerBase::RootMotion(float _distance)
  */
 void APlayerBase::CallGameModeFunc_DestroyPlayer()
 {
-
-	// ゲームモード作成
-	pGameMode = Cast<ANEOGameMode>(GetWorld()->GetAuthGameMode());
-	//UTGS_GameInstance* GameInstance = GetGameInstance();
-
-	if (pGameMode)
+	// コントローラーからプレイヤーを削除
+	if (PlayerController)
 	{
 		// 残機があるうちはリスポーン
 		if (PlayerController->GetRemainingLives() > 0)
 		{
 			// プレイヤーリスポーン
-			pGameMode->RespawnPlayer(this);
-
-			// 残機-１
-			PlayerController->ReduceRemainingLives();
+			PlayerController->RespawnPlayer();
 		}
 		// それ以外はゲームオーバー
 		else
 		{
-			// ゲームオーバーへ
-			pGameMode->DestroyPlayer(this);
+			// プレイヤー削除
+			PlayerController->DestroyPlayer();
 		}
 	}
 }

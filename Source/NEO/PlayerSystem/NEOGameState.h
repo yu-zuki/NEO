@@ -33,20 +33,40 @@ public:
 	// ゲームの状態を更新
 	void UpdateGameState(float DeltaTime);
 
+	// ゲームステート更新処理
+	UFUNCTION(BlueprintCallable, Category = "GetParam")
+		class ANEOPlayerController* GetPlayerController()const { return PlayerController; }
+
+	// ゲームステート更新処理
 	UFUNCTION(BlueprintCallable, Category = "UpdateState")
 		EGameState_NEO GetGameState()const { return GameState; }
 
+	// 次のステートへ移動する準備が整ったときに使用
+	UFUNCTION(BlueprintCallable, Category = "UpdateState")
+		void SetReadyUpdateGame(bool _isReadyToUpdateGame){ IsReadyToUpdateGame = _isReadyToUpdateGame; }
+
 	// ゲームを任意の状態へ
 	void SetNextGameState(EGameState_NEO _nextGameState);
+
+	// タイトル画面を表示
+	UFUNCTION(BlueprintNativeEvent,BlueprintCallable, Category = "Title")
+		void DisplayTitleScreen();
+
+	virtual void DisplayTitleScreen_Implementation() {};
+
+	// デモ画面を表示
+	UFUNCTION(BlueprintNativeEvent,BlueprintCallable, Category = "DEMO")
+		void DisplayDemoScreen();
+
+	virtual void DisplayDemoScreen_Implementation() {};
 
 private:
 
 	// ゲームの状態を初期化
 	void InitGameState();							
 
-
 	// タイトルの処理
-	void OnGameTitle();
+	void OnTitle();
 
 	// オープニングの処理
 	void OnOpening();
@@ -64,6 +84,9 @@ private:
 
 	// ゲームの状態を管理
 	EGameState_NEO GameState;
+
+	// ゲームを次の状態にアップデートする準備ができたか
+	bool IsReadyToUpdateGame;
 
 	// プレイヤーのコントローラー格納用
 	class ANEOPlayerController* PlayerController;

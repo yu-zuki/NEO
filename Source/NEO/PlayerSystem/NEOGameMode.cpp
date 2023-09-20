@@ -3,7 +3,6 @@
 
 #include "NEOGameMode.h"
 #include "Kismet/GameplayStatics.h"
-#include "NEOGameState.h"
 #include "Camera/CameraComponent.h"
 #include "ProceduralMeshComponent.h"
 #include "NEO/GameSystem/SplineCamera.h"
@@ -11,6 +10,7 @@
 #include "NEO/OdaBase.h"
 #include "NEO/Enemy/EnamyBase.h"
 #include "PlayerBase.h"
+#include "NEOPlayerController.h"
 
 
 ANEOGameMode::ANEOGameMode()
@@ -26,8 +26,8 @@ void ANEOGameMode::BeginPlay()
 	// ゲームステートを取得
 	pGameState = Cast<ANEOGameState>(UGameplayStatics::GetGameState(GetWorld()));
 
-	// プレイヤー取得
-	pPlayer = Cast<APlayerBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
+	// プレイヤーコントローラーを取得
+	PlayerController = Cast<ANEOPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 }
 
 void ANEOGameMode::Tick(float DeltaTime)
@@ -48,10 +48,21 @@ void ANEOGameMode::Tick(float DeltaTime)
 	}
 }
 
+
+/*
+ * 関数名　　　　：SetViewTargetWithBlend()
+ * 処理内容　　　：現在のカメラの情報を返す
+ * 引数１　　　　：AActor* _newViewTarget・・・新しいカメラの情報
+ * 引数２　　　　：float _blendTime・・・・・・切り替えにかける時間
+ * 引数３　　　　：EViewTargetBlendFunction _blendFunc
+ * 引数４　　　　：float _blendExp
+ * 引数５　　　　：bool _bLockOutgoing
+ * 戻り値　　　　：現在のカメラの情報
+ */
 void ANEOGameMode::SetViewTargetWithBlend(AActor* _newViewTarget, float _blendTime, EViewTargetBlendFunction _blendFunc, float _blendExp, bool _bLockOutgoing)
 {
 	// プレイヤーコントローラーを取得
-	PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+	PlayerController = Cast<ANEOPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 
 	// コントローラーがある時カメラをブレンド
 	if (PlayerController)
@@ -62,23 +73,37 @@ void ANEOGameMode::SetViewTargetWithBlend(AActor* _newViewTarget, float _blendTi
 	pCamera = _newViewTarget;
 }
 
-FRotator ANEOGameMode::GetCameraRotation()const
-{
-	if (pCamera)
-	{
-		// カメラのコンポーネント取得
-		UCameraComponent* CameraComponent = pCamera->FindComponentByClass<UCameraComponent>();
-		if (CameraComponent) 
-		{
-			return CameraComponent->GetComponentRotation();
-		}
-	}
 
-	return FRotator::ZeroRotator;
+/*
+ * 関数名　　　　：GetNowPlayerCamera()
+ * 処理内容　　　：現在のカメラの情報を返す
+ * 戻り値　　　　：現在のカメラの情報
+ */
+AActor* ANEOGameMode::GetNowPlayerCamera()const
+{
+	// バトルエリア内にいるかどうかでカメラを選択
+	AActor* NowCamera = (bIsOnBattleArea) ? (pCamera) : (PlayerCamera);
+
+	if (NowCamera)
+	{
+		return NowCamera;
+	}
+	
+	return nullptr;
 }
 
 
-
+/*
+ * 関数名　　　　：SetIsOnBattleArea()
+ * 処理内容　　　：バトルエリアを起動する
+ * 引数１　　　　：bool _IsBattleArea・・・・・・・・・・・・・バトルエリアを発動するか
+ * 引数２　　　　：TArray<class ASpawnPoint*> SpawnPoints・・・出現場所の配列情報
+ * 引数３　　　　：AActor* Camera・・・・・・・・・・・・・・・バトルエリアのカメラ情報
+ * 引数４　　　　：UProceduralMeshComponent* LeftMesh・・・・・バトルエリアの壁の情報(左)
+ * 引数５　　　　：UProceduralMeshComponent* RightMesh ・・・・バトルエリアの壁の情報(右)
+ * 引数６　　　　：UProceduralMeshComponent* NearMesh・・・・・バトルエリアの壁の情報(手前)
+ * 戻り値　　　　：なし
+ */
 void ANEOGameMode::SetIsOnBattleArea(bool _IsBattleArea,TArray<class ASpawnPoint*> SpawnPoints,
 	AActor* Camera = nullptr,
 	class UProceduralMeshComponent* LeftMesh = nullptr,
@@ -127,6 +152,13 @@ void ANEOGameMode::SetIsOnBattleArea(bool _IsBattleArea,TArray<class ASpawnPoint
 	bIsOnBattleArea = _IsBattleArea;
 }
 
+
+/*
+ * 関数名　　　　：SpawnEnemy()
+ * 処理内容　　　：敵の出現処理
+ * 引数１　　　　：出現場所の情報
+ * 戻り値　　　　：なし
+ */
 AActor* ANEOGameMode::SpawnEnemy(ASpawnPoint* spawnPoint)
 {
 	//NULL Check
@@ -170,43 +202,46 @@ AActor* ANEOGameMode::SpawnEnemy(ASpawnPoint* spawnPoint)
 
 }
 
-void ANEOGameMode::DestroyPlayer(AActor* _player)
+
+/*
+ * 関数名　　　　：DestroyEnemy()
+ * 処理内容　　　：敵の削除処理
+ * 戻り値　　　　：なし
+ */
+void ANEOGameMode::SetNextGameState(EGameState_NEO _nextState)
 {
-	// プレイヤー削除
-	_player->Destroy();
-
-	// プレイヤーをNULLに
-	pPlayer = nullptr;
-
 	// ゲームを次の状態へ
-	pGameState->SetNextGameState(EGameState_NEO::OnGameOver);
+	pGameState->SetNextGameState(_nextState);
 }
 
-void ANEOGameMode::RespawnPlayer(AActor* _player)
+
+/*
+ * 関数名　　　　：SetCameraOnPlayer()
+ * 処理内容　　　：プレイヤーのカメラ設定
+ * 戻り値　　　　：なし
+ */
+void ANEOGameMode::SetCameraOnPlayer()
 {
-	if (_player)
+	if (PlayerController)
 	{
-		// プレイヤーが死亡した位置取得
-		FTransform RespownPos = _player->GetActorTransform();
-
-		// プレイヤーを削除
-		_player->Destroy();
-
-		// プレイヤーをNULLに
-		pPlayer = nullptr;
-
-		// 新しいプレイヤーを生成
-		if (PlayerController) {
-			pPlayer = Cast<APlayerBase>(GetWorld()->SpawnActor<APawn>(DefaultPawnClass, RespownPos));
-
+		// プレイヤーが生きていることを確認
+		if (!PlayerController->GetPlayerIsDead())
+		{
+			// バトルエリア内にいるかどうかでカメラを選択
 			AActor* NowCamera = (bIsOnBattleArea)?(pCamera):(PlayerCamera);
 
+			// プレイヤーのカメラに設定
 			SetViewTargetWithBlend(NowCamera);
 		}
 	}
 }
 
 
+/*
+ * 関数名　　　　：DestroyEnemy()
+ * 処理内容　　　：敵の削除処理
+ * 戻り値　　　　：なし
+ */
 void ANEOGameMode::DestroyEnemy(AActor* _enemy, bool _bBattleAreaEnemy)
 {
 	if (_enemy)
@@ -228,6 +263,11 @@ void ANEOGameMode::DestroyEnemy(AActor* _enemy, bool _bBattleAreaEnemy)
 }
 
 
+/*
+ * 関数名　　　　：SpawnEnemyInBattleArea()
+ * 処理内容　　　：バトルエリアに敵を出現させる
+ * 戻り値　　　　：なし
+ */
 void ANEOGameMode::SpawnEnemyInBattleArea()
 {
 	//Check SpawnPoints
@@ -250,6 +290,11 @@ void ANEOGameMode::SpawnEnemyInBattleArea()
 }
 
 
+/*
+ * 関数名　　　　：ExitBattleArea()
+ * 処理内容　　　：バトルエリアから抜ける処理
+ * 戻り値　　　　：なし
+ */
 void ANEOGameMode::ExitBattleArea()
 {
 	bIsOnBattleArea = false;

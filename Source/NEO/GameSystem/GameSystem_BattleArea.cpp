@@ -270,7 +270,7 @@ void AGameSystem_BattleArea::EnterBattleArea()
 	ANEOGameMode* GameMode = GetWorld()->GetAuthGameMode<ANEOGameMode>();
 
 	//Transformを設定
-	UCameraComponent* NowCamera = GameMode->GetPlayerCamera()->FindComponentByClass<UCameraComponent>();
+	UCameraComponent* NowCamera = GameMode->GetNowPlayerCamera()->FindComponentByClass<UCameraComponent>();
 	CameraComponent->SetWorldTransform(NowCamera->GetComponentTransform());
 	CameraComponent->FieldOfView = NowCamera->FieldOfView;
 	CameraComponent->AspectRatio = NowCamera->AspectRatio;

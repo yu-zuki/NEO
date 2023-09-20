@@ -15,15 +15,15 @@ public:
     // コンストラクタ
     ANEOPlayerController();
 
-    // プレイヤーの状態リセット
-    void ResetPlayerStatus();
-
-    // 入力のバインド
-    virtual void SetupInputComponent() override;
+    // ゲーム開始時の処理
+    void BeginPlay();
 
     // いずれかのキーを入力中かを取得
     UFUNCTION(BlueprintCallable, Category = "SetStatus")
-        bool GetIsAnyKeyPressed()const { return IsAnyKeyPressed; }
+        bool GetIsAnyKeyPressed()const { return IsInputKeyDown("AnyKey"); }
+
+    // プレイヤーの状態リセット
+    void ResetPlayerStatus();
 
     // プレイヤーの残機取得
     int GetRemainingLives()const { return RemainingLives; }
@@ -34,16 +34,17 @@ public:
     // プレイヤーが死んでいるかを教えてもらう
     void SetPlayerIsDead(bool _isDead) { PlayerIsDead = _isDead; }
 
+    // プレイヤーの削除
+    void DestroyPlayer();
+
+    // プレイヤーのリスポーン
+    void RespawnPlayer();
+
+    // 現在のプレイヤーのカメラ取得
+    FRotator GetNowCameraRotation()const;
+
     // プレイヤーが死んでいるかを伝える
     bool GetPlayerIsDead()const { return PlayerIsDead; }
-
-private:
-
-    // 全てのキーでどこかが押されているか判定
-    void AnyKeyPressed() { IsAnyKeyPressed = true; }
-
-    // 全てのキーで離されたか判定
-    void AnyKeyReleased() { IsAnyKeyPressed = false; }
 
 private:
 
@@ -57,7 +58,10 @@ private:
     // プレイヤーが
     bool PlayerIsDead;
 
-    // キーが押されているかどうか
-    bool IsAnyKeyPressed;
+    // プレイヤーのポインタ
+    class APlayerBase* pPlayer;
+
+    // ゲームモード
+    class ANEOGameMode* pGameMode;
 };
 
