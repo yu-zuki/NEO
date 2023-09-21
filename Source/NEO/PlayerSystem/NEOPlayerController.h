@@ -31,10 +31,7 @@ public:
     // プレイヤーの残機減らす
     void ReduceRemainingLives() { --RemainingLives; }
 
-    // プレイヤーが死んでいるかを教えてもらう
-    void SetPlayerIsDead(bool _isDead) { PlayerIsDead = _isDead; }
-
-    // プレイヤーの削除
+    // プレイヤーの削除5rttrt5r
     void DestroyPlayer();
 
     // プレイヤーのリスポーン

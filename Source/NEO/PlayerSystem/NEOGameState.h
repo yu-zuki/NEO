@@ -18,6 +18,15 @@ enum class EGameState_NEO : uint8
 	OnGameOver		UMETA(DisplayName = "GameOver")			// オーバー
 };
 
+// タイトルの状態を管理するEnum
+UENUM(BlueprintType)
+enum class ETitleState_NEO : uint8
+{
+	OnLogoDisplay	UMETA(DisplayName = "LogoMovie"),		// 日電のロゴ表示
+	OnTitleDisplay	UMETA(DisplayName = "Title"),			// タイトル画面
+	OnDemoDisplay	UMETA(DisplayName = "Demo"),			// デモ画面
+};
+
 
 UCLASS()
 class NEO_API ANEOGameState : public AGameStateBase
@@ -37,16 +46,25 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "GetParam")
 		class ANEOPlayerController* GetPlayerController()const { return PlayerController; }
 
-	// ゲームステート更新処理
+	// ゲームステート取得
 	UFUNCTION(BlueprintCallable, Category = "UpdateState")
 		EGameState_NEO GetGameState()const { return GameState; }
+
+	// タイトルステート取得
+	UFUNCTION(BlueprintCallable, Category = "UpdateState")
+		ETitleState_NEO GetTitleState()const { return TitleState; }
+
+	// タイトルステートセット
+	UFUNCTION(BlueprintCallable, Category = "UpdateState")
+		void SetTitleState(ETitleState_NEO _titleState){ TitleState = _titleState; }
 
 	// 次のステートへ移動する準備が整ったときに使用
 	UFUNCTION(BlueprintCallable, Category = "UpdateState")
 		void SetReadyUpdateGame(bool _isReadyToUpdateGame){ IsReadyToUpdateGame = _isReadyToUpdateGame; }
 
 	// ゲームを任意の状態へ
-	void SetNextGameState(EGameState_NEO _nextGameState);
+	UFUNCTION(BlueprintCallable, Category = "UpdateState")
+		void SetNextGameState(EGameState_NEO _nextGameState);
 
 	// タイトル画面を表示
 	UFUNCTION(BlueprintNativeEvent,BlueprintCallable, Category = "Title")
@@ -60,10 +78,20 @@ public:
 
 	virtual void DisplayDemoScreen_Implementation() {};
 
+	// デモ画面を表示
+	UFUNCTION(BlueprintImplementableEvent)
+		void DeleteWidget();
+
 private:
 
 	// ゲームの状態を初期化
-	void InitGameState();							
+	void InitGameState();	
+
+	// ゲームの状態をリセット
+	void RestartGame();
+
+	// インゲーム開始時にする処理
+	void InitInGame();
 
 	// タイトルの処理
 	void OnTitle();
@@ -84,6 +112,9 @@ private:
 
 	// ゲームの状態を管理
 	EGameState_NEO GameState;
+
+	// タイトルの状態を管理
+	ETitleState_NEO TitleState = ETitleState_NEO::OnLogoDisplay;
 
 	// ゲームを次の状態にアップデートする準備ができたか
 	bool IsReadyToUpdateGame;

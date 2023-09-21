@@ -73,6 +73,11 @@ void ANEOGameMode::SetViewTargetWithBlend(AActor* _newViewTarget, float _blendTi
 	pCamera = _newViewTarget;
 }
 
+// カメラの初期設定
+void ANEOGameMode::InitCameraOnPlayer()
+{
+	SetViewTargetWithBlend(PlayerCamera);
+}
 
 /*
  * 関数名　　　　：GetNowPlayerCamera()
@@ -204,18 +209,6 @@ AActor* ANEOGameMode::SpawnEnemy(ASpawnPoint* spawnPoint)
 
 
 /*
- * 関数名　　　　：DestroyEnemy()
- * 処理内容　　　：敵の削除処理
- * 戻り値　　　　：なし
- */
-void ANEOGameMode::SetNextGameState(EGameState_NEO _nextState)
-{
-	// ゲームを次の状態へ
-	pGameState->SetNextGameState(_nextState);
-}
-
-
-/*
  * 関数名　　　　：SetCameraOnPlayer()
  * 処理内容　　　：プレイヤーのカメラ設定
  * 戻り値　　　　：なし
@@ -236,6 +229,17 @@ void ANEOGameMode::SetCameraOnPlayer()
 	}
 }
 
+
+/*
+ * 関数名　　　　：RestartGame()
+ * 処理内容　　　：ゲームリセット
+ * 戻り値　　　　：なし
+ */
+void ANEOGameMode::RestartGame()
+{
+	UGameplayStatics::OpenLevel(GetWorld(),"GameMap");
+
+}
 
 /*
  * 関数名　　　　：DestroyEnemy()
@@ -310,11 +314,10 @@ void ANEOGameMode::ExitBattleArea()
 	}
 
 	//固定カメラをプレイヤーのカメラに変更
-	if (pPlayer)
+	if (!PlayerController->GetPlayerIsDead())
 	{
 		if (PlayerCamera)
 		{
-			//カメラをプレイヤーのカメラに変更
 			SetViewTargetWithBlend(PlayerCamera, 1.f);
 		}
 	}

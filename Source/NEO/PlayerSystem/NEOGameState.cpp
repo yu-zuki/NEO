@@ -4,6 +4,7 @@
 #include "NEOGameState.h"
 #include "Kismet/GameplayStatics.h"
 #include "NEOPlayerController.h"
+#include "NEOGameMode.h"
 
 // コンストラクタ
 ANEOGameState::ANEOGameState()
@@ -20,11 +21,50 @@ ANEOGameState::ANEOGameState()
  */
 void ANEOGameState::InitGameState()
 {
-	if (!PlayerController) { return; }
+	if (PlayerController) { return; }
+
+	// コントローラー取得
+	PlayerController = Cast<ANEOPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 
 	// プレイヤーの状態初期化
 	PlayerController->ResetPlayerStatus();
 }
+
+
+/*
+ * 関数名　　　　：InitInGame()
+ * 処理内容　　　：インゲームの状態を更新
+ * 戻り値　　　　：なし
+ */
+void ANEOGameState::InitInGame()
+{
+	// ゲームモード取得
+	ANEOGameMode* pGameMode = Cast<ANEOGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+
+	if (pGameMode)
+	{
+		// プレイヤーにカメラを設定
+		pGameMode->InitCameraOnPlayer();
+	}
+}
+
+/*
+ * 関数名　　　　：ResetGame()
+ * 処理内容　　　：インゲームの状態を更新
+ * 戻り値　　　　：なし
+ */
+void ANEOGameState::RestartGame()
+{
+	// ゲームモード取得
+	ANEOGameMode* pGameMode = Cast<ANEOGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+
+	if (pGameMode)
+	{
+		// プレイヤーにカメラを設定
+		pGameMode->RestartGame();
+	}
+}
+
 
 /*
  * 関数名　　　　：UpdateGameState()
@@ -67,19 +107,22 @@ void ANEOGameState::UpdateGameState(float DeltaTime)
  */
 void ANEOGameState::OnTitle()
 {
+	// ゲームの状態初期化
+	InitGameState();
+
+	if (!PlayerController) { return; }
+
+	// タイトル画面が表示されているとき次に進める
+	IsReadyToUpdateGame = (TitleState == ETitleState_NEO::OnTitleDisplay);
+
 	// いずれかのキーが押されているか取得
-	if (PlayerController->GetIsAnyKeyPressed() && IsReadyToUpdateGame)
+	if (IsReadyToUpdateGame && PlayerController->GetIsAnyKeyPressed())
 	{
 		// 次のステートへ
-		SetNextGameState(EGameState_NEO::OnTitle);
+		SetNextGameState(EGameState_NEO::OnOpening);
 
 		// 長押しなどで一気に飛ばないようにフラグを下げておく
 		IsReadyToUpdateGame = false;
-	}
-	else
-	{
-		// タイトル画面を表示
-		DisplayTitleScreen();
 	}
 }
 
@@ -90,7 +133,23 @@ void ANEOGameState::OnTitle()
  */
 void ANEOGameState::OnOpening()
 {
+	if (!PlayerController) { return; }
 
+	// BP側でオープニング再生終了などを取得
+	if (IsReadyToUpdateGame)
+	{
+		// 次のステートへ
+		SetNextGameState(EGameState_NEO::OnGamePlaying);
+
+		// フラグを下げておく
+		IsReadyToUpdateGame = false;
+
+		// 表示されているWidgetは消去
+		DeleteWidget();
+
+		// インゲーム初期化
+		InitInGame();
+	}
 }
 
 
@@ -101,9 +160,26 @@ void ANEOGameState::OnOpening()
  */
 void ANEOGameState::OnGamePlaying()
 {
-	// ゲームの状態初期化
-	InitGameState();
+	if (!PlayerController) { return; }
 
+	if (IsReadyToUpdateGame)
+	{
+		// プレイヤーが死んでいたらゲームオーバー
+		if (PlayerController->GetPlayerIsDead())
+		{
+			// 次のステートへ
+			SetNextGameState(EGameState_NEO::OnGameOver);
+		}
+		// それ以外はゲームクリア
+		else
+		{
+			// 次のステートへ
+			SetNextGameState(EGameState_NEO::OnGameClear);
+		}
+
+		// フラグを下げておく
+		IsReadyToUpdateGame = false;
+	}
 }
 
 /*
@@ -113,8 +189,14 @@ void ANEOGameState::OnGamePlaying()
  */
 void ANEOGameState::OnGameClear()
 {
+	if (IsReadyToUpdateGame)
+	{
+		// 次のステートへ
+		SetNextGameState(EGameState_NEO::OnTitle);
 
-
+		// ゲームリセット
+		RestartGame();
+	}	
 }
 
 
@@ -125,8 +207,14 @@ void ANEOGameState::OnGameClear()
  */
 void ANEOGameState::OnGameOver()
 {
+	if (IsReadyToUpdateGame)
+	{
+		// 次のステートへ
+		SetNextGameState(EGameState_NEO::OnTitle);
 
-
+		// ゲームリセット
+		RestartGame();
+	}
 }
 
 

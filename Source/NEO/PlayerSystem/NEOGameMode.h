@@ -22,14 +22,17 @@ class NEO_API ANEOGameMode : public AGameModeBase
 
 public:
 
+
 	UFUNCTION(BlueprintCallable, Category = "UpdateState")
-		class ANEOGameState* GetGameState() { return pGameState; }
+		class ANEOGameState* GetGameState()const { return pGameState; }
 
 	// プレイヤーのカメラ変更
 	void SetViewTargetWithBlend(AActor* _newViewTarget, float _blendTime = 0.f, EViewTargetBlendFunction _blendFunc = VTBlend_Linear, float _blendExp = 0.f, bool _bLockOutgoing = false);
 
 	// プレイヤーのカメラ設定
 	void SetPlayerCamera(AActor* _playerCamera) { PlayerCamera = _playerCamera; }
+
+	void InitCameraOnPlayer();
 	
 	// 現在のカメラ取得
 	AActor* GetNowPlayerCamera()const;
@@ -60,8 +63,8 @@ public:
 	// バトルエリア内に敵を出現させる
 	void SpawnEnemyInBattleArea();
 
-	// プレイヤーの削除
-	void SetNextGameState(EGameState_NEO _nextState);
+	// ゲームを次の状態へ移す準備が整ったことを伝える
+	void SetNextGameState() { if (pGameState) { pGameState->SetReadyUpdateGame(true); } }
 
 	// プレイヤーにカメラを設定する
 	void SetCameraOnPlayer();
@@ -71,6 +74,9 @@ public:
 
 	// デフォルトポーンクラスを取得
 	TSubclassOf<APawn> GetDefaultPawnClass()const { return DefaultPawnClass; }
+
+	// 
+	void RestartGame();
 
 private:
 
@@ -91,7 +97,4 @@ private:
 
 	// プレイヤーコントローラーのポインタ
 	class ANEOPlayerController* PlayerController;
-
-	// プレイヤーのポインタ
-	class APlayerBase* pPlayer;
 };

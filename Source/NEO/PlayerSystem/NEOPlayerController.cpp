@@ -56,8 +56,11 @@ void ANEOPlayerController::DestroyPlayer()
         // プレイヤーをNULLに
         pPlayer = nullptr;
 
+        // プレイヤーを死亡状態へ
+        PlayerIsDead = true;
+
         // ゲームを次の状態へ
-        pGameMode->SetNextGameState(EGameState_NEO::OnGameOver);
+        pGameMode->SetNextGameState();
     }
 }
 
