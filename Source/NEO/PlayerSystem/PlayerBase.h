@@ -3,9 +3,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameFramework/Character.h"
+#include "EnhancedInputComponent.h"
 #include "InputActionValue.h"
 #include <type_traits>
-#include "NEO/GameSystem/InputCharacter.h"
 #include "NEO/WeaponSystem/WeaponBase.h"
 #include "ActionAssistComponent.h"
 #include <Runtime/Engine/Classes/Components/CapsuleComponent.h>
@@ -138,7 +139,7 @@ struct FPlayerAnimation
 //----------------------------------------------------------------------------------------
 
 UCLASS()
-class NEO_API APlayerBase : public AInputCharacter
+class NEO_API APlayerBase : public ACharacter
 {
 	GENERATED_BODY()
 
@@ -152,6 +153,15 @@ protected:
 	//----------------入力で呼び出される関数-----------------------------
 	// 移動
 	virtual void Move(const FInputActionValue& _value);
+
+	// デモ中の移動
+	void AIMove();
+
+	// デモ中の攻撃
+	void AIAttack();
+
+	// デモ中の武器拾う
+	void AIPickUpWeapon();
 
 	// ダッシュ切り替え
 	void Run();
@@ -189,6 +199,9 @@ protected:
 public:
 
 	//-----------------他クラスで呼び出し可--------------------------------------------------------------------------------------------
+	// AI解除
+	void SetRelease(bool _isAIPlayer) { IsAIPlayer = _isAIPlayer; }
+
 	// コンボ継続
 	void ContinuationCombo();
 
@@ -200,7 +213,7 @@ public:
 	bool GetKicking()const { return IsKicking; }
 
 	// ダメージを与える処理
-	virtual void SetCollision() { return; }
+	virtual void SetCollision();
 
 	// アクションアシストコンポーネントを取得
 	UActionAssistComponent* GetActionAssistComponent()const { return ActionAssistComp; }
@@ -291,9 +304,6 @@ private:
 	// 攻撃に関するフラグをすべてリセット
 	void ResetAllAttackFlags();
 
-	// スプライン検索
-	AActor* GetSplineActor(const FName _tag);
-
 	// アニメーション再生
 	void PlayAnimation(UAnimMontage* _toPlayAnimMontage, FName _startSectionName = "None", float _playRate = 1.f);
 
@@ -319,6 +329,9 @@ protected:
 
 	// ボタンの設定
 	void SetupMainActionMapping();
+
+	// アニメーションアセットの設定
+	void SetupAnimationAssets();
 
 	// 引数によってスタティックメッシュかスケルタルメッシュのセットアップ
 	void SetupWeaponMesh(UStaticMeshComponent*& MeshComp, TCHAR* WeaponAssetPath, FName PublicName = "WeaponStaticMesh");
@@ -396,7 +409,10 @@ protected:
 private:
 
 	// 入力可能かどうか
-	bool IsControl;					
+	bool IsControl;	
+
+	// AI移動する
+	bool IsAIPlayer;
 
 	// ダッシュ中かどうか
 	bool IsRunning;		
@@ -404,7 +420,7 @@ private:
 	// 右を向いているか
 	bool IsLookRight;
 
-	// 
+	// 右に動いているか
 	bool MoveRight = false;
 
 	// 蹴り攻撃中かどうか
@@ -473,11 +489,8 @@ private:
 	// ハンドル
 	FTimerHandle TimerHandle;		
 
-	// プレイヤーが通るスプライン
-	class APlayerSpline* SplineActor;		
-
 	// ゲームモード保存
-	class ATGS_GameMode* pGameMode;
+	class ANEOGameMode* pGameMode;
 
-	class UTGS_GameInstance* GetGameInstance();
+	class ANEOPlayerController* PlayerController;
 };

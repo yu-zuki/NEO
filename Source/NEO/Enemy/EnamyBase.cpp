@@ -3,7 +3,7 @@
 
 #include "EnamyBase.h"
 #include "EngineUtils.h"
-#include "NEO/GameSystem/TGS_GameMode.h"
+#include "NEO/PlayerSystem/NEOGameMode.h"
 #include "Kismet/GameplayStatics.h"
 #include "NEO/GameSystem/GameSystem_BattleArea.h"
 #include "NEO/GameSystem/Enemy_UMG.h"
@@ -48,7 +48,7 @@ AEnamyBase::AEnamyBase()
 
 void AEnamyBase::DestoryEnemy()
 {
-	ATGS_GameMode* GameMode = Cast<ATGS_GameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	ANEOGameMode* GameMode = Cast<ANEOGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 	if (GameMode)
 	{
 		GameMode->DestroyEnemy(this, IsAreaEnemy);

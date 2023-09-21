@@ -12,6 +12,7 @@
 #include "DrawDebugHelpers.h"
 #include "TGS_GameMode.h"
 #include "Components/BoxComponent.h"							//ボックスコンポーネントを使うため
+#include "NEO/PlayerSystem/NEOGameMode.h"
 
 
 // Sets default values
@@ -38,6 +39,24 @@ ASplineCamera::ASplineCamera()
 
 }
 
+
+void ASplineCamera::SetPlayerCamera()
+{
+	//SetViewTarget
+	ANEOGameMode* GameMode = Cast<ANEOGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	if (GameMode)
+	{
+		GameMode->SetPlayerCamera(this);
+		GameMode->SetViewTargetWithBlend(this);
+	}
+
+	ACharacter* PlayerCharacter = UGameplayStatics::GetPlayerCharacter(this, 0);
+	//SetOwner
+	if (PlayerCharacter) {
+		PlayerCharacter->SetOwner(this);
+	}
+}
+
 // Called when the game starts or when spawned
 void ASplineCamera::BeginPlay()
 {
@@ -49,23 +68,6 @@ void ASplineCamera::BeginPlay()
 		CameraComponent->SetWorldLocation(CameraLocation);
 	}
 
-	//SetViewTarget
-	ATGS_GameMode* GameMode = Cast<ATGS_GameMode>(UGameplayStatics::GetGameMode(this));
-	if (GameMode) {
-		GameMode->SetViewTargetWithBlend(this);
-	}
-
-	//CastTGSGameMode
-	ATGS_GameMode* TGSGameMode = Cast<ATGS_GameMode>(UGameplayStatics::GetGameMode(this));
-	if (TGSGameMode) {
-		TGSGameMode->SetSplineCamera(this);
-	}
-
-	ACharacter* PlayerCharacter = UGameplayStatics::GetPlayerCharacter(this, 0);
-	//SetOwner
-	if (PlayerCharacter) {
-		PlayerCharacter->SetOwner(this);
-	}
 	
 }
 
