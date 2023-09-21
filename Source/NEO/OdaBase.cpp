@@ -95,7 +95,7 @@ void AOdaBase::Tick(float DeltaTime)
 	//プレイヤーがなかったらこれ以降の処理をスルーする
 	if (Player == nullptr)  return;
 
-	if (FVector::Dist(GetActorLocation(), UGameplayStatics::GetPlayerPawn(GetWorld(), 0)->GetActorLocation()) <= 1000.f)
+	if (FVector::Dist(GetActorLocation(), UGameplayStatics::GetPlayerPawn(GetWorld(), 0)->GetActorLocation()) <= 2000.f)
 	{
 
 		//Enemy Hp Set
@@ -459,8 +459,8 @@ void AOdaBase::OdaAttack2(int Timer) {
 		isShockWaveSpawnTiming = false;
 	}
 
-	//100フレームたったら
-	if (Timer % 100 == 0)
+	//170フレームたったら
+	if (Timer % 170 == 0)
 	{
 		//前ダッシュしてみる
 		OdaMoveEnum = ECPPOdaEnum::Moveflont;
@@ -534,8 +534,8 @@ void AOdaBase::OdaUlt(int Timer)
 
 
 
-	//200フレームたったら
-	if (Timer > 200)
+	//250フレームたったら
+	if (Timer > 250)
 	{
 		//ステートを切り替える
 		OdaMoveEnum = ECPPOdaEnum::Moveflont;
@@ -682,14 +682,14 @@ void AOdaBase::ApplyDamage(float Damage)
 			}
 		}
 		//
-		else if (Health <= 750.f && EnemyOneTimeSpawn == 0)
+		else if (Health <= 900.f && EnemyOneTimeSpawn == 0)
 		{
 			CallEnemy(GunPath, FVector(6350.f,1800.f,1200.f));
 			CallEnemy(GunPath, FVector(7150.f, 1800.f, 1200.f));
 			//1加算
 			EnemyOneTimeSpawn++;
 		}
-		else if (Health <= 500.f && EnemyOneTimeSpawn == 1)
+		else if (Health <= 700.f && EnemyOneTimeSpawn == 1)
 		{
 			CallEnemy(GunPath, FVector(6350.f, 1800.f, 1200.f));
 			CallEnemy(GunPath, FVector(7150.f, 1800.f, 1200.f));
@@ -697,7 +697,7 @@ void AOdaBase::ApplyDamage(float Damage)
 			//1加算
 			EnemyOneTimeSpawn++;
 		}
-		else if (Health <= 250.f && EnemyOneTimeSpawn == 2)
+		else if (Health <= 400.f && EnemyOneTimeSpawn == 2)
 		{
 			CallEnemy(GunPath, FVector(6350.f, 1800.f, 1200.f));
 			CallEnemy(GunPath, FVector(7150.f, 1800.f, 1200.f));
