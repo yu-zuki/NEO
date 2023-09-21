@@ -10,8 +10,6 @@
 ANEOGameState::ANEOGameState()
 	: IsReadyToUpdateGame(false)
 {
-	// タイトル状態に設定
-	GameState = EGameState_NEO::OnTitle;
 }
 
 /*
@@ -22,6 +20,9 @@ ANEOGameState::ANEOGameState()
 void ANEOGameState::InitGameState()
 {
 	if (PlayerController) { return; }
+
+	// タイトル状態に設定
+	GameState = EGameState_NEO::OnTitle;
 
 	// コントローラー取得
 	PlayerController = Cast<ANEOPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
@@ -121,6 +122,12 @@ void ANEOGameState::OnTitle()
 		// 次のステートへ
 		SetNextGameState(EGameState_NEO::OnOpening);
 
+		// 表示されているWidgetは消去
+		DeleteWidget();
+
+		// タイトル状態に設定
+		TitleState = ETitleState_NEO::OnDisplay_None;
+
 		// 長押しなどで一気に飛ばないようにフラグを下げておく
 		IsReadyToUpdateGame = false;
 	}
@@ -143,9 +150,6 @@ void ANEOGameState::OnOpening()
 
 		// フラグを下げておく
 		IsReadyToUpdateGame = false;
-
-		// 表示されているWidgetは消去
-		DeleteWidget();
 
 		// インゲーム初期化
 		InitInGame();

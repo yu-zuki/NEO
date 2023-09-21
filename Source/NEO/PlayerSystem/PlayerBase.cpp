@@ -108,7 +108,7 @@ void APlayerBase::Tick(float DeltaTime)
 	}
 
 	// アニメーションに合わせて移動
-	if (EnableRootMotion && !ActionAssistComp->WallCheck(50.f) && !ActionAssistComp->WallCheck(-30.f))
+	if (EnableRootMotion && !ActionAssistComp->WallCheck(50.f) && !ActionAssistComp->WallCheck(-50.f))
 	{
 		RootMotion(AnimationMoveValue);
 	}
@@ -139,6 +139,9 @@ void APlayerBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 		// チャージ終了
 		EnhancedInputComponent->BindAction(MainActionMapping.ComboAction1, ETriggerEvent::Completed, this, &APlayerBase::Attack1);
 		EnhancedInputComponent->BindAction(MainActionMapping.ComboAction2, ETriggerEvent::Completed, this, &APlayerBase::Attack2);
+
+		// 武器を拾う
+		EnhancedInputComponent->BindAction(MainActionMapping.PickAction, ETriggerEvent::Started, this, &APlayerBase::PickUpWeapon);
 
 		
 		// チャージ判定用
@@ -225,6 +228,7 @@ void APlayerBase::SetupMainActionMapping()
 	inputActionPaths.Add(TEXT("/Game/0122/Player/Input/Actions/IA_Jump"));
 	inputActionPaths.Add(TEXT("/Game/0122/Player/Input/Actions/IA_Combo1"));
 	inputActionPaths.Add(TEXT("/Game/0122/Player/Input/Actions/IA_Combo2"));
+	inputActionPaths.Add(TEXT("/Game/0122/Player/Input/Actions/IA_PickUp"));
 
 	// ボタンのマッピング設定
 	MainActionMapping.DefaultMappingContext = LoadObject<UInputMappingContext>(nullptr, defaultMappingContext);
@@ -251,6 +255,9 @@ void APlayerBase::SetupMainActionMapping()
 			break;
 		case 4:
 			MainActionMapping.ComboAction2 = tempInputAction;
+			break;
+		case 5:
+			MainActionMapping.PickAction = tempInputAction;
 			break;
 		default:
 			UE_LOG(LogTemp, Error, TEXT("InputAction Array reference error"));
@@ -549,7 +556,7 @@ void APlayerBase::Jump()
 	SetActorLocation(nextPos);
 
 	// 着地処理 下降開始から判定開始
-	if (IsPlayerGrounded() && frames >= 10.f)
+	if (frames >= 10.f && (IsPlayerGrounded() || nextPos.Z <= JumpBeforePos_Z))
 	{
 		IsJumping = false;
 	}
@@ -700,49 +707,21 @@ void APlayerBase::Attack2()
 
 	IsCharging = false;
 
-	if (IsPickUpWeapon && CanPickUpWeapon)
+	FDateTime ChargeEndTime = UKismetMathLibrary::Now();
+
+	// 差分を計算          
+	FTimespan Span = ChargeEndTime - ChargeStartTime;
+
+	// ボタンを押している時間で攻撃変更
+	if (Span.GetSeconds() <= ChargeTime)
 	{
-		if (Weapon != nullptr)
-		{
-			Weapon->DetachToHand();
-			Weapon = nullptr;
-		}
-		else
-		{
-			IsHoldWeapon = true;
-			// 武器を落とすまでの回数をリセット
-			PlayerStatus.WeaponDropLimit = PlayerStatus.DefaultWeaponDropLimit;
-		}
-
-		if (!CanPickUpWeapon->GetIsHeld() && !CanPickUpWeapon->GetIsFalling())
-		{
-			Weapon = CanPickUpWeapon;
-			WeaponType = Weapon->GetWeaponType();
-			Weapon->AttachToHand(this, SocketName[int32(WeaponType)], EOwnerType::OwnerType_Player);
-
-			CanPickUpWeapon = nullptr;
-		}
-
-		IsControl = true;
+		// コンボ攻撃
+		ComboAttack(1);
 	}
 	else
 	{
-		FDateTime ChargeEndTime = UKismetMathLibrary::Now();
-
-		// 差分を計算          
-		FTimespan Span = ChargeEndTime - ChargeStartTime;
-
-		// ボタンを押している時間で攻撃変更
-		if (Span.GetSeconds() <= ChargeTime)
-		{
-			// コンボ攻撃
-			ComboAttack(1);
-		}
-		else
-		{
-			// 溜め攻撃
-			ChargeAttack();
-		}
+		// 溜め攻撃
+		ChargeAttack();
 	}
 }
 
@@ -862,6 +841,38 @@ void APlayerBase::GunAttack(int _attackNum)
 		PlayAnimation(PlayerAnimation.GunAttack);
 	}
 }
+
+
+// 武器拾う
+void APlayerBase::PickUpWeapon()
+{
+	if (!IsControl) { return; }
+
+	if (IsPickUpWeapon && CanPickUpWeapon)
+	{
+		if (Weapon != nullptr)
+		{
+			Weapon->DetachToHand();
+			Weapon = nullptr;
+		}
+		else
+		{
+			IsHoldWeapon = true;
+			// 武器を落とすまでの回数をリセット
+			PlayerStatus.WeaponDropLimit = PlayerStatus.DefaultWeaponDropLimit;
+		}
+
+		if (!CanPickUpWeapon->GetIsHeld() && !CanPickUpWeapon->GetIsFalling())
+		{
+			Weapon = CanPickUpWeapon;
+			WeaponType = Weapon->GetWeaponType();
+			Weapon->AttachToHand(this, SocketName[int32(WeaponType)], EOwnerType::OwnerType_Player);
+
+			CanPickUpWeapon = nullptr;
+		}
+	}
+}
+
 
 
 /*
@@ -1031,6 +1042,14 @@ void APlayerBase::ResetCombo()
 	// コントロール可能状態へ
 	IsControl = true;
 }
+
+
+void APlayerBase::StopMontage()
+{
+	//アニメーションを止める
+	GetMesh()->GetAnimInstance()->StopSlotAnimation();
+}
+
 
 /*
  * 関数名　　　　：SetCollision()

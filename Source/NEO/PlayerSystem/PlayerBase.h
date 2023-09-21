@@ -47,6 +47,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		UInputAction* ComboAction2 = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		UInputAction* PickAction = nullptr;
 };
 //----------------------------------------------------------------------------------------
 
@@ -193,6 +196,9 @@ protected:
 
 	// 銃の攻撃
 	void GunAttack(int _attackNum);
+
+	// 武器拾う
+	void PickUpWeapon();
 	//-------------------------------------------------------------------
 
 
@@ -207,6 +213,8 @@ public:
 
 	// コンボリセット
 	void ResetCombo();
+
+	void StopMontage();
 
 	int GetComboIndex()const { return ComboIndex; }
 

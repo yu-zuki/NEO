@@ -22,6 +22,7 @@ enum class EGameState_NEO : uint8
 UENUM(BlueprintType)
 enum class ETitleState_NEO : uint8
 {
+	OnDisplay_None	UMETA(DisplayName = "None"),			// なにもしない
 	OnLogoDisplay	UMETA(DisplayName = "LogoMovie"),		// 日電のロゴ表示
 	OnTitleDisplay	UMETA(DisplayName = "Title"),			// タイトル画面
 	OnDemoDisplay	UMETA(DisplayName = "Demo"),			// デモ画面
