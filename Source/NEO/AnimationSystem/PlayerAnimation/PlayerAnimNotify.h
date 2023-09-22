@@ -16,6 +16,7 @@ enum class EPlayerNotifyType :uint8
     NotifyType_CanControl   UMETA(DisplayName = "CanControl"),
     NotifyType_SlowDown     UMETA(DisplayName = "SlowDown"),
     NotifyType_DropWeapon   UMETA(DisplayName = "DropWeapon"),
+    NotifyType_StopMontage   UMETA(DisplayName = "StopMontage"),
 };
 
 

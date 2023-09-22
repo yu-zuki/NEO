@@ -54,9 +54,9 @@ AOdaBase::AOdaBase() :
 	BoxComp->SetRelativeLocation(FVector(0.0f, 0.f, 0.0f));
 	BoxComp->SetBoxExtent(FVector(10.f, 70.f, 10.f));
 
-	//UI Create
-	EnemyWidget = CreateDefaultSubobject<UEnemyBase_WidgetComponent>(TEXT("EnemyWidget"));
-	EnemyWidget->SetupAttachment(RootComponent);
+	////UI Create
+	//EnemyWidget = CreateDefaultSubobject<UEnemyBase_WidgetComponent>(TEXT("EnemyWidget"));
+	//EnemyWidget->SetupAttachment(RootComponent);
 	// Assist Create
 	ActionAssistComp = CreateDefaultSubobject<UActionAssistComponent>(TEXT("ActionAssist"));
 
@@ -99,7 +99,7 @@ void AOdaBase::Tick(float DeltaTime)
 	{
 
 		//Enemy Hp Set
-		EnemyWidget->SetHPInfo(Health, MaxHealth);
+		//EnemyWidget->SetHPInfo(Health, MaxHealth);
 
 		//ƒtƒŒ[ƒ€‚²‚Æ‚É‰ÁZ‚·‚é
 		FlameCounter++;

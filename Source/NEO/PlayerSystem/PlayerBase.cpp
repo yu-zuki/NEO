@@ -13,19 +13,20 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "NEO/GameSystem/TGS_GameMode.h"
 #include "NEO/GameSystem/TGS_GameInstance.h"
-#include "PlayerSpline.h"
-
+#include "NEOPlayerController.h"
+#include "NEOGameMode.h"
 
 // Sets default values
 APlayerBase::APlayerBase()
 	: IsControl(true)
+	, IsAIPlayer(true)
 	, IsRunning(false)
 	, IsLookRight(true)
 	, IsJumping(false)
 	, IsCharging(false)
 	, IsHoldWeapon(true)
-	, IsDeath(false)
 	, IsInvincibility(false)
+	, IsDeath(false)
 	, frames(0.f)
 	, IsAttacking(false)
 	, CanCombo(false)
@@ -52,14 +53,11 @@ APlayerBase::APlayerBase()
 	// アタックアシストコンポーネント作成
 	ActionAssistComp = CreateDefaultSubobject<UActionAssistComponent>(TEXT("AttackAssist"));
 
-	//WeaponPickUpArea = CreateDefaultSubobject<UBoxComponent>(TEXT("WeaponArea"));
-
 	// コリジョンイベントを設定
 	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &APlayerBase::OnOverlap);
 
-	//GetCapsuleComponent()->OnComponentEndOverlap.AddDynamic(this, &APlayerBase::EndOverlap);
-
-	//WeaponPickUpArea->OnComponentBeginOverlap.AddDynamic(this, &APlayerBase::OnOverlap);
+	// Playerのセットアップ
+	SetupPlayerData();
 }
 
 
@@ -68,12 +66,15 @@ void APlayerBase::BeginPlay()
 {
 	Super::BeginPlay();
 
-	//Add Input Mapping Context
-	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
+	// コントローラー取得
+	PlayerController = Cast<ANEOPlayerController>(Controller);
+
+	// 入力の設定
+	if (PlayerController)
 	{
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 		{
-			Subsystem->AddMappingContext(MainActionMapping.DefaultMappingContext, 1);
+			Subsystem->AddMappingContext(MainActionMapping.DefaultMappingContext, 0);
 		}
 	}
 
@@ -107,7 +108,7 @@ void APlayerBase::Tick(float DeltaTime)
 	}
 
 	// アニメーションに合わせて移動
-	if (EnableRootMotion && !ActionAssistComp->WallCheck(50.f) && !ActionAssistComp->WallCheck(-30.f))
+	if (EnableRootMotion && !ActionAssistComp->WallCheck(50.f) && !ActionAssistComp->WallCheck(-50.f))
 	{
 		RootMotion(AnimationMoveValue);
 	}
@@ -139,6 +140,9 @@ void APlayerBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 		EnhancedInputComponent->BindAction(MainActionMapping.ComboAction1, ETriggerEvent::Completed, this, &APlayerBase::Attack1);
 		EnhancedInputComponent->BindAction(MainActionMapping.ComboAction2, ETriggerEvent::Completed, this, &APlayerBase::Attack2);
 
+		// 武器を拾う
+		EnhancedInputComponent->BindAction(MainActionMapping.PickAction, ETriggerEvent::Started, this, &APlayerBase::PickUpWeapon);
+
 		
 		// チャージ判定用
 		//EnhancedInputComponent->BindAction(MainActionMapping.ComboAction1, ETriggerEvent::Completed, this, &APlayerBase::ChargeAttack_End);
@@ -169,16 +173,10 @@ void APlayerBase::SetupPlayerData()
 	ComboStartSectionNames = { "First", "Second", "Third","Fourth" };
 
 	// ゲームモード取得
-	pGameMode = Cast<ATGS_GameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	pGameMode = Cast<ANEOGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 
-	// スプラインを検索して格納
-	AActor* tempSplineActor = GetSplineActor("PlayerLoad");
-
-	// アクターをスプラインにキャスト
-	if(tempSplineActor)
-	{
-		SplineActor = Cast<APlayerSpline>(tempSplineActor);
-	}
+	// アニメーションアセット設定
+	SetupAnimationAssets();
 }
 
 
@@ -230,6 +228,7 @@ void APlayerBase::SetupMainActionMapping()
 	inputActionPaths.Add(TEXT("/Game/0122/Player/Input/Actions/IA_Jump"));
 	inputActionPaths.Add(TEXT("/Game/0122/Player/Input/Actions/IA_Combo1"));
 	inputActionPaths.Add(TEXT("/Game/0122/Player/Input/Actions/IA_Combo2"));
+	inputActionPaths.Add(TEXT("/Game/0122/Player/Input/Actions/IA_PickUp"));
 
 	// ボタンのマッピング設定
 	MainActionMapping.DefaultMappingContext = LoadObject<UInputMappingContext>(nullptr, defaultMappingContext);
@@ -257,10 +256,86 @@ void APlayerBase::SetupMainActionMapping()
 		case 4:
 			MainActionMapping.ComboAction2 = tempInputAction;
 			break;
+		case 5:
+			MainActionMapping.PickAction = tempInputAction;
+			break;
 		default:
 			UE_LOG(LogTemp, Error, TEXT("InputAction Array reference error"));
 			break;
 		}
+	}
+}
+
+
+/*
+ * 関数名　　　　：SetupAnimationAssets()
+ * 処理内容　　　：アニメーションアセットのセットアップ
+ * 戻り値　　　　：なし
+ */
+void APlayerBase::SetupAnimationAssets()
+{
+	// コンボアニメーションのパス保管用
+	{
+		TCHAR* ComboAnimationAssetPaths[2];
+
+		// アニメーションアセットのパス
+		ComboAnimationAssetPaths[0] = TEXT("/Game/0122/Player/Animation/Montage/Combo/Combo1");
+		ComboAnimationAssetPaths[1] = TEXT("/Game/0122/Player/Animation/Montage/Combo/Combo2");
+
+		for (int i = 0; i < 2; ++i)
+		{
+			PlayerAnimation.ComboAttack[i] = GetAnimationAsset(ComboAnimationAssetPaths[i]);
+		}
+	}
+
+	{
+		// 空中での攻撃アニメーション
+		TCHAR* AirAttackAnimationAssetPath = TEXT("/Game/0122/Player/Animation/Montage/Combo/JumpAttack_Montage");
+
+		PlayerAnimation.AirAttack = GetAnimationAsset(AirAttackAnimationAssetPath);
+	}
+
+	{
+		// 空中での攻撃アニメーション
+		TCHAR* ChargeAttackAnimationAssetPath = TEXT("/Game/0122/Player/Animation/Montage/ChargeAttack_Montage");
+
+		PlayerAnimation.ChargeAttack = GetAnimationAsset(ChargeAttackAnimationAssetPath);
+	}
+
+	{
+		// 空中での攻撃アニメーション
+		TCHAR* GunAttackAnimationAssetPath = TEXT("/Game/0122/Player/Animation/Montage/GunAttack_Montage");
+
+		PlayerAnimation.GunAttack = GetAnimationAsset(GunAttackAnimationAssetPath);
+	}
+
+	{
+		// 銃撃アニメーション
+		TCHAR* GunAttack2AnimationAssetPath = TEXT("/Game/0122/Player/Animation/Montage/Kick_Montage");
+
+		PlayerAnimation.GunAttack2 = GetAnimationAsset(GunAttack2AnimationAssetPath);
+	}
+
+
+	{
+		// 被ダメージアニメーションのパス保管用
+		TCHAR* DamageAnimationAssetPath = TEXT("/Game/0122/Player/Animation/Montage/Damaged_Montage");
+
+		PlayerAnimation.TakeDamage = GetAnimationAsset(DamageAnimationAssetPath);
+	}
+
+	{
+		// 被ダメージアニメーションのパス保管用
+		TCHAR* KnockBackAnimationAssetPath = TEXT("/Game/0122/Player/Animation/Montage/KnockBack_Montage");
+
+		PlayerAnimation.KnockBack = GetAnimationAsset(KnockBackAnimationAssetPath);
+	}
+
+	{
+		// 死亡時アニメーションのパス保管
+		TCHAR* DeathAnimationAssetPath = TEXT("/Game/0122/Player/Animation/Montage/Death_Montage");
+
+		PlayerAnimation.Death = GetAnimationAsset(DeathAnimationAssetPath);
 	}
 }
 
@@ -360,11 +435,12 @@ void APlayerBase::Move(const FInputActionValue& _value)
 	// 2軸で入力取得
 	FVector2D MovementVector = _value.Get<FVector2D>();
 
-	if (pGameMode)
+	if (PlayerController)
 	{
 		// カメラの角度取得
-		const FRotator Rotation = pGameMode->GetCameraRotation();
+		const FRotator Rotation = PlayerController->GetNowCameraRotation();
 
+		// 回転設定
 		const FRotator YawRotation(0.f, Rotation.Yaw, 0.f);
 
 		// スプラインに沿った移動方向取得(X,Y)
@@ -378,6 +454,38 @@ void APlayerBase::Move(const FInputActionValue& _value)
 		// 移動方向に回転
 		RotateCharacter(MovementVector.Y);
 	}
+}
+
+
+/*
+ * 関数名　　　　：AIMove()
+ * 処理内容　　　：プレイヤーの移動処理(デモ画面)
+ * 戻り値　　　　：なし
+ */
+void APlayerBase::AIMove()
+{
+
+}
+
+/*
+ * 関数名　　　　：AIAttack()
+ * 処理内容　　　：プレイヤーの攻撃処理(デモ画面)
+ * 戻り値　　　　：なし
+ */
+void APlayerBase::AIAttack()
+{
+
+}
+
+
+/*
+ * 関数名　　　　：AIPickUpWeapon()
+ * 処理内容　　　：プレイヤーの武器を拾う処理(デモ画面)
+ * 戻り値　　　　：なし
+ */
+void APlayerBase::AIPickUpWeapon()
+{
+
 }
 
 
@@ -448,7 +556,7 @@ void APlayerBase::Jump()
 	SetActorLocation(nextPos);
 
 	// 着地処理 下降開始から判定開始
-	if (IsPlayerGrounded() && frames >= 10.f)
+	if (frames >= 10.f && (IsPlayerGrounded() || nextPos.Z <= JumpBeforePos_Z))
 	{
 		IsJumping = false;
 	}
@@ -599,49 +707,21 @@ void APlayerBase::Attack2()
 
 	IsCharging = false;
 
-	if (IsPickUpWeapon && CanPickUpWeapon)
+	FDateTime ChargeEndTime = UKismetMathLibrary::Now();
+
+	// 差分を計算          
+	FTimespan Span = ChargeEndTime - ChargeStartTime;
+
+	// ボタンを押している時間で攻撃変更
+	if (Span.GetSeconds() <= ChargeTime)
 	{
-		if (Weapon != nullptr)
-		{
-			Weapon->DetachToHand();
-			Weapon = nullptr;
-		}
-		else
-		{
-			IsHoldWeapon = true;
-			// 武器を落とすまでの回数をリセット
-			PlayerStatus.WeaponDropLimit = PlayerStatus.DefaultWeaponDropLimit;
-		}
-
-		if (!CanPickUpWeapon->GetIsHeld() && !CanPickUpWeapon->GetIsFalling())
-		{
-			Weapon = CanPickUpWeapon;
-			WeaponType = Weapon->GetWeaponType();
-			Weapon->AttachToHand(this, SocketName[int32(WeaponType)], EOwnerType::OwnerType_Player);
-
-			CanPickUpWeapon = nullptr;
-		}
-
-		IsControl = true;
+		// コンボ攻撃
+		ComboAttack(1);
 	}
 	else
 	{
-		FDateTime ChargeEndTime = UKismetMathLibrary::Now();
-
-		// 差分を計算          
-		FTimespan Span = ChargeEndTime - ChargeStartTime;
-
-		// ボタンを押している時間で攻撃変更
-		if (Span.GetSeconds() <= ChargeTime)
-		{
-			// コンボ攻撃
-			ComboAttack(1);
-		}
-		else
-		{
-			// 溜め攻撃
-			ChargeAttack();
-		}
+		// 溜め攻撃
+		ChargeAttack();
 	}
 }
 
@@ -763,6 +843,38 @@ void APlayerBase::GunAttack(int _attackNum)
 }
 
 
+// 武器拾う
+void APlayerBase::PickUpWeapon()
+{
+	if (!IsControl) { return; }
+
+	if (IsPickUpWeapon && CanPickUpWeapon)
+	{
+		if (Weapon != nullptr)
+		{
+			Weapon->DetachToHand();
+			Weapon = nullptr;
+		}
+		else
+		{
+			IsHoldWeapon = true;
+			// 武器を落とすまでの回数をリセット
+			PlayerStatus.WeaponDropLimit = PlayerStatus.DefaultWeaponDropLimit;
+		}
+
+		if (!CanPickUpWeapon->GetIsHeld() && !CanPickUpWeapon->GetIsFalling())
+		{
+			Weapon = CanPickUpWeapon;
+			WeaponType = Weapon->GetWeaponType();
+			Weapon->AttachToHand(this, SocketName[int32(WeaponType)], EOwnerType::OwnerType_Player);
+
+			CanPickUpWeapon = nullptr;
+		}
+	}
+}
+
+
+
 /*
  * 関数名　　　　：RotateCharacter()
  * 処理内容　　　：プレイヤーのステータス初期化
@@ -870,34 +982,20 @@ void APlayerBase::RootMotion(float _distance)
  */
 void APlayerBase::CallGameModeFunc_DestroyPlayer()
 {
-
-	// ゲームモード作成
-	ATGS_GameMode* gameMode = Cast<ATGS_GameMode>(GetWorld()->GetAuthGameMode());
-	UTGS_GameInstance* GameInstance = GetGameInstance();
-
-	if (gameMode)
+	// コントローラーからプレイヤーを削除
+	if (PlayerController)
 	{
-		gameMode->DestroyPlayer(this);
-
-		PlayerStatus.RemainingLife = GameInstance->LoadRemainingLife();
-
 		// 残機があるうちはリスポーン
-		if (PlayerStatus.RemainingLife > 0)
+		if (PlayerController->GetRemainingLives() > 0)
 		{
 			// プレイヤーリスポーン
-			gameMode->RespawnPlayer();
-
-			// 残機-１
-			GameInstance->SaveRemainingLife( --PlayerStatus.RemainingLife );
+			PlayerController->RespawnPlayer();
 		}
 		// それ以外はゲームオーバー
 		else
 		{
-			// ゲームオーバーへ
-			gameMode->SetState_GameOver();
-
 			// プレイヤー削除
-			gameMode->DestroyPlayer(this);
+			PlayerController->DestroyPlayer();
 		}
 	}
 }
@@ -916,47 +1014,6 @@ void APlayerBase::CallGameModeFunc_DestroyPlayer()
 	IsControl = false;
 	IsKicking = false;
 	ComboIndex = 0;
-}
-
-
-/*
- * 関数名　　　　：GetSplineActor()
- * 処理内容　　　：SplineActor検索
- * 引数１　　　　：FName _tag・・・このタグを持ったActorを検索
- * 戻り値　　　　：なし
- */
-AActor* APlayerBase::GetSplineActor(const FName _tag)
-{
-	//ゲーム全体に対するActorの検索コストが高いため、一回保存しておくだけにする
-	//検索対象は全てのActor
-	TSubclassOf<AActor> findClass;
-	findClass = AActor::StaticClass();
-	TArray<AActor*> actors;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), findClass, actors);
-
-	//検索結果、Actorがあれば
-	if (actors.Num() > 0)
-	{
-		// そのActorの中を順番に検索
-		for (int idx = 0; idx < actors.Num(); idx++)
-		{
-			AActor* pActor = Cast<AActor>(actors[idx]);
-
-			// タグ名で判断
-			if (pActor->ActorHasTag(_tag))
-			{
-				//デバッグ確認
-				FString message = FString("Founded Actor	:") + pActor->GetName();
-				UE_LOG(LogTemp, Warning, TEXT("%s"), *message);
-
-
-				return pActor;
-			}
-		}
-	}
-
-
-	return NULL;
 }
 
 
@@ -986,6 +1043,27 @@ void APlayerBase::ResetCombo()
 	IsControl = true;
 }
 
+
+void APlayerBase::StopMontage()
+{
+	//アニメーションを止める
+	GetMesh()->GetAnimInstance()->StopSlotAnimation();
+}
+
+
+/*
+ * 関数名　　　　：SetCollision()
+ * 処理内容　　　：攻撃判定
+ * 戻り値　　　　：なし
+ */
+void APlayerBase::SetCollision()
+{
+	// 武器を持っているとき当たり判定をつける
+	if (Weapon)
+	{
+		Weapon->SetCollision();
+	}
+}
 
 /*
  * 関数名　　　　：TakedDamage()
@@ -1064,12 +1142,6 @@ void APlayerBase::TakedDamage(float _damage, bool _isLastAttack /*= false*/)
 		// ヒットエフェクト発生
 		ActionAssistComp->SpawnEffect(HitEffect, GetActorLocation());
 
-		// 無敵開始
-		IsInvincibility = true;
-
-		// 任意の時間後無敵解除
-		FTimerManager& TimerManager = GetWorld()->GetTimerManager();
-		TimerManager.SetTimer(TimerHandle, this, &APlayerBase::InvincibilityRelease, InvincibilityReleaseTime, false);
 	}
 }
 
@@ -1102,21 +1174,6 @@ void APlayerBase::PlayAnimation(UAnimMontage* _toPlayAnimMontage, FName _startSe
 	{
 		ActionAssistComp->PlayAnimation(_toPlayAnimMontage, _startSectionName, _playRate);
 	}
-}
-
-UTGS_GameInstance* APlayerBase::GetGameInstance()
-{
-	UWorld* World = GetWorld();
-	if (!World) return nullptr;
-
-	UTGS_GameInstance* GameInstance = Cast<UTGS_GameInstance>(GetWorld()->GetGameInstance());
-	if (GameInstance) {
-		return GameInstance;
-	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("GameInstance is not Found"));
-	}
-	return nullptr;
 }
 
 

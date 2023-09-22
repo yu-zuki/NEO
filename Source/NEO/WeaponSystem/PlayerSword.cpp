@@ -88,7 +88,7 @@ void APlayerSword::PlyerAttack()
 
 		// “–‚½‚è”»’è‚ðŽæ‚é”ÍˆÍ
 		FVector Start = WeaponCollision->GetComponentLocation();
-		FVector End = Start;
+		FVector End = Start - 50.f;
 		FQuat Rot = WeaponCollision->GetComponentQuat();
 		FCollisionShape CollisionShape = FCollisionShape::MakeCapsule(WeaponCollision->GetScaledCapsuleRadius(), WeaponCollision->GetScaledCapsuleHalfHeight());
 
