@@ -411,6 +411,9 @@ public:
 	UPROPERTY(EditAnywhere)
 		float MaxHealth;
 
+	UPROPERTY(EditAnywhere)
+		bool movieend = false;
+
 protected:
 	AActor* GetPlayer();
 };
