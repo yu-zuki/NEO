@@ -6,6 +6,7 @@
 #include "GameFramework/PlayerController.h"
 #include "NEOPlayerController.generated.h"
 
+
 UCLASS()
 class NEO_API ANEOPlayerController : public APlayerController
 {
@@ -20,7 +21,10 @@ public:
 
     // いずれかのキーを入力中かを取得
     UFUNCTION(BlueprintCallable, Category = "SetStatus")
-        bool GetIsAnyKeyPressed()const { return IsInputKeyDown("AnyKey"); }
+        bool GetIsAnyKeyPressed()const { return IsInputKeyDown("AnyKey") && GetIsDebugKeyPressed(); }
+
+    UFUNCTION(BlueprintCallable, Category = "SetStatus")
+        bool AnyEnemiesNearbyMoreSecond()const;
 
     // プレイヤーの状態リセット
     void ResetPlayerStatus();
@@ -31,7 +35,7 @@ public:
     // プレイヤーの残機減らす
     void ReduceRemainingLives() { --RemainingLives; }
 
-    // プレイヤーの削除5rttrt5r
+    // プレイヤーの削除
     void DestroyPlayer();
 
     // プレイヤーのリスポーン
@@ -45,9 +49,25 @@ public:
 
 private:
 
+    bool GetIsDebugKeyPressed()const;
+
+
+
+private:
+
     // プレイヤーがリスポーンできる回数
     UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
         int DefaultRemainingLives;
+
+    // プレイヤーの近くに何体敵がいたら強調表示するか
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+        int EnemiesCnt;
+
+    // プレイヤーがリスポーンできる回数
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+        float PlayerToEnemyDistance;
+
+    FName KeyNames[10] = { "F1","F2","F3","F4","F5","F6","F7","F8","F9","F10" };
 
     // プレイヤーの復活可能回数
     int RemainingLives;

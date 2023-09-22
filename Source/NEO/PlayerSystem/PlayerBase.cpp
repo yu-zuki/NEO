@@ -25,8 +25,8 @@ APlayerBase::APlayerBase()
 	, IsJumping(false)
 	, IsCharging(false)
 	, IsHoldWeapon(true)
-	, IsDeath(false)
 	, IsInvincibility(false)
+	, IsDeath(false)
 	, frames(0.f)
 	, IsAttacking(false)
 	, CanCombo(false)
@@ -1142,12 +1142,6 @@ void APlayerBase::TakedDamage(float _damage, bool _isLastAttack /*= false*/)
 		// ヒットエフェクト発生
 		ActionAssistComp->SpawnEffect(HitEffect, GetActorLocation());
 
-		// 無敵開始
-		IsInvincibility = true;
-
-		// 任意の時間後無敵解除
-		FTimerManager& TimerManager = GetWorld()->GetTimerManager();
-		TimerManager.SetTimer(TimerHandle, this, &APlayerBase::InvincibilityRelease, InvincibilityReleaseTime, false);
 	}
 }
 

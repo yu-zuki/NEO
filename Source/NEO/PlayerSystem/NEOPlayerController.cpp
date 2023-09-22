@@ -9,6 +9,8 @@
 
 ANEOPlayerController::ANEOPlayerController()
     : DefaultRemainingLives(2)
+    , EnemiesCnt(3)
+    , PlayerToEnemyDistance(200.f)
     , RemainingLives(DefaultRemainingLives)
     , PlayerIsDead(false)
 {
@@ -121,4 +123,63 @@ FRotator ANEOPlayerController::GetNowCameraRotation()const
     }
 
     return FRotator::ZeroRotator;
+}
+
+
+/*
+ * 関数名　　　　：GetIsDebugKeyPressed()
+ * 処理内容　　　：デバッグキーに設定されているキーが押されているか
+ * 戻り値　　　　：なし
+ */
+bool ANEOPlayerController::GetIsDebugKeyPressed()const
+{
+    for (int i = 0; i < sizeof(KeyNames) / sizeof(FName); ++i)
+    {
+        if (IsInputKeyDown(KeyNames[i]))
+        {
+            return false;
+        }
+
+    }
+
+    return true;
+}
+
+
+bool ANEOPlayerController::AnyEnemiesNearbyMoreSecond()const
+{
+    if (pGameMode)
+    {
+        // ゲームモードから現在出ている敵の情報を取得
+        TArray<AActor*> Enemies = pGameMode->GetEnemies();
+
+        // プレイヤーの位置取得
+        FVector PlayerPos = pPlayer->GetActorLocation();
+
+        // 近くに敵がいた時のカウント
+        int NearByEnemiesCnt = 0;
+        // プレイヤーと敵との距離を計測
+        for (int i = 0; i < Enemies.Num(); ++i)
+        {
+            if (Enemies[i])
+            {
+                // 敵の位置取得
+                FVector EnemyPos = Enemies[i]->GetActorLocation();
+                // プレイヤーと距離計算
+                float Distance = FVector::Dist(EnemyPos, PlayerPos);
+
+                if (Distance <= PlayerToEnemyDistance)
+                {
+                    ++NearByEnemiesCnt;
+                }
+            }
+
+            if (NearByEnemiesCnt >= EnemiesCnt)
+            {
+                return true;
+            }
+        }
+    }
+
+    return false;
 }

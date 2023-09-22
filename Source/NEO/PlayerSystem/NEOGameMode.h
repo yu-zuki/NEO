@@ -27,7 +27,8 @@ public:
 		class ANEOGameState* GetGameState()const { return pGameState; }
 
 	// プレイヤーのカメラ変更
-	void SetViewTargetWithBlend(AActor* _newViewTarget, float _blendTime = 0.f, EViewTargetBlendFunction _blendFunc = VTBlend_Linear, float _blendExp = 0.f, bool _bLockOutgoing = false);
+	UFUNCTION(BlueprintCallable, Category = "UpdateState")
+		void SetViewTargetWithBlend(AActor* _newViewTarget, float _blendTime = 0.f, EViewTargetBlendFunction _blendFunc = VTBlend_Linear, float _blendExp = 0.f, bool _bLockOutgoing = false);
 
 	// プレイヤーのカメラ設定
 	void SetPlayerCamera(AActor* _playerCamera) { PlayerCamera = _playerCamera; }
@@ -44,6 +45,8 @@ public:
 			class UProceduralMeshComponent* RightMesh,
 			class UProceduralMeshComponent* NearMesh
 		);
+
+	TArray<AActor*> GetEnemies()const { return Enemies; }
 
 
 	// バトルエリアから出る
@@ -75,10 +78,17 @@ public:
 	// デフォルトポーンクラスを取得
 	TSubclassOf<APawn> GetDefaultPawnClass()const { return DefaultPawnClass; }
 
-	// 
-	void RestartGame();
+	// ゲームリセット
+	UFUNCTION(BlueprintCallable)
+		void RestartGame();
+
+	// デモ画面を表示
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+		void DestroyerEvent();
 
 private:
+
+	TArray<AActor*> Enemies;
 
 	// バトルエリアのフラグ
 	bool bIsOnBattleArea;

@@ -6,6 +6,7 @@
 #include "Camera/CameraComponent.h"
 #include "ProceduralMeshComponent.h"
 #include "NEO/GameSystem/SplineCamera.h"
+#include "NEO/GameSystem/GameSystem_BattleArea.h"
 #include "NEO/GameSystem/SpawnPoint.h"
 #include "NEO/OdaBase.h"
 #include "NEO/Enemy/EnamyBase.h"
@@ -250,13 +251,23 @@ void ANEOGameMode::DestroyEnemy(AActor* _enemy, bool _bBattleAreaEnemy)
 {
 	if (_enemy)
 	{
-		// エネミー削除
-		_enemy->Destroy();
+		for (int i = 0; i < Enemies.Num(); ++i)
+		{
+			if (Enemies[i] == _enemy)
+			{
+				// エネミー削除
+				Enemies.Remove(_enemy);
+				_enemy->Destroy();
+				break;
+			}
+		}
+
 
 		// エリア内のエネミーだったらカウントを減らす
 		if (_bBattleAreaEnemy)
 		{
 			--BattleAreaEnemyCount;
+
 
 			if (BattleAreaEnemyCount == 0 && bIsOnBattleArea)
 			{
@@ -289,7 +300,7 @@ void ANEOGameMode::SpawnEnemyInBattleArea()
 		if (!spawnPoint) continue; //Check SpawnPoint
 
 		//敵を生成する
-		SpawnEnemy(spawnPoint);
+		Enemies.Add(SpawnEnemy(spawnPoint));
 	}
 }
 
@@ -301,8 +312,16 @@ void ANEOGameMode::SpawnEnemyInBattleArea()
  */
 void ANEOGameMode::ExitBattleArea()
 {
-	bIsOnBattleArea = false;
+	// 策破壊イベント
+	AGameSystem_BattleArea* Area = Cast<AGameSystem_BattleArea>(GetNowPlayerCamera());
+	if (Area) 
+	{
+		Area->ExitAreaEvent();
+	}
+
+
 	//バトルエリアを無効化
+	bIsOnBattleArea = false;
 	for (auto Mesh : BattleAreaMeshs) {
 		if (Mesh) {
 			Mesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -312,6 +331,7 @@ void ANEOGameMode::ExitBattleArea()
 			UE_LOG(LogTemp, Warning, TEXT("MeshWall is not found"));
 		}
 	}
+
 
 	//固定カメラをプレイヤーのカメラに変更
 	if (!PlayerController->GetPlayerIsDead())

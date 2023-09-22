@@ -220,6 +220,9 @@ public:
 
 	bool GetKicking()const { return IsKicking; }
 
+	// 無敵時間設定
+	void SetInvincibility(bool _invincibility) { IsInvincibility = _invincibility; }
+
 	// ダメージを与える処理
 	virtual void SetCollision();
 
@@ -236,7 +239,8 @@ public:
 	void SpawnEffect() { ActionAssistComp->SpawnEffect(HitEffect,GetActorLocation()); }
 	
 	// 操作可・不可を切り替える処理
-	void SetControl(bool _isControl) { IsControl = _isControl; }
+	UFUNCTION(BlueprintCallable, Category = "Action")
+		void SetControl(bool _isControl) { IsControl = _isControl; }
 
 	// 死亡時のアニメーションの再生を遅くする
 	void SlowDownDeathAnimationRate();
@@ -302,9 +306,6 @@ private:
 
 	// キャラクターの移動量取得
 	void AmountOfMovement(FVector _nowPos);
-
-	// 無敵解除
-	void InvincibilityRelease() { IsInvincibility = false; }
 
 	// 死亡処理呼び出し
 	void CallGameModeFunc_DestroyPlayer();
@@ -449,8 +450,11 @@ private:
 	// 溜めているかどうか
 	bool IsCharging;
 
-	// 絶対無敵
+	// デバッグ用絶対無敵
 	bool AbsolutelyInvincible = false;
+
+	// 無敵状態かどうか
+	bool IsInvincibility;
 
 	// 溜め攻撃のための長押し時間
 	const float ChargeTime = 0.5f;
@@ -464,8 +468,6 @@ private:
 	// 死んでいるかどうか
 	bool IsDeath;
 
-	// 無敵状態かどうか
-	bool IsInvincibility;
 
 	// フレームカウント用
 	float frames;	

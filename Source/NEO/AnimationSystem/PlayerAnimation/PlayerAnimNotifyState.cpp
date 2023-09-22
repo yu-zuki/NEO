@@ -39,7 +39,11 @@ void UPlayerAnimNotifyState::NotifyBeginAction(AActor* _Owner, UAnimSequenceBase
         }
         else if (NotifyType == EPlayerNotifyStateType::NotifyType_RootMotion_KnockBack)
         {
-            pPlayer->SetEnableRootMotion(true, -4.f);
+            pPlayer->SetEnableRootMotion(true, -5.f);
+        }
+        else if (NotifyType == EPlayerNotifyStateType::NotifyType_SetIsInvincibility)
+        {
+            pPlayer->SetInvincibility(true);
         }
 
     }
@@ -76,6 +80,10 @@ void UPlayerAnimNotifyState::NotifyEndAction(AActor* _Owner, UAnimSequenceBase* 
         else if (NotifyType == EPlayerNotifyStateType::NotifyType_RootMotion_KnockBack)
         {
             pPlayer->SetEnableRootMotion(false);
+        }
+        else if (NotifyType == EPlayerNotifyStateType::NotifyType_SetIsInvincibility)
+        {
+            pPlayer->SetInvincibility(false);
         }
     }
 }
