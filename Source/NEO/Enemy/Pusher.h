@@ -26,12 +26,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawning")
 		TSubclassOf<ARolling> RollingToSpawn;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
-		float  HP;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
-		float  MaxHP;
-	UFUNCTION(BlueprintCallable, Category = "Health")
-		virtual void ApplyDamagePush(float DamageAmount);
+	
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -40,6 +35,8 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	
 
 
 	void DoPush();
@@ -50,7 +47,7 @@ public:
 	UFUNCTION()
 		void DetachRolling();
 
-	void DeathPusher();
+	
 
 	ARolling* CurrentRolling;
 
