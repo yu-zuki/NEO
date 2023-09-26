@@ -30,11 +30,7 @@ void APusher::BeginPlay()
 void APusher::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	if (DeathCheck == true)
-	{
-
-
-	}
+	
 }
 
 // Called to bind functionality to input
@@ -42,7 +38,12 @@ void APusher::Tick(float DeltaTime)
 
 void APusher::DoPush()
 {
-	PlayAnimMontage(Push, 1.5, NAME_None);
+	if (Health > 0) 
+	{
+
+PlayAnimMontage(Push, 1.5, NAME_None);
+	}
+	
 }
 
 void APusher::SpawnRolling()
@@ -84,20 +85,4 @@ void APusher::DetachRolling()
 
 		CurrentRolling = nullptr;  // null
 	}
-}
-void APusher::ApplyDamagePush(float DamageAmount)
-{
-	if (Health > 0)
-	{
-
-		PlayAnimMontage(DeathMon, 1.0, NAME_None);
-		Tags.Remove(FName("Enemy"));
-		GetWorldTimerManager().SetTimer(TimerHandle_DeathPusher, this, &APusher::DeathPusher,0.5f, true);
-
-		DeathCheck = true;
-	}
-}
-void APusher::DeathPusher()
-{
-	Destroy();
 }
