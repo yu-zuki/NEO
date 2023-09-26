@@ -86,6 +86,8 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 		void DestroyerEvent();
 
+	void SpawnEnemyInBossArea(TSubclassOf<class AEnamyBase> _enemyClass, FVector Location, FRotator Rotation);
+
 private:
 
 	TArray<AActor*> Enemies;

@@ -387,6 +387,9 @@ public:
 		void toPlayerAttacked();
 	//-----------------------------------------------------------------------------------
 
+	UPROPERTY(EditAnywhere)
+		TSubclassOf<class AEnamyBase> Enemy;/* = TSoftClassPtr<AActor>(FSoftObjectPath(*path)).LoadSynchronous()*/; // 上記で設定したパスに該当するクラスを取得
+
 
 //////////////////////////////////////////////////////////////////////////
 //死亡処理

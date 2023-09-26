@@ -304,6 +304,27 @@ void ANEOGameMode::SpawnEnemyInBattleArea()
 	}
 }
 
+/*
+ * 関数名　　　　：SpawnEnemyInBossArea()
+ * 処理内容　　　：ボスエリアに敵を出現させる
+ * 戻り値　　　　：なし
+ */
+void ANEOGameMode::SpawnEnemyInBossArea(TSubclassOf<AEnamyBase> _enemyClass,FVector Location, FRotator Rotation)
+{
+
+	for (ASpawnPoint* spawnPoint : BattleAreaSpawnPoints) {
+		if (!spawnPoint) continue; //Check SpawnPoint
+
+		//敵を生成する
+		if (_enemyClass)
+		{
+			AActor* SpawnedEnemy = GetWorld()->SpawnActor<AActor>(_enemyClass, Location, Rotation);
+			Enemies.Add(SpawnedEnemy);
+		}
+	}
+}
+
+
 
 /*
  * 関数名　　　　：ExitBattleArea()

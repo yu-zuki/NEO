@@ -2,8 +2,9 @@
 
 
 #include "OdaBase.h"
-#include "GameSystem/TGS_GameMode.h"
+#include "PlayerSystem/NEOGameMode.h"
 #include "GameSystem/EnemyBase_WidgetComponent.h"
+#include "NEO/Enemy/EnamyBase.h"
 
 
 
@@ -719,11 +720,12 @@ void AOdaBase::ApplyDamage(float Damage)
  */
 void AOdaBase::CallEnemy(FString path , FVector Location)
 {
-	TSubclassOf<class AActor> Enemy = TSoftClassPtr<AActor>(FSoftObjectPath(*path)).LoadSynchronous(); // 上記で設定したパスに該当するクラスを取得
-	if (Enemy != nullptr)
+	// ゲームモード取得
+	ANEOGameMode* pGameMode = Cast<ANEOGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+
+	if (Enemy != nullptr && pGameMode)
 	{
-		AActor* a = GetWorld()->SpawnActor<AActor>(Enemy); // スポーン処理
-		a->SetActorLocation(Location); // 確認しやすいように座標を設定
+		pGameMode->SpawnEnemyInBossArea(Enemy, Location, FRotator::ZeroRotator);
 	}
 }
 
@@ -927,16 +929,14 @@ void AOdaBase::DeathMotion()
 void AOdaBase::Death()
 {
 	//ゲームモードにてこのアクタを消す処理
-	ATGS_GameMode* GameMode = Cast<ATGS_GameMode>(UGameplayStatics::GetGameMode(GetWorld()));
-	if (GameMode)
+	ANEOGameMode* GameMode = Cast<ANEOGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+
+	if (this != NULL && GameMode)
 	{
-		if (this != NULL)
-		{
-			//現在エラーで落ちるので普通に消す
-			//ゲームモードを用いて消す
-			GameMode->DestroyEnemy(this, IsAreaEnemy);
-			GameMode->SetState_GameClear(0);
-		}
+		//現在エラーで落ちるので普通に消す
+		//ゲームモードを用いて消す
+		GameMode->DestroyEnemy(this, IsAreaEnemy);
+		//GameMode->SetState_GameClear(0);
 	}
 }
 
