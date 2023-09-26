@@ -8,7 +8,7 @@
 
 // Sets default values
 APlayerBullet::APlayerBullet()
-	: MoveSpeed(10.f)
+	: MoveSpeed(20.f)
 	, TimeToDelete(5.f)
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.

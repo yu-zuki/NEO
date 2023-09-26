@@ -66,6 +66,10 @@ void UPlayerAnimNotify::NotifyAction(AActor* _Owner, UAnimSequenceBase* Animatio
         {
             pPlayer->SlowDownDeathAnimationRate();
         }
+        else if (NotifyType == EPlayerNotifyType::NotifyType_StopMontage)
+        {
+            pPlayer->StopMontage();
+        }
     }
 }
 

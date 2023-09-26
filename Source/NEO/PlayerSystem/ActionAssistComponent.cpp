@@ -9,8 +9,7 @@
 #include "Camera/PlayerCameraManager.h"
 #include "NiagaraComponent.h"									
 #include "NiagaraFunctionLibrary.h"		
-#include "NEO/PlayerSystem/CharacterCamera.h"
-#include "NEO/GameSystem/TGS_GameMode.h"
+#include "NEOPlayerController.h"
 
 #define DIRECTION_Y (90.f)
 
@@ -284,13 +283,13 @@ void UActionAssistComponent::OwnerParallelToCamera(bool _lookRight)
 	// 機能のオン・オフ
 	if (!bUseFaceCamera) { return; }
 
-	// ゲームモード作成
-	ATGS_GameMode* GameMode = Cast<ATGS_GameMode>(UGameplayStatics::GetGameMode(GetWorld()));
-	if (!GameMode) { return; }
+	// プレイヤーコントローラー取得
+	ANEOPlayerController* PlayerController = Cast<ANEOPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));;
+	if (!PlayerController) { return; }
 
 
 	// カメラの角度を取得
-	const FRotator CameraRotation = GameMode->GetCameraRotation();
+	const FRotator CameraRotation = PlayerController->GetNowCameraRotation();
 
 
 	// カメラのピッチとヨー

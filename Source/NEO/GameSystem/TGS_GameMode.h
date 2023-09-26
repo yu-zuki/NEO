@@ -148,6 +148,5 @@ protected:
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "Level")
-		void MoveToInGameLevel();
-		
+		void MoveToInGameLevel();	
 };

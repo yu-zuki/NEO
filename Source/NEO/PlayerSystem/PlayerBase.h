@@ -3,9 +3,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameFramework/Character.h"
+#include "EnhancedInputComponent.h"
 #include "InputActionValue.h"
 #include <type_traits>
-#include "NEO/GameSystem/InputCharacter.h"
 #include "NEO/WeaponSystem/WeaponBase.h"
 #include "ActionAssistComponent.h"
 #include <Runtime/Engine/Classes/Components/CapsuleComponent.h>
@@ -46,6 +47,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		UInputAction* ComboAction2 = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		UInputAction* PickAction = nullptr;
 };
 //----------------------------------------------------------------------------------------
 
@@ -138,7 +142,7 @@ struct FPlayerAnimation
 //----------------------------------------------------------------------------------------
 
 UCLASS()
-class NEO_API APlayerBase : public AInputCharacter
+class NEO_API APlayerBase : public ACharacter
 {
 	GENERATED_BODY()
 
@@ -152,6 +156,15 @@ protected:
 	//----------------入力で呼び出される関数-----------------------------
 	// 移動
 	virtual void Move(const FInputActionValue& _value);
+
+	// デモ中の移動
+	void AIMove();
+
+	// デモ中の攻撃
+	void AIAttack();
+
+	// デモ中の武器拾う
+	void AIPickUpWeapon();
 
 	// ダッシュ切り替え
 	void Run();
@@ -183,24 +196,35 @@ protected:
 
 	// 銃の攻撃
 	void GunAttack(int _attackNum);
+
+	// 武器拾う
+	void PickUpWeapon();
 	//-------------------------------------------------------------------
 
 
 public:
 
 	//-----------------他クラスで呼び出し可--------------------------------------------------------------------------------------------
+	// AI解除
+	void SetRelease(bool _isAIPlayer) { IsAIPlayer = _isAIPlayer; }
+
 	// コンボ継続
 	void ContinuationCombo();
 
 	// コンボリセット
 	void ResetCombo();
 
+	void StopMontage();
+
 	int GetComboIndex()const { return ComboIndex; }
 
 	bool GetKicking()const { return IsKicking; }
 
+	// 無敵時間設定
+	void SetInvincibility(bool _invincibility) { IsInvincibility = _invincibility; }
+
 	// ダメージを与える処理
-	virtual void SetCollision() { return; }
+	virtual void SetCollision();
 
 	// アクションアシストコンポーネントを取得
 	UActionAssistComponent* GetActionAssistComponent()const { return ActionAssistComp; }
@@ -215,7 +239,8 @@ public:
 	void SpawnEffect() { ActionAssistComp->SpawnEffect(HitEffect,GetActorLocation()); }
 	
 	// 操作可・不可を切り替える処理
-	void SetControl(bool _isControl) { IsControl = _isControl; }
+	UFUNCTION(BlueprintCallable, Category = "Action")
+		void SetControl(bool _isControl) { IsControl = _isControl; }
 
 	// 死亡時のアニメーションの再生を遅くする
 	void SlowDownDeathAnimationRate();
@@ -282,17 +307,11 @@ private:
 	// キャラクターの移動量取得
 	void AmountOfMovement(FVector _nowPos);
 
-	// 無敵解除
-	void InvincibilityRelease() { IsInvincibility = false; }
-
 	// 死亡処理呼び出し
 	void CallGameModeFunc_DestroyPlayer();
 
 	// 攻撃に関するフラグをすべてリセット
 	void ResetAllAttackFlags();
-
-	// スプライン検索
-	AActor* GetSplineActor(const FName _tag);
 
 	// アニメーション再生
 	void PlayAnimation(UAnimMontage* _toPlayAnimMontage, FName _startSectionName = "None", float _playRate = 1.f);
@@ -319,6 +338,9 @@ protected:
 
 	// ボタンの設定
 	void SetupMainActionMapping();
+
+	// アニメーションアセットの設定
+	void SetupAnimationAssets();
 
 	// 引数によってスタティックメッシュかスケルタルメッシュのセットアップ
 	void SetupWeaponMesh(UStaticMeshComponent*& MeshComp, TCHAR* WeaponAssetPath, FName PublicName = "WeaponStaticMesh");
@@ -396,7 +418,10 @@ protected:
 private:
 
 	// 入力可能かどうか
-	bool IsControl;					
+	bool IsControl;	
+
+	// AI移動する
+	bool IsAIPlayer;
 
 	// ダッシュ中かどうか
 	bool IsRunning;		
@@ -404,7 +429,7 @@ private:
 	// 右を向いているか
 	bool IsLookRight;
 
-	// 
+	// 右に動いているか
 	bool MoveRight = false;
 
 	// 蹴り攻撃中かどうか
@@ -425,8 +450,11 @@ private:
 	// 溜めているかどうか
 	bool IsCharging;
 
-	// 絶対無敵
+	// デバッグ用絶対無敵
 	bool AbsolutelyInvincible = false;
+
+	// 無敵状態かどうか
+	bool IsInvincibility;
 
 	// 溜め攻撃のための長押し時間
 	const float ChargeTime = 0.5f;
@@ -440,8 +468,6 @@ private:
 	// 死んでいるかどうか
 	bool IsDeath;
 
-	// 無敵状態かどうか
-	bool IsInvincibility;
 
 	// フレームカウント用
 	float frames;	
@@ -473,11 +499,8 @@ private:
 	// ハンドル
 	FTimerHandle TimerHandle;		
 
-	// プレイヤーが通るスプライン
-	class APlayerSpline* SplineActor;		
-
 	// ゲームモード保存
-	class ATGS_GameMode* pGameMode;
+	class ANEOGameMode* pGameMode;
 
-	class UTGS_GameInstance* GetGameInstance();
+	class ANEOPlayerController* PlayerController;
 };
