@@ -251,21 +251,20 @@ void ANEOGameMode::DestroyEnemy(AActor* _enemy, bool _bBattleAreaEnemy)
 {
 	if (_enemy)
 	{
-		for (int i = 0; i < Enemies.Num(); ++i)
-		{
-			if (Enemies[i] == _enemy)
-			{
-				// エネミー削除
-				Enemies.Remove(_enemy);
-				_enemy->Destroy();
-				break;
-			}
-		}
-
-
 		// エリア内のエネミーだったらカウントを減らす
 		if (_bBattleAreaEnemy)
 		{
+			for (int i = 0; i < Enemies.Num(); ++i)
+			{
+				if (Enemies[i] == _enemy)
+				{
+					// エネミー削除
+					Enemies.Remove(_enemy);
+					_enemy->Destroy();
+					break;
+				}
+			}
+
 			--BattleAreaEnemyCount;
 
 
@@ -273,6 +272,10 @@ void ANEOGameMode::DestroyEnemy(AActor* _enemy, bool _bBattleAreaEnemy)
 			{
 				ExitBattleArea();
 			}
+		}
+		else
+		{
+			_enemy->Destroy();
 		}
 	}
 }

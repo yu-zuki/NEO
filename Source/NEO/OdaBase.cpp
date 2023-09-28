@@ -2,7 +2,7 @@
 
 
 #include "OdaBase.h"
-#include "GameSystem/TGS_GameMode.h"
+#include "PlayerSystem/NEOGameMode.h"
 #include "GameSystem/EnemyBase_WidgetComponent.h"
 
 
@@ -675,7 +675,8 @@ void AOdaBase::ApplyDamage(float Damage)
 
 				//アニメーションの長さを判定してその時間が過ぎたら死亡処理の関数に飛ばせる処理
 				FTimerManager& TimerManager2 = GetWorld()->GetTimerManager();
-				TimerManager2.SetTimer(TimerHandle_DeathToGameOver, this, &AOdaBase::Death, AnimMontage_BossDeath->GetPlayLength() - 0.5f, false);
+				//応急処置で+する
+				TimerManager2.SetTimer(TimerHandle_DeathToGameOver, this, &AOdaBase::Death, AnimMontage_BossDeath->GetPlayLength() +0.01f, false);
 
 				//一度だけ流したいのでフラグを切り替える
 				isMotionPlaying = false;
@@ -927,15 +928,14 @@ void AOdaBase::DeathMotion()
 void AOdaBase::Death()
 {
 	//ゲームモードにてこのアクタを消す処理
-	ATGS_GameMode* GameMode = Cast<ATGS_GameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	ANEOGameMode* GameMode = Cast<ANEOGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 	if (GameMode)
 	{
 		if (this != NULL)
 		{
 			//現在エラーで落ちるので普通に消す
 			//ゲームモードを用いて消す
-			GameMode->DestroyEnemy(this, IsAreaEnemy);
-			GameMode->SetState_GameClear(0);
+			GameMode->DestroyEnemy(this, false);
 		}
 	}
 }
