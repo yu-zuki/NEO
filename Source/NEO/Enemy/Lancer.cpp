@@ -159,26 +159,26 @@ void ALancer::Tick(float DeltaTime)
     }
  
     SetActorLocation(GetActorLocation() + MoveVector);
-  /*  TArray<AActor*> FoundEnemies;
-    UGameplayStatics::GetAllActorsWithTag(GetWorld(), FName("Enemy"), FoundEnemies)*/;
+    TArray<AActor*> FoundEnemies;
+    UGameplayStatics::GetAllActorsWithTag(GetWorld(), FName("Enemy"), FoundEnemies);
 
-    //for (AActor* Enemy : FoundEnemies)
-    //{
-    //    // 自分自身はスキップする
-    //    if (Enemy == this) continue;
+    for (AActor* Enemy : FoundEnemies)
+    {
+        // 自分自身はスキップする
+        if (Enemy == this) continue;
 
-    //    float DistanceToEnemy = FVector::Distance(GetActorLocation(), Enemy->GetActorLocation());
+        float DistanceToEnemy = FVector::Distance(GetActorLocation(), Enemy->GetActorLocation());
 
-    //    // 距離が近すぎる場合、遠ざかる
-    //    if (DistanceToEnemy < SomeMinimumDistance) // SomeMinimumDistanceは設定する値
-    //    {
-    //        FVector DirectionAwayFromEnemy = (GetActorLocation() - Enemy->GetActorLocation()).GetSafeNormal();
-    //        FVector MoveAwayVector = DirectionAwayFromEnemy * Speed * DeltaTime;
+        // 距離が近すぎる場合、遠ざかる
+        if (DistanceToEnemy < SomeMinimumDistance) // SomeMinimumDistanceは設定する値
+        {
+            FVector DirectionAwayFromEnemy = (GetActorLocation() - Enemy->GetActorLocation()).GetSafeNormal();
+            FVector MoveAwayVector = DirectionAwayFromEnemy * Speed * DeltaTime;
 
-    //        // 実際に移動する
-    //        SetActorLocation(GetActorLocation() + MoveAwayVector);
-    //    }
-    //}
+            // 実際に移動する
+            SetActorLocation(GetActorLocation() + MoveAwayVector);
+        }
+    }
 }
 void ALancer::ChooseNewTarget()
 {
@@ -237,7 +237,7 @@ void ALancer::CheckPlayerInFront()
 
                     if (bIsPlayerInFront&& Health > 0)
                     {
-                        if (FMath::FRand() < 0.8f)
+                        if (FMath::FRand() < 0.2f)
                         {
                             PlayAnimMontage(Attack, 1, NAME_None);
                               

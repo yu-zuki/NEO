@@ -11,5 +11,5 @@ AGimmikGunMan::AGimmikGunMan()
 
 void AGimmikGunMan::Tick(float DeltaTime)
 {
-	bCanMove = false;
+	IsIdol = true;
 }
