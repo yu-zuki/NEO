@@ -7,6 +7,7 @@
 #include "NiagaraComponent.h"
 #include "NEO/PlayerSystem/ActionAssistComponent.h"
 #include "NEO/PlayerSystem/PlayerBase.h"
+#include "NEO/PlayerSystem/NEOPlayerController.h"
 
 // Sets default values
 AWeaponBase::AWeaponBase()
@@ -31,6 +32,9 @@ void AWeaponBase::BeginPlay()
 	
 	// プレイヤー取得
 	pPlayer = Cast<APlayerBase>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+
+	// コントローラー取得
+	PlayerController = Cast<ANEOPlayerController>(Controller);
 }
 
 // Called every frame
@@ -87,8 +91,6 @@ void AWeaponBase::AttachToHand(ACharacter* _owner, FName _socketName,EOwnerType 
 	// 持たれている状態にする
 	IsHeld = true;
 
-	IsHoldDistance = false;
-
 	// オーナーに設定
 	pOwner = _owner;
 
@@ -136,37 +138,31 @@ void AWeaponBase::DistanceCalculationToPlayer()
 {
 	if (IsHeld || IsFalling) { return; }
 
-	APlayerBase* Player = Cast<APlayerBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
+	if (!PlayerController) { return; }
 
-	if (Player)
+	// プレイヤーの位置取得
+	FVector PlayerPos = PlayerController->GetPlayerLocation();
+
+	// プレイヤーと距離計算
+	DistanceToPlayer = FVector::Dist(PlayerPos, GetActorLocation());
+
+	// 拾える距離だったら
+	if (DistanceToPlayer <= PlayerController->GetPickUpDistance())
 	{
-		FVector PlayerPos = Player->GetActorLocation();
-		// プレイヤーと距離計算
-		float Distance = FVector::Dist(PlayerPos, GetActorLocation());
-
-
-		if (Distance <= 120.f)
-		{
-			IsHoldDistance = true;
-
-			if (Cast<APlayerBase>(Player)->GetPickUpWeapon() == nullptr)
-			{
-				Cast<APlayerBase>(Player)->SetPickUpWeapon(this);
-				Cast<APlayerBase>(Player)->SetIsPickUpWeapon(true);
-			}
-
-		}
-		else
-		{
-			IsHoldDistance = false;
-			if (Cast<APlayerBase>(Player)->GetPickUpWeapon() == this)
-			{
-				Cast<APlayerBase>(Player)->SetPickUpWeapon(nullptr);
-				Cast<APlayerBase>(Player)->SetIsPickUpWeapon(false);
-			}
-		}
+		// コントローラーに追加
+		PlayerController->AddWeapons(this);
+	}
+	else
+	{
+		// コントローラーから削除
+		PlayerController->RemoveWeapons(this);
 	}
 
+	// プレイヤーとの距離が一定以上離れたら削除
+	if (DistanceToPlayer > DeleteOnDistance)
+	{
+		Destroy();
+	}
 }
 
 

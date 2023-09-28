@@ -6,79 +6,110 @@
 #include "GameFramework/PlayerController.h"
 #include "NEOPlayerController.generated.h"
 
+class APlayerBase;
+class AWeaponBase;
 
 UCLASS()
 class NEO_API ANEOPlayerController : public APlayerController
 {
 	GENERATED_BODY()
-	
+
 public:
-    // コンストラクタ
-    ANEOPlayerController();
+	// コンストラクタ
+	ANEOPlayerController();
 
-    // ゲーム開始時の処理
-    void BeginPlay();
+	// ゲーム開始時の処理
+	void BeginPlay();
 
-    // いずれかのキーを入力中かを取得
-    UFUNCTION(BlueprintCallable, Category = "SetStatus")
-        bool GetIsAnyKeyPressed()const { return IsInputKeyDown("AnyKey") && GetIsDebugKeyPressed(); }
+	// いずれかのキーを入力中かを取得
+	UFUNCTION(BlueprintCallable, Category = "SetStatus")
+		bool GetIsAnyKeyPressed()const { return IsInputKeyDown("AnyKey") && GetIsDebugKeyPressed(); }
 
-    UFUNCTION(BlueprintCallable, Category = "SetStatus")
-        bool AnyEnemiesNearbyMoreSecond()const;
+	UFUNCTION(BlueprintCallable, Category = "SetStatus")
+		bool AnyEnemiesNearbyMoreSecond()const;
 
-    // プレイヤーの状態リセット
-    void ResetPlayerStatus();
+	// プレイヤーの状態リセット
+	void ResetPlayerStatus();
 
-    // プレイヤーの残機取得
-    int GetRemainingLives()const { return RemainingLives; }
+	// プレイヤーの残機取得
+	int GetRemainingLives()const { return RemainingLives; }
 
-    // プレイヤーの残機減らす
-    void ReduceRemainingLives() { --RemainingLives; }
+	// プレイヤーの残機減らす
+	void ReduceRemainingLives() { --RemainingLives; }
 
-    // プレイヤーの削除
-    void DestroyPlayer();
+	// プレイヤーの削除
+	void DestroyPlayer();
 
-    // プレイヤーのリスポーン
-    void RespawnPlayer();
+	// プレイヤーのリスポーン
+	void RespawnPlayer();
 
-    // 現在のプレイヤーのカメラ取得
-    FRotator GetNowCameraRotation()const;
+	// プレイヤーの位置取得
+	FVector GetPlayerLocation()const { return pPlayer->GetActorLocation(); }
 
-    // プレイヤーが死んでいるかを伝える
-    bool GetPlayerIsDead()const { return PlayerIsDead; }
+	// 現在のプレイヤーのカメラ取得
+	FRotator GetNowCameraRotation()const;
+
+	// プレイヤーが死んでいるかを伝える
+	bool GetPlayerIsDead()const { return PlayerIsDead; }
+
+	// プレイヤーが武器を持っているか伝える
+	bool GetPlayerIsHeldWeapon()const { return PlayerIsHeldWeapon; }
+
+	// プレイヤーが武器を拾える距離にいるかどうか
+	float GetPickUpDistance()const { return PickUpWeaponDistance; }
+
+	// 拾える武器を追加
+	void AddWeapons(AWeaponBase* _weapon) { CanPickUpWeapons.Add(_weapon); }
+
+	// 離れた武器を削除
+	void RemoveWeapons(AWeaponBase* _weapon);
 
 private:
 
-    bool GetIsDebugKeyPressed()const;
+	// デバッグキーが押されたか
+	bool GetIsDebugKeyPressed()const;
 
+	// 登録された武器の中で距離が一番近いものを探す
+	AWeaponBase* GetClosestDistanceWeapons()const;
 
 
 private:
 
-    // プレイヤーがリスポーンできる回数
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-        int DefaultRemainingLives;
+	// プレイヤーがリスポーンできる回数
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		int DefaultRemainingLives;
 
-    // プレイヤーの近くに何体敵がいたら強調表示するか
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-        int EnemiesCnt;
+	// プレイヤーの近くに何体敵がいたら強調表示するか
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		int EnemiesCnt;
 
-    // プレイヤーがリスポーンできる回数
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-        float PlayerToEnemyDistance;
+	// プレイヤーがリスポーンできる回数
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		float PlayerToEnemyDistance;
 
-    FName KeyNames[10] = { "F1","F2","F3","F4","F5","F6","F7","F8","F9","F10" };
+	// 武器が拾えるようになる距離
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		float PickUpWeaponDistance;
 
-    // プレイヤーの復活可能回数
-    int RemainingLives;
+	// PressAnyからFキーは除く
+	FName KeyNames[10] = { "F1","F2","F3","F4","F5","F6","F7","F8","F9","F10" };
 
-    // プレイヤーが
-    bool PlayerIsDead;
+	// プレイヤーの復活可能回数
+	int RemainingLives;
 
-    // プレイヤーのポインタ
-    class APlayerBase* pPlayer;
+	// プレイヤーが死んでいるか
+	bool PlayerIsDead;
 
-    // ゲームモード
-    class ANEOGameMode* pGameMode;
+	// プレイヤーが武器を持っているか
+	bool PlayerIsHeldWeapon;
+
+	// プレイヤーの情報
+	APlayerBase* pPlayer;
+
+	// ゲームモード
+	class ANEOGameMode* pGameMode;
+
+	// 武器の情報
+	TArray<AWeaponBase*> CanPickUpWeapons;
 };
 

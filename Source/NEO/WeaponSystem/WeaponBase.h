@@ -90,8 +90,6 @@ protected:
 	// ボスの攻撃記述用
 	virtual void BossAttack() { return; }
 
-private:
-
 
 public:
 
@@ -156,17 +154,21 @@ protected:
 
 private:
 
-	// プレイヤーに持たれているかのフラグ
+	// プレイヤーに持たれているか
 	bool IsHeld;
 
 	// 飛んでいるかどうか
 	bool IsFalling;
 
-	// 拾える距離にいるかどうか
-	bool IsHoldDistance;
-
 	// フレームカウント用
 	float frames;
+
+	// プレイヤーとの距離
+	float DistanceToPlayer;
+
+	// 削除される距離
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Effect", meta = (AllowPrivateAccess = "true"))
+		float DeleteOnDistance;
 
 	// ジャンプの計算
 	const float radPerFrame = 3.14f / 30.f;
@@ -174,12 +176,17 @@ private:
 	// 飛ぶ前の位置
 	FVector FlyBeforePos;
 
-	// 被ダメージ時のエフェクト
+	// 落ちている武器にかかるエフェクト
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Effect", meta = (AllowPrivateAccess = "true"))
 		class UNiagaraSystem* AuraEffect;
 
+	// 武器を落とした時の音
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Sound", meta = (AllowPrivateAccess = "true"))
 		class USoundBase* DropWeaponSoundObj;
 
-	class APlayerBase* pPlayer = nullptr;
+	// プレイヤーの情報
+	class APlayerBase* pPlayer;
+
+	// プレイヤーの情報
+	class ANEOPlayerController* PlayerController;
 };
