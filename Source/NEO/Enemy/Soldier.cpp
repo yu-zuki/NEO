@@ -20,7 +20,11 @@ ASoldier::ASoldier()
     IsIdol = false;
     IsRunning = true;
 }
-
+/*
+ * 関数名　　　　：ASoldier::BeginPlay
+ * 処理内容　　　：初期設定を行います。武器のスポーンなど。
+ * 戻り値　　　　：なし（void）
+ */
 void ASoldier::BeginPlay()
 {
     Super::BeginPlay();
@@ -40,7 +44,11 @@ void ASoldier::BeginPlay()
         }
     }
 }
-
+/*
+ * 関数名　　　　：ASoldier::AttackCombo
+ * 処理内容　　　：コンボ攻撃のロジックを実行します。
+ * 戻り値　　　　：なし（void）
+ */
 void ASoldier::AttackCombo()
 {
     if (bIsOnCooldown) return;
@@ -70,6 +78,11 @@ void ASoldier::AttackCombo()
     IsRunning = false;
     bIsAttacking = true;
 }
+/*
+ * 関数名　　　　：ASoldier::ResetCombo
+ * 処理内容　　　：コンボカウンターをリセットし、攻撃状態を更新します。
+ * 戻り値　　　　：なし（void）
+ */
 void ASoldier::ResetCombo()
 {
     ComboCounter = 0;
@@ -77,7 +90,11 @@ void ASoldier::ResetCombo()
     IsRunning = true;
     IsIdol = false;
 }
-
+/*
+ * 関数名　　　　：ASoldier::CollisionOn
+ * 処理内容　　　：武器のコリジョンを有効にします。
+ * 戻り値　　　　：なし（void）
+ */
 void ASoldier::CollisionOn()
 {
     if (Weapon)
@@ -85,7 +102,11 @@ void ASoldier::CollisionOn()
         Weapon->SetCollision();
     }
 }
-
+/*
+ * 関数名　　　　：ASoldier::Tick
+ * 処理内容　　　：毎フレーム呼び出され、キャラクターの状態や位置を更新します。
+ * 戻り値　　　　：なし（void）
+ */
 void ASoldier::Tick(float DeltaTime)
 {
     if (bIsNowDamage )
@@ -137,7 +158,11 @@ void ASoldier::Tick(float DeltaTime)
         }
     }
 }
-
+/*
+ * 関数名　　　　：ASoldier::GetSnappedDirection
+ * 処理内容　　　：与えられた方向ベクトルを調整します。
+ * 戻り値　　　　：調整された方向ベクトル（FVector）
+ */
 FVector ASoldier::GetSnappedDirection(const FVector& Direction) const
 {
     FVector SnappedDirection = Direction;
@@ -160,6 +185,11 @@ void ASoldier::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
     Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 }
+/*
+ * 関数名　　　　：ASoldier::GetPlayerDirection
+ * 処理内容　　　：プレイヤーへの方向ベクトルを取得します。
+ * 戻り値　　　　：プレイヤーへの方向ベクトル（FVector）
+ */
 
 FVector ASoldier::GetPlayerDirection() const
 {
@@ -169,6 +199,11 @@ FVector ASoldier::GetPlayerDirection() const
     FVector LancerLocation = GetActorLocation();
     return FVector(PlayerLocation.X - LancerLocation.X, PlayerLocation.Y - LancerLocation.Y, 0.0f).GetSafeNormal();
 }
+/*
+ * 関数名　　　　：ASoldier::GetDistanceToPlayer
+ * 処理内容　　　：プレイヤーまでの距離を取得します。
+ * 戻り値　　　　：プレイヤーまでの距離（float）
+ */
 float ASoldier::GetDistanceToPlayer() const
 {
     if (!PlayerCharacter) return 0.0f;
@@ -178,7 +213,11 @@ float ASoldier::GetDistanceToPlayer() const
     return FVector::Distance(PlayerLocation, LancerLocation);
 }
 
-
+/*
+ * 関数名　　　　：ASoldier::EndComboCooldown
+ * 処理内容　　　：コンボのクールダウンを終了し、キャラクターの状態を更新します。
+ * 戻り値　　　　：なし（void）
+ */
 void ASoldier::EndComboCooldown()
 {
     bIsOnCooldown = false;

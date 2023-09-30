@@ -26,13 +26,7 @@ void UEnemyAnimNotifyState::NotifyEndAction(AActor* _Owner, UAnimSequenceBase* A
     AEnamyBase* pEnemy = Cast<AEnamyBase>(_Owner);
 
 
-    if (pEnemy)
-    {
-        if (NotifyType == EEnemyNotifyType2::NotifyType1)
-        {
-            pEnemy->CheckCollisonOff();
-        }
-    }
+    
 }
 
 
