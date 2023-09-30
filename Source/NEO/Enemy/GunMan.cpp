@@ -32,8 +32,11 @@ AGunMan::AGunMan()
 }
 
 
-// Called when the game starts or when spawned
-void AGunMan::BeginPlay()
+/*
+ * 関数名　　　　：AGunMan::BeginPlay
+ * 処理内容　　　：初期設定を行います。タイマーの設定、武器のスポーンなど。
+ * 戻り値　　　　：なし（void）
+ */void AGunMan::BeginPlay()
 {
     Super::BeginPlay();
     // プレイヤーキャラクターの参照を取得
@@ -56,7 +59,11 @@ void AGunMan::BeginPlay()
         }
     }
 }
-
+ /*
+ * 関数名　　　　：AGunMan::GetSnappedDirection
+ * 処理内容　　　：与えられた方向ベクトルを調整します。
+ * 戻り値　　　　：調整された方向ベクトル（FVector）
+ */
 FVector AGunMan::GetSnappedDirection(const FVector& Direction) const
 {
     FVector SnappedDirection = Direction;
@@ -72,7 +79,11 @@ FVector AGunMan::GetSnappedDirection(const FVector& Direction) const
 
     return SnappedDirection.GetSafeNormal();
 }
-
+/*
+ * 関数名　　　　：AGunMan::CollisionOn
+ * 処理内容　　　：武器のコリジョンを有効にします。
+ * 戻り値　　　　：なし（void）
+ */
 
 void AGunMan::CollisionOn()
 {
@@ -81,7 +92,11 @@ void AGunMan::CollisionOn()
         Weapon->SetCollision();
     }
 }
-// Called every frame
+/*
+ * 関数名　　　　：AGunMan::Tick
+ * 処理内容　　　：毎フレーム呼び出され、キャラクターの状態や位置を更新します。
+ * 戻り値　　　　：なし（void）
+ */
 void AGunMan::Tick(float DeltaTime)
 {
 
@@ -94,37 +109,7 @@ void AGunMan::Tick(float DeltaTime)
             Weapon = nullptr;
         }
     }
-    /* PlayerCharacter = Cast<ACharacter>(GetPlayer());
-
-     {
-         if (PlayerCharacter)
-         {
-             // プレイヤーとの距離を取得
-             float DistanceToPlayer = GetDistanceToPlayer();
-
-             // プレイヤーとの距離が望ましい距離よりも離れている場合、プレイヤーに近づく
-             if (DistanceToPlayer > DesiredDistance)
-             {
-                 FVector PlayerDirection = GetPlayerDirection();
-                 AddMovementInput(PlayerDirection);
-
-             }
-             else if (DistanceToPlayer < DesiredDistance - 150.0f) // プレイヤーが望ましい距離-100以下に入った場合
-             {
-                 // プレイヤーから離れる
-                 FVector PlayerDirection = GetPlayerDirection();
-                 AddMovementInput(-PlayerDirection);
-             }
-         }
-
-
-
-         // キャラクターの位置を取得
-         FVector CharacterLocation = GetActorLocation();
-
-
-     }
- */
+  
 
     if (bIsNowDamage)
     {
@@ -198,7 +183,11 @@ void AGunMan::Tick(float DeltaTime)
     }
 }
 
-
+/*
+ * 関数名　　　　：AGunMan::GetPlayerDirection
+ * 処理内容　　　：プレイヤーへの方向ベクトルを取得します。
+ * 戻り値　　　　：プレイヤーへの方向ベクトル（FVector）
+ */
 
 FVector AGunMan::GetPlayerDirection() const
 {
@@ -206,13 +195,22 @@ FVector AGunMan::GetPlayerDirection() const
     FVector GunManLocation = GetActorLocation();
     return FVector(PlayerLocation.X - GunManLocation.X, PlayerLocation.Y - GunManLocation.Y, 0.0f).GetSafeNormal();
 }
-
+/*
+ * 関数名　　　　：AGunMan::GetDistanceToPlayer
+ * 処理内容　　　：プレイヤーまでの距離を取得します。
+ * 戻り値　　　　：プレイヤーまでの距離（float）
+ */
 float AGunMan::GetDistanceToPlayer() const
 {
     FVector PlayerLocation = PlayerCharacter->GetActorLocation();
     FVector GunManLocation = GetActorLocation();
     return FVector::Distance(PlayerLocation, GunManLocation);
 }
+/*
+ * 関数名　　　　：AGunMan::SpawnTrajectoryBullet
+ * 処理内容　　　：トラジェクトリーバレットをスポーンします。
+ * 戻り値　　　　：なし（void）
+ */
 void AGunMan::SpawnTrajectoryBullet()
 {
 
@@ -229,26 +227,14 @@ void AGunMan::SpawnTrajectoryBullet()
         }
     }
 }
-
+/*
+ * 関数名　　　　：AGunMan::ReplaceWithBullet
+ * 処理内容　　　：バレットと置き換えます。
+ * 戻り値　　　　：なし（void）
+ */
 void AGunMan::ReplaceWithBullet()
 {
-    //bIsSpawningBullet = false;
-    //// Replace TrajectoryBullet with Bullet
-    //FActorSpawnParameters SpawnParams;
-    //FVector SpawnLocation = GetActorLocation(); // Adjust as necessary
-    //FRotator SpawnRotation = GetActorRotation(); // Adjust as necessary
-
-    //ABullet* Bullet = GetWorld()->SpawnActor<ABullet>(BulletClass, SpawnLocation, SpawnRotation, SpawnParams);
-    //if (Bullet)
-    //{
-    //    // Destroy the TrajectoryBullet if it's valid
-    //    ATrajectoryBullet* TrajectoryBullet = Bullet->GetTrajectoryBullet();
-    //    if (IsValid(TrajectoryBullet))
-    //    {
-    //        GetWorld()->DestroyActor(TrajectoryBullet);
-    //    }
-    //}
-    //bIsRotation = true;
+   
     FVector SpawnBulletLocation = GetActorLocation(); // または他の場所
     FRotator SpawnBulletRotation = GetActorRotation(); // または他の回転
     if (BulletClass)
@@ -258,23 +244,36 @@ void AGunMan::ReplaceWithBullet()
 
     }
 }
+/*
+ * 関数名　　　　：AGunMan::ResumeMovement
+ * 処理内容　　　：移動を再開します。
+ * 戻り値　　　　：なし（void）
+ */
 void AGunMan::ResumeMovement()
 {
     // Resume movement
     GetCharacterMovement()->Activate(true);
 
 }
+/*
+ * 関数名　　　　：AGunMan::UnlockRotation
+ * 処理内容　　　：回転をアンロックします。
+ * 戻り値　　　　：なし（void）
+ */
 void AGunMan::UnlockRotation()
 {
     bIsSpawningBullet = false;
 }
-
+/*
+ * 関数名　　　　：AGunMan::PlayAttackAnim
+ * 処理内容　　　：攻撃アニメーションを再生します。
+ * 戻り値　　　　：なし（void）
+ */
 void AGunMan::PlayAttackAnim()
 {
     if (Health > 0)
     {
         PlayAnimMontage(Attack, 1.0f, NAME_None);
-        /* SetActorTickEnabled(false);*/
         GetWorldTimerManager().SetTimer(TickEnableTimerHandle, this, &AGunMan::EnableTickAfterDelay, 3.0f, false);
         MoveSpeed = 0;
         IsRunning = false;
@@ -282,9 +281,13 @@ void AGunMan::PlayAttackAnim()
     }
 
 }
+/*
+*関数名　　　　：AGunMan::EnableTickAfterDelay
+* 処理内容　　　：ディレイ後にTickを有効化します。
+* 戻り値　　　　：なし（void）
+*/
 void AGunMan::EnableTickAfterDelay()
 {
-    // Tickを再有効化する
-    /*SetActorTickEnabled(true);*/
+    
     MoveSpeed = 100;
 }

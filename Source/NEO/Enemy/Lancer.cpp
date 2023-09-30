@@ -22,7 +22,11 @@ ALancer::ALancer()
 }
 
 
-
+/*
+ * 関数名　　　　：ALancer::BeginPlay
+ * 処理内容　　　：初期設定を行います。タイマーの設定、武器のスポーンなど。
+ * 戻り値　　　　：なし（void）
+ */
 void ALancer::BeginPlay()
 {
     Super::BeginPlay();
@@ -48,6 +52,11 @@ void ALancer::BeginPlay()
         }
     }
 }
+/*
+ * 関数名　　　　：ALancer::GetSnappedDirection
+ * 処理内容　　　：与えられた方向ベクトルを調整します。
+ * 戻り値　　　　：調整された方向ベクトル（FVector）
+ */
 
 FVector ALancer::GetSnappedDirection(const FVector& Direction) const
 {
@@ -64,7 +73,11 @@ FVector ALancer::GetSnappedDirection(const FVector& Direction) const
 
     return SnappedDirection.GetSafeNormal();
 }
-
+/*
+ * 関数名　　　　：ALancer::CollisionOn
+ * 処理内容　　　：武器のコリジョンを有効にします。
+ * 戻り値　　　　：なし（void）
+ */
 void ALancer::CollisionOn()
 {
     if (Weapon)
@@ -72,6 +85,11 @@ void ALancer::CollisionOn()
         Weapon->SetCollision();
     }
 }
+/*
+ * 関数名　　　　：ALancer::Tick
+ * 処理内容　　　：毎フレーム呼び出され、キャラクターの状態や位置を更新します。
+ * 戻り値　　　　：なし（void）
+ */
 void ALancer::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
@@ -101,19 +119,10 @@ void ALancer::Tick(float DeltaTime)
     {
         bIsRandMove = false;
     }
-    if (Health > 0&& IsAnimationAttacking()==false)
+    if (Health > 0)
     {
 
-        //if (CurrentDistance < DesiredDistance + 400 && TimeUntilNextRandomMove <= 0) // DesiredDistanceより400m以上離れている場合
-        //{
-        //    // ランダムに動く方向を決定
-        //    FVector RandomDirection = FVector(FMath::RandRange(-1.0f, 1.0f), FMath::RandRange(-1.0f, 1.0f), 0.0f).GetSafeNormal();
-        //    MoveVector = RandomDirection * MoveSpeed * DeltaTime;
-
-        //    // 次のランダムな移動までの待機時間を設定する
-        //    TimeUntilNextRandomMove = FMath::RandRange(MinWaitTime, MaxWaitTime);
-        //}
-       /* else */
+        
         if (CurrentDistance > DesiredDistance&& bIsRandMove==false)
         {
             SnappedDirection = GetSnappedDirection(DirectionToPlayer);
@@ -131,11 +140,7 @@ void ALancer::Tick(float DeltaTime)
            
        }
 
-       /* else if (CurrentDistance < DesiredDistance +400)
-        {
-            SnappedDirection = GetSnappedDirection(-DirectionToPlayer);
-            MoveVector = SnappedDirection * MoveSpeed/2 * DeltaTime;
-        }*/
+      
        else if (FMath::Abs(CurrentDistance - DesiredDistance) < 10.0f)
         {
             SnappedDirection = GetSnappedDirection(DirectionToPlayer);
@@ -159,27 +164,13 @@ void ALancer::Tick(float DeltaTime)
     }
  
     SetActorLocation(GetActorLocation() + MoveVector);
-  /*  TArray<AActor*> FoundEnemies;
-    UGameplayStatics::GetAllActorsWithTag(GetWorld(), FName("Enemy"), FoundEnemies)*/;
-
-    //for (AActor* Enemy : FoundEnemies)
-    //{
-    //    // 自分自身はスキップする
-    //    if (Enemy == this) continue;
-
-    //    float DistanceToEnemy = FVector::Distance(GetActorLocation(), Enemy->GetActorLocation());
-
-    //    // 距離が近すぎる場合、遠ざかる
-    //    if (DistanceToEnemy < SomeMinimumDistance) // SomeMinimumDistanceは設定する値
-    //    {
-    //        FVector DirectionAwayFromEnemy = (GetActorLocation() - Enemy->GetActorLocation()).GetSafeNormal();
-    //        FVector MoveAwayVector = DirectionAwayFromEnemy * Speed * DeltaTime;
-
-    //        // 実際に移動する
-    //        SetActorLocation(GetActorLocation() + MoveAwayVector);
-    //    }
-    //}
+    
 }
+/*
+ * 関数名　　　　：ALancer::ChooseNewTarget
+ * 処理内容　　　：新しいターゲットをランダムに選択します。
+ * 戻り値　　　　：なし（void）
+ */
 void ALancer::ChooseNewTarget()
 {
     TArray<AActor*> FoundTargetPoints;
@@ -191,7 +182,11 @@ void ALancer::ChooseNewTarget()
         CurrentTarget = Cast<ATargetPoint>(FoundTargetPoints[FMath::RandRange(0, FoundTargetPoints.Num() - 1)]);
     }
 }
-
+/*
+ * 関数名　　　　：ALancer::GetPlayerDirection
+ * 処理内容　　　：プレイヤーへの方向ベクトルを取得します。
+ * 戻り値　　　　：プレイヤーへの方向ベクトル（FVector）
+ */
 FVector ALancer::GetPlayerDirection() const
 {
     if (!PlayerCharacter) return FVector::ZeroVector;
@@ -200,6 +195,11 @@ FVector ALancer::GetPlayerDirection() const
     FVector LancerLocation = GetActorLocation();
     return FVector(PlayerLocation.X - LancerLocation.X, PlayerLocation.Y - LancerLocation.Y, 0.0f).GetSafeNormal();
 }
+/*
+ * 関数名　　　　：ALancer::GetDistanceToPlayer
+ * 処理内容　　　：プレイヤーまでの距離を取得します。
+ * 戻り値　　　　：プレイヤーまでの距離（float）
+ */
 float ALancer::GetDistanceToPlayer() const
 {
     if (!PlayerCharacter) return 0.0f;
@@ -208,7 +208,11 @@ float ALancer::GetDistanceToPlayer() const
     FVector LancerLocation = GetActorLocation();
     return FVector::Distance(PlayerLocation, LancerLocation);
 }
-
+/*
+ * 関数名　　　　：ALancer::CheckPlayerInFront
+ * 処理内容　　　：プレイヤーがLancerの前にいるかどうかを確認します。
+ * 戻り値　　　　：なし（void）
+ */
 void ALancer::CheckPlayerInFront()
 {
     // 自分の位置を取得
@@ -252,25 +256,7 @@ void ALancer::CheckPlayerInFront()
     
 }
 
-//FVector ALancer::RoundDirectionT45Degrees(FVector direction) const
-//{
-//   
-//    float angle = FMath::Atan2(direction.Y, direction.X);
-//
-//  
-//    float angleDegrees = FMath::RadiansToDegrees(angle);
-//
-//   
-//    float roundedAngleDegrees = FMath::RoundToFloat(angleDegrees / 45.0f) * 45.0f;
-//
-//   
-//    float roundedAngle = FMath::DegreesToRadians(roundedAngleDegrees);
-//
-//   
-//    FVector roundedDirection(FMath::Cos(roundedAngle), FMath::Sin(roundedAngle), 0.0f);
-//
-//    return roundedDirection;
-//}
+
 
 
 

@@ -45,7 +45,11 @@ AEnamyBase::AEnamyBase()
 	/*MovementSpline = CreateDefaultSubobject<USplineComponent>(TEXT("MovementSpline1"));
 	MovementSpline->SetupAttachment(RootComponent);*/
 }
-
+/*
+ * 関数名　　　　：AEnemyBase::DestroyEnemy
+ * 処理内容　　　：敵キャラクターを破壊し、ゲームモードのDestroyEnemyメソッドを呼び出します。
+ * 戻り値　　　　：なし（void）
+ */
 void AEnamyBase::DestoryEnemy()
 {
 	ANEOGameMode* GameMode = Cast<ANEOGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
@@ -57,7 +61,11 @@ void AEnamyBase::DestoryEnemy()
 	
 }
 
-// Called when the game starts or when spawned
+/*
+ * 関数名　　　　：AEnemyBase::BeginPlay
+ * 処理内容　　　：敵キャラクターの初期化とバトルエリアの取得を行います。
+ * 戻り値　　　　：なし（void）
+ */
 void AEnamyBase::BeginPlay()
 {
 	Super::BeginPlay();
@@ -77,51 +85,24 @@ void AEnamyBase::BeginPlay()
 
 		}
 	}
-	/*TArray<AActor*> FoundPlayers;
-	UGameplayStatics::GetAllActorsWithTag(GetWorld(), TEXT("Player"), FoundPlayers);
-
-	if (FoundPlayers.Num() > 0)
-	{
-		PlayerCharacter = Cast<ACharacter>(FoundPlayers[0]);
-	}*/
-	//if (ActorHasTag("pattern2")) {
-	//	// Yawを中心に180度回転させる
-	//	AddActorLocalRotation(FRotator(0.0f, 180.0f, 0.0f));
-	//	// スプラインに沿って移動を開始する
-	//	bShouldMoveAlongSpline = true;
-	//	TimeSinceStartOfMovement = 0.0f;
-	//}
-	//TArray<AActor*> FoundBattleAreas;
-	//UGameplayStatics::GetAllActorsOfClass(GetWorld(), AGameSystem_BattleArea::StaticClass(), FoundBattleAreas);
-
-	//for (AActor* Actor : FoundBattleAreas)
-	//{
-	//	AGameSystem_BattleArea* BattleArea = Cast<AGameSystem_BattleArea>(Actor);
-	//	if (BattleArea)
-	//	{
-	//		// BattleAreaの各メッシュコンポーネント（LeftMesh, RightMesh, NearMesh）を取得する。
-	//		UProceduralMeshComponent* LeftMesh = BattleArea->LeftMesh;
-	//		UProceduralMeshComponent* RightMesh = BattleArea->RightMesh;
-	//		UProceduralMeshComponent* NearMesh = BattleArea->NearMesh;
-
-	//		// EnamyBaseのカプセルコリジョンがこれらのメッシュコンポーネントを無視するように設定する。
-	//		if (LeftMesh && RightMesh && NearMesh)
-	//		{
-	//			CapsuleComponent->SetCollisionResponseToChannel(LeftMesh->GetCollisionObjectType(), ECR_Ignore);
-	//			CapsuleComponent->SetCollisionResponseToChannel(RightMesh->GetCollisionObjectType(), ECR_Ignore);
-	//			CapsuleComponent->SetCollisionResponseToChannel(NearMesh->GetCollisionObjectType(), ECR_Ignore);
-	//		}
-	//	}
-	//}
+	
 }
-
+/*
+ * 関数名　　　　：AEnemyBase::GetPlayer
+ * 処理内容　　　：プレイヤーポーンを取得して返します。
+ * 戻り値　　　　：プレイヤーポーンのポインタ（AActor*）
+ */
 AActor* AEnamyBase::GetPlayer()
 {
 	APawn* PlayerChara = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
 	return PlayerChara;
 }
 
-// Called every frame
+/*
+ * 関数名　　　　：AEnemyBase::Tick
+ * 処理内容　　　：毎フレーム呼び出され、キャラクターの状態や位置を更新します。
+ * 戻り値　　　　：なし（void）
+ */
 void AEnamyBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -158,19 +139,12 @@ void AEnamyBase::Tick(float DeltaTime)
 					{
 						if (bIsRotation)
 						{
-							/*FRotator NewRotation = GetActorRotation();
-							NewRotation.Yaw = -90.0f;
-							SetActorRotation(NewRotation);*/
-
-
+							
 							LookRight = true;
 						}
 						else
 						{
-							/*FRotator NewRotation = GetActorRotation();
-							NewRotation.Yaw = 90.0f;
-							SetActorRotation(NewRotation);*/
-
+							
 							LookRight = false;
 						}
 
@@ -180,19 +154,12 @@ void AEnamyBase::Tick(float DeltaTime)
 					{
 						if (bIsRotationTag2)
 						{
-							/*FRotator NewRotation = GetActorRotation();
-							NewRotation.Yaw = -180.0f;
-							SetActorRotation(NewRotation);*/
-
+						
 							LookRight = true;
 
 						}
 						else
 						{
-							/*FRotator NewRotation = GetActorRotation();
-							NewRotation.Yaw = 0.0f;
-							SetActorRotation(NewRotation);*/
-
 							LookRight = false;
 						}
 
@@ -202,18 +169,12 @@ void AEnamyBase::Tick(float DeltaTime)
 					{
 						if (bIsRotation)
 						{
-							/*FRotator NewRotation = GetActorRotation();
-							NewRotation.Yaw = -90.0f;
-							SetActorRotation(NewRotation);*/
-
+					
 							LookRight = false;
 
 						}
 						else
 						{
-							/*FRotator NewRotation = GetActorRotation();
-							NewRotation.Yaw = 90.0f;
-							SetActorRotation(NewRotation);*/
 
 							LookRight = true;
 						}
@@ -249,7 +210,7 @@ void AEnamyBase::Tick(float DeltaTime)
 		}
 	}
 	if (bShouldMoveAlongSpline) {
-		// 3秒間移動させるにゃ
+		// 3秒間移動させる
 		TimeSinceStartOfMovement += DeltaTime;
 		float Alpha = FMath::Min(TimeSinceStartOfMovement / MovementDuration, 1.0f);
 		FVector NewLocation = MovementSpline->GetLocationAtDistanceAlongSpline(MovementSpline->GetSplineLength() * Alpha, ESplineCoordinateSpace::Local);
@@ -259,22 +220,19 @@ void AEnamyBase::Tick(float DeltaTime)
 			bShouldMoveAlongSpline = false;
 		}
 
-		// 他のTick処理を停止するにゃ
+		// 他のTick処理を停止する
 		return;
 	}
 	CheckHealth();
 }
 
-void AEnamyBase::CheckCollisonOff()
-{
-	
-}
-void AEnamyBase::SpawnSword()
-{
-
-}
 
 
+/*
+ * 関数名　　　　：AEnemyBase::ApplyDamage
+ * 処理内容　　　：ダメージを適用し、キャラクターの状態を更新します。
+ * 戻り値　　　　：なし（void）
+ */
 void AEnamyBase::ApplyDamage(float DamageAmount)
 {
 
@@ -308,6 +266,11 @@ void AEnamyBase::ApplyDamage(float DamageAmount)
 
 
 }
+/*
+ * 関数名　　　　：AEnemyBase::MaintainDistanceFromEnemy
+ * 処理内容　　　：敵キャラクターから一定の距離を保つように移動します。
+ * 戻り値　　　　：なし（void）
+ */
 void AEnamyBase::MaintainDistanceFromEnemy()
 {
 	for (TActorIterator<AActor> It(GetWorld()); It; ++It)
@@ -326,6 +289,11 @@ void AEnamyBase::MaintainDistanceFromEnemy()
 		}
 	}
 }
+/*
+ * 関数名　　　　：AEnemyBase::AfterDeath
+ * 処理内容　　　：キャラクターの死後の処理を行います。
+ * 戻り値　　　　：なし（void）
+ */
 void AEnamyBase::AfterDeath()
 {
 	FVector SpawnLocation = GetActorLocation();
@@ -343,12 +311,20 @@ void AEnamyBase::AfterDeath()
 	DestoryEnemy();
 
 }
-
+/*
+ * 関数名　　　　：AEnemyBase::DamageReac
+ * 処理内容　　　：ダメージ反応のフラグをリセットします。
+ * 戻り値　　　　：なし（void）
+ */
 void AEnamyBase::DamageReac()
 {
 	bIsNowDamage = false;
 }
-
+/*
+ * 関数名　　　　：AEnemyBase::CheckHealth
+ * 処理内容　　　：キャラクターの健康状態を確認し、必要に応じて死亡トリガーを生成します。
+ * 戻り値　　　　：なし（void）
+ */
 void AEnamyBase::CheckHealth()
 {
 	if (Health <= 0)
@@ -356,7 +332,11 @@ void AEnamyBase::CheckHealth()
 		SpawnDeathTrigger();
 	}
 }
-
+/*
+ * 関数名　　　　：AEnemyBase::SpawnDeathTrigger
+ * 処理内容　　　：死亡トリガーを生成します。
+ * 戻り値　　　　：なし（void）
+ */
 void AEnamyBase::SpawnDeathTrigger()
 {
 	if (DeathTriggerClass = nullptr)
@@ -370,20 +350,12 @@ void AEnamyBase::SpawnDeathTrigger()
 	}
 }
 
-bool AEnamyBase::IsAnimationAttacking() const
-{
-	UAnimInstance* AnimAttack = GetMesh() ? GetMesh()->GetAnimInstance() : nullptr;
-	if (AnimAttack)
-	{
-		if (AnimAttack->Montage_IsPlaying(Attack) || AnimAttack->Montage_IsPlaying(Attack2) || AnimAttack->Montage_IsPlaying(Attack3))
-		{
 
-			return true;
-		}
-	}
-	return false;
-}
-
+/*
+ * 関数名　　　　：AEnemyBase::GetEnemyActor
+ * 処理内容　　　：Enemyタグを持つアクターを取得します。
+ * 戻り値　　　　：Enemyタグを持つ最初のアクター。見つからない場合は nullptr。
+ */
 AActor* AEnamyBase::GetEnemyActor() const
 {
 	for (TActorIterator<AActor> It(GetWorld()); It; ++It)

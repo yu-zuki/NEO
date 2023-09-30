@@ -106,10 +106,6 @@ public:
 
 	virtual void CollisionOn() { return; }
 
-	void CheckCollisonOff();
-
-	void SpawnSword();
-
 	bool bIsShoot = false;
 
 	UFUNCTION(BlueprintCallable)
@@ -121,7 +117,7 @@ public:
 
 	bool bIsDeath;
 	
-	bool IsAnimationAttacking() const;
+	
 	UPROPERTY(BlueprintReadWrite)
 		bool IsIdol;
 
