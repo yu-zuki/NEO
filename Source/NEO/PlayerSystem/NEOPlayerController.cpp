@@ -101,6 +101,21 @@ void ANEOPlayerController::RespawnPlayer()
 
 
 /*
+ * 関数名　　　　：GetPlayerLocation()
+ * 処理内容　　　：プレイヤーの座標を返す
+ * 戻り値　　　　：プレイヤーの座標
+ */
+FVector ANEOPlayerController::GetPlayerLocation()const
+{
+	if (pPlayer)
+	{
+		return pPlayer->GetActorLocation();
+	}
+
+	return FVector::ZeroVector;
+}
+
+/*
  * 関数名　　　　：GetNowCameraRotation()
  * 処理内容　　　：カメラの回転
  * 戻り値　　　　：なし
@@ -162,7 +177,6 @@ bool ANEOPlayerController::GetIsDebugKeyPressed()const
 		{
 			return false;
 		}
-
 	}
 
 	return true;
@@ -196,23 +210,19 @@ AWeaponBase* ANEOPlayerController::GetClosestDistanceWeapons()const
 		// プレイヤーと武器の距離計算
 		const float Distance = FVector::Dist(PlayerPos, WeaponPos);
 
-		// 拾える距離にいるかどうか
-		if (Distance <= PickUpWeaponDistance)
+		// 1回目は一番近い距離に設定
+		if (i == 0)
 		{
-			// 1回目は一番近い距離に設定
-			if (i == 0)
+			ClosestDistance = Distance;
+		}
+		//　2回目以降は距離を比べて一番近い距離を探す
+		else
+		{
+			// 距離を比較
+			if (Distance < ClosestDistance)
 			{
-				ClosestDistance = PickUpWeaponDistance;
-			}
-			//　2回目以降は距離を比べて一番近い距離を探す
-			else
-			{
-				// 距離を比較
-				if (PickUpWeaponDistance < ClosestDistance)
-				{
-					ClosestDistance = PickUpWeaponDistance;
-					WeaponIndex = i;
-				}
+				ClosestDistance = Distance;
+				WeaponIndex = i;
 			}
 		}
 	}

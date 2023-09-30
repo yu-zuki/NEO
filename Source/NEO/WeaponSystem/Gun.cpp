@@ -85,41 +85,22 @@ void AGun::PlyerAttack()
 
 		if (!Kicking)
 		{
-			FActorSpawnParameters SpawnParams;
-			SpawnParams.Owner = this;
-			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-			FVector SpawnBulletLocation = GetActorLocation();
-			FRotator SpawnBulletRotation = pOwner->GetActorRotation();
-
-			GetWorld()->SpawnActor<AActor>(BulletClass, SpawnBulletLocation, SpawnBulletRotation, SpawnParams);
-
-			if (ShootSoundObj)
-			{
-				// オブジェクト破壊用のサウンド再生
-				ActionAssistComp->PlaySound(ShootSoundObj);
-			}
+			// 蹴り攻撃じゃない時銃を発射
+			SpawnBullet();
 		}
 		else
 		{
-			// 自分とプレイヤーに当たらないようにする
-			FCollisionQueryParams CollisionParams;
-			CollisionParams.AddIgnoredActor(this);
-			CollisionParams.AddIgnoredActor(Player);
-
-			TArray<FHitResult> HitResults;
-
-			float DamageAmount = Player->GetDamageAmount();
-
 			// 当たり判定を取る範囲
 			FVector Start = WeaponCollision->GetComponentLocation();
-			FVector End = Start;
-			FQuat Rot = WeaponCollision->GetComponentQuat();
-			FCollisionShape CollisionShape = FCollisionShape::MakeCapsule(WeaponCollision->GetScaledCapsuleRadius(), WeaponCollision->GetScaledCapsuleHalfHeight());
+			FVector End = Start - 50.f;
 
-			// あたっているか確認
-			bool isHit = GetWorld()->SweepMultiByChannel(HitResults, Start, End, Rot, ECollisionChannel::ECC_GameTraceChannel1, CollisionShape, CollisionParams);
+			// 当たったオブジェクト格納用
+			TArray<FHitResult> HitResults;
 
-			if (isHit)
+			// 攻撃が当たっているか判定
+			bool IsHit = GetHitResults(Start, End, HitResults);
+
+			if (IsHit)
 			{
 				// 当たったオブジェクトの数だけ繰り返し
 				for (const FHitResult HitResult : HitResults)
@@ -127,60 +108,29 @@ void AGun::PlyerAttack()
 					// 当たったキャラクターを格納
 					AActor* tempActor = HitResult.GetActor();
 
+					// プレイヤーから現在の攻撃力を取得
+					float DamageAmount = 10.f;
+
 					// 先にオブジェクトに当たったら処理しない
 					if (tempActor && tempActor->ActorHasTag("Object"))
 					{
-						AObjectBase* Object = Cast<AObjectBase>(HitResult.GetActor());
-
-						if (Object)
-						{
-							Object->ReceiveDamage(DamageAmount);
-
-							if (ObjectHitSoundObj)
-							{
-								// オブジェクト破壊用のサウンド再生
-								ActionAssistComp->PlaySound(ObjectHitSoundObj);
-							}
-						}
+						// オブジェクトに攻撃
+						AttackObject(tempActor, DamageAmount, ObjectHitSoundObj);
+						break;
 					}
 
 					// ヒットしたアクターが"Enemy"タグを持っていたら
 					if (tempActor && tempActor->ActorHasTag("Enemy"))
 					{
+						// 敵に攻撃
+						AttackEnemy(tempActor, DamageAmount, EnemyHitSoundObj);
 
-						// エネミーのdamage処理
-						AEnamyBase* Enemy = Cast<AEnamyBase>(HitResult.GetActor());
-						AOdaBase* Oda = Cast<AOdaBase>(HitResult.GetActor());
-
-						if (Enemy)
+						if (HitEffect)
 						{
-							if (EnemyHitSoundObj)
-							{
-								// サウンド再生
-								ActionAssistComp->PlaySound(EnemyHitSoundObj);
-							}
-
-							// 敵のダメージ処理
-							Enemy->ApplyDamage(10.f);
-
-							// ノックバック
-							Enemy->AddActorLocalOffset(FVector(-100.f, 0.f, 0.f));
-
+							// ヒットエフェクト表示
+							ActionAssistComp->SpawnEffect(HitEffect, HitResult.Location);
 						}
-						else if (Oda)
-						{
-							if (EnemyHitSoundObj)
-							{
-								// サウンド再生
-								ActionAssistComp->PlaySound(EnemyHitSoundObj);
-							}
-
-							// ボスのダメージ処理
-							Oda->ApplyDamage(10.f);
-							Oda->BossKnockback();
-
-						}
-
+						break;
 					}
 				}
 			}
@@ -191,12 +141,80 @@ void AGun::PlyerAttack()
 // 敵の当たり判定
 void AGun::EnemyAttack()
 {
-	FVector SpawnBulletLocation = GetActorLocation(); // または他の場所
-	FRotator SpawnBulletRotation = pOwner->GetActorRotation(); // または他の回転
-	if (BulletClass)
+	// 敵は発射のみ
+	SpawnBullet();
+}
+
+// 敵に攻撃した時の処理
+void AGun::AttackEnemy(AActor* _enemy, float _damageAmount, class USoundBase* _hitSoundObj)
+{
+	// プレイヤー取得
+	APlayerBase* Player = Cast<APlayerBase>(pOwner);
+
+	// エネミーのdamage処理
+	AEnamyBase* Enemy = Cast<AEnamyBase>(_enemy);
+	AOdaBase* Boss = Cast<AOdaBase>(_enemy);
+
+	// ヒットストップ
+	Player->HitStop(0.1f, HitStopTime);
+
+	if (Enemy)
 	{
-		AActor* SpawnedBullet = GetWorld()->SpawnActor<AActor>(BulletClass, SpawnBulletLocation, SpawnBulletRotation);
+		// 敵のダメージ処理
+		Enemy->ApplyDamage(_damageAmount);
+
+		// 敵のノックバック処理
+		if (!Enemy->ActionAssistComp->WallCheck(KnockBackDistance))
+		{
+			Enemy->AddActorLocalOffset(FVector(KnockBackDistance, 0.f, 0.f));
+		}
+
+		// 敵が常に動いているので
+		// コンボが当たりやすいように敵にも止まってもらう
+		Enemy->ActionAssistComp->HitStop(0.1f, HitStopTime * 2.f);
+	}
+	else if (Boss)
+	{
+		// ボスのダメージ処理
+		Boss->ApplyDamage(_damageAmount);
+
+		// 敵のノックバック処理
+		if (!Boss->ActionAssistComp->WallCheck(KnockBackDistance))
+		{
+			Boss->AddActorLocalOffset(FVector(KnockBackDistance, 0.f, 0.f));
+		}
+
+		// 敵が常に動いているので
+		// コンボが当たりやすいように敵にも止まってもらう
+		Boss->ActionAssistComp->HitStop(0.1f, HitStopTime * 2.f);
+	}
+
+	if (_hitSoundObj)
+	{
+		// 蹴りSE再生
+		ActionAssistComp->PlaySound(_hitSoundObj);
 	}
 }
 
 
+
+// 銃弾をスポーン
+void AGun::SpawnBullet()
+{
+	// 銃弾をスポーン
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Owner = this;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+	// スポーン時の場所と回転を指定
+	FVector SpawnBulletLocation = GetActorLocation();
+	FRotator SpawnBulletRotation = pOwner->GetActorRotation();
+
+	GetWorld()->SpawnActor<AActor>(BulletClass, SpawnBulletLocation, SpawnBulletRotation, SpawnParams);
+
+	if (ShootSoundObj)
+	{
+		// 発射音再生
+		ActionAssistComp->PlaySound(ShootSoundObj);
+	}
+}

@@ -44,7 +44,7 @@ public:
 	void RespawnPlayer();
 
 	// プレイヤーの位置取得
-	FVector GetPlayerLocation()const { return pPlayer->GetActorLocation(); }
+	FVector GetPlayerLocation()const;
 
 	// 現在のプレイヤーのカメラ取得
 	FRotator GetNowCameraRotation()const;
@@ -55,8 +55,14 @@ public:
 	// プレイヤーが武器を持っているか伝える
 	bool GetPlayerIsHeldWeapon()const { return PlayerIsHeldWeapon; }
 
-	// プレイヤーが武器を拾える距離にいるかどうか
+	// プレイヤーが武器を拾える距離を返す
 	float GetPickUpDistance()const { return PickUpWeaponDistance; }
+
+	// プレイヤーに取得できる武器があるか伝える
+	bool GetIsPickUpWeapon()const { return (CanPickUpWeapons.Num() > 0); }
+
+	// 登録された武器の中で距離が一番近いものを探して渡す
+	AWeaponBase* GetClosestDistanceWeapons()const;
 
 	// 拾える武器を追加
 	void AddWeapons(AWeaponBase* _weapon) { CanPickUpWeapons.Add(_weapon); }
@@ -68,9 +74,6 @@ private:
 
 	// デバッグキーが押されたか
 	bool GetIsDebugKeyPressed()const;
-
-	// 登録された武器の中で距離が一番近いものを探す
-	AWeaponBase* GetClosestDistanceWeapons()const;
 
 
 private:
