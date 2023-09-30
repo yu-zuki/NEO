@@ -78,25 +78,17 @@ void ALance::PlyerAttack()
 
 	if (Player)
 	{
-		// 自分とプレイヤーに当たらないようにする
-		FCollisionQueryParams CollisionParams;
-		CollisionParams.AddIgnoredActor(this);
-		CollisionParams.AddIgnoredActor(Player);
-
-		TArray<FHitResult> HitResults;
-
-		float DamageAmount = Player->GetDamageAmount();
-
 		// 当たり判定を取る範囲
 		FVector Start = WeaponCollision->GetComponentLocation();
 		FVector End = Start - 50.f;
-		FQuat Rot = WeaponCollision->GetComponentQuat();
-		FCollisionShape CollisionShape = FCollisionShape::MakeCapsule(WeaponCollision->GetScaledCapsuleRadius(), WeaponCollision->GetScaledCapsuleHalfHeight());
 
-		// あたっているか確認
-		bool isHit = GetWorld()->SweepMultiByChannel(HitResults, Start, End, Rot, ECollisionChannel::ECC_GameTraceChannel1, CollisionShape, CollisionParams);
+		// 当たったオブジェクト格納用
+		TArray<FHitResult> HitResults;
 
-		if (isHit)
+		// 攻撃が当たっているか判定
+		bool IsHit = GetHitResults(Start, End, HitResults);
+
+		if (IsHit)
 		{
 			// 当たったオブジェクトの数だけ繰り返し
 			for (const FHitResult HitResult : HitResults)
@@ -104,103 +96,28 @@ void ALance::PlyerAttack()
 				// 当たったキャラクターを格納
 				AActor* tempActor = HitResult.GetActor();
 
+				// プレイヤーから現在の攻撃力を取得
+				float DamageAmount = Player->GetDamageAmount();
+
 				// 先にオブジェクトに当たったら処理しない
 				if (tempActor && tempActor->ActorHasTag("Object"))
 				{
-					AObjectBase* Object = Cast<AObjectBase>(HitResult.GetActor());
-
-					if (Object)
-					{
-						Object->ReceiveDamage(DamageAmount);
-
-						// オブジェクト破壊用のサウンド再生
-						ActionAssistComp->PlaySound(ObjectHitSoundObj);
-					}
+					// オブジェクトに攻撃
+					AttackObject(tempActor, DamageAmount, ObjectHitSoundObj);
+					break;
 				}
 
 				// ヒットしたアクターが"Enemy"タグを持っていたら
 				if (tempActor && tempActor->ActorHasTag("Enemy"))
 				{
+					// 敵に攻撃
+					AttackEnemy(tempActor, DamageAmount, EnemyHitSoundObj);
 
-					// エネミーのdamage処理
-					AEnamyBase* Enemy = Cast<AEnamyBase>(HitResult.GetActor());
-					AOdaBase* Oda = Cast<AOdaBase>(HitResult.GetActor());
-
-					int ComboNum = Player->GetComboIndex();
-
-					if (ComboNum < 2)
-					{
-						HitStopTime = 0.2f;
-					}
-					else if (ComboNum == 2)
-					{
-						HitStopTime = 0.25f;
-					}
-					else
-					{
-						HitStopTime = 0.3f;
-					}
-
-
-					// ヒットストップ
-					Player->HitStop(0.1f, HitStopTime);
-
-					// コンボのフィニッシュのみカメラを揺らす
-					if (ComboNum == 3)
-					{
-						Player->CameraShake();
-					}
-
-					if (EnemyHitSoundObj)
-					{
-						// 斬撃SE再生
-						ActionAssistComp->PlaySound(EnemyHitSoundObj);
-					}
-
-					if (Enemy)
-					{
-						Enemy->ApplyDamage(DamageAmount);
-
-						if (ComboNum == 1)
-						{
-							if (!Enemy->ActionAssistComp->WallCheck(-100.f))
-							{
-								Enemy->AddActorLocalOffset(FVector(-100.f, 0.f, 0.f));
-							}
-						}
-						else if (ComboNum == 2)
-						{
-							if (!Enemy->ActionAssistComp->WallCheck(-100.f))
-							{
-								Enemy->AddActorLocalOffset(FVector(-100.f, 0.f, 0.f));
-							}
-						}
-						else if (ComboNum == 3)
-						{
-							if (!Enemy->ActionAssistComp->WallCheck(-250.f))
-							{
-								Enemy->AddActorLocalOffset(FVector(-250.f, 0.f, 0.f));
-							}
-						}
-
-						Enemy->ActionAssistComp->HitStop(0.1f, HitStopTime);
-					}
-					else if (Oda)
-					{
-						Oda->ApplyDamage(DamageAmount);
-
-						if (Player->GetComboIndex() == 3)
-						{
-							Oda->BossKnockback();
-						}
-					}
 					if (HitEffect)
 					{
 						// ヒットエフェクト表示
 						ActionAssistComp->SpawnEffect(HitEffect, HitResult.Location);
 					}
-
-
 					break;
 				}
 			}
@@ -215,26 +132,19 @@ void ALance::EnemyAttack()
 
 	if (pEnemy)
 	{
-		// 自分とプレイヤーに当たらないようにする
-		FCollisionQueryParams CollisionParams;
-		CollisionParams.AddIgnoredActor(this);
-		CollisionParams.AddIgnoredActor(pEnemy);
-
-		TArray<FHitResult> HitResults;
-
 		// 当たり判定を取る範囲
 		FVector Start = WeaponCollision->GetComponentLocation();
 		FVector End = Start;
-		FQuat Rot = WeaponCollision->GetComponentQuat();
-		FCollisionShape CollisionShape = FCollisionShape::MakeCapsule(WeaponCollision->GetScaledCapsuleRadius(), WeaponCollision->GetScaledCapsuleHalfHeight());
 
-		// あたっているか確認
-		bool isHit = GetWorld()->SweepMultiByChannel(HitResults, Start, End, Rot, ECollisionChannel::ECC_GameTraceChannel1, CollisionShape, CollisionParams);
+		// 当たったオブジェクト格納用
+		TArray<FHitResult> HitResults;
 
-		if (isHit)
+		// 攻撃が当たっているか判定
+		bool IsHit = GetHitResults(Start, End, HitResults);
+
+		if (IsHit)
 		{
 			// ダメージ量
-
 			float DamageAmount = 5.f;
 			// 当たったオブジェクトの数だけ繰り返し
 			for (const FHitResult HitResult : HitResults)
@@ -267,5 +177,28 @@ void ALance::EnemyAttack()
 			}
 		}
 	}
+}
 
+
+/*
+ * 関数名　　　　：SetHitStopTime()
+ * 処理内容　　　：敵に攻撃した時のヒットストップの時間を設定
+ * 戻り値　　　　：ヒットストップの時間を返す
+ */
+float ALance::SetHitStopTime(int _comboNum)
+{
+	// 初期設定
+	float hitStopTime = HitStopTime;
+
+	// コンボ最終段につれ、ヒットストップを少し長く
+
+	for (int i = 2; i < _comboNum; ++i)
+	{
+		if (_comboNum)
+		{
+			hitStopTime += HitStopTimeRise;
+		}
+	}
+
+	return hitStopTime;
 }

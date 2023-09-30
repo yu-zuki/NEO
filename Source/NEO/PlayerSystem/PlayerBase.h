@@ -7,8 +7,8 @@
 #include "EnhancedInputComponent.h"
 #include "InputActionValue.h"
 #include <type_traits>
-#include "NEO/WeaponSystem/WeaponBase.h"
 #include "ActionAssistComponent.h"
+#include "NEO/WeaponSystem/WeaponBase.h"
 #include <Runtime/Engine/Classes/Components/CapsuleComponent.h>
 
 #include "PlayerBase.generated.h"
@@ -123,10 +123,6 @@ struct FPlayerAnimation
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Animation")
 		UAnimMontage* AirAttack = nullptr;
 
-	// 空中にいるときの攻撃
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Animation")
-		UAnimMontage* ChargeAttack = nullptr;
-
 	// 被ダメージ
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Animation")
 		UAnimMontage* TakeDamage = nullptr;
@@ -176,17 +172,11 @@ protected:
 	// コンボ攻撃
 	virtual void ComboAttack(int _attackNum = 0);
 
-	// チャージ攻撃
-	void Attack_Start();
-
 	// 一つ目のコンボ
 	virtual void Attack1();
 
 	// 二つ目のコンボ
 	virtual void Attack2();
-
-	// チャージ攻撃
-	virtual void ChargeAttack();
 
 	// 剣の攻撃
 	void SwordAttack(int _attackNum);
@@ -288,17 +278,6 @@ public:
 	//---------------------------------------------------------------------------------------------------------------------------------------------------
 
 
-	void SetIsPickUpWeapon(bool _isPickUp) { IsPickUpWeapon = _isPickUp; }
-
-	//
-	void SetPickUpWeapon(class AWeaponBase* _pickupWeapon = nullptr) { CanPickUpWeapon = _pickupWeapon; }
-
-	UFUNCTION(BlueprintCallable, Category = "SetStatus")
-		class AWeaponBase* GetPickUpWeapon()const { return CanPickUpWeapon; }
-
-	bool GetPlayerMoveRight()const { return MoveRight; }
-
-
 private:
 
 	// キャラクターの回転
@@ -374,6 +353,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Battle", meta = (AllowPrivateAccess = "true"))
 		TSubclassOf<AWeaponBase> WeaponClass;
 
+	// 武器のクラス
+	AWeaponBase* Weapon;
+
 	//-------------------------------------------------------------------------------------------------------------
 
 
@@ -381,10 +363,6 @@ protected:
 	// 攻撃のアシスト用
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Action Assist", meta = (AllowPrivateAccess = "true"))
 		UActionAssistComponent* ActionAssistComp;
-
-	//// プレイやーのアクション管理用
-	//UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	//	UBoxComponent* WeaponPickUpArea;
 
 	// 被ダメージ時のエフェクト
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Effect", meta = (AllowPrivateAccess = "true"))
@@ -409,11 +387,6 @@ protected:
 	// 移動した距離
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		float DistanceAdvanced;
-
-	// 武器のクラス
-	class AWeaponBase* Weapon;
-
-	class AWeaponBase* CanPickUpWeapon = nullptr;
 
 private:
 
@@ -447,17 +420,11 @@ private:
 	// ルートモーションでの移動値
 	float AnimationMoveValue;
 
-	// 溜めているかどうか
-	bool IsCharging;
-
 	// デバッグ用絶対無敵
 	bool AbsolutelyInvincible = false;
 
 	// 無敵状態かどうか
 	bool IsInvincibility;
-
-	// 溜め攻撃のための長押し時間
-	const float ChargeTime = 0.5f;
 
 	// 武器それぞれのソケットの名前
 	FName SocketName[3];
@@ -467,7 +434,6 @@ private:
 
 	// 死んでいるかどうか
 	bool IsDeath;
-
 
 	// フレームカウント用
 	float frames;	
@@ -492,9 +458,6 @@ private:
 
 	// コンボの段数(First,Second,Third・・・)
 	TArray<FName> ComboStartSectionNames;	
-
-	// チャージ開始時間
-	FDateTime ChargeStartTime;
 
 	// ハンドル
 	FTimerHandle TimerHandle;		

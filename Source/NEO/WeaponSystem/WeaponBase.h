@@ -8,18 +8,19 @@
 
 
 class ACharacter;
+class UNiagaraSystem;
 
-//-----------------所持者の種類-------------------------------------------------------------
+//-----------------所持者の種類-----------------------------------
 UENUM(BlueprintType)
 enum class EOwnerType :uint8
 {
 	OwnerType_Player   UMETA(DisplayName = "PlayerType"),
 	OwnerType_Enemy    UMETA(DisplayName = "EnemyType"),
-	OwnerType_Boss     UMETA(DisplayName = "BossType"),
+	OwnerType_Boss     UMETA(DisplayName = "BossType")
 };
-//----------------------------------------------------------------------------------------
+//----------------------------------------------------------------
 
-//-----------------武器の種類-------------------------------------------------------------
+//-----------------武器の種類-------------------------------------
 UENUM(BlueprintType)
 enum class EWeaponType :uint8
 {
@@ -28,7 +29,7 @@ enum class EWeaponType :uint8
 	WeaponType_Gun     UMETA(DisplayName = "Gun"),
 	WeaponType_None	   UMETA(DisplayName = "None")
 };
-//----------------------------------------------------------------------------------------
+//----------------------------------------------------------------
 
 
 UCLASS()
@@ -37,8 +38,40 @@ class NEO_API AWeaponBase : public AActor
 	GENERATED_BODY()
 	
 public:	
-	// Sets default values for this actor's properties
+	// コンストラクタ
 	AWeaponBase();
+
+public:
+
+	// プレイヤーの手に付ける
+	void AttachToHand(ACharacter* _owner, FName _socketName, EOwnerType _ownerType);
+
+	// プレイヤーの手から外れる
+	void DetachToHand();
+
+	// ダメージを与える処理(オーバーライド用)
+	virtual void SetCollision() { return; }
+
+	// 持たれている状態か
+	UFUNCTION(BlueprintCallable, Category = "State")
+		bool GetIsHeld()const { return IsHeld; }
+
+	// 飛んでいる状態か
+	UFUNCTION(BlueprintCallable, Category = "State")
+		bool GetIsFalling()const { return IsFalling; }
+
+	// プレイヤーが近くにいるか
+	UFUNCTION(BlueprintCallable, Category = "State")
+		bool GetIsPickUpDistanceEnteredPlayer()const { return IsPickUpDistanceEnteredPlayer; }
+
+	// オーナーの種類判別用
+	UFUNCTION(BlueprintCallable, Category = "State")
+		EOwnerType GetOwnerType()const { return OwnerType; }
+
+	// 武器の種類判別用
+	UFUNCTION(BlueprintCallable, Category = "State")
+		EWeaponType GetWeaponType()const { return WeaponType; }
+
 
 protected:
 	// Called when the game starts or when spawned
@@ -76,10 +109,6 @@ protected:
 	}
 	//---------------------------------------------------------------------------------------------------------------------------------------------------
 
-protected:
-
-	// 外れた時吹っ飛ぶ
-	void BlowsAway();
 
 	// プレイヤーの攻撃記述用
 	virtual void PlayerAttack() { return; }
@@ -90,49 +119,32 @@ protected:
 	// ボスの攻撃記述用
 	virtual void BossAttack() { return; }
 
+	// 攻撃が当たったかどうか
+	bool GetHitResults(FVector _start,FVector _end, TArray<FHitResult>& _outHitResults);
+
+	// 破壊可能オブジェクトに攻撃した時の処理
+	void AttackObject(AActor* _object, float _damageAmount, class USoundBase* _hitSoundObj);
+
+	// 敵に攻撃した時の処理
+	virtual void AttackEnemy(AActor* _enemy, float _damageAmount, class USoundBase* _hitSoundObj);
+
+	// 敵に攻撃した時のヒットストップの時間を設定
+	virtual float SetHitStopTime(int _comboNum) { return 0.f; }
+
+	// 敵のノックバック処理
+	void EnemyKnockBack(int _comboNum, class AEnamyBase* _enemy);
+
+
 private:
 
-
-public:
-
-	// プレイヤーの手に付ける
-	void AttachToHand(ACharacter* _owner, FName _socketName, EOwnerType _ownerType);
-
-	// プレイヤーの手から外れる
-	void DetachToHand();
-
-	// ダメージを与える処理(オーバーライド用)
-	virtual void SetCollision() { return; }
-
-	// 持たれている状態か
-	UFUNCTION(BlueprintCallable, Category = "State")
-		bool GetIsHeld()const { return IsHeld; }
-
-	// オーナーの種類判別用
-	UFUNCTION(BlueprintCallable, Category = "State")
-		bool GetIsHoldDistance()const { return IsHoldDistance; }
-
-	// 飛んでいる状態か
-	UFUNCTION(BlueprintCallable, Category = "State")
-		bool GetIsFalling()const { return IsFalling; }
-
-	// オーナーの種類判別用
-	UFUNCTION(BlueprintCallable, Category = "State")
-		EOwnerType GetOwnerType()const { return OwnerType; }
-
-	// 武器の種類判別用
-	EWeaponType GetWeaponType()const { return WeaponType; }
-
-	// プレイヤーとの距離計測
+	// プレイヤーとの距離を計算する処理
 	void DistanceCalculationToPlayer();
 
+	// オーナーがいなくなったとき武器が落ちる
+	void BlowsAway();
+
+
 protected:
-
-		// アクションアシストコンポーネント
-		class UActionAssistComponent* ActionAssistComp;
-
-		// オーナーになるキャラクターの情報
-		class ACharacter* pOwner = nullptr;
 
 		// 武器のメッシュ
 		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "WeaponMesh")
@@ -142,44 +154,77 @@ protected:
 		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "WeaponCollision")
 			class UCapsuleComponent* WeaponCollision;
 
-		// オーナーを判別するEnum
-		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "OwnerType")
-			EOwnerType OwnerType;
+		// アクション補助の役割をするコンポーネント
+		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ActionAssist")
+			class UActionAssistComponent* ActionAssistComp;
+
+		// 落ちている武器にかかるエフェクト
+		UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Effect")
+			UNiagaraSystem* AuraEffect;
+
+		// 武器を落とした時の音
+		UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Sound")
+			class USoundBase* DropWeaponSoundObj;
 
 		// 武器を判別するEnum
-		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "WeaponType")
-			EWeaponType WeaponType;
+		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Drop")
+			FVector DropLocation;
 
 		// 武器を判別するEnum
-		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "DropAngle")
+		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Drop")
 			FRotator DropAngle;
+
+		// プレイヤーとの距離が近い時の計算を行う間隔
+		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Calculate")
+			float CalculateInterval_nearPlayer;
+
+		// プレイヤーとの距離が遠い時の計算を行う間隔
+		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Calculate")
+			float CalculateInterval_farPlayer;
+
+		// 距離計算を省く距離
+		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Calculate")
+			float DistanceToOmitCalc;
+
+		// ジャンプの高さ
+		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Calculate")
+			float JumpHeight;
+
+		// 所持者の情報
+		ACharacter* pOwner;
+
+		// オーナーを判別するEnum
+		EOwnerType OwnerType;
+
+		// 武器を判別するEnum
+		EWeaponType WeaponType;
 
 private:
 
-	// プレイヤーに持たれているかのフラグ
+	// プレイヤーに持たれているか
 	bool IsHeld;
 
 	// 飛んでいるかどうか
 	bool IsFalling;
 
-	// 拾える距離にいるかどうか
-	bool IsHoldDistance;
+	// プレイヤーが一定距離内に入ったか
+	bool IsPickUpDistanceEnteredPlayer;
 
 	// フレームカウント用
-	float frames;
+	float Frames;
+
+	// プレイヤーとの距離
+	float DistanceToPlayer;
 
 	// ジャンプの計算
-	const float radPerFrame = 3.14f / 30.f;
+	const float RadPerFrame = 3.14f / 30.f;
 
 	// 飛ぶ前の位置
 	FVector FlyBeforePos;
 
-	// 被ダメージ時のエフェクト
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Effect", meta = (AllowPrivateAccess = "true"))
-		class UNiagaraSystem* AuraEffect;
+	// プレイヤーコントローラーの情報
+	class ANEOPlayerController* PlayerController;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Sound", meta = (AllowPrivateAccess = "true"))
-		class USoundBase* DropWeaponSoundObj;
-
-	class APlayerBase* pPlayer = nullptr;
+	// ハンドル
+	FTimerHandle TimerHandle;
 };

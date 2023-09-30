@@ -36,6 +36,12 @@ private:
 	// 敵の当たり判定
 	void EnemyAttack();
 
+	// 敵に攻撃した時の処理
+	void AttackEnemy(AActor* _enemy, float _damageAmount, class USoundBase* _hitSoundObj);
+
+	// 銃弾をスポーン
+	void SpawnBullet();
+
 private:
 
 	UPROPERTY(EditAnywhere, Category = "Spawning")
@@ -55,7 +61,11 @@ private:
 		class USoundBase* ObjectHitSoundObj;
 
 	// 何秒間ヒットストップを起こすか
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = "Action Assist")
-		float HitStopTime = 0.2f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Action Assist", meta = (AllowPrivateAccess = "true"))
+		float HitStopTime = 0.1f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Action Assist",meta = (AllowPrivateAccess = "true"))
+		float KnockBackDistance = -250.f;
+
 
 };

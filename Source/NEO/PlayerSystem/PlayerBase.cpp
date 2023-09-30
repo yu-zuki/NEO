@@ -5,14 +5,9 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/GameplayStatics.h"
-#include "Misc/DateTime.h"
-#include "Components/InputComponent.h"
 #include "InputMappingContext.h"
-#include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "NEO/GameSystem/TGS_GameMode.h"
-#include "NEO/GameSystem/TGS_GameInstance.h"
 #include "NEOPlayerController.h"
 #include "NEOGameMode.h"
 
@@ -23,9 +18,8 @@ APlayerBase::APlayerBase()
 	, IsRunning(false)
 	, IsLookRight(true)
 	, IsJumping(false)
-	, IsCharging(false)
-	, IsHoldWeapon(true)
 	, IsInvincibility(false)
+	, IsHoldWeapon(true)
 	, IsDeath(false)
 	, frames(0.f)
 	, IsAttacking(false)
@@ -65,6 +59,9 @@ APlayerBase::APlayerBase()
 void APlayerBase::BeginPlay()
 {
 	Super::BeginPlay();
+
+	// ゲームモード取得
+	pGameMode = Cast<ANEOGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 
 	// コントローラー取得
 	PlayerController = Cast<ANEOPlayerController>(Controller);
@@ -133,20 +130,11 @@ void APlayerBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 		EnhancedInputComponent->BindAction(MainActionMapping.JumpAction, ETriggerEvent::Started, this, &APlayerBase::JumpStart);
 
 		// 攻撃アクション
-		EnhancedInputComponent->BindAction(MainActionMapping.ComboAction1, ETriggerEvent::Started, this, &APlayerBase::Attack_Start);
-		EnhancedInputComponent->BindAction(MainActionMapping.ComboAction2, ETriggerEvent::Started, this, &APlayerBase::Attack_Start);
-
-		// チャージ終了
-		EnhancedInputComponent->BindAction(MainActionMapping.ComboAction1, ETriggerEvent::Completed, this, &APlayerBase::Attack1);
-		EnhancedInputComponent->BindAction(MainActionMapping.ComboAction2, ETriggerEvent::Completed, this, &APlayerBase::Attack2);
+		EnhancedInputComponent->BindAction(MainActionMapping.ComboAction1, ETriggerEvent::Started, this, &APlayerBase::Attack1);
+		EnhancedInputComponent->BindAction(MainActionMapping.ComboAction2, ETriggerEvent::Started, this, &APlayerBase::Attack2);
 
 		// 武器を拾う
-		EnhancedInputComponent->BindAction(MainActionMapping.PickAction, ETriggerEvent::Started, this, &APlayerBase::PickUpWeapon);
-
-		
-		// チャージ判定用
-		//EnhancedInputComponent->BindAction(MainActionMapping.ComboAction1, ETriggerEvent::Completed, this, &APlayerBase::ChargeAttack_End);
-		//EnhancedInputComponent->BindAction(MainActionMapping.ComboAction2, ETriggerEvent::Completed, this, &APlayerBase::ChargeAttack_End);
+		EnhancedInputComponent->BindAction(MainActionMapping.PickAction, ETriggerEvent::Started, this, &APlayerBase::PickUpWeapon);	
 	}
 }
 
@@ -171,9 +159,6 @@ void APlayerBase::SetupPlayerData()
 
 	// コンボの名前格納
 	ComboStartSectionNames = { "First", "Second", "Third","Fourth" };
-
-	// ゲームモード取得
-	pGameMode = Cast<ANEOGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 
 	// アニメーションアセット設定
 	SetupAnimationAssets();
@@ -296,21 +281,14 @@ void APlayerBase::SetupAnimationAssets()
 	}
 
 	{
-		// 空中での攻撃アニメーション
-		TCHAR* ChargeAttackAnimationAssetPath = TEXT("/Game/0122/Player/Animation/Montage/ChargeAttack_Montage");
-
-		PlayerAnimation.ChargeAttack = GetAnimationAsset(ChargeAttackAnimationAssetPath);
-	}
-
-	{
-		// 空中での攻撃アニメーション
+		// 銃所持時のアニメーション
 		TCHAR* GunAttackAnimationAssetPath = TEXT("/Game/0122/Player/Animation/Montage/GunAttack_Montage");
 
 		PlayerAnimation.GunAttack = GetAnimationAsset(GunAttackAnimationAssetPath);
 	}
 
 	{
-		// 銃撃アニメーション
+		// 銃所持時のアニメーション
 		TCHAR* GunAttack2AnimationAssetPath = TEXT("/Game/0122/Player/Animation/Montage/Kick_Montage");
 
 		PlayerAnimation.GunAttack2 = GetAnimationAsset(GunAttack2AnimationAssetPath);
@@ -639,28 +617,9 @@ void APlayerBase::ComboAttack(int _attackNum /*= 0*/)
 		GunAttack(_attackNum);
 		break;
 	case EWeaponType::WeaponType_None:
-		IsControl = true;
-		break;
-	default:
+
 		break;
 	}
-}
-
-
-/*
- * 関数名　　　　：Attack_Start()
- * 処理内容　　　：プレイヤーの入力受付(溜め攻撃)
- * 戻り値　　　　：なし
- */
-void APlayerBase::Attack_Start()
-{
-	// 攻撃可能か
-	if (!IsControl) { return; }
-
-	ChargeStartTime = UKismetMathLibrary::Now();
-
-	IsControl = false;
-	IsCharging = true;
 }
 
 
@@ -671,29 +630,10 @@ void APlayerBase::Attack_Start()
  */
 void APlayerBase::Attack1()
 {
-	if (!IsCharging || ChargeStartTime == 0.f) { return; }
+	if (!IsControl) { return; }
 
-	IsCharging = false;
-
-	FDateTime ChargeEndTime = UKismetMathLibrary::Now();
-
-	// 差分を計算          
-	FTimespan Span = ChargeEndTime - ChargeStartTime;
-
-	// 時間をもとに
-	ChargeStartTime = 0.f;
-
-	// ボタンを押している時間で攻撃変更
-	if (Span.GetSeconds() <= ChargeTime)
-	{
-		// コンボ攻撃
-		ComboAttack(0);
-	}
-	else
-	{
-		// 溜め攻撃
-		ChargeAttack();
-	}
+	// コンボ攻撃
+	ComboAttack(0);
 }
 
 /*
@@ -703,37 +643,10 @@ void APlayerBase::Attack1()
  */
 void APlayerBase::Attack2()
 {
-	if (!IsCharging) { return; }
+	if (!IsControl) { return; }
 
-	IsCharging = false;
-
-	FDateTime ChargeEndTime = UKismetMathLibrary::Now();
-
-	// 差分を計算          
-	FTimespan Span = ChargeEndTime - ChargeStartTime;
-
-	// ボタンを押している時間で攻撃変更
-	if (Span.GetSeconds() <= ChargeTime)
-	{
-		// コンボ攻撃
-		ComboAttack(1);
-	}
-	else
-	{
-		// 溜め攻撃
-		ChargeAttack();
-	}
-}
-
-
-/*
- * 関数名　　　　：ChargeAttack()
- * 処理内容　　　：溜め攻撃
- * 戻り値　　　　：なし
- */
-void APlayerBase::ChargeAttack()
-{
-	PlayAnimation(PlayerAnimation.ChargeAttack);
+	// コンボ攻撃
+	ComboAttack(1);
 }
 
 
@@ -843,33 +756,37 @@ void APlayerBase::GunAttack(int _attackNum)
 }
 
 
-// 武器拾う
+/*
+ * 関数名　　　　：PickUpWeapon()
+ * 処理内容　　　：武器を拾う処理
+ * 戻り値　　　　：なし
+ */
 void APlayerBase::PickUpWeapon()
 {
 	if (!IsControl) { return; }
 
-	if (IsPickUpWeapon && CanPickUpWeapon)
+	if (PlayerController->GetIsPickUpWeapon())
 	{
+		// 別の武器を持っているとき
 		if (Weapon != nullptr)
 		{
+			// 今持っている武器を手放す
 			Weapon->DetachToHand();
 			Weapon = nullptr;
 		}
+		// それ以外
 		else
 		{
 			IsHoldWeapon = true;
-			// 武器を落とすまでの回数をリセット
-			PlayerStatus.WeaponDropLimit = PlayerStatus.DefaultWeaponDropLimit;
 		}
 
-		if (!CanPickUpWeapon->GetIsHeld() && !CanPickUpWeapon->GetIsFalling())
-		{
-			Weapon = CanPickUpWeapon;
-			WeaponType = Weapon->GetWeaponType();
-			Weapon->AttachToHand(this, SocketName[int32(WeaponType)], EOwnerType::OwnerType_Player);
+		// 武器を更新
+		Weapon = PlayerController->GetClosestDistanceWeapons();
+		WeaponType = Weapon->GetWeaponType();
+		Weapon->AttachToHand(this, SocketName[int32(WeaponType)], EOwnerType::OwnerType_Player);
 
-			CanPickUpWeapon = nullptr;
-		}
+		// 武器を落とすまでの回数をリセット
+		PlayerStatus.WeaponDropLimit = PlayerStatus.DefaultWeaponDropLimit;
 	}
 }
 
@@ -888,7 +805,6 @@ void APlayerBase::RotateCharacter(float _nowInput_X)
 
 	// 右を向いているか確認
 	IsLookRight = (_nowInput_X != 1.f) ? (true) : (false);
-	MoveRight = (_nowInput_X == 1.f);
 
 	// 回転
 	ActionAssistComp->OwnerParallelToCamera(IsLookRight);
@@ -954,7 +870,7 @@ void APlayerBase::SetEnableRootMotion(bool _enableRootMotion, float _distance /*
 
 /*
  * 関数名　　　　：RootMotion()
- * 処理内容　　　：RootMotionの疑似的な実装
+ * 処理内容　　　：RootMotionの実装
  * 引数１　　　　：float _distance・・・アニメーションで移動した距離
  * 戻り値　　　　：なし
  */
@@ -1009,7 +925,6 @@ void APlayerBase::CallGameModeFunc_DestroyPlayer()
 {
 	// 攻撃中のフラグリセット
 	IsAttacking = false;
-	IsCharging = false;
 	CanCombo = false;
 	IsControl = false;
 	IsKicking = false;

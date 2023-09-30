@@ -33,6 +33,9 @@ private:
 	// 敵の当たり判定
 	void EnemyAttack();
 
+	// 敵に攻撃した時のヒットストップの時間を設定
+	float SetHitStopTime(int _comboNum);
+
 private:
 
 	// 被ダメージ時のエフェクト
@@ -47,5 +50,9 @@ private:
 
 	// 何秒間ヒットストップを起こすか
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = "Action Assist")
-		float HitStopTime = 0.2f;
+		float HitStopTime = 0.3f;
+
+	// ヒットストップの長さの上がり幅
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = "Action Assist")
+		float HitStopTimeRise = 0.05f;
 };
