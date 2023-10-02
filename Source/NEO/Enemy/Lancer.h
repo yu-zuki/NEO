@@ -22,7 +22,9 @@ public:
         float SomeMinimumDistance = 100.0f; // 移動速度
     float Speed = 100.0f;
     void ChooseNewTarget();
-   
+    void SwitchMove(float DeltaTime);
+    int32 Movementpattern;
+    void MoveRandom(float DeltaTime);
 protected:
     virtual void BeginPlay() override;
 
@@ -56,6 +58,7 @@ private:
    
     ATargetPoint* CurrentTarget = nullptr;
     
+    bool NowAttack;
     
     ECollisionResponse DefaultCollisionResponseToPlayers;  // プレイヤーに対するデフォルトのコリジョンレスポンス
     ECollisionResponse DefaultCollisionResponseToWorld;  // 地面（WorldStatic）に対するデフォルトのコリジョンレスポンス

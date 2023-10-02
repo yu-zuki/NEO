@@ -244,7 +244,7 @@ void AEnamyBase::ApplyDamage(float DamageAmount)
 	{
 
 		PlayAnimMontage(Death, 0.8, NAME_None);
-		GetWorldTimerManager().SetTimer(TimerHandle_DestroyEnemy, this, &AEnamyBase::AfterDeath, 1.6f, true);
+		GetWorldTimerManager().SetTimer(TimerHandle_DestroyEnemy, this, &AEnamyBase::AfterDeath, 2.0f, true);
 		bIsDeath = true;
 		FVector ForceDirection = -GetActorForwardVector();
 		float ForceStrength = 1000.0f;  // Adjust this value as needed.

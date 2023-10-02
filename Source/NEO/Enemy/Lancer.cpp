@@ -19,6 +19,7 @@ ALancer::ALancer()
     GetCharacterMovement()->MaxWalkSpeed = MovementSpeed;
     IsRunning = false;
     IsIdol = true;
+    NowAttack = false;
 }
 
 
@@ -92,6 +93,7 @@ void ALancer::CollisionOn()
  */
 void ALancer::Tick(float DeltaTime)
 {
+  
     Super::Tick(DeltaTime);
     if (bIsNowDamage || bShouldSkipNextMovement)
     {
@@ -99,72 +101,10 @@ void ALancer::Tick(float DeltaTime)
         return;
     }
     
-   
+    NowAttack = false;
     
    
-    PlayerCharacter = Cast<ACharacter>(GetPlayer());
-    if (!PlayerCharacter) return;
-
-    float CurrentDistance = GetDistanceToPlayer();
-    FVector DirectionToPlayer = GetPlayerDirection();
-    FVector SnappedDirection;
-    FVector MoveVector;
-    
-
-    if (CurrentDistance < DesiredDistance+100 )
-    {
-        bIsRandMove = true;
-    }
-    else if(CurrentDistance > DesiredDistance - 100)
-    {
-        bIsRandMove = false;
-    }
-    if (Health > 0)
-    {
-
-        
-        if (CurrentDistance > DesiredDistance&& bIsRandMove==false)
-        {
-            SnappedDirection = GetSnappedDirection(DirectionToPlayer);
-            MoveVector = SnappedDirection * Speed*3 * DeltaTime;
-            IsRunning = true;
-            IsIdol = false;
-           
-        }
-       else if(CurrentDistance < DesiredDistance + 100 && CurrentTarget&& bIsRandMove==true) // DesiredDistanceより400m遠い場合
-       {
-           FVector DirectionToTarget = (CurrentTarget->GetActorLocation() - GetActorLocation()).GetSafeNormal();
-           MoveVector = DirectionToTarget * Speed/2* DeltaTime;
-           IsRunning = true;
-           IsIdol = false;
-           
-       }
-
-      
-       else if (FMath::Abs(CurrentDistance - DesiredDistance) < 10.0f)
-        {
-            SnappedDirection = GetSnappedDirection(DirectionToPlayer);
-            MoveVector = SnappedDirection * Speed * 3 * DeltaTime;
-            IsRunning = false;
-            IsIdol = true;
-        }
-    else
-    {
-            IsRunning = false;
-            IsIdol = true;
-    }
-    }
-    if (Health <= 0)
-    {
-        if (Weapon)
-        {
-            Weapon->DetachToHand();
-            Weapon = nullptr;
-        }
-    }
- 
-    SetActorLocation(GetActorLocation() + MoveVector);
-    
+    MoveRandom(DeltaTime);
 }
 /*
  * 関数名　　　　：ALancer::ChooseNewTarget
@@ -182,6 +122,93 @@ void ALancer::ChooseNewTarget()
         CurrentTarget = Cast<ATargetPoint>(FoundTargetPoints[FMath::RandRange(0, FoundTargetPoints.Num() - 1)]);
     }
 }
+/*
+ * 関数名　　　　：ALancer::SwitchMove
+ * 処理内容　　　：動きを変えます。
+ * 戻り値　　　　：なし（void）
+ */
+void ALancer::SwitchMove(float DeltaTime)
+{
+   
+    
+    switch (Movementpattern)
+    {
+    case 0:
+        break;
+    case 1:
+        break;
+    case 2:
+        break;
+    }
+}
+
+void ALancer::MoveRandom(float DeltaTime)
+{
+
+    PlayerCharacter = Cast<ACharacter>(GetPlayer());
+    if (!PlayerCharacter) return;
+
+    float CurrentDistance = GetDistanceToPlayer();
+    FVector DirectionToPlayer = GetPlayerDirection();
+    FVector SnappedDirection;
+    FVector MoveVector;
+
+
+    if (CurrentDistance < DesiredDistance + 100)
+    {
+        bIsRandMove = true;
+    }
+    else if (CurrentDistance > DesiredDistance - 100)
+    {
+        bIsRandMove = false;
+    }
+    if (Health > 0 && NowAttack == false)
+    {
+
+
+        if (CurrentDistance > DesiredDistance && bIsRandMove == false)
+        {
+            SnappedDirection = GetSnappedDirection(DirectionToPlayer);
+            MoveVector = SnappedDirection * Speed * 3 * DeltaTime;
+            IsRunning = true;
+            IsIdol = false;
+
+        }
+        else if (CurrentDistance < DesiredDistance + 100 && CurrentTarget && bIsRandMove == true) // DesiredDistanceより400m遠い場合
+        {
+            FVector DirectionToTarget = (CurrentTarget->GetActorLocation() - GetActorLocation()).GetSafeNormal();
+            MoveVector = DirectionToTarget * Speed / 2 * DeltaTime;
+            IsRunning = true;
+            IsIdol = false;
+
+        }
+
+
+        else if (FMath::Abs(CurrentDistance - DesiredDistance) < 10.0f)
+        {
+            SnappedDirection = GetSnappedDirection(DirectionToPlayer);
+            MoveVector = SnappedDirection * Speed * 3 * DeltaTime;
+            IsRunning = false;
+            IsIdol = true;
+        }
+        else
+        {
+            IsRunning = false;
+            IsIdol = true;
+        }
+    }
+    if (Health <= 0)
+    {
+        if (Weapon)
+        {
+            Weapon->DetachToHand();
+            Weapon = nullptr;
+        }
+    }
+
+    SetActorLocation(GetActorLocation() + MoveVector);
+}
+
 /*
  * 関数名　　　　：ALancer::GetPlayerDirection
  * 処理内容　　　：プレイヤーへの方向ベクトルを取得します。
@@ -244,7 +271,7 @@ void ALancer::CheckPlayerInFront()
                         if (FMath::FRand() < 0.8f)
                         {
                             PlayAnimMontage(Attack, 1, NAME_None);
-                              
+                            NowAttack = true;
                         }
 
                     }
@@ -255,15 +282,3 @@ void ALancer::CheckPlayerInFront()
    
     
 }
-
-
-
-
-
-
-
-
-
-
-
-
