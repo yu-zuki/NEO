@@ -23,8 +23,6 @@ UActionAssistComponent::UActionAssistComponent()
 	// Tick()を毎フレーム呼ばないようにする
 	PrimaryComponentTick.bCanEverTick = false;
 
-	RayLength_CorrectAngle = 300.f;
-	MaxCorrectAngle = 10.f;
 }
 
 
@@ -40,51 +38,6 @@ void UActionAssistComponent::BeginPlay()
 void UActionAssistComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-}
-
-
-/*
- * 関数名　　　　：CorrectAttackAngle()
- * 処理内容　　　：角度を補正して攻撃を当たりやすくする(直線状にいる敵)
- * 戻り値　　　　：なし
- */
-void UActionAssistComponent::CorrectAttackAngle()
-{
-	// 機能のオン・オフ
-	if (!bUseCorrectAttackAngle) { return; }
-
-	// オーナー取得
-	AActor* Owner = GetOwner();
-
-	//　前方にいるエネミー取得
-	AActor* InFrontOfEnemy = GetFrontActor();
-
-	if (Owner && InFrontOfEnemy)
-	{
-		// プレイヤーと敵の方向を取得する
-		FVector direction = InFrontOfEnemy->GetActorLocation() - Owner->GetActorLocation();
-		direction.Normalize();
-
-		// プレイヤーの向きを取得する
-		FRotator CurrentRotation = Owner->GetActorRotation();
-
-		// 補正角度取得
-		float CorrectAngle = direction.Rotation().Yaw;
-
-		// 最大補正角度を超えていたら値を補正
-		if ( (0.f < CorrectAngle && CorrectAngle < DIRECTION_Y - MaxCorrectAngle) || (-180.f < CorrectAngle && CorrectAngle < DIRECTION_Y - MaxCorrectAngle))
-		{
-			CorrectAngle = -DIRECTION_Y - MaxCorrectAngle;
-		}
-		else if ( (180.f > CorrectAngle && CorrectAngle > -DIRECTION_Y + MaxCorrectAngle) || (0.f > CorrectAngle && CorrectAngle > -DIRECTION_Y + MaxCorrectAngle))
-		{
-			CorrectAngle = DIRECTION_Y + MaxCorrectAngle;
-		}
-
-		// プレイヤーの向きを変更する
-		FRotator NewRotation(CurrentRotation.Pitch, CorrectAngle, CurrentRotation.Roll);
-		Owner->SetActorRotation(NewRotation);
-	}
 }
 
 
@@ -204,56 +157,6 @@ void UActionAssistComponent::PlaySound(USoundBase* _sound_Obj,float _startTime /
 
 
 /*
- * 関数名　　　　：GetFrontActor()
- * 処理内容　　　：敵が直線状にいるか判定
- * 戻り値　　　　：見つけた敵の情報を返す
- */
-AActor* UActionAssistComponent::GetFrontActor()
-{
-	// 所有者の情報取得
-	AActor* pOwner = GetOwner();
-
-	if (pOwner)
-	{
-		// レイを飛ばす
-		// 飛ばす方向指定
-		float Rotation_Z = pOwner->GetActorRotation().Yaw;
-		float LineDirection = (Rotation_Z > 0) ? (RayLength_CorrectAngle) : (-RayLength_CorrectAngle);
-
-		// 始点
-		FVector start = pOwner->GetActorLocation();
-
-		// 終点
-		FVector end = FVector(start.X, start.Y + LineDirection, start.Z);
-
-		// 自身を除く
-		FCollisionQueryParams CollisionParams;
-		CollisionParams.AddIgnoredActor(pOwner);
-
-		// 当たったオブジェクト格納用
-		FHitResult OutHit;
-
-		// ヒットした場合true
-		bool isHit = GetWorld()->LineTraceSingleByChannel(OutHit, start, end, ECC_WorldStatic, CollisionParams);
-		//DrawDebugLine(GetWorld(), start, end, FColor::Green, true, 1.0f);
-
-		if (isHit)
-		{
-			AActor* HitEnemy = OutHit.GetActor();
-
-			// "Enemy"タグを持っているActorのみを返す
-			if (HitEnemy->ActorHasTag("Enemy"))
-			{
-				return HitEnemy;
-			}
-		}
-	}
-
-	return nullptr;
-}
-
-
-/*
  * 関数名　　　　：EndHitStop()
  * 処理内容　　　：ヒットストップ終了
  * 戻り値　　　　：なし
@@ -316,7 +219,12 @@ void UActionAssistComponent::OwnerParallelToCamera(bool _lookRight)
 }
 
 
-// 壁とのレイキャストを行う関数
+/*
+ * 関数名　　　　：WallCheck()
+ * 引数			 ：float _lineLength・・・トレースを行う長さ
+ * 処理内容　　　：オーナーの向いている方向にレイを飛ばして、障害物があるか判定
+ * 戻り値　　　　：障害物のありなし
+ */
 bool UActionAssistComponent::WallCheck(float _lineLength)
 {
 	// オーナー取得
@@ -333,12 +241,6 @@ bool UActionAssistComponent::WallCheck(float _lineLength)
 	FVector start = pOwner->GetActorLocation();
 	// 終点
 	FVector end = FVector(start.X, start.Y + LineLength, start.Z);
-
-	//UE_LOG(LogTemp, Warning, TEXT("capsuleHeigth : %f"), Capsule->GetScaledCapsuleHalfHeight());
-	//UE_LOG(LogTemp, Warning, TEXT("capsuleHeigth / 2 : %f"), Capsule->GetScaledCapsuleHalfHeight() / 2.0f);
-
-	//UE_LOG(LogTemp, Warning, TEXT("StartLocation : %f"), StartLocation.Z);
-	//UE_LOG(LogTemp, Warning, TEXT("EndLocation : %f"), EndLocation.Z);
 
 
 	FCollisionQueryParams CollisionParams;

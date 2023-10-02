@@ -17,9 +17,6 @@ public:
 	// コンストラクタ
 	UActionAssistComponent();
 
-	// 攻撃の角度修正
-	void CorrectAttackAngle();
-
 	// ヒットストップ処理
 	void HitStop(float _speedDuringHitStop, float _stopTime);
 
@@ -51,9 +48,6 @@ protected:
 
 private:
 
-	// 前方にいるActorを返す
-	AActor* GetFrontActor();
-
 	// ヒットストップ終了
 	void EndHitStop();
 
@@ -74,14 +68,6 @@ protected:
 		bool bUseFaceCamera;
 
 	//----------------------------------------------------------------------------
-
-	// 攻撃の角度補正用のレイの長さ
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Action Assist")
-		float RayLength_CorrectAngle;
-
-	// 攻撃の角度補正の最大角度
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Action Assist")
-		float MaxCorrectAngle;
 
 private:
 
