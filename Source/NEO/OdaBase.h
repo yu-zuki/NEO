@@ -396,11 +396,6 @@ public:
 
 	void Death();
 
-	////////////////////////////////////////////////////////////////////////////
-	////UI
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
-	//	class UEnemyBase_WidgetComponent* EnemyWidget;
-
 	UFUNCTION(BlueprintCallable)
 		float GetHP()const { return Health; }
 

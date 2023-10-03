@@ -12,6 +12,8 @@
 #include "NEO/Enemy/EnamyBase.h"
 #include "PlayerBase.h"
 #include "NEOPlayerController.h"
+#include "LevelSequence.h"
+
 
 
 ANEOGameMode::ANEOGameMode()
@@ -29,6 +31,9 @@ void ANEOGameMode::BeginPlay()
 
 	// プレイヤーコントローラーを取得
 	PlayerController = Cast<ANEOPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+
+	BossStartMovie = LoadObject<ULevelSequence>(nullptr, TEXT("/Game/0122/Level/BossStartMovie"));
+	
 }
 
 void ANEOGameMode::Tick(float DeltaTime)
