@@ -6,6 +6,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "NEO/PlayerSystem/PlayerCharacter.h"
 #include "NEO/Enemy/EnamyBase.h"
+#include "NEO/OdaBase.h"
 #include "Components/CapsuleComponent.h"
 
 // Sets default values
@@ -175,6 +176,37 @@ void APlayerSword::EnemyAttack()
 		}
 	}
 
+}
+
+// プレイヤーの当たり判定
+void APlayerSword::BossAttack()
+{
+	AOdaBase* pBoss = Cast<AOdaBase>(pOwner);
+
+	if (pBoss)
+	{
+		// 当たり判定を取る範囲
+		FVector Start = WeaponCollision->GetComponentLocation();
+		FVector End = Start;
+
+		// 当たったオブジェクト格納用
+		TArray<FHitResult> HitResults;
+
+		// 攻撃が当たっているか判定
+		bool IsHit = GetHitResults(Start, End, HitResults);
+
+
+		if (IsHit)
+		{
+			// Playerのダメージ処理
+			APlayerBase* Player = Cast<APlayerBase>(HitResults[0].GetActor());
+			if(Player)
+			Player->TakedDamage(pBoss->SwordFirstDamage, pBoss->LastAttack());
+
+			//ヒットストップをかける
+			ActionAssistComp->HitStop(1.f, .2f);
+		}
+	}
 }
 
 

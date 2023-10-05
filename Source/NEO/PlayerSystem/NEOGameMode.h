@@ -107,4 +107,6 @@ private:
 
 	// プレイヤーコントローラーのポインタ
 	class ANEOPlayerController* PlayerController;
+
+	class ULevelSequence* BossStartMovie;
 };

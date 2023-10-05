@@ -3,7 +3,7 @@
 
 #include "OdaBase.h"
 #include "GameSystem/TGS_GameMode.h"
-#include "GameSystem/EnemyBase_WidgetComponent.h"
+#include "WeaponSystem/WeaponBase.h"
 
 
 
@@ -44,19 +44,16 @@ AOdaBase::AOdaBase() :
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	swordConp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Sword"), true);
-	swordConp->SetupAttachment(GetMesh(), "R_Weapon");
+	//swordConp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Sword"), true);
+	//swordConp->SetupAttachment(GetMesh(), "R_Weapon");
 
 
-	//Box Create
-	BoxComp = CreateDefaultSubobject<UBoxComponent>(TEXT("SwordComponent"), true);
-	BoxComp->SetupAttachment(GetMesh(), "R_Weapon");
-	BoxComp->SetRelativeLocation(FVector(0.0f, 0.f, 0.0f));
-	BoxComp->SetBoxExtent(FVector(10.f, 70.f, 10.f));
+	////Box Create
+	//BoxComp = CreateDefaultSubobject<UBoxComponent>(TEXT("SwordComponent"), true);
+	//BoxComp->SetupAttachment(GetMesh(), "R_Weapon");
+	//BoxComp->SetRelativeLocation(FVector(0.0f, -50.f, 0.0f));
+	//BoxComp->SetBoxExtent(FVector(10.f, 70.f, 10.f));
 
-	////UI Create
-	//EnemyWidget = CreateDefaultSubobject<UEnemyBase_WidgetComponent>(TEXT("EnemyWidget"));
-	//EnemyWidget->SetupAttachment(RootComponent);
 	// Assist Create
 	ActionAssistComp = CreateDefaultSubobject<UActionAssistComponent>(TEXT("ActionAssist"));
 
@@ -76,6 +73,21 @@ void AOdaBase::BeginPlay()
 
 	//
 	isBossHPRock = true;
+
+	// 武器をSpawn
+	if (WeaponClass && !Weapon)
+	{
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.Owner = this;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+		Weapon = GetWorld()->SpawnActor<AWeaponBase>(WeaponClass, SpawnParams);
+
+		if (Weapon)
+		{
+			Weapon->AttachToHand(this, "R_Weapon", EOwnerType::OwnerType_Boss);
+		}
+	}
 }
 
 
@@ -967,43 +979,45 @@ void AOdaBase::CheckOverlap()
 	}
 
 	for (FHitResult HitResult : HitResults) {
-		PlayerOnOverlap(HitResult);
+		//PlayerOnOverlap(HitResult);
 	}
 }
 
 /*
- * 関数名　　　　：CheckOverlap()
+ * 関数名　　　　：PlayerOnOverlap()
  * 処理内容　　　：プレイヤーが当たったらの処理
  * 戻り値　　　　：なし
  */
-void AOdaBase::PlayerOnOverlap(FHitResult& _HitResult)
+void AOdaBase::PlayerOnOverlap(/*FHitResult& _HitResult*/)
 {
 	//Cast
-	APlayerBase* Player = Cast<APlayerBase>(_HitResult.GetActor());
-	if (Player) {
-		//プレイヤーがHPをロックしたらこの処理を通る
+	//APlayerBase* Player = Cast<APlayerBase>(_HitResult.GetActor());
+	//if (Player) {
+	//	//プレイヤーがHPをロックしたらこの処理を通る
 		if (bIsAttacked) {
 			return;
 		}
 
-		if (Combo1Counter == 0)
-		{
-			Player->TakedDamage(SwordFirstDamage, LastAttack());						//プレイヤーにダメージを与える初段
-			UKismetSystemLibrary::PrintString(this, LastAttack() ? TEXT("true") : TEXT("false"), true, true, FColor::Cyan, 2.f, TEXT("None"));
+		//if (Combo1Counter == 0)
+		//{
+		//	Player->TakedDamage(SwordFirstDamage, LastAttack());						//プレイヤーにダメージを与える初段
+		//	UKismetSystemLibrary::PrintString(this, LastAttack() ? TEXT("true") : TEXT("false"), true, true, FColor::Cyan, 2.f, TEXT("None"));
 
-		}
-		else
-		{
-			//追加ダメージ値確認用
-			//UKismetSystemLibrary::PrintString(this, FString::FromInt(SwordFirstDamage + ((float)SwordFirstDamage*(float)(Combo1Counter/4.f))), true, true, FColor::Cyan, 2.f, TEXT("None"));
+		//}
+		//else
+		//{
+		//	//追加ダメージ値確認用
+		//	//UKismetSystemLibrary::PrintString(this, FString::FromInt(SwordFirstDamage + ((float)SwordFirstDamage*(float)(Combo1Counter/4.f))), true, true, FColor::Cyan, 2.f, TEXT("None"));
 
-			Player->TakedDamage(SwordFirstDamage + ((float)SwordFirstDamage * (float)(Combo1Counter / 4.f)), LastAttack());						//プレイヤーにダメージを与える(後半の処理はコンボ時の追加ダメージ)
-			UKismetSystemLibrary::PrintString(this, LastAttack() ? TEXT("true") : TEXT("false"), true, true, FColor::Cyan, 2.f, TEXT("None"));
-		}
-		//ヒットストップをかける
-		ActionAssistComp->HitStop(1.f, .2f);
+		//	Player->TakedDamage(SwordFirstDamage + ((float)SwordFirstDamage * (float)(Combo1Counter / 4.f)), LastAttack());						//プレイヤーにダメージを与える(後半の処理はコンボ時の追加ダメージ)
+		//	UKismetSystemLibrary::PrintString(this, LastAttack() ? TEXT("true") : TEXT("false"), true, true, FColor::Cyan, 2.f, TEXT("None"));
+		//}
+		////ヒットストップをかける
+		//ActionAssistComp->HitStop(1.f, .2f);
+
+		Weapon->SetCollision();
 
 		//リセット
 		bIsAttacked = true;
-	}
+	//}
 }
