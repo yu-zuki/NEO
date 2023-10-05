@@ -34,6 +34,9 @@ private:
 	// 敵の当たり判定
 	void EnemyAttack();
 
+	// ボスの攻撃記述用
+	void BossAttack();
+
 	// 敵に攻撃した時のヒットストップの時間を設定
 	float SetHitStopTime(int _comboNum);
 

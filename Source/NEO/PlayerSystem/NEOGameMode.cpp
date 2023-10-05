@@ -12,9 +12,10 @@
 #include "NEO/Enemy/EnamyBase.h"
 #include "PlayerBase.h"
 #include "NEOPlayerController.h"
+#include "LevelSequenceActor.h"
 #include "LevelSequence.h"
-
-
+#include "MovieSceneBinding.h"
+#include "MovieSceneObjectBindingID.h"
 
 ANEOGameMode::ANEOGameMode()
 {
@@ -33,7 +34,7 @@ void ANEOGameMode::BeginPlay()
 	PlayerController = Cast<ANEOPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 
 	BossStartMovie = LoadObject<ULevelSequence>(nullptr, TEXT("/Game/0122/Level/BossStartMovie"));
-	
+
 }
 
 void ANEOGameMode::Tick(float DeltaTime)
@@ -202,6 +203,15 @@ AActor* ANEOGameMode::SpawnEnemy(ASpawnPoint* spawnPoint)
 	else if (Boss) {
 		Boss->SetActorTransform(spawnTransform);
 		Boss->IsAreaEnemy = true;		//Flag Set 
+
+
+		//FMovieSceneObjectBindingID BindingId = FMovieSceneObjectBindingID(Binding[0].GetObjectGuid());		
+		//TArray<AActor*> bossToRebind;
+		//bossToRebind.Add(Boss);
+
+		TArray<FMovieSceneBinding> Binding = BossStartMovie->GetMovieScene()->GetBindings();
+		BossStartMovie->BindPossessableObject(Binding[0].GetObjectGuid(), *Boss, Boss);
+
 
 		// エネミーを追加
 		++BattleAreaEnemyCount;

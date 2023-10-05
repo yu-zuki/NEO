@@ -20,6 +20,7 @@
 
 #include "OdaBase.generated.h"
 
+class AWeaponBase;
 
 UCLASS()
 class NEO_API AOdaBase : public ACharacter
@@ -96,6 +97,14 @@ protected:
 	//randomの値を入れる為の変数
 	UPROPERTY()
 		int RandomNum;
+
+	// プレイヤーの武器
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Battle", meta = (AllowPrivateAccess = "true"))
+		TSubclassOf<AWeaponBase> WeaponClass;
+
+	// 武器のクラス
+	AWeaponBase* Weapon;
+
 
 public:
 
@@ -376,7 +385,7 @@ public:
 	//プレイヤー----------------------------------------------------------------------
 	//プレイヤーに当たったら
 	UFUNCTION()
-		void PlayerOnOverlap(FHitResult& _HitResult);
+		void PlayerOnOverlap(/*FHitResult& _HitResult*/);
 
 	//プレイヤーに対してのHPロック
 	UPROPERTY()
