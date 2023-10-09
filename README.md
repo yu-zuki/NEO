@@ -7,7 +7,6 @@
   - **GameMode処理**: ゲームの基本ルールや状態の管理。
   - **画面遷移処理**: ゲームの画面間の遷移を制御。
   - **バトルエリア処理**: カメラを固定し、プレイヤーが画面外に出ないようにする処理。
-  - **UI全般処理**: ゲーム内のユーザーインターフェースの制御。
   - **SplineCamera処理**: Lineに沿ってカメラを移動させる処理。
 
 [→プレイ動画](#プレイ動画)
@@ -46,15 +45,6 @@
 [→バトルエリア処理のコードを参照](#バトルエリア処理のコード部分)
 
 ![動画](Document/Enemy.gif)
-
-
-### UI全般処理
-敵のUI表示やタイトル画面の動画再生など、ゲーム内のユーザーインターフェースを管理します。
-
-[→UI全般処理のコードを参照](#UI全般処理のコード部分)
-
-![動画](Document/UI.gif)
-
 
 ### SplineCamera処理
 スプライン曲線に沿ってカメラを滑らかに移動させる処理を実装しています。
@@ -512,19 +502,64 @@ void AGameSystem_BattleArea::EnterBattleArea()
 
 ```
 
-### UI全般処理のコード部分
-
-```cpp
-//ファイル：DestinyChangerCharacter.h
-
-```
 
 ### SplineCamera処理
 スプライン曲線に沿ってカメラを滑らかに移動させる処理を実装しています。
 
 ```cpp
-//ファイル：QuestSystem.h
+//ファイル：SplineCamera.cpp
 
+// Called every frame
+void ASplineCamera::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+
+	//if (bMoveFlag != true) return;
+
+	SetCamera();
+
+}
+
+
+void ASplineCamera::SetCamera()
+{
+	// プレイヤーを取得
+	APlayerBase* PlayerCharacter = Cast<APlayerBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
+	if (PlayerCharacter && SplineComponent)
+	{
+		//if (PlayerCharacter->GetPlayerMoveRight() != true) { return; }
+
+		// プレイヤーの位置を取得
+		FVector PlayerLocation = PlayerCharacter->GetActorLocation();
+
+		// Spline曲線上でプレイヤーに最も近い点を取得
+		FVector NearestPoint = SplineComponent->FindLocationClosestToWorldLocation(PlayerLocation, ESplineCoordinateSpace::World);
+
+
+		UE_LOG(LogTemp, Log, TEXT("location: %s"), *NearestPoint.ToString());
+
+
+		FVector BeforeCameraLocation = CameraComponent->GetComponentLocation();		//カメラの座標を取得
+
+		// カメラの座標をSpline曲線上でプレイヤーに最も近い点に滑らかに移動させる
+		FVector CameraLocation = FMath::Lerp(BeforeCameraLocation, NearestPoint, 0.08);
+
+		//DrawDebugPoint(GetWorld(), BeforeCameraLocation, 100, FColor(52, 220, 239), false);
+
+		CameraComponent->SetWorldLocation(CameraLocation);
+
+
+		//Spline曲線上でプレイヤーに最も近い点の回転を取得
+		FRotator NewRotation = SplineComponent->FindRotationClosestToWorldLocation(CameraLocation, ESplineCoordinateSpace::World);
+
+		//プレイヤーの方を向くように調整
+		NewRotation.Yaw += -90.f;
+		NewRotation.Pitch = -25.f;
+
+		CameraComponent->SetWorldRotation(NewRotation);
+	}
+}
 ```
 
 ## 5. 成果と学び
