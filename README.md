@@ -565,7 +565,7 @@ void ASplineCamera::SetCamera()
 ## 6. プロジェクトのリンク
 - [GitHubリポジトリ](https://github.com/yu-zuki/NEO)  
 ### 実行ファイルのダウンロード
-- [実行可能なデモ Github](https://github.com/yu-zuki/DestinyChanger/releases/tag/Demov1.0)
+- [実行可能なデモ Github](https://github.com/yu-zuki/NEO/releases/tag/Beta)
 - [実行可能なデモ GoogleDrive](https://drive.google.com/file/d/18FxKYuwqYmItv_jzpY7GavtOp-R1PQbw/view?usp=sharing)
 
 ## 7. 連絡先情報
