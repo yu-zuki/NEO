@@ -28,15 +28,13 @@
 
 [→GameMode処理のコードを参照](#GameMode処理のコード部分)
 
-![動画](Document/Battle.gif)
-
 
 ### 画面遷移処理  
 タイトル画面からオープニングへ、そしてオープニングからインゲームへの遷移を管理します。各種遷移処理はGameStateで制御されています。
 
 [→画面遷移処理のコードを参照](#画面遷移処理の部分)
 
-![動画](Document/Destiny.gif)
+![動画](Document/ChangeLevel.gif)
 
 
 ### バトルエリア処理
@@ -44,14 +42,14 @@
 
 [→バトルエリア処理のコードを参照](#バトルエリア処理のコード部分)
 
-![動画](Document/Enemy.gif)
+![動画](Document/BattleArea.gif)
 
 ### SplineCamera処理
 スプライン曲線に沿ってカメラを滑らかに移動させる処理を実装しています。
 
 [→SplineCamera処理のコードを参照](#SplineCamera処理のコード部分)
 
-![動画](Document/Quest.gif)
+![動画](Document/SplineCamera.gif)
 
 
 ## 4. ソースコードの説明とサンプル
