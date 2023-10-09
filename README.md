@@ -54,10 +54,6 @@
 ![動画](Document/Quest.gif)
 
 
-### 簡単な仕様図
-![簡単な説明図](Document/ARPG.png)
-
-
 ## 4. ソースコードの説明とサンプル
 
 ### GameMode処理のコード部分
@@ -562,22 +558,19 @@ void ASplineCamera::SetCamera()
 }
 ```
 
-## 5. 成果と学び
-
-
-## 6. ビジュアルとメディア
+## 5. ビジュアルとメディア
 ![スクリーンショット](Document/Title.png)  
 
 ### プレイ動画
-[プロジェクトデモビデオ]()
+[プロジェクトデモビデオ](https://youtu.be/7TcuybOK8C8)
 
-## 7. プロジェクトのリンク
+## 6. プロジェクトのリンク
 - [GitHubリポジトリ](https://github.com/yu-zuki/NEO)  
 ### 実行ファイルのダウンロード
 - [実行可能なデモ Github](https://github.com/yu-zuki/DestinyChanger/releases/tag/Demov1.0)
-- [実行可能なデモ GoogleDrive](https://drive.google.com/drive/folders/1w2h7GhYy8HUFfTIW6YDCepHEAFAgkzOj?usp=drive_link)
+- [実行可能なデモ GoogleDrive](https://drive.google.com/file/d/18FxKYuwqYmItv_jzpY7GavtOp-R1PQbw/view?usp=sharing)
 
-## 8. 連絡先情報
+## 7. 連絡先情報
 - 名前: トウ　ゼイキ
 - メール: touzeiki@gmail.com
 
